@@ -419,7 +419,7 @@
                     var popUpAddProject = undefined;
                     vmProjectStrategy.openPopUpAddProject = function () {
                         popUpAddProject = showPopup(popUpAddProject,
-                            $('#pop-add-project-place'), '../Contents/popAddProject.html',
+                            $('#pop-add-project-place'), vmCommon.rootUrl + 'Contents/popAddProject.html',
                             {
                                 title: kLg.addProject,
                                 height: 410,
@@ -671,7 +671,7 @@
                                 vmUser.showPopUpChangePassword = function () {
                                     vmUser.popUpChangePassword = showPopup(vmUser.popUpChangePassword,
                                         $('.ms-header #pop-changePassword'),
-                                        '../Contents/popChangePassword.html',
+                                        vmCommon.rootUrl + 'Contents/popChangePassword.html',
                                         {
                                             title: kLg.changePassTitle,
                                             height: 295,
@@ -683,7 +683,7 @@
                                 vmUser.popUpChangeInfomation = undefined;
                                 vmUser.showPopUpChangeInfomation = function () {
                                     vmUser.popUpChangeInfomation = showPopup(vmUser.popUpChangeInfomation,
-                                        $('.ms-header #pop-changeInfo'), '../Contents/popEditUserInfomation.html',
+                                        $('.ms-header #pop-changeInfo'), vmCommon.rootUrl + 'Contents/popEditUserInfomation.html',
                                         {
                                             title: kLg.changeInforTitle,
                                             height: 410,
@@ -695,7 +695,7 @@
                                 vmUser.popUpQrCode = undefined;
                                 vmUser.showPopUpQrCode = function () {
                                     vmUser.popUpQrCode = showPopup(vmUser.popUpQrCode,
-                                        $('.ms-header #pop-showQrCode'), '../Contents/popQrCode.html',
+                                        $('.ms-header #pop-showQrCode'), vmCommon.rootUrl + 'Contents/popQrCode.html',
                                         {
                                             title: kLg.titleQrCode,
                                             height: 350,

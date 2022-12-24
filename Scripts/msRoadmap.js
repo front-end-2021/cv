@@ -204,7 +204,7 @@ msRoadmap.openPopExportRoadmap = function () {
         widthcreen = 1600;
     }
     msRoadmap.popExportRoadmap = showPopup(msRoadmap.popExportRoadmap,
-        $("#popExportRoadmap"), '../Contents/MsPopExportRoadmap.html', {
+        $("#popExportRoadmap"), vmCommon.rootUrl + 'Contents/MsPopExportRoadmap.html', {
         title: kLg.ExportPreview,
         width: widthcreen,
         height: 800,

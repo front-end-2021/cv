@@ -3406,7 +3406,7 @@ var language = 'en';
             } else {
                 popUpCategories = showPopup(popUpCategories,
                     $('#pop-add-categories-place'),
-                    '../Contents/popAddCategories.html',
+                    vmCommon.rootUrl + 'Contents/popAddCategories.html',
                     {
                         title: vmPopSetting.tmpTitle,
                         height: 295,
@@ -3427,7 +3427,7 @@ var language = 'en';
     vmPopSetting.openPopupKpiTime = function () {
         vmPopSetting.popupCategory = showPopup(vmPopSetting.popupCategory,
             $("#pop-add-categories-place"),
-            "../Contents/msPopEditKpiTime.html",
+            vmCommon.rootUrl + "Contents/msPopEditKpiTime.html",
             {
                 title: kLg.lblKpiTimePeriod,
                 height: 360,
@@ -3440,7 +3440,7 @@ var language = 'en';
     vmPopSetting.openPopupInstrument = function () {
         vmPopSetting.popupInstrument = showPopup(vmPopSetting.popupInstrument,
             $("#pop-add-categories-place"),
-            "../Contents/popActionCustomView.html",
+            vmCommon.rootUrl + "Contents/popActionCustomView.html",
             {
                 title: vmPopSetting.tmpTitle,
                 height: 360,
@@ -3463,7 +3463,7 @@ var language = 'en';
         }
         popUpKpiUnit = showPopup(popUpKpiUnit,
             $('#pop-add-categories-place'),
-            '../Contents/MsPopAddKpiUnit.html',
+            vmCommon.rootUrl + 'Contents/MsPopAddKpiUnit.html',
             {
                 title: kLg.lblKpiUnit,
                 height: 650,
@@ -5211,7 +5211,7 @@ var language = 'en';
     vmPopSetting.OpenPopUpAddKpiTopic = function () {
         popUpKpiTopic = showPopup(popUpKpiTopic,
             $('#pop-add-categories-place'),
-            '../Contents/MsPopAddKpiTopic.html',
+            vmCommon.rootUrl + 'Contents/MsPopAddKpiTopic.html',
             {
                 title: kLg.lblKpiTopic,
                 height: 185,
@@ -5719,16 +5719,13 @@ var language = 'en';
 
     var popUpSelectIndex = undefined;
     vmPopSetting.selectKpiUnit = function (id) {
-
-        //var act = e.data;
-        //alert(act.SettingIndexId);
         var entryData = { Id: id }
         vmPopSetting.dataservice.getSelectIndex(entryData, function (serData) {
             vmPopSetting.TopicIndex = serData.value.KpiTopics;
             vmPopSetting.Paths = serData.value.Paths;
             popUpSelectIndex = showPopup(popUpSelectIndex,
                 $('#divSelectKpiIndex'),
-                '../Contents/MsPopSelectSettingIndex.html',
+                vmCommon.rootUrl + 'Contents/MsPopSelectSettingIndex.html',
                 {
                     title: kLg.titleSelectKpiIndex.format(kLg.menuKpiIndex),
                     width: 800,
@@ -5745,7 +5742,7 @@ var language = 'en';
         vmPopSetting.FormatItem = data;
         popUpKpiFormat = showPopup(popUpKpiFormat,
             $('#divSelectKpiIndex'),
-            '../Contents/MsPopAddKpiFormat.html',
+            vmCommon.rootUrl + 'Contents/MsPopAddKpiFormat.html',
             {
                 title: kLg.lblKpiFormat,
                 height: 290,
@@ -6069,7 +6066,7 @@ var language = 'en';
     vmPopSetting.openSelectCrmLink = function () {
         vmGoalAction.popCrmLink = showPopup(vmGoalAction.popCrmLink,
             $("#pop-selectcrmlink"),
-            "../Contents/MsPopSelectCrmLink.html",
+            vmCommon.rootUrl + "Contents/MsPopSelectCrmLink.html",
             {
                 title: kLg.titleSelectCrmLink,
                 width: 650,
@@ -6503,11 +6500,11 @@ var language = 'en';
     vmPopSetting.popEditSubmarketProductSe = function (type, id, level) {
 
         var isJourneyType = type == vmPopSetting.enumsType.categoryCustomerJourney;
-        var linkTemplate = '/Contents/MsPopSubmarketProductSe.html';
+        var linkTemplate = vmCommon.rootUrl + 'Contents/MsPopSubmarketProductSe.html';
         var height = 336;
 
         if (isJourneyType) {
-            linkTemplate = '/Contents/MsPopCustomerJourneySe.html';
+            linkTemplate = vmCommon.rootUrl + 'Contents/MsPopCustomerJourneySe.html';
             height = 274;
         }
 
@@ -6524,13 +6521,12 @@ var language = 'en';
     };
     
     vmPopSetting.popAddSubmarketProductSe = function (type, parentId, level) {
-
         var isJourneyType = type == vmPopSetting.enumsType.categoryCustomerJourney;
-        var linkTemplate = '/Contents/MsPopSubmarketProductSe.html';
+        var linkTemplate = vmCommon.rootUrl + 'Contents/MsPopSubmarketProductSe.html';
         var height = 336;
 
         if (isJourneyType) {
-            linkTemplate = '/Contents/MsPopCustomerJourneySe.html';
+            linkTemplate = vmCommon.rootUrl + 'Contents/MsPopCustomerJourneySe.html';
             height = 274;
         }
 

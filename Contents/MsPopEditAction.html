@@ -3023,7 +3023,7 @@
     vmEditAction.openPopAdvertiser = function () {
         vmGoalAction.popAdvertiser = showPopup(vmGoalAction.popAdvertiser,
             $("#popadvertiser"),
-            "../Contents/MsPopSelectAdvertiser.html",
+            vmCommon.rootUrl + "Contents/MsPopSelectAdvertiser.html",
             {
                 title: kLg.lblNameAdvertiser + '/' + kLg.lblKpiFormat,
                 width: 650,
@@ -7192,7 +7192,7 @@
 
             vmEditAction.popSelectAction = showPopup(vmEditAction.popSelectAction,
                 $('#popSelectAction'),
-                '../Contents/MsPopSelectAction.html',
+                vmCommon.rootUrl + 'Contents/MsPopSelectAction.html',
                 {
                     title: kLg.titleSelectUpStream,
                     width: 800,

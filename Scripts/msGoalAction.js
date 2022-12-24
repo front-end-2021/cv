@@ -1177,7 +1177,7 @@ vmGoalAction.loadSetting = function () {
 vmGoalAction.openPopSelectRegion = function () {
     vmGoalAction.popSelectRegion = showPopup(vmGoalAction.popSelectRegion,
         $("#popActionFibu"),
-        "../Contents/MsPopSelectRegion.html",
+        vmCommon.rootUrl + "Contents/MsPopSelectRegion.html",
         {
             title: kLg.strSelectionFormat.format(vmGoalAction.RegionTitle ? vmGoalAction.RegionTitle : kLg.lblRegions),
             width: 650,
@@ -1190,7 +1190,7 @@ vmGoalAction.openPopSelectRegion = function () {
 vmGoalAction.openPopSubProduct = function (title) {
     vmGoalAction.popSubProduct = showPopup(vmGoalAction.popSubProduct,
         $("#popActionFibu"),
-        "../Contents/MsPopEditSubProduct.html",
+        vmCommon.rootUrl + "Contents/MsPopEditSubProduct.html",
         {
             title: title,
             width: 650,
@@ -1221,7 +1221,7 @@ vmGoalAction.openPopupActionFibu = function (actionId) {
 vmGoalAction.showPopFibu = function (title) {
     vmGoalAction.popActionFibu = showPopup(vmGoalAction.popActionFibu,
         $("#popActionFibu"),
-        "../Contents/MsPopActionFibu.html",
+        vmCommon.rootUrl + "Contents/MsPopActionFibu.html",
         {
             title: title,
             width: screen.width - 50,
@@ -1237,7 +1237,7 @@ vmGoalAction.showAddGoalPopup = function (title) {
         vmGoalAction.goalTemplates = res.value;
         vmGoalAction.popEditMainGoal = showPopup(vmGoalAction.popEditMainGoal,
             $('#popEditMainGoal'),
-            '../Contents/MsPopEditGoal.html',
+            vmCommon.rootUrl + 'Contents/MsPopEditGoal.html',
             {
                 title: title,
                 width: 1080,
@@ -1254,7 +1254,7 @@ vmGoalAction.showAddGoalPopup = function (title) {
 vmGoalAction.showEditNamePopUp = function (title) {
     vmGoalAction.popEditName = showPopup(vmGoalAction.popEditName,
         $('#popEditName'),
-        '../Contents/MsPopName.html',
+        vmCommon.rootUrl + 'Contents/MsPopName.html',
         {
             width: 400,
             height: 156,
@@ -1271,7 +1271,7 @@ vmGoalAction.showAddActionPopup = function (title) {
     }
     vmGoalAction.popEditAction = showPopup(vmGoalAction.popEditAction,
         $('#popEditAction'),
-        '../Contents/MsPopEditAction.html',
+        vmCommon.rootUrl + 'Contents/MsPopEditAction.html',
         {
             title: (language === 'pm') ? kLg.titlepAddAction : title,
             width: 1080,
@@ -1287,7 +1287,7 @@ vmGoalAction.showAddActionPopup = function (title) {
 vmGoalAction.showAddIndependencePopup = function (title, height) {
     vmGoalAction.popEditIndependence = showPopup(vmGoalAction.popEditIndependence,
         $('#popEditIndependence'),
-        '../Contents/MsPopEditIndependence.html',
+        vmCommon.rootUrl + 'Contents/MsPopEditIndependence.html',
         {
             title: title,
             width: 650,
@@ -1300,7 +1300,7 @@ vmGoalAction.showAddIndependencePopup = function (title, height) {
 vmGoalAction.openActionIndex = function (title) {
     vmGoalAction.popActionIndex = showPopup(vmGoalAction.popActionIndex,
         $("#popActionIndex"),
-        "../Contents/MsPopActionIndex2.html",
+        vmCommon.rootUrl + "Contents/MsPopActionIndex2.html",
         {
             title: title,
             width: vmGoalAction.kpiActionOptions.enableOutcomeTime ? 947 : 732,
@@ -3111,7 +3111,7 @@ vmGoalAction.onClickSubgoalToggleAll = function (el) {
 vmGoalAction.openKpiGoalAction = function () {
     vmGoalAction.popKpiGoalAction = showPopup(vmGoalAction.popKpiGoalAction,
         $("#popkpigoalaction"),
-        "../Contents/MsPopKpiGoalAction.html",
+        vmCommon.rootUrl + "Contents/MsPopKpiGoalAction.html",
         {
             title: "",
             width: 860,
@@ -3145,7 +3145,7 @@ vmGoalAction.openPopConnectionOverview = function (id, typeid, areaId) {
     else {
         vmGoalAction.popConnectionOverview = showPopup(vmGoalAction.popConnectionOverview,
             $("#popConnectionOverview"),
-            "../Contents/MsPopConnectionOverview.html",
+            vmCommon.rootUrl + "Contents/MsPopConnectionOverview.html",
             {
                 title: title,
                 width: 860,
@@ -4610,7 +4610,7 @@ vmGoalAction.openPopEditColumn = function (id, goalId, mainGoalId, isExpand) {
     
     vmCommon.currentMarket = { Id: id, GoalId: goalId, MainGoalId: mainGoalId };
     vmCommon.popEditType = showPopup(vmCommon.popEditType, $('#popCustomerJourneySeAssignColunm'),
-        '/Contents/MsPopCustomerJourneySeAssignColunm.html',
+        vmCommon.rootUrl + 'Contents/MsPopCustomerJourneySeAssignColunm.html',
         {
             height: 304,
             width: 500,
@@ -7722,7 +7722,7 @@ vmGoalAction.openPopReminder = function (e, type) {
     vmGoalAction.ReminderType = type;
     vmGoalAction.pop.ReminderManager = showPopup(vmGoalAction.pop.ReminderManager,
         $('#pop-Reminder'),
-        '../Contents/CrmPopReminder.html',
+        vmCommon.rootUrl + 'Contents/CrmPopReminder.html',
         {
             title: kLg.reminder,
             height: 250,
@@ -7846,7 +7846,7 @@ vmGoalAction.showPopKpiGoal = function () {
 
     vmGoalAction.popKpiGoal = showPopup(vmGoalAction.popKpiGoal,
         $("#popkpigoal"),
-        "../Contents/MsPopKpiGoal.html",
+        vmCommon.rootUrl + "Contents/MsPopKpiGoal.html",
         {
             title: vmGoalAction.goalOptions.GoalType === vmCommon.GoalType.MainGoal ? kLg.titleKpiMainGoal : kLg.titleKpiSubGoal,
             height: 512,
@@ -8077,7 +8077,7 @@ vmGoalAction.GetSelectedRegionRole = function (accountId, contains) {
 };
 
 vmGoalAction.showPopupGoalActionEval = function (type) {
-    var path = "/Contents/MsPopGoalActionEval2.html";
+    var path = vmCommon.rootUrl + "Contents/MsPopGoalActionEval2.html";
 
     var template = type == 1 ? vmEditGoal.optionTemp.Applying : vmEditAction.viewModel.get("templateId");
 
@@ -8112,16 +8112,7 @@ vmGoalAction.showPopupGoalActionEval = function (type) {
         }).data("kendoWindow").center();
     }
 
-    var independencyId = vmGoalAction.goalActionEvalOptions.goalActionModel.IndependencyId;
-    var submarketProductId = vmGoalAction.goalActionEvalOptions.goalActionModel.SubMarketProductId;
-
-    vmGoalAction.goalActionEvalOptions.cb = function () {
-        //if (vmCommon.checkCurrentPage(vmCommon.enumPage.ActionPlan) &&
-        //    ((submarketProductId != undefined && submarketProductId != null)
-        //        || (independencyId != undefined && independencyId != null))) {
-        //    vmGoalAction.bindChild(submarketProductId, independencyId);
-        //}
-
+    vmGoalAction.goalActionEvalOptions.cb = function () {        
         if (vmCommon.checkCurrentPage(vmCommon.enumPage.SubMarket)) {
             reloadTooltipForm();
         }
@@ -8136,7 +8127,7 @@ vmGoalAction.showPopupGoalActionEval = function (type) {
 
 
 vmGoalAction.showPopupGoalActionEval_Edit = function (objectData, type) {
-    var path = "/Contents/MsPopGoalActionEval2.html";
+    var path = vmCommon.rootUrl + "Contents/MsPopGoalActionEval2.html";
     if (typeof MsaApp == 'object' && MsaApp) MsaApp.setLastActiveElement(objectData.TheObject.Id);
     vmGoalAction.goalActionEvalOptions = vmGoalAction.goalActionEvalOptions || {};
 
@@ -8200,7 +8191,7 @@ vmGoalAction.popEditLink = undefined;
 vmGoalAction.openPopEditLink = function () {
     vmGoalAction.popEditLink = showPopup(vmGoalAction.popEditLink,
         $("#popEditLink"),
-        "../Contents/MsPopEditLink.html",
+        vmCommon.rootUrl + "Contents/MsPopEditLink.html",
         {
             title: kLg.titlePopConnection,
             width: 650,
@@ -8330,7 +8321,7 @@ vmGoalAction.openPopImport = function (opts) {
 
     vmGoalAction.popImport = showPopup(vmGoalAction.popImport,
         $("#popimport"),
-        "../Contents/PopImport.html",
+        vmCommon.rootUrl + "Contents/PopImport.html",
         {
             title: opts.title,
             width: 416,

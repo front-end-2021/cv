@@ -237,7 +237,7 @@ vmCommon.currentControl = undefined;
 vmCommon.IsWaitResult = true;
 vmCommon.clickTimeout = undefined;
 vmCommon.currentPageName = undefined;
-
+vmCommon.rootUrl = ``;
 vmCommon.PopupInstance = (function () {
     var checker = {};
     var isOpening = function (name) {
@@ -1922,7 +1922,7 @@ function setMarketButtonVisibilitiy() {
 
 vmCommon.showAllDescription = function () {
     vmCommon.popEditDescription = showPopup(vmCommon.popEditDescription, $('#popDescriptionMarket'),
-        '/Contents/MsPopDescription.html',
+        vmCommon.rootUrl + 'Contents/MsPopDescription.html',
         {
             height: 168,
             width: 500,
@@ -2885,10 +2885,6 @@ vmCommon.settingLabelDefault = function (dicValues, keyCaption) {
     }
 
 };
-//SONPT. 04-01-2015. List customize language param
-//vmCommon.arrListCustomLangParam = ['titleMarketSegment', 'lblMarktsegemente', 'marketInfo', 'tabMarketSegment', 'addRegion'
-//, 'tabSubMarketProduct', 'Produktstrategie', 'lblMarktsegementeSubMarket', 'lblProductGroup', 'addProduct', 'filterLabelMarket', 'filterLabelLandRegion', 'filterLabelLand', 'filterLabelRegion', 'btnAddMarketSegment', 'AddLand', 'Auswertung', 'btnEvaluation', 'btnEvaluationSub', 'btnStrategy', 'btnMoney', 'menuEvaluation', 'menuMatrix', 'menuStr', 'menuMoney', 'menuEvaluation', 'menuMatrix', 'menuStr', 'menuMoney', 'filterLabelProductGroupProduct', 'filterLabelProductGroup', 'lblSubmarket', 'createNewProduct', 'createSubmarket', 'addNewStakeholderGroup', 'AddProductGroup', 'lblProductGroupLabelL1', 'addProduct', 'filterLabelMarketSub', 'filterLabelSubMarket', 'lblLands', 'lblRegions', 'AddLable', 'ExpandLabel', "strategyTab", "crmTab"
-//];
 vmCommon.arrListCustomLangParam = ['titleMarketSegment', 'lblMarktsegemente', 'marketInfo', 'tabMarketSegment', 'addRegion'
     , 'tabSubMarketProduct', 'Produktstrategie', 'lblMarktsegementeSubMarket', 'lblProductGroup', 'addProduct', 'filterLabelMarket', 'filterLabelLandRegion', 'filterLabelLand', 'filterLabelRegion', 'btnAddMarketSegment'
     , 'AddLand', 'Auswertung', 'btnEvaluation', 'btnEvaluationSub', 'btnStrategy', 'btnMoney', 'menuEvaluation', 'menuMatrix', 'menuStr', 'menuMoney', 'menuEvaluation', 'menuMatrix', 'menuStr', 'menuMoney'
@@ -2902,7 +2898,6 @@ vmCommon.loadcustomizeMarketLanguage = function (dicValues) { //SONPT. Last edit
         vmCommon.settingLabelDefault(dicValues, vmCommon.arrListCustomLangParam[i]);
     }
 };
-
 
 vmCommon.arrListCustomCatLang = ['lblNameCatGoal', 'lblNameAction', 'labelEvaluation', 'Currency', 'titleActionFibu', 'lblVolumeStrategy', 'lblKpiIndex'
     , 'menuInstrument', 'filterLblProductGroup', 'titleStackholderGroups', 'vtextCustomerJourney', 'lblNameAdvertisingMaterials', 'lblNameSubjetThema',
@@ -2919,7 +2914,6 @@ vmCommon.loadcustomizeMarketCatLanguage = function (dicValues) {
 vmCommon.Browser = {
     Chrome: "Chrome", FireFox: "FireFox", Safari: "Safari", Ie: "IE", Opera: "Opera", Edge: "Edge"
 };
-
 
 vmCommon.updateEmailTo = function (data) {
     for (var i = 0; i < data.length; i++) {

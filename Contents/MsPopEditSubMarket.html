@@ -243,7 +243,7 @@
     vmSubMarket.showPopSubClient = function (title) {
         var options = { height: 350, width: 500 };
         vmSubMarket.popSubClient = showPopup(vmSubMarket.popSubClient, $("#popeditsubclient"),
-            "/Contents/MsPopEditSubClientName.html",
+            vmCommon.rootUrl + "Contents/MsPopEditSubClientName.html",
             {
                 title: htmlDecode(title),
                 height: options.height,
@@ -732,16 +732,6 @@
 
     vmSubMarket.effectNewRow = function () {
         return;
-        //var lastRow = (index == undefined) ? $("#tableSubData tbody tr:last:visible").children("td.sub-td") : $("#tableSubData tbody tr:eq(" + index + ")").children("td.sub-td");
-        //if (lastRow.length === 0)
-        //    return;
-
-        //setTimeout(function () {
-        //    $(lastRow).css({ "background-color": "beige" });
-        //    setTimeout(function() {
-        //        $(lastRow).css({ "background-color": "white" });
-        //    },300);
-        //}, 50);
     };
 
     vmSubMarket.showSelectSubProSe = function (control,linkId,linkType,isQuick) {
@@ -756,7 +746,7 @@
             //alert(checkSubSource.length);
         };
         vmCommon.popSelectSubmarketProductSe = showPopup(vmCommon.popSelectSubmarketProductSe, $('#popSelectSubmarketProductSe'),
-            '/Contents/MsPopSelectSubmarketProductSe.html',
+            vmCommon.rootUrl + 'Contents/MsPopSelectSubmarketProductSe.html',
             {
                 title: kLg.strSelectionFormat.format(kLg.lblSubmarket),
                 height: 525,

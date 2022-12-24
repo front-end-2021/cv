@@ -1431,7 +1431,7 @@
                 vmApEval.dataservice.getEvalTemplateByUser(vmApImport.templateType, (data) => {
                     if (vmApEval.curRole > 0) {
                         vmApImport.lstAvaiTemplate = data;
-                        var path = "../Contents/MsPopGoalActionEval_PopImportTemplate.html";
+                        var path = vmCommon.rootUrl + "Contents/MsPopGoalActionEval_PopImportTemplate.html";
                         vmApImport.importTempWindown = showImportTempPopup(null, $("#apImportTempWindow"), path, function () {
                             vmApImport.importTempWindown.destroy();
                             vmApImport.importTempWindown == null;
@@ -1819,22 +1819,10 @@
                     });
                 },
                 getSwotData() {
-                    $('#tabSwotAnalyse').load('/Contents/MsPopGoalActionEval_TabSwotAnalyse.html');
-                    //vmApEvalx.dataService.getSwotData({ goalActionId: vmGoalAction.goalActionEvalOptions.goalActionModel.Id }).then(function (res) {
-                    //    var data = res.value;
-
-                    //    that.ApSwotanalyseTemplates = data.ApSwotanalyseTemplates;
-                    //    that.ApSwotanalyses = data.ApSwotanalyse;
-                    //});
+                    $('#tabSwotAnalyse').load(vmCommon.rootUrl + 'Contents/MsPopGoalActionEval_TabSwotAnalyse.html');
                 },
                 getProductData() {
-                    $('#tabProductStructure').load('/Contents/MsPopGoalActionEval_MsTabProductStructure.html');
-                    //vmApEvalx.dataService.getProductData({ TargetName: "", ChartName: "", GoalActionId: vmGoalAction.goalActionEvalOptions.goalActionModel.Id }).then(function (res) {
-                    //    var data = res.value;
-
-                    //    that.ApSwotanalyseTemplates = data.ApSwotanalyseTemplates;
-                    //    that.ApSwotanalyses = data.ApSwotanalyse;
-                    //});
+                    $('#tabProductStructure').load(vmCommon.rootUrl + 'Contents/MsPopGoalActionEval_MsTabProductStructure.html');
                 },
                 getEvalXYZByTemplateId(templateId) {        // apply template
                     const apEvalData = this.ap.APEvaluations.APEvaluationData;

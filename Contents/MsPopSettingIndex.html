@@ -368,9 +368,6 @@
             vmPopKpiSettingIndex.bindFormatSortable();
         });
     }
-
-    
-
     popUpSettingIndex.bind("close", function (e) {
             popUpSettingIndex.destroy();
             popUpSettingIndex = null;
@@ -379,16 +376,13 @@
 
     var popUpSelectIndex = undefined;
     vmPopKpiSettingIndex.selectKpiUnit = function (id) {
-
-        //var act = e.data;
-        //alert(act.SettingIndexId);
         var entryData = {Id:id}
         vmPopKpiSettingIndex.dataService.getSelectIndex(entryData, function (serData) {
             vmPopKpiSettingIndex.TopicIndex = serData.value.KpiTopics;
             vmPopKpiSettingIndex.Paths = serData.value.Paths;
             popUpSelectIndex = showPopup(popUpSelectIndex,
                 $('#divSelectKpiIndex'),
-                '../Contents/MsPopSelectSettingIndex.html',
+                vmCommon.rootUrl + 'Contents/MsPopSelectSettingIndex.html',
                 {
                     title: kLg.titleSelectKpiIndex.format(kLg.menuKpiIndex) ,
                     width: 800,
@@ -405,7 +399,7 @@
         vmPopKpiSettingIndex.FormatItem = data;
         popUpKpiFormat = showPopup(popUpKpiFormat,
             $('#divSelectKpiIndex'),
-            '../Contents/MsPopAddKpiFormat.html',
+            vmCommon.rootUrl + 'Contents/MsPopAddKpiFormat.html',
             {
                 title: kLg.lblKpiFormat,
                 height: 290,
@@ -413,8 +407,6 @@
                 resizable: false
             });
     };
-
-
   
     $(document).ready(function () {
         vmPopKpiSettingIndex.getAndBindIndexFormat();

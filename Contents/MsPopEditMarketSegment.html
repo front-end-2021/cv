@@ -514,18 +514,13 @@
                 vmMarketSegment.IsQuickAdd = false;
                 vmMarketSegment.popSubClient = undefined;
                 vmMarketSegment.popSubClient = showPopup(vmMarketSegment.popSubClient, $('#editsubproductname'),
-                    '/Contents/MsPopEditSubProductName.html',
+                    vmCommon.rootUrl + 'Contents/MsPopEditSubProductName.html',
                     {
                         title: vmCommon.joinString(kLg.addlowcase, htmlDecode(kLg.lblSubProductGroup)),
                         height: 370,
                         width: 500,
                         resizable: false
                     });
-                //vmEditSubsProduct.SubProductName = "";
-                //vmEditSubsProduct.SubProductDescription = "";
-                //vmEditSubsProduct.excuteInsert = vmMarketSegment.excuteInsert;
-                //vmEditSubsProduct.isExistedName = vmMarketSegment.isExistedName;
-                //vmEditSubsProduct.showTooltipById = vmMarketSegment.showToolTipById;
             },
             addSubProduct: function () {
                 var sname = vmMarketSegment.viewModel.get("SubProductName").trim();
@@ -577,28 +572,16 @@
                 vmMarketSegment.SubProduct = item;
                 vmMarketSegment.IsSubProductEdit = true;
                 vmMarketSegment.IsQuickAdd = false;
-                //var el = $(e.target).parent().parent().parent();
-
-                //var idx = parseInt(el.parent(".divDragDrop").attr("mindex"));
+                
                 vmMarketSegment.popSubClient = undefined;
                 vmMarketSegment.popSubClient = showPopup(vmMarketSegment.popSubClient, $('#editsubproductname'),
-                    '/Contents/MsPopEditSubProductName.html',
+                    vmCommon.rootUrl + 'Contents/MsPopEditSubProductName.html',
                     {
                         title: vmCommon.joinString(kLg.editlowcase, htmlDecode(kLg.lblSubProductGroup)),
                         height: 370,
                         width: 500,
                         resizable: false
                     });
-                //var sources = vmMarketSegment.viewModel.get("SubProducts");
-
-                //vmEditSubsProduct.MIndex = item.MIndex;
-                ////var item = ($.grep(sources, function (item) { return item.MIndex === idx; }))[0];
-                //vmEditSubsProduct.SubProductName = item.Name;
-                //vmEditSubsProduct.SubProductDescription = item.Description;
-                //vmEditSubsProduct.excuteUpdate = vmMarketSegment.excuteUpdate;
-                //vmEditSubsProduct.isExistedName = vmMarketSegment.isExistedName;
-                //vmEditSubsProduct.showTooltipById = vmMarketSegment.showToolTipById;
-                //vmEditSubsProduct.SubmarketProductDocuments = item.SubmarketProductDocuments;
             },
             delSubProduct: function (e) {
                 pConfirmWithDesc({
@@ -806,42 +789,6 @@
         return jsonObject;
     }
 
-    //function processSameNameProduct(data) {
-    //    if (data != null && data.value != null) {
-    //        var isDisabled = $("#cbAddSubProduct").attr("disabled");
-    //        if (isDisabled != null) $("#cbAddSubProduct").removeAttr("disabled");
-
-    //        var product = data.value;
-
-    //        vmCommon.showNotification("#marketName", kLg.msgErrorDataOverrideByProductSameName, 3000, -65);
-
-    //        var ischecked = $('input#cbAddSubProduct').is(':checked');
-    //        if (ischecked && product.IsSubProduct === false)
-    //            $("#cbAddSubProduct").click();
-    //        if (!ischecked && product.IsSubProduct === true)
-    //            $("#cbAddSubProduct").click();
-
-    //        for (var i = 0; i < product.SubProducts.length; i++) {
-    //            product.SubProducts[i].Id = -1;
-    //        }
-
-    //        vmMarketSegment.viewModel.set("SubProducts", product.SubProducts);
-    //        vmMarketSegment.bindSubproducts();
-
-
-    //    } else {
-    //        //Case - clone able
-    //        if (vmCommon.currentMarket.IsCloneAble === true && vmMarketSegment.askForCloneAlbe === false) {
-    //            vmMarketSegment.askForCloneAlbe = true;
-    //            pConfirm(kLg.msgConfirmCloneAbleSubProduct).then(null, function () {
-    //                vmMarketSegment.bindSubproducts([]);
-    //            });
-
-    //        }
-
-    //    }
-    //}
-
     vmMarketSegment.showSelectSubProSe = function (control, linkId, linkType) {
 
         vmCommon.popSelectSubProOptions.Type = control || vmCommon.currentControl;
@@ -854,7 +801,7 @@
         };
         vmCommon.popSelectSubmarketProductSe = showPopup(vmCommon.popSelectSubmarketProductSe,
             $('#popSelectSubmarketProductSe'),
-            '/Contents/MsPopSelectSubmarketProductSe.html',
+            vmCommon.rootUrl + 'Contents/MsPopSelectSubmarketProductSe.html',
             {
                 title: kLg.strSelectionFormat.format(kLg.createNewProduct),
                 height: 525,
@@ -864,9 +811,7 @@
     };
 
     //Pageload
-    $(document).ready(function () {        
-        //vmFile.assginedIcon("popEditMarketSegment");
-
+    $(document).ready(function () { 
         if (vmCommon.currentControl == "productgroup" || vmCommon.currentControl == "submarket" || vmCommon.currentControl == vmCommon.enumType.Product) {
             vmCommon.currentMarket.RoleMaster = vmSProduct.SMProductData.RoleMaster > 0 ? true : false;
         } else {

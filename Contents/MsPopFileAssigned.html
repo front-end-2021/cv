@@ -439,22 +439,12 @@
                         return menu;
                     }
                 }
-
-                //if (type == 0) {
-                //    return "";
-                //} else {
-                //    menu += '<li onclick=""><a href="../FileUpload/' + physicalName + '" target="_blank" download="' + name + '" class="dropdow-menu-li-a"><span class="icon-24 icon-left-block icon-update-gray"></span><span>' + kLg.btnDownload + '</span></a></li>';
-                //    menu += '</ul></div>';
-                //    return menu;
-                //}
             }
         }
         
         return "";
     };
     
-
-
     function showEditFileAssign(id) {
         if (vmFile.CurrentRole > 0) {
             var file = findFileAssign(id);
@@ -464,7 +454,7 @@
             var options = { height: (ftype == 8) ? 335 : 272, width: 500, resizable: false };
 
             vmFile.popEditFile = showPopup(vmFile.popEditFile, $('#popEditFile'),
-                '/Contents/MsPopEditFile.html', options);
+                vmCommon.rootUrl + 'Contents/MsPopEditFile.html', options);
             if (ftype > 0) {
                 vmFile.popEditFile.title(ftype == 8 ? kLg.editUrl : kLg.editFile);
             } else {
@@ -507,7 +497,6 @@
                 vmFile.DeleteFile(id, mdf, type);
 
                 vmFile.afterDelete(contents);
-                //loadFileAssigned(vmFile.idFileAssigned.contents);
             });
         } else {
             return;

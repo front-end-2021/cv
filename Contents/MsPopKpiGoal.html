@@ -483,7 +483,7 @@
 
         vmGoalAction.popKpiGoalTopic = showPopup(vmGoalAction.popKpiGoalTopic,
             $("#popkpigoaltopic"),
-            "../Contents/MsPopKpiGoalTopic.html",
+            vmCommon.rootUrl + "Contents/MsPopKpiGoalTopic.html",
             {
                 title: titles[vmGoalAction.kpiTopicOptions.kpiTopic.TypeId],
                 height: 290,
@@ -1081,7 +1081,7 @@
     vmGoalAction.showPopGoalIndex = function (title) {
         vmGoalAction.popKpiGoalIndex = showPopup(vmGoalAction.popKpiGoalIndex,
             $("#popkpigoalindex"),
-            "../Contents/msPopSelectGoalIndex.html",
+            vmCommon.rootUrl + "Contents/msPopSelectGoalIndex.html",
             {
                 title: title,
                 width: 650,
@@ -1093,9 +1093,6 @@
 
     vmKpiGoal.autoIncrease = [];
 
-    //vmKpiGoal.addGoalIndex = function (e, topicId) {
-    //    vmKpiGoal.openSelectGoalIndex(undefined, topicId);
-    //};
     vmKpiGoal.addNewGoalIndex = function (newIndex) {
         var topic = vmCommon.findById(newIndex.KpiGoalTopicId, kpiData.KpiGoalTopics);
         if (topic == undefined) return;

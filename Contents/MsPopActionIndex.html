@@ -828,7 +828,7 @@
     vmKpiAction.openSelectKpiIndex = function() {
         vmGoalAction.popKpiIndex = showPopup(vmGoalAction.popKpiIndex,
             $("#pop-selectkpiindex"),
-            "../Contents/MsPopSelectKpiIndex.html",
+            vmCommon.rootUrl + "Contents/MsPopSelectKpiIndex.html",
             {
                 title: kLg.titleSelectIndex.format(kLg.menuKpiIndex),
                 width: 650,
@@ -1179,22 +1179,13 @@
 
         content.append("<div class='crmlink-item' fi='" + crmLink.Id + "'><div class='pull-left'><a class='goal-truncate ms-link'>" + newCrmLink.Name + "</a></div><span class='icon-20 ms-icon-delete-gray' style='cursor: pointer;zoom: 85%;' ivid='"+newCrmLink.Id+"' onclick='vmKpiAction.deleteCrmLink(this)'></span></div>");
 
-        //$(content).html("");
-
-        //var itemValues = $.grep(crmLink.ItemValues, function(it) { return it.DataState !== dataState.Deleted; });
-        //if (itemValues.length > 0) {
-        //    var itemValue = itemValues[0];
-        //    $(content).append("<div class='crmlink-item' fi='" + crmLink.Id + "'><div class='pull-left'><a class='goal-truncate ms-link'>" + itemValue.Name + "</a></div><span class='icon-20 ms-icon-delete-gray' style='cursor: pointer;zoom: 85%;' ivid='"+itemValue.Id+"' onclick='vmKpiAction.deleteCrmLink(this)'></span></div>");
-        //} else {
-        //    $(content).append("<div class='crmlink-add' fi='" + crmLink.Id + "'><span class='icon-32 cursor-pointer icon-add' fi='" + crmLink.Id + "' onclick='vmKpiAction.selectCrmLink()'></span></div>");
-        //}
     };
 
     vmKpiAction.openSelectCrmLink = function() {
         
         vmGoalAction.popCrmLink = showPopup(vmGoalAction.popCrmLink,
             $("#pop-selectcrmlink"),
-            "../Contents/MsPopSelectCrmLink.html",
+            vmCommon.rootUrl + "Contents/MsPopSelectCrmLink.html",
             {
                 title: kLg.titleSelectCrmLink,
                 width: 650,
@@ -2393,7 +2384,7 @@
     vmGoalAction.showPopMasterIndex = function (title) {
         vmGoalAction.popKpiMasterIndex = showPopup(vmGoalAction.popKpiMasterIndex,
             $("#popkpigoalindex"),
-            "../Contents/msPopSelectMasterIndex.html",
+            vmCommon.rootUrl + "Contents/msPopSelectMasterIndex.html",
             {
                 title: title,
                 width: 650,
@@ -2484,7 +2475,7 @@
 
         vmGoalAction.popKpiMasterTopic = showPopup(vmGoalAction.popKpiMasterTopic,
             $("#popkpigoaltopic"),
-            "../Contents/MsPopKpiMasterTopic.html",
+            vmCommon.rootUrl + "Contents/MsPopKpiMasterTopic.html",
             {
                 title: titles[vmGoalAction.kpiTopicOptions.kpiTopic.TypeId],
                 height: 290,

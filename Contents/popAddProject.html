@@ -1188,11 +1188,9 @@
         vmProject.StrategyMemberCurrent = Object.assign({}, listMember.find(m => m.MemberId == memberId)); // avoid add new var in data source
         vmProject.StrategyMemberCurrent.Accounts = vmProject.ComboEmailDataSource.slice(); // vmProject.ProjectDetail.ListMember.slice(); // avoid add new var in data source
 
-        //vmProject.curProjectId = vmProject.ProjectDetail.Id;
-
         vmProject.PopupTransferResponsibility = showPopup(vmProject.PopupTransferResponsibility,
             $('#pop-transferResponsibility'),
-            'Contents/MsPopTransferResponsibility.html',
+            vmCommon.rootUrl + 'Contents/MsPopTransferResponsibility.html',
             {
                 title: kLg.TransferResponsibility,
                 height: 280,
@@ -1208,11 +1206,9 @@
         vmProject.StrategyMemberCurrent = Object.assign({}, listMember.find(m => m.MemberId == memberId)); // avoid add new var in data source
         vmProject.StrategyMemberCurrent.Accounts = vmProject.ComboEmailDataSource.slice(); // vmProject.ProjectDetail.ListMember.slice(); // avoid add new var in data source
 
-        //vmProject.curProjectId = vmProject.ProjectDetail.Id;
-
         vmProject.PopupTransferResponsibilityCRM = showPopup(vmProject.PopupTransferResponsibilityCRM,
             $('#pop-transferResponsibilityCRM'),
-            'Contents/MsPopTransferResponsibilityCRM.html',
+            vmCommon.rootUrl + 'Contents/MsPopTransferResponsibilityCRM.html',
             {
                 title: kLg.TransferResponsibility,
                 height: 280,
@@ -1556,7 +1552,7 @@
         vmProject.isEdit = isEdit;
         popUpRole = showPopup(popUpRole,
                 $('#pop-setRole'),
-                'Contents/MsPopSetRoleLandRegion.html',
+                vmCommon.rootUrl + 'Contents/MsPopSetRoleLandRegion.html',
                 {
                     title: kLg.setRole,
                     height: 380,
@@ -1582,7 +1578,7 @@
         var popTitle = isAdd ? kLg.titleAccountRegisterForm: kLg.changeInforTitle;
         popAddNewUser = showPopup(popAddNewUser,
                 $('#pop-add-new'),
-                '../Contents/popAddPerson.html',
+                vmCommon.rootUrl + 'Contents/popAddPerson.html',
                 {
                     title: popTitle,
                     height: 410,

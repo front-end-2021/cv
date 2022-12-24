@@ -4,48 +4,48 @@
 <head>
     <title>Road Map</title>
     <meta name="robots" content="noindex, nofollow" />
-    <link href="../css/bootstrap.css" rel="stylesheet" />
+    <link href="css/bootstrap.css" rel="stylesheet" />
     <meta http-equiv='cache-control' content='no-cache' />
     <meta http-equiv='expires' content='0' />
     <meta http-equiv='pragma' content='no-cache' />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link href="../css/default-master.css" rel="stylesheet" />
-    <link href="../css/master.css" rel="stylesheet" />
-    <link href="../css/kendo.css" rel="stylesheet" />
+    <link href="css/default-master.css" rel="stylesheet" />
+    <link href="css/master.css" rel="stylesheet" />
+    <link href="css/kendo.css" rel="stylesheet" />
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
-    <link href="../css/calendar.css" rel="stylesheet" />
-    <link rel="stylesheet" href="../css/popupeditboard.css">
-    <link href="../css/msRoadmap.css" rel="stylesheet" />
+    <link href="css/calendar.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/popupeditboard.css">
+    <link href="css/msRoadmap.css" rel="stylesheet" />
 
-    <script src="../Language/en.js"></script>
-    <script src="../Scripts/mService.js"></script>
-    <script src="../Scripts/jquery.js"></script>
-    <script src="../Scripts/bootstrap.js"></script>
-    <script src="../Scripts/kendo.js"></script>
-    <script src="../Scripts/master.js"></script>
-    <script src="../Scripts/validatetooltip.js"></script>
-    <script src="../Scripts/momentjs.js"></script>
-    <script src="../Scripts/MsFileManagement.js"></script>
-    <script src="../Scripts/msFilter.js"></script>
-    <script src="../Scripts/clampjs.js"></script>
-    <script src="../Scripts/rmexceljs.js"></script>
-    <script src="../Scripts/vuejs/vue.min.js"></script>
-    <script src="../Scripts/vuejs/vuesortable.js"></script>
-    <script src="../Scripts/vuejs/vue-observe-visibility.min.js"></script>
-    <script src="../Scripts/vuejs/lodash.min.js"></script>
-    <script src="../Scripts/vuejs/Sortable.min.js"></script>
-    <script src="../Scripts/vuejs/vue-draggable.js"></script>
-    <script src="../Scripts/vuejs/vuedraggable.umd.min.js"></script>
-    <script src="../Scripts/jquery.ui.touch-punch.min.js"></script>
-    <script src="../Scripts/jquery-mousewheel.js"></script>
+    <script src="Language/en.js"></script>
+    <script src="Scripts/mService.js"></script>
+    <script src="Scripts/jquery.js"></script>
+    <script src="Scripts/bootstrap.js"></script>
+    <script src="Scripts/kendo.js"></script>
+    <script src="Scripts/master.js"></script>
+    <script src="Scripts/validatetooltip.js"></script>
+    <script src="Scripts/momentjs.js"></script>
+    <script src="Scripts/MsFileManagement.js"></script>
+    <script src="Scripts/msFilter.js"></script>
+    <script src="Scripts/clampjs.js"></script>
+    <script src="Scripts/rmexceljs.js"></script>
+    <script src="Scripts/vuejs/vue.min.js"></script>
+    <script src="Scripts/vuejs/vuesortable.js"></script>
+    <script src="Scripts/vuejs/vue-observe-visibility.min.js"></script>
+    <script src="Scripts/vuejs/lodash.min.js"></script>
+    <script src="Scripts/vuejs/Sortable.min.js"></script>
+    <script src="Scripts/vuejs/vue-draggable.js"></script>
+    <script src="Scripts/vuejs/vuedraggable.umd.min.js"></script>
+    <script src="Scripts/jquery.ui.touch-punch.min.js"></script>
+    <script src="Scripts/jquery-mousewheel.js"></script>
 </head>
 
 <body>
     <div class="wrapper">
         <div class="ms-header" role="navigation">
             <span onclick="redirectHomePage()" class="logo">
-                <img class="cursor-pointer" src="../images/stratsigner_logo.png" />
+                <img class="cursor-pointer" src="images/stratsigner_logo.png" />
             </span>
             <div class="navbar-collapse collapse block-nav">
                 <!-- Start dropdown 1 -->
@@ -317,7 +317,7 @@
                     vmProjectStrategy.ProjectGroupId = 0;
 
                     vmProjectStrategy.GetProjectStrategy = function () {
-                        var url = "../Handlers/ProjectHandler.ashx?funcName=getprojectstrategy&projid=" + sHandler.ProjectId + "&strid=" + sHandler.StrategyId;
+                        var url = "Handlers/ProjectHandler.ashx?funcName=getprojectstrategy&projid=" + sHandler.ProjectId + "&strid=" + sHandler.StrategyId;
                         callAjax(null, url, null, function (data) {
                             vmProjectStrategy.ListProject = data.value.ListProject;
                             if (vmProjectStrategy.ListProject.length > 0) {
@@ -639,7 +639,7 @@
                                 };
                          
                                 vmUser.logOut = function () {
-                                    var url = "../Handlers/AccountHandler.ashx?funcName=signOut";
+                                    var url = "Handlers/AccountHandler.ashx?funcName=signOut";
                                     callAjax("div-loading-ucaccount", url, null, vmUser.signOutCallBack, AjaxConst.GetRequest);
                                 };
                          
@@ -656,7 +656,7 @@
                                     var strid = objQuery.get("strid") || 0;
                          
                                     if (!vmUser.currentAccount) {
-                                        var url = "../Handlers/AccountHandler.ashx?funcName=getcurrentaccount&strid=" + strid;
+                                        var url = "Handlers/AccountHandler.ashx?funcName=getcurrentaccount&strid=" + strid;
                                         return callAjaxPromise(url).then(function (data) {
                                             vmUser.currentAccount = data.value;
                                             vmUser.currentAccount.Name = data.value.FirstName + " " + data.value.LastName;
@@ -976,12 +976,12 @@
         <div class="clear"></div>
 
 
-        <script src="../Scripts/msGoalAction.js"></script>
+        <script src="Scripts/msGoalAction.js"></script>
 
         <div id="RoadmapApp"></div>
-        <script src="../Scripts/msRoadmap.js"></script>
-        <script src="../MsRoadmap/RoadmapApp.js"></script>
-        <script src="../MsRoadmap//Navigator/RoadMapNavigator.js"></script>
+        <script src="Scripts/msRoadmap.js"></script>
+        <script src="MsRoadmap/RoadmapApp.js"></script>
+        <script src="MsRoadmap//Navigator/RoadMapNavigator.js"></script>
 
     </div>
 

@@ -1,7 +1,4 @@
-﻿<!--<link href="../Css/newkendo/kendo.common.min.css" rel="stylesheet" />
-<link href="../Css/newkendo/kendo.default.min.css" rel="stylesheet" />-->
-
-<style type="text/css">
+﻿<style type="text/css">
     /*task : 7298*/
     .k-window-titlebar .k-link {
         border-radius: 0;
@@ -654,7 +651,7 @@
 
 <div id="load-logo"></div>
 <div class="loading" id="add-cproject-loading"></div>
-<script src="../Scripts/clipboard/clipboard.min.js"></script>
+<script src="Scripts/clipboard/clipboard.min.js"></script>
 <script type="text/javascript">
     var cprojectViewModel;
     var vmEditCProject = {};
@@ -1519,10 +1516,6 @@
                     },
                     uploadUrl: `../api/imagebrowser/upload?pid=${projectId}&crfol=${crownProjectAPI.Folder || ''}&accid=-1&aid=${vmCommon.emptyGuid}&astype=crm`,
                     imageUrl: function (name) {
-                        //$.ajax({
-                        //    type: "GET", url: "../api/imagebrowser/imagex?path=" + path, data: { path: path },
-                        //    success: function (res) { $("#k-editor-image-url").val(res); }
-                        //});
                         return document.location.origin + "/ImgBrowser/" + (crownProjectAPI.Folder ? crownProjectAPI.Folder + '/' : '') + name;
                     }
                 }

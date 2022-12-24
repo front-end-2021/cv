@@ -1,7 +1,7 @@
 ﻿<div id="popUpMainContent"></div>
 <div id="editsubproductname"></div>
 <div id="editMarketLoading" class=""></div>
-<link href="../Css/multiple-select.css" rel="stylesheet" />
+<link href="css/multiple-select.css" rel="stylesheet" />
 
 <style>
     .hoand-tb-subproduct {
@@ -115,7 +115,7 @@
 <div id="popSelectSubmarketProductSeHolder"></div>
 <div id="popSelectSubmarketProductSe"></div>
 
-<script src="../Scripts/jquery.multiple.select.js"></script>
+<script src="Scripts/jquery.multiple.select.js"></script>
 <div id="popMarketSegmentEdit">
     <div class="modal-body ms-modal-body" id="popMarketSegmentBody" 
         style="height:250px; overflow: hidden scroll;">
@@ -607,7 +607,6 @@
                     vmMarketSegment.viewModel.set("EnSubProducts", isSubProduct);
                     vmMarketSegment.AdjustHeight();
                     setupSubProductDragDropAble();
-                    //bindSwitchSpanToInputSubsProduct(updateSubNameCallback, "sub-product-name", removeAllHover, addAllHover, 100);
                 });                
             },
             textChange: function () {
@@ -664,9 +663,6 @@
         kendo.bind($("#popMarketSegmentEdit"), vmMarketSegment.viewModel);
         
         setupSubProductDragDropAble();
-
-        // Bugs 9284
-        //bindSwitchSpanToInputSubsProduct(updateSubNameCallback, "sub-product-name", removeAllHover, addAllHover, 100);
     };
     
     function getRemoveIdCallback(e, callbackCheckTime, callbackTime) {

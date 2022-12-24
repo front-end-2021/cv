@@ -422,7 +422,6 @@
 
     vmCampaign.dataservice = (function () {
         var callAjaxQuestionFilter = function (divId, funcName, entryData, requestType, successCallBack) {
-            //var url = "../Handlers/CrmCrowdProjectViewHandler.ashx?funcName=" + funcName + "&projid=" + projectId + "&strid=" + strategyId + "&lang=" + language;
             var url = "../Handlers/CrmCrowdProjectViewHandler.ashx?funcName=" + funcName + "&projid=" + projectId + "&strid=" + strategyId + "&cpid=" + vmCrowdProjectView.CrowdProjectId + "&lang=" + vmCampaign.currentLang;//+ "&strid=" + strategyId + "&lang=" + language;
             return callAjax(divId, url, entryData, successCallBack, requestType);
         };

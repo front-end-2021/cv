@@ -35,25 +35,6 @@
         $("#pop-add-kpitopic #lblCloseKpiCategories").text(kLg.lblClose);
     };
 
-    //vmPopKpiTopic.dataService = function() {
-    //    var callAjaxCrm = function (divId, funcName, entryData, requestType, successCallBack) {
-    //        var url = "../Handlers/SettingHandler.ashx?funcName=" + funcName + "&projid=" + projectId + "&strid=" + strategyId + "&lang=" + language;
-    //        return callAjax(divId, url, entryData, successCallBack, requestType);
-    //    };
-
-    //    var callAjaxByPost = function (funcName, entryData, successFunc, loadingdiv) {
-    //        return callAjaxCrm(loadingdiv || "categories-loading", funcName, JSON.stringify(entryData), AjaxConst.PostRequest, successFunc);
-    //    };
-
-    //    var updateKpiTopic = function(entryData, successFunc) {
-    //        return callAjaxByPost("updatekpitopic", entryData, successFunc);
-    //    }
-
-    //    return {
-    //        updateKpiTopic: updateKpiTopic
-    //    }
-    //}();
-
     vmPopKpiTopic.SetupValidate = function () {
         $('#add-kpitopic-form').validate({
             rules: {

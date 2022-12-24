@@ -12,8 +12,7 @@
     }
 </style>
 
-<!--<script src="../Scripts/kendo/kendo.all.min.js"></script>-->
-<script src="../Scripts/jszip.min.js"></script>
+<script src="Scripts/jszip.min.js"></script>
 <div id="loadingportexcel" class="loading"></div>
 <div id="popexportexcel">
     <form id="fExportExcel">
@@ -93,7 +92,6 @@
     $(function () {
         bindData(vmSubmenu.exportOption.crows);
         setupLanguage();
-        //$("#popexportexcel").parent().append($("<script src='' id='kallscript'><\/script>").attr("src", "../Scripts/kendo/kendo.all.min.js"));
     });
 
     var columnCount = 0;

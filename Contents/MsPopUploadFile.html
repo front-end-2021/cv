@@ -281,18 +281,10 @@
         if (count > 0) {
             closeForm();
             Uploading(data);
-            //$('#txtFile').val("");
         }
 
         return false;
     };
-
-    //vmUploadFile.upFile = function(formData) {
-    //    var url = "../Handlers/DFolderHandler.ashx?funcName=uploadformatfile&projid=" + projectId + "&strid=" + strategyId;
-    //    vmCommon.sendFile(url, formData, function (res) {
-    //        var savedFiles = res.value;
-    //    }, "");
-    //};
 
     function upUrl() {
         var txtUrl = $('#furl #txtUrl').val().trim();
@@ -314,8 +306,6 @@
         currentPage = getCurrentPage();
 
         var url = "../Handlers/DFolderHandler.ashx?funcName=addurl&parentId=" + vmFile.selectFolderId + "&projid=" + projectId + "&strid=" + strategyId;
-
-        //HoaND upload organization and person                
         if (vmFile.popUpFileAssigned && typeof (vmFile.popFileAssignedActive) !== "undefined" && vmFile.popFileAssignedActive
             && (vmFile.idFileAssigned.assigntype === vmCommon.enumType.CrmOrganisation
                 || vmFile.idFileAssigned.assigntype === vmCommon.enumType.CrmPerson

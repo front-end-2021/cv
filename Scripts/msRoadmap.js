@@ -263,7 +263,7 @@ msRoadmap.dataService = function () {
 msRoadmap.qUnit = 4;
 msRoadmap.mUnit = 9;
 msRoadmap.View = (function () {
-    var __rootFolder__ = '../MsRoadmap';
+    var __rootFolder__ = 'MsRoadmap';
     var Tabview = '/TabView';
     setupLang();
 

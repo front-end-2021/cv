@@ -1,0 +1,95 @@
+﻿<style>
+    #popexportactivityexcel .k-multiselect-wrap input[class~="k-input"] {
+    display: none !important;
+}
+</style>
+<!--<script src="../Scripts/2017.2.621/jszip.min.js"></script>-->
+<div id="loadingportexcel" class="loading"></div>
+<div id="popexportactivityexcel">
+    <form id="fExportActivityExcel">
+        <div class="modal-body ms-modal-body">
+            <div class="clearx4"></div>
+            <div class="form-group">
+                <table class="w-100per" id="tblRes">
+                    <tr>
+                        <td style="width: 28%"><label class="modal-label pull-left" id="lblResponbility">Verantwortung</label></td>
+                        <td><select data-role="multiselect"
+                                    data-placeholder=""
+                                    data-value-primitive="true"
+                                    data-text-field="Name"
+                                    data-value-field="Id"
+                                    data-bind="value: value, source: accounts, events:{change: onChange}"></select>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="modal-market-footer">
+            <button id="btnUpdate" type="button" tabindex="2" class="ms-button bg-disable cursor-pointer" data-bind="events:{click: exportExcel}, enabled: isExport">
+                <span class="icon-20 icon-close"></span>
+                <span id="lblExport">Close</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script src="../Scripts/CrmPopEditActivities.js"></script>
+
+<script type="text/javascript">
+    var viewModel, vmActivityExport = vmActivityExport || {};
+    var strategyId = strategyId || 0;
+    vmSubmenu = vmSubmenu || {};
+    var src = vmSubmenu.exportOption.Accounts || [];
+
+    vmActivityExport.AdjustPopupHeight = function () {
+        if (vmSubmenu.popExportExcel) {
+            var max = 100, fix = 145;
+            var extra = $("#tblRes").height() - 31;
+
+            setHeightPopUpFix(vmSubmenu.popExportExcel, fix + Math.min(extra, max));
+        }
+    };
+
+    vmActivityExport.setupLanguage = function() {
+        $("#popexportactivityexcel #lblResponbility").text(kLg.labelRes);
+        $("#popexportactivityexcel #lblExport").text(kLg.textExport);
+    }
+
+    vmActivityExport.visibleBtnExport = function(flag) {
+        if (!flag) {
+            $("#popexportactivityexcel #btnUpdate").addClass("bg-disable");
+        } else {
+            $("#popexportactivityexcel #btnUpdate").removeClass("bg-disable");
+        }
+
+        return flag;
+    };
+
+    $(function () {
+        viewModel = kendo.observable({
+            value: [],
+            accounts: src,
+            isExport: false,
+            exportExcel: function () {
+                if (!this.isExport) return;
+
+                vmEditAct.dataservice.getDataExport({ ids: this.value }, function(res) {
+                    vmActivityExport.export(res.value);
+                });
+            },
+            onChange: function () {
+                vmActivityExport.AdjustPopupHeight();
+                var flag = this.value.length > 0;
+
+                this.set("isExport", flag);
+                vmActivityExport.visibleBtnExport(flag);
+            }
+        });
+
+        kendo.bind($("#popexportactivityexcel"), viewModel);
+        vmActivityExport.setupLanguage();
+    });
+
+    
+
+</script>

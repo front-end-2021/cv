@@ -1,0 +1,1163 @@
+﻿<!-- Manh: -->
+<style>
+    .show-img {
+        position: relative;
+    }
+
+        .show-img:hover .preview-img {
+            position: absolute;
+            display: block;
+            border: 2px solid #e7e7e7;
+            border-radius: 5px;
+            z-index: 1;
+            top: 15px;
+            max-width: 700px;
+            object-fit: cover;
+        }
+
+    div.k-animation-container > div.k-tooltip.k-popup {
+        margin: 0;
+    }
+
+    .preview-img {
+        position: absolute;
+        display: none;
+    }
+    #tree-data {
+        max-width: 632px;
+        overflow: hidden;
+        font-size: 16px;
+        font-family: 'Lato-New';
+        max-height: 38px;
+        display: inline-flex;
+    }
+    #tree-data > li:last-child {text-overflow:ellipsis;overflow:hidden;}
+
+    #fFileManagement #uploadFile {
+        min-height: 19px;
+        max-height: 19px;
+        display: inline-flex;
+        margin-top: 6px;
+        margin-right: 0;
+    }
+    #fFileManagement #filepath {
+        display: inline-flex;
+        width: auto;
+        max-height: 33px;
+        margin-top: 4px;
+        margin-left: 11px;
+        padding-right: 13px;
+        padding-top: 1px;
+        padding-left: 4px;border-radius:3px;
+    }
+    #add-folder-place {opacity:0;height:69px}
+</style>
+
+<form id="fFileManagement">
+    <div id="file-uploading" class="loading" style="z-index: 99999999;">
+        <div id="loading-center-helper" style="height: 40%"></div>
+        <div style="display: block; background-color: grey; width: 310px; border: #5e696e solid 1px; height: 50px; opacity: 0.7; margin: 0 auto;">
+        </div>
+        <div style="text-align: center; position: relative; margin: 0 auto; color: whitesmoke; height: 40px; top: -54px">
+            <div>
+                <span id="uploadedValue" style="position: relative; top: 20px"></span>
+            </div>
+            <div>
+                <progress id="uploadprogress" max="100" value="0" style="width: 280px"></progress>
+            </div>
+        </div>
+    </div>
+    <div class="div-file">
+        <label id="navi">Dokumente / Notizen / 2013</label>
+        <div class="file-path hidden" id="filepath">
+            <span class="icon-20 icon-allfile icon-left-block add-file" style="margin:2px 4px;"></span>
+            <label id="lblOnlyAssignData">Nur zugeordnete Dateien</label>
+        </div>
+
+        <button type="button" class="ms-button" name="uploadFile" id="uploadFile" onclick="showUploadFile()">
+            <span class="icon-16 icon-upload"></span><span id="lblUpload">Hochladen</span>
+        </button>
+    </div>
+    <div id="pop-register"></div>
+    <div id='popupMessageAlert'></div>
+    <div id='popProgress'></div>
+    <div class="clear icon-pdf"></div>
+    <div id="holder" style="padding: 3px 12px 14px 14px; height: 400px">
+        <div id="grid" style="max-height:494px;">
+        </div>
+        <div style="box-sizing: border-box; overflow:hidden; border-bottom:1px solid #d5d5d5;border-left:1px solid #d5d5d5; border-right:1px solid #d5d5d5;padding-top:13px">
+            <video autoplay loop style="margin-bottom: -10px; width:100%; height:100%;">
+                <source src="../Images/GUI. Animation.mp4">
+            </video>
+        </div>
+
+    </div>
+    <div class="clear"></div>
+    <div style="height: 70px; margin-top: 15px" class="div-addfile">
+        <div id="add-folder-place">
+
+        </div>
+    </div>
+    
+    <div class="modal-market-footer mass-footer" style="background-color:transparent;border-color:transparent;">
+        <input type="file" style="display: none;" id="inputfile" multiple />
+        <div style="float:left;width:500px;margin-top:62px;">
+
+            <label class="margin-left12" id="lblFolder" style="margin-bottom:0">Ordner</label>
+            <div class="clear"></div>
+            <div>
+                <input class="modal-mass-input manager-footer-input margin-top0" id="txtNewFolder" type="text" />
+                <span class="icon-32 icon-add icon-addfile" id="lblCreateFolder"></span>
+            </div>
+        </div>
+        <button style="margin-top: 83px" class="ms-button" type="button" onclick="saveAndCloseFileManager()" tabindex="1">
+            <span class="icon-20 icon-add-file"></span><span class="lblClose">Save and close</span>
+        </button>
+    </div>
+</form>
+
+<script id="navi-template" type="text/x-kendo-template">
+    <ul id="tree-data">
+        #if(data.length <= 3){#
+        #for(var i = 0; i < data.length; i++){#
+        #if(i+1 < data.length){#
+        <li>
+            #if(vmFile.treeLists[i].fname.length > 9){#
+            <a href="javascript:navigatorClick(#=i#);"><div style="max-width:74px"><span class="file-sub">#:vmFile.treeLists[i].fname#</span></div></a>
+            #}else{#
+            <a href="javascript:navigatorClick(#=i#);"><span>#:vmFile.treeLists[i].fname#</span></a>
+            #}#
+        </li>
+        <li><span>/</span></li>
+        #}else{#
+        <li>
+            #if(vmFile.treeLists[i].fname.length > 25){#
+            <div style="max-width:#=(vmFile.isAssigned?220:540)#px"><span style="color: gray;" class="file-sub">#:vmFile.treeLists[i].fname#</span></div>
+            #}else{#
+            <span style="color: gray;">#:vmFile.treeLists[i].fname#</span>
+            #}#
+        </li>
+        #}#
+        #}#
+        #}else{#
+        <li>
+            <a href="javascript:navigatorClick(#=0#);">
+                <span>#=vmFile.treeLists[0].fname#</span>
+            </a>
+        </li>
+        <li><span>/</span></li>
+        <li>
+            <span style="color: gray;min-width:32px;display:inline-block;"> . . . . . </span>
+        </li>
+        <li><span>/</span></li>
+        <li>
+            #if(vmFile.treeLists[data.length-2].fname.length > 9){#
+            <a href="javascript:navigatorClick(#=data.length-2#);"><div style="width:74px"><span class="file-sub">#=vmFile.treeLists[data.length-2].fname#</span></div></a>
+            #}else{#
+            <a href="javascript:navigatorClick(#=data.length-2#);"><span>#=vmFile.treeLists[data.length-2].fname#</span></a>
+            #}#
+        </li>
+        <li><span>/</span></li>
+        <li>
+            #if(vmFile.treeLists[data.length-1].fname.length > 25){#
+            <div ><span style="color: gray;" class="file-sub">#=vmFile.treeLists[data.length-1].fname#</span></div>
+            #}else{#
+            <span style="color: gray;">#=vmFile.treeLists[data.length-1].fname#</span>
+            #}#
+        </li>
+        #}#
+    </ul>
+</script>
+
+<!-- ReSharper disable once UseOfImplicitGlobalInFunctionScope -->
+<script type="text/javascript">
+    var pageSize = 10;
+    var pageHeight = 401;
+    var defaultPage = 1;
+
+    var xhr = undefined;
+    
+    //#region BINDING CLOSE/SAVE AND CLOSE.
+    function saveFileManager() {
+        vmFile.isUploading = false;
+        if (vmFile.XHRObj) {
+            vmFile.XHRObj.isAbort = true;
+            vmFile.XHRObj.abort();
+            vmFile.XHRObj = null;
+        }
+        $("#uploadprogress").attr("value", 0);
+        $('#file-uploading').hide();
+    }
+
+    function saveAndCloseFileManager() {
+        if (typeof assignedFile == 'function' && vmFile.isAssigned) {
+            assignedFile();
+        }
+        else {
+            saveFileManager();
+            destroyPopupFileManager();
+        }
+    }
+
+    if (vmFile.popUpToAssign) {
+        vmFile.popUpToAssign.bind("close", function (e) {
+            if (vmFile.XHRObj && vmFile.isUploading) {
+                pConfirm(kLg.confirmStopUpload).then(function () {
+                    saveFileManager();
+
+                    destroyPopUpToAssign(e);
+                });
+                e.preventDefault();
+            } else {
+                destroyPopUpToAssign(e);
+            }
+
+            //sonpt: check status file assigned of Thema (Id = vmFile.idFileAssigned.assignidi). at CrmQuestionAnswer.aspx page
+            //vmFile.checkChangeIconFileCrm(vmFile.idFileAssigned.assignidi, vmFile.idFileAssigned.assigntype);
+        });
+    } else {
+        if (vmFile.popUpFileManagement) {
+            vmFile.popUpFileManagement.bind("close", function (e) {
+                if (vmFile.XHRObj && vmFile.isUploading) {
+                    pConfirm(kLg.confirmStopUpload).then(function () {
+                        saveFileManager();
+
+                        destroyPopupFileManager();
+                    });
+                    e.preventDefault();
+                } else {
+                    destroyPopupFileManager();
+                }
+            });
+        }
+    }
+    function destroyPopupFileManager() {
+        vmFile.popUpFileManagement.destroy();
+        vmFile.popUpFileManagement = null;
+        $('div[class="navbar-collapse collapse block-nav"]').after('<div id="pop-file-management-place"></div>');
+        vmFile.isFilterByImage = false;
+    }
+    function destroyPopUpToAssign(e) {
+        if (!vmFile.popUpToAssign) return;
+
+        vmFile.popFileAssignedOpen = false;
+        if (vmFile.isChangeFileAssigned) {
+
+            ynConfirm(kLg.msnIsChangedAssigned).then(
+                function () {
+                    assignedFile();
+                    vmFile.isFilterByImage = false;
+                    vmFile.isChangeFileAssigned = false;
+
+                    if (vmFile.popUpToAssign) {
+                        vmFile.popUpToAssign.destroy();
+                        vmFile.popUpToAssign = null;
+                        $('div[class="navbar-collapse collapse block-nav"]').after('<div id="pop-file-management-place"></div>');
+                    }
+
+                },
+                function () {
+                    vmFile.restoreFileAssigned();
+
+                    vmFile.popUpToAssign.destroy();
+                    vmFile.popUpToAssign = null;
+                    $('div[class="navbar-collapse collapse block-nav"]').after('<div id="pop-file-management-place"></div>');
+                    vmFile.isFilterByImage = false;
+                });
+        } else {
+            vmFile.popUpToAssign.destroy();
+            vmFile.popUpToAssign = null;
+            $('div[class="navbar-collapse collapse block-nav"]').after('<div id="pop-file-management-place"></div>');
+            vmFile.isFilterByImage = false;
+        }
+        e.preventDefault();
+
+        //vmFile.popUpToAssign.destroy();
+        //vmFile.popUpToAssign = null;
+        //$('div[class="navbar-collapse collapse block-nav"]').after('<div id="pop-file-management-place"></div>');
+    };
+    //#endregion 
+    $(document).ready(function () {
+        $('#fFileManagement #lblUpload').text(kLg.lblNewDataUpload); 
+        $('#fFileManagement #lblFolder').text(kLg.lblFolder);
+        $('#fFileManagement .lblClose').text(kLg.lblClose);
+        $('#fFileManagement #lblOnlyAssignData').text(kLg.btnOnlyAssignedData);
+
+        if (vmFile.treeLists == undefined) {
+            vmFile.treeLists = [{ fid: vmFile.selectFolderId, fname: kLg.titleDocument }];
+        }
+
+        LoadFile();
+        showAssignedPlace();
+
+        $('#fFileManagement').on('keydown', function (e) {
+            if (e.keyCode == 9) {
+                e.preventDefault();
+                return;
+            }
+
+        });
+
+        switch (vmFile.idFileAssigned.assigntype) {
+            case vmCommon.enumType.CrmOrganisation:
+            case vmCommon.enumType.CrmPerson:
+            case vmCommon.enumType.CrmActivity:
+            case vmCommon.enumType.CrmStatusProtocol:
+            case vmCommon.enumType.SubGoal:
+            case vmCommon.enumType.Goal:
+            case vmCommon.enumType.Action:
+            case vmCommon.enumType.ActionTodoFile:
+                if (typeof (vmFile.popFileAssignedOpen) !== "undefined"
+                    && vmFile.popFileAssignedOpen === true) {
+                    vmFile.openPopUpFileAssign();
+                    vmFile.popFileAssignedOpen = false;
+
+                    vmFile.isChangeFileAssigned == true && (vmFile.isChangeFileAssigned = false);
+                    vmFile.popUpToAssign.close();
+                }
+                break;
+            default:
+                break;
+        }
+
+        var holder = document.getElementById('holder');
+        if (holder !== undefined && holder !== null) {
+            holder.ondragover = function () { return false; };
+            holder.ondragleave = function () { return false; };
+
+            holder.ondrop = function (e) {
+                if (!(vmFile.CurrentRole > 0)) {
+                    return false;
+                }
+
+                if (!e.dataTransfer) return false;
+                currentPage = getCurrentPage();
+                this.className = '';
+
+                var files = e.dataTransfer.files,
+                    data = new FormData(),
+                    count = 0;
+                if (overMaxLength(files)) {
+                    pAlert(kLg.msgTotalFileOverLoad);
+                    return false;
+                }
+
+                if (validFileUpload(files)) {
+                    for (var i = 0; i < files.length; i++) {
+                        data.append(files[i].name, files[i]);
+                        count++;
+                    }
+                }
+
+                if (count > 0) {
+                    Uploading(data);
+                }
+
+                $('#txtFile').val("");
+                return false;
+            };
+        }
+
+        var uploadingFrame = document.getElementById('file-uploading');
+
+        if (uploadingFrame !== undefined && uploadingFrame !== null) {
+            uploadingFrame.ondragover = function () { return false; };
+            uploadingFrame.ondragleave = function () { return false; };
+            uploadingFrame.ondrop = function (e) {
+                pAlert(kLg.msgDuringUpload);
+                //e.preventDefault();
+                return false;
+            }
+        }
+        vmCommon.resetTabIndex("fFileManagement", 1);
+    });
+
+    $('#txtNewFolder').keydown(function (e) {
+        $('#txtNewFolder').tooltip('hide');
+        if (e.keyCode == 13) {
+            e.preventDefault();
+            createFolder();
+        } else {
+            $('#txtNewFolder').tooltip('hide');
+        }
+    });
+    $('#txtNewFolder').click(function () {
+        $('#txtNewFolder').tooltip('hide');
+    });
+
+    $('#filepath').click(function () {
+        vmFile.openPopUpFileAssign();
+    });
+
+    $('#lblCreateFolder').on('click', function (e) {
+        createFolder();
+    });
+
+
+    var isLoadAssignedFiles = false;
+    function Uploading(data, funcCallback) {
+        var url = "../Handlers/DFolderHandler.ashx?funcName=addfile&parentId=" + vmFile.selectFolderId + "&projid=" + projectId + "&strid=" + strategyId;
+        $('#file-uploading').show();
+
+        //HoaND upload organization and person
+        if (vmFile.popUpFileAssigned && typeof (vmFile.popFileAssignedActive) !== "undefined" && vmFile.popFileAssignedActive
+            && (vmFile.idFileAssigned.assigntype === vmCommon.enumType.CrmOrganisation
+                || vmFile.idFileAssigned.assigntype === vmCommon.enumType.CrmPerson
+                || vmFile.idFileAssigned.assigntype === vmCommon.enumType.CrmActivity
+                || vmFile.idFileAssigned.assigntype === vmCommon.enumType.CrmStatusProtocol
+                || vmFile.idFileAssigned.assigntype === vmCommon.enumType.ActionTodoFile
+                || vmFile.idFileAssigned.assigntype === vmCommon.enumType.Action
+                || vmFile.idFileAssigned.assigntype === vmCommon.enumType.SubGoal
+                || vmFile.idFileAssigned.assigntype === vmCommon.enumType.Goal)) {
+
+            switch (vmFile.idFileAssigned.assigntype) {
+                case vmCommon.enumType.ActionTodoFile:
+                    url += "&pageName=ActionTodoFile&SubmarketProductId=" + vmFile.idFileAssigned.assignidu;
+                    break;
+                case vmCommon.enumType.Action:
+                    url += "&pageName=ActionAssignFile&SubmarketProductId=" + vmFile.idFileAssigned.assignidu;
+                    break;
+                case vmCommon.enumType.Goal:
+                    url += "&pageName=GoalAssignFile&SubmarketProductId=" + vmFile.idFileAssigned.assignidu;
+                    break;
+                case vmCommon.enumType.SubGoal:
+                    url += "&pageName=SubGoalAssignFile&SubmarketProductId=" + vmFile.idFileAssigned.assignidu;
+                    break;
+                case vmCommon.enumType.CrmActivity:
+                    url += "&pageName=CrmActivities&activityUploadId=" + vmFile.idFileAssigned.assignidi;
+                    break;
+                case vmCommon.enumType.CrmOrganisation:
+                    url += "&pageName=CrmOrganisation&orgUploadId=" + vmFile.idFileAssigned.assignidi;
+                    break;
+                case vmCommon.enumType.CrmPerson:
+                    url += "&pageName=CrmPerson&personUploadId=" + vmFile.idFileAssigned.assignidi;
+                    break;
+                case vmCommon.enumType.CrmStatusProtocol:
+                    url += "&pageName=StatusProtocol&statusprotocolUploadId=" + vmFile.idFileAssigned.assignidi + "&activityUploadId=" + actViewModel.activity.Id;
+                    break;
+            }
+
+            vmFile.objAssign = {
+                folderfileid: 0,
+                assignidi: vmFile.idFileAssigned.assignidi,
+                assignidu: undefined,
+                type: vmFile.idFileAssigned.assigntype
+            };
+            isLoadAssignedFiles = true;
+            $('#fileassigned-uploading').show();
+        }
+
+        //<!--
+
+        if (window.XMLHttpRequest) {
+            // Chrome, Firefox, IE7+, Opera, Safari
+            vmFile.XHRObj = new XMLHttpRequest();
+        } else {
+            // IE6
+            try {
+                vmFile.XHRObj = new ActiveXObject('MSXML2.XMLHTTP.6.0');
+            } catch (e) {
+                try {
+                    vmFile.XHRObj = new ActiveXObject('MSXML2.XMLHTTP.3.0');
+                } catch (e) {
+                    alert(kLg.msgNotSupportAjax);
+                    vmFile.XHRObj = null;
+                    return;
+                }
+            }
+        }
+
+        vmFile.isUploading = true;
+        vmFile.XHRObj.upload.addEventListener("progress", OnProgress, false);
+        vmFile.XHRObj.addEventListener("load", OnComplete, false);
+
+        vmFile.XHRObj.open("POST", url);
+        vmFile.XHRObj.send(data);
+
+        vmFile.XHRObj.onreadystatechange = function () {
+            if (!vmFile.XHRObj.isAbort) {
+
+                if (vmFile.XHRObj.status == 0) {
+                    if (vmFile.XHRObj.status < 200 || vmFile.XHRObj.status > 304) {
+                        pAlert(kLg.msgNoInternetConnection);
+                        setTimeout(function () {
+                            $("#uploadprogress").attr("value", 0);
+                            $('#file-uploading').hide();
+                        }, 200);
+
+                        vmFile.isUploading = false;
+                        vmFile.XHRObj = null;
+                    }
+                }
+
+                if (vmFile.popUpFileAssigned && isLoadAssignedFiles) {
+                    isLoadAssignedFiles = false;
+                    $('#file-uploading').hide();
+
+                    //vmFile.reLoadFileAssignedByDragDrop(funcCallback);
+
+                    //getOldAssignedFile(vmFile.objAssign);
+                    if (vmFile.idFileAssigned.assignidi > 0 && vmFile.idFileAssigned.assigntype !== vmCommon.enumType.CrmStatusProtocol)
+                        reloadAssignIcon(true);
+
+                    vmFile.checkChangeIconFileCrm(vmFile.idFileAssigned.assignidi, vmFile.idFileAssigned.assigntype);
+                }
+            }
+        };
+        //vmFile.isUploading = true;
+    };
+
+    function OnComplete(evt) {
+
+        setTimeout(function () {
+            $('#uploadedValue').text(kLg.titleDone);
+            if (vmFile.popUpFileAssigned)
+                $('#uploadedFileAssignValue').text(kLg.titleDone);
+        }, 50);
+
+        setTimeout(function () {
+            $("#uploadprogress").attr("value", 0);
+            $('#file-uploading').hide();
+
+            if (vmFile.popUpFileAssigned) {
+                $("#uploadFileAssignProgress").attr("value", 0);
+                $('#fileassigned-uploading').hide();
+            }
+        }, 500);
+
+        var res = undefined;
+        var nAgt = navigator.userAgent;
+        // In Opera, the true version is after "Opera" or after "Version"
+        if ((nAgt.indexOf("OPR")) != -1) {
+            res = JSON.parse(this.responseText);
+        }
+        // In Chrome, the true version is after "Chrome"
+        else if ((nAgt.indexOf("Chrome")) != -1) {
+            res = JSON.parse(this.responseText);
+        }
+        // In Safari, the true version is after "Safari" or after "Version"
+        else if ((nAgt.indexOf("Safari")) != -1) {
+            res = JSON.parse(this.responseText);
+        }
+        // In Firefox, the true version is after "Firefox"
+        else if ((nAgt.indexOf("Firefox")) != -1) {
+            res = JSON.parse(this.responseText);
+        }
+        else {
+            res = JSON.parse(this.responseText);
+        }
+        vmFile.isUploading = false;
+
+        if (vmFile.popUpFileAssigned) {
+            var assigneds = res.Assigneds;
+            if (assigneds) { // && vmFile.idFileAssigned.assignidi <= 0 && vmFile.idFileAssigned.assigntype === vmCommon.enumType.CrmStatusProtocol) {
+                vmCommon.pushApply(vmFile.idFileAssigned.fileids, assigneds, function (item) { return "cbx" + item.Id; });
+                vmCommon.pushApply(vmFile.idFileAssigned.contents, assigneds);
+                vmCommon.pushApply(vmFile.contentFileAssigned, assigneds);
+
+                loadFileAssigned(vmFile.idFileAssigned.contents);
+
+                if (vmFile.openTodoFileAssign)
+                    vmFile.openTodoFileAssign(vmFile.idFileAssigned);
+
+                setUpSetting();
+            }
+        } else {
+            bindGrid(res.Data, currentPage);
+        }
+
+        vmFile.XHRObj = null;
+    };
+
+    function OnProgress(evt) {
+        if (evt.lengthComputable) {
+            var progress = Math.round(evt.loaded * 100 / evt.total);
+            $("#uploadprogress").attr("value", progress);
+            if (progress == 100) {
+                setTimeout(function () {
+                    $('#uploadedValue').text(kLg.titleWaiting + "... " + progress + "%");
+                }, 50);
+
+            } else {
+                $('#uploadedValue').text(progress + "%");
+            }
+
+            $("#uploadFileAssignProgress").attr("value", progress);
+            if (progress == 100) {
+                setTimeout(function () {
+                    $('#uploadedFileAssignValue').text(kLg.titleWaiting + "... " + progress + "%");
+                }, 50);
+
+            } else {
+                $('#uploadedFileAssignValue').text(progress + "%");
+            }
+        }
+    };
+
+    function generateNavigator() {
+        var jstemplate = kendo.template($("#navi-template").html());
+        $("#navi").html(jstemplate(vmFile.treeLists));
+    }
+
+    function previousFolder() {
+        var lastIndex = vmFile.treeLists.length - 1;
+        if (lastIndex > 0) {
+            vmFile.selectFolderId = vmFile.treeLists[lastIndex - 1].fid;
+            vmFile.treeLists.pop();
+        } else {
+            vmFile.selectFolderId = 0;
+            return;
+        }
+        LoadFile();
+    }
+
+    function returnRoot() {
+        vmFile.selectFolderId = 0;
+        vmFile.treeLists = vmFile.treeLists.slice(0, 1);
+        LoadFile();
+    }
+
+    function navigatorClick(index) {
+        vmFile.selectFolderId = vmFile.treeLists[index].fid;
+        vmFile.treeLists = vmFile.treeLists.slice(0, index + 1);
+        LoadFile();
+    }
+
+    function openFolder(id) {
+        if (vmFile.isUploading) {
+            return;
+        }
+        vmFile.isUploading = true;
+
+        var file = findFile(id);
+        var folder = { fid: file.Id, fname: file.Name };
+        vmFile.treeLists.push(folder);
+        vmFile.selectFolderId = id;
+        LoadFile();
+    }
+
+    function LoadFile() {
+        var url = "../Handlers/DFolderHandler.ashx?funcName=getfolder&parentId=" + vmFile.selectFolderId + "&projid=" + projectId + "&strid=" + strategyId;
+        url += (typeof vmQuestionView != "undefined" && vmFile.elementid != "iconFileManagement") ? "&fid=" + vmQuestionView.fragensetId : "";
+        generateNavigator();
+        callAjax("file-loading", url, null, function (res) {
+            //check server vmFile.isEndUserAccessed. Case open 2 tab and answer at Frontend -> go back tab -> assign file
+            //vmFile.CurrentRole = vmFile.isEndUserAccessed ? vmCommon.MemberRole.View : res.Role;
+
+            vmFile.CurrentRole = res.Role;
+            bindGrid(res.Data, defaultPage);
+        }, AjaxConst.GetRequest);
+
+        void function setPathForAssignedFile() {
+            if (!vmFile.popFileAssignedOpen && vmFile.isAssigned) {
+                $('#tree-data').css({
+                    'max-width': vmCommon.isDeLang() ? '409px' : '504px'
+                });
+            } else {
+                $('#tree-data').css({
+                    'max-width': vmCommon.isDeLang() ? '' : '680px'
+                });
+            }
+        }();
+    }
+
+    function openUploadDialog() {
+        if (vmFile.CurrentRole > 0) {
+            $('#inputfile').click();
+        }
+    }
+
+    //HoaND
+    function isFilterByImage() {
+        var flag = false;
+
+        if (vmFile.isFilterByImage) {
+            flag = true;
+        }
+
+        return flag;
+    }
+
+    function bindGrid(res, curPage) {
+        //HoaND
+        //If needed filter with image types
+        if (isFilterByImage()) {
+            var tmpRes = [];
+            for (var i = 0; i < res.length; i++) {
+                //todo: hardcode Type needed change to enum
+                if (res[i].Type == 0 || res[i].Type == 7) {
+                    tmpRes.push(res[i]);
+                }
+            }
+            res = tmpRes;
+        }
+        //<!--
+        vmFile.CurrentListFile = res;
+
+        if (vmFile.selectFolderId != 0) {
+            pageHeight -= 30;
+        }
+        $("#grid").kendoGrid().empty();
+        var vsource = new kendo.data.DataSource({
+            data: res,
+            schema: {
+                model: {
+                    id: "Id",
+                    fields: {
+                        Name: { editable: true }
+                    }
+                }
+            },
+            pageSize: pageSize
+        });
+        function setupDragDropClass($tr) {
+            $tr.each(function () {
+                var $this = $(this);
+                $this.addClass('fileDraggable');
+                var dirType = $this.find('.dirType').attr('type');
+                if (dirType == 0) {
+                    $this.addClass('folderDroppable');
+                } else {
+                    $this.addClass('fileDroppable');
+                }
+            });
+        };
+        if (!vmFile.isAssigned) {
+            $("#grid").kendoGrid({
+                dataSource: vsource,
+                scrollable: false,
+                sortable: true,
+                filterable: false,
+                pageSize: pageSize,
+                pageable: {
+                    input: true,
+                    numeric: false,
+                    messages: {
+                        display: "{0}-{1} " + kLg.charOf + " {2} " + kLg.charItems,
+                        empty: kLg.msgFileEmpty,
+                        page: kLg.charPage,
+                        of: kLg.charOf + " {0}"
+                    }
+                },
+                columns: [
+                    {
+                        title: "<span class='icon-20 icon-folder-add td-icon'></span>",
+                        width: "38px",
+                        template: "#=showIcon(ProjectId, PhysicalName, Type, Name)#"
+                    },
+                    { field: "Name", title: kLg.nameHeader, template: "#=showName(Id, Name, Type, PhysicalName)#", width: "250px", headerAttributes: { style: "background-color: #76838a;" } },
+                    { field: "Description", title: kLg.descriptionHeader, template: "#=showDescription(PhysicalName, Description, Type, false)#", headerAttributes: { style: "background-color: #76838a;" } },
+                    { field: "CreatedBy", title: kLg.createdByHeader, width: "170px", template: "#=showCreator(CreatedBy)#", headerAttributes: { style: "background-color: #76838a;" } },
+                    { field: "CreatedDate", title: kLg.dateHeader, width: "110px", template: "#=showTime(CreatedDate)#", headerAttributes: { style: "background-color: #76838a;" } },
+                    { title: "", template: "#=showMenu(Id, Mdf, PhysicalName, Name, Type, Description)#", width: "30px", headerAttributes: { style: "background-color: #76838a;" } }
+                ],
+                dataBound: function (e) {
+                    if (vmFile.CurrentRole > 0) {
+                        setupDragDropClass(e.sender.tbody.children());
+
+                        setupDragDrop();
+                    }
+                },
+                dataBinding: function (e) {
+                    adjustPositionImgThumb(e);
+                },
+                page: function (e) {
+                    adjustPositionImgThumb(e);
+                }
+            });
+
+            $("#grid").find("thead").first().append('<tr>' +
+                '<th class="k-header-white" tabindex="1"><a href="javascript:previousFolder()"><span class="icon-20 icon-folder-up-blue td-icon""></span></a></th>' +
+                '<th class="k-header-white"><span>...</span></th>' +
+                '<th class="k-header-white"></th>' +
+                '<th class="k-header-white"></th>' +
+                '<th class="k-header-white"></th>' +
+                '<th class="k-header-white"></th>' +
+                '</tr>');
+        } else {
+            $("#grid").kendoGrid({
+                dataSource: vsource,
+                scrollable: false,
+                sortable: true,
+                filterable: false,
+                pageable: {
+                    input: true,
+                    numeric: false,
+                    messages: {
+                        display: "{0}-{1} " + kLg.charOf + " {2} " + kLg.charItems,
+                        empty: kLg.msgFileEmpty,
+                        page: kLg.charPage,
+                        of: kLg.charOf + " {0}"
+                    }
+                },
+                columns: [
+                    {
+                        title: "<span class='icon-20 icon-folder-add td-icon'></span>",
+                        width: "38px",
+                        template: "#=showIcon(ProjectId, PhysicalName, Type, Name)#"
+                    },
+                    { field: "Name", title: kLg.nameHeader, template: "#=showName(Id, Name, Type, PhysicalName)#", width: "250px", headerAttributes: { style: "background-color: #76838a;" } },
+                    { field: "Description", title: kLg.descriptionHeader, template: "#=showDescription(PhysicalName, Description, Type, true)#", headerAttributes: { style: "background-color: #76838a;" } },
+                    { field: "CreatedBy", title: kLg.createdByHeader, width: "170px", template: "#=showCreator(CreatedBy)#", headerAttributes: { style: "background-color: #76838a;" } },
+                    { field: "CreatedDate", title: kLg.dateHeader, width: "110px", template: "#=showTime(CreatedDate)#", headerAttributes: { style: "background-color: #76838a;" } },
+                    { title: "", width: "30px", template: "#=showCheckbox(Id, Type)#", headerAttributes: { style: "background-color: #76838a;" } },
+                    { title: "", template: "#=showMenu(Id, Mdf, PhysicalName, Name, Type, Description)#", width: "30px", headerAttributes: { style: "background-color: #76838a;" } }
+                ],
+                dataBound: function (e) {
+                    if (vmFile.CurrentRole > 0) {
+                        setupDragDropClass(e.sender.tbody.children());
+
+                        setupDragDrop();
+                    }
+                },
+                dataBinding: function (e) {
+                    adjustPositionImgThumb(e);
+                },
+                page: function (e) {
+                    adjustPositionImgThumb(e);
+                }
+            });
+
+            $("#grid").find("thead").first().append('<tr>' +
+                '<th class="k-header-white" tabindex="1"><a href="javascript:previousFolder()"><span class="icon-20 icon-folder-up-blue td-icon""></span></a></th>' +
+                '<th class="k-header-white"><span>...</span></th>' +
+                '<th class="k-header-white"></th>' +
+                '<th class="k-header-white"></th>' +
+                '<th class="k-header-white"></th>' +
+                '<th class="k-header-white"></th>' +
+                '<th class="k-header-white"></th>' +
+                '</tr>');
+        };
+
+        function adjustPositionImgThumb(e) {
+
+            setTimeout(function () {
+
+                e.sender.element.find('.show-img').each(function () {
+
+                    var imgIconTop = $(this).offset().top,
+                        popupHeight = $('#pop-file-management-place').height(),
+                        $imgPreview = $(this).find('img.preview-img').first(),
+                        imgThumbHeight = $imgPreview.height();
+                    var imgOffset = imgIconTop + imgThumbHeight + 50,
+                        maxY = popupHeight + 128;
+
+                    imgOffset > maxY && $imgPreview.css({ 'top': (maxY - imgOffset - Math.floor(popupHeight / 9)) + 'px' });
+                });
+            }, 456);
+        };
+
+        var grid = $('#grid').data('kendoGrid');
+        if (grid !== null)
+            grid.dataSource.page(curPage);
+
+
+        if (vmFile.isShowEditFile.isShowEdit && vmFile.isShowEditFile.fileId != undefined) {
+            showEditFile(vmFile.isShowEditFile.fileId);
+            vmFile.isShowEditFile.isShowEdit = false;
+        }
+
+        vmFile.isUploading = false;
+        vmCommon.setupMenuIcon('#grid span[data-toggle=dropdown]', '#pop-file-management-place');
+
+        $('#grid .k-link.k-pager-nav').each(function () {
+            if (!$(this).hasClass('k-state-disabled')) {
+                $(this).attr('tabindex', '1');
+            }
+        });
+        $('#grid .k-grid-header > tr:first-child > th > a').each(function () {
+            $(this).attr('tabindex', '-1');
+        });
+        $('#grid .k-pager-wrap.k-grid-pager.k-widget.k-floatwrap > span.k-pager-input.k-label > input.k-textbox').attr('tabindex', '1');
+
+    }
+
+    function showCheckbox(id, type) {
+        if (type > 0) {
+            var n = vmFile.idFileAssigned.fileids.length;
+            var check = false;
+            if (n > 0) {
+                for (var i = 0; i < n; i++) {
+                    if ("cbx" + id == vmFile.idFileAssigned.fileids[i]) {
+                        check = true;
+                        break;
+                    }
+                }
+            }
+            if (vmFile.RegionRole == undefined) {
+                if (vmFile.CurrentRole > 0) {
+                    return '<input type="checkbox" class="checkb" id="cbx' + id + '" ' + (check ? "checked" : "") + ' onclick="checkToAssign(this);"></input>';
+                }
+                return '<input type="checkbox" class="checkb" id="cbx' + id + '" ' + (check ? "checked" : "") + ' disabled></input>';
+            } else {
+                if (vmFile.RegionRole > 0) {
+                    return '<input type="checkbox" class="checkb" id="cbx' + id + '" ' + (check ? "checked" : "") + ' onclick="checkToAssign(this);"></input>';
+                }
+                return '<input type="checkbox" class="checkb" id="cbx' + id + '" ' + (check ? "checked" : "") + ' disabled></input>';
+            }
+        } else {
+            return '';
+        }
+    }
+
+    function createFolder() {
+        if (vmFile.CurrentRole > 0) {
+            if (addFolderValidate()) {
+                var name = $('#txtNewFolder').val().trim();
+                $('#txtNewFolder').val('');
+                var jsonObject = { Name: name };
+                currentPage = getCurrentPage();
+
+                folderProcessing(true);
+                var url = "../Handlers/DFolderHandler.ashx?funcName=createfolder&parentId=" + vmFile.selectFolderId + "&projid=" + projectId + "&strid=" + strategyId;
+                callAjax("file-loading", url, JSON.stringify(jsonObject), function (res) {
+                    $('#txtNewFolder').val('');
+                    folderProcessing(false);
+                    bindGrid(res.Data, currentPage);
+                }, AjaxConst.PostRequest);
+            }
+        }
+        return;
+    };
+
+    function sleep(milliseconds) {
+        var start = new Date().getTime();
+        for (var i = 0; i < 1e7; i++) {
+            if ((new Date().getTime() - start) > milliseconds) {
+                break;
+            }
+        }
+    }
+
+    function folderProcessing(flag) {
+        $('#lblCreateFolder').css("cursor", flag ? "default" : "auto");
+        $("#fFileManagement").css("cursor", flag ? "wait" : "auto");
+    }
+
+    function deleteFileOverView(id, mdf, type) {
+        var contents = [];
+        pConfirm(type > 0 ? kLg.confirmDeleteFile : kLg.confirmDeleteFolder).then(function () {
+            var fileIndex = vmCommon.findIndexByFunc(vmFile.idFileAssigned.fileids, function (fileId) { return "cbx" + id == fileId; });
+            if (fileIndex != -1) {
+                vmFile.idFileAssigned.fileids.splice(fileIndex, 1);
+                vmFile.idFileAssigned.contents.splice(fileIndex, 1);
+            }
+
+            if (type == 7) {
+                for (var i = 0; i < vmFile.CurrentListFile.length; i++) {
+                    if (vmFile.CurrentListFile[i].Id == id) {
+                        contents.push(vmFile.CurrentListFile[i].PhysicalName);
+                        break;
+                    }
+                }
+            }
+
+            vmFile.removeFileAssigned(id);
+            vmFile.DeleteFile(id, mdf, type);
+
+            vmFile.afterDelete(contents);
+        });
+
+    }
+
+    function checkToAssign(e) {
+        vmFile.isChangeFileAssigned = true;
+        if (e.checked) {
+            //HoaND
+            //Can not chose more than one file
+            if (isFilterByImage() && vmFile.idFileAssigned.contents.length > 0) {
+                pAlert(kLg.msgCanOnlyAssignedOneFile);
+                LoadFile();
+                return;
+            }
+            //<!--
+
+            vmFile.backupFileAssigned();
+            //vmFile.isChangeFileAssigned = true;
+
+            vmFile.idFileAssigned.fileids.push(e.id);
+            var file = vmCommon.findByFunc(vmFile.CurrentListFile, function (obj) { return e.id == "cbx" + obj.Id; });
+            if (file != null) {
+                vmFile.contentFileAssigned.push(file);
+                vmFile.idFileAssigned.contents.push(file);
+            }
+        } else {
+            vmFile.backupFileAssigned();
+
+            var fileIndex = vmCommon.findIndexByFunc(vmFile.idFileAssigned.fileids, function (id) { return e.id == id; });
+            if (fileIndex != -1) {
+                vmFile.idFileAssigned.fileids.splice(fileIndex, 1);
+                vmFile.idFileAssigned.contents.splice(fileIndex, 1);
+            }
+        }
+    };
+
+    function addFolderValidate() {
+        if (!$('#txtNewFolder').val().trim().length > 0) {
+            $('#txtNewFolder').tooltip('destroy');
+            $('#txtNewFolder').attr("title", kLg.requiredName);
+            $('#txtNewFolder').tooltip({ placement: 'top', trigger: 'manual' }).tooltip('show');
+            return false;
+        } else {
+            return true;
+        }
+
+    };
+
+    function showAssignedPlace() {
+        if (vmFile.isAssigned) {
+            $('#filepath').attr('class', 'file-path');
+            $('#btnAssignData').removeClass('hidden');
+        } else {
+            return;
+        }
+    };
+
+    function visibleByRole(role) {
+        if (role < 1) {
+            //create folder
+            $('#txtNewFolder').prop('readonly', true);
+            $('#lblCreateFolder').css("cursor", "default");
+
+            //$('#lblCreateFolder').off('click');
+        }
+    }
+
+</script>
+
+<!-- ReSharper disable once Html.AttributeNotResolved -->
+<style>
+    input[type="checkbox"] {
+        margin: 8px 0 0;
+        line-height: normal;
+    }
+
+    #pop-file-management-place {
+        overflow: hidden;
+    }
+
+    .mass-footer {
+        margin-top: 28px;
+    }
+
+    .div-addfile {
+        margin-top: -5px;
+        padding-top: 77px;
+    }
+
+    .k-grid td {
+        border-style: solid;
+        border-width: 0 0 0 1px;
+        padding: .4em .6em;
+        overflow: visible;
+        line-height: 1.6em;
+        vertical-align: middle;
+        text-overflow: ellipsis;
+        /*height: 38px;*/
+        border-style: solid;
+        border: 1px solid #e7e7e7;
+        border-width: 1px 0 0 1px;
+    }
+
+    ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    #tree-data li {
+        display: inline;
+    }
+
+    .icon-dropdow-folder {
+        background-position: -82px -299px;
+        text-indent: -999px;
+        float: right;
+        display: block;
+    }
+
+    /*custom grid kendo*/
+
+    .k-grid th.k-header,
+    .k-grid-header {
+        background: #38baf8;
+        font-weight: lighter;
+        text-align: left;
+        font-family: "Lato" !important;
+        height: 26px;
+    }
+
+
+    .k-grid th.k-header-gray {
+        background: gray;
+        font-weight: lighter;
+        text-align: left;
+        font-family: "Lato" !important;
+        height: 26px;
+    }
+
+    .k-grid th.k-header,
+    .k-grid th.k-header .k-link {
+        color: #FFFFFF;
+        text-decoration: none;
+    }
+
+    .k-grid-header .k-link > .k-icon {
+        vertical-align: text-top;
+        line-height: 16px;
+    }
+
+    .bg-boldgrey {
+        background-color: #5e696e;
+    }
+
+    .bg-grey {
+        background-color: #76838a;
+    }
+
+    .k-grid th.k-header-white {
+        background: #ffffff;
+        border-style: solid;
+        border: none;
+        padding: .4em .6em;
+        overflow: visible;
+        line-height: 1.6em;
+        vertical-align: middle;
+        text-overflow: ellipsis;
+        border-left: 1px solid #e7e7e7;
+        /*height: 38px;*/
+    }
+
+    th.k-icon {
+        width: 20px;
+        height: 20px;
+        background-position: -228px -334px;
+        background: url(../images/icon-sprite.png);
+        float: right;
+        display: block;
+    }
+
+    /* manh: resize tooltip */
+    .tooltip-inner {
+        max-width: 400px;
+    }
+
+    /*progress*/
+    progress {
+        background-color: #C7D5ED;
+        border: 0;
+        height: 24px;
+        /*border-radius: 9px;*/
+    }
+
+        progress[value]::-webkit-progress-bar {
+            background-color: #eee;
+            border-radius: 2px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+        }
+
+
+    .fileDraggable:hover {
+        cursor: move;
+    }
+</style>

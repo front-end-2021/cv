@@ -1,0 +1,141 @@
+﻿<div class="pop-wrapper" id="pop-add-fragenset">
+    <div class="ms-modal-body">
+        <form id="add-fragenset-form" data-bind="events:{change: formChange}">
+            <div class="form-group">
+                <label id="lblNameFragenset">Name :</label>
+                <p class="clear"></p>
+                <input class="modal-input txtInput w-98per" tabindex="1" maxlength="100" name="FragensetName" id="txtNameFragenset" data-value-update="keyup" data-bind="value: fragenset.Name"/>
+            </div>
+            <hr class="modal-market-hr"/>
+            <div class="form-group">
+                <label id="lblDescriptionFragenset">Description :</label>
+                <p class="clear"></p>
+                <textarea class="modal-textarea w-98per" tabindex="2" name="FragensetDescription" id="txtDescriptionFragenset" data-value-update="keyup" data-bind="value: fragenset.Description"></textarea>
+            </div>
+        </form>
+    </div>
+    <div class="modal-market-footer">
+        <button type="button" class="ms-button" id="btnCloseFragenset" tabindex="3" data-bind="events:{click: update}">
+            <span class="icon-16 icon-close margin-right6"></span><span id="lblClose">Speichern und schliessen</span>
+        </button>
+    </div>
+</div>
+<div class="loading" id="add-fragenset-loading"></div>
+<script type="text/javascript">
+    var fragensetViewModel;
+    var vmEditFragenset = {};
+  
+    vmEditFragenset.IsModified = false;
+    vmEditFragenset.SetupValidate = function () {
+        $('#add-fragenset-form').validate({
+            rules: {
+                FragensetName: {
+                    required: true,
+                   // maxlength: 100
+                }
+            },
+            messages: {
+                FragensetName: {
+                    required: kLg.requiredName,
+                  //  maxlength: kLg.msgMaxlenghName
+                }
+            }
+        });
+
+        //prevent Enter key submit form
+        $('form').on('submit', function (e) {
+            e.preventDefault();
+            $('#btnCloseFragenset').trigger('click');
+        });
+    };
+
+
+    vmEditFragenset.setupLanguage = function () {
+        $('#lblClose').text(kLg.lblClose);
+        $('#lblNameFragenset').text(kLg.titleFrName);
+        $('#lblDescriptionFragenset').text(kLg.titleFrDescription);
+    };
+    $("#txtNameFragenset").on('keydown', function (e) {
+        if (e.keyCode == 9 || e.keyCode == 13) {
+            e.preventDefault();
+            return;
+        }
+    });
+    popUpAddFragenset.bind("close", function (e) {
+       // e.preventDefault();
+        if (vmEditFragenset.IsModified == true) {
+            if (!confirm(kLg.saveConfirmQuestion)) {
+                popUpAddFragenset.destroy();
+                popUpAddFragenset = null;
+                $('.body-content').after('<div id="pop-add-fragenset-place"></div>');
+
+            } else {
+                e.preventDefault();
+                if (!$('#add-fragenset-form').valid()) {
+                    return;
+                };
+                fragensetViewModel.update();
+                
+                //popUpAddFragenset = null;
+                $('.body-content').after('<div id="pop-add-fragenset-place"></div>');
+            }
+        } else {
+            popUpAddFragenset.destroy();
+            popUpAddFragenset = null;
+            $('.body-content').after('<div id="pop-add-fragenset-place"></div>');
+
+        }
+    });
+
+    $(function () {
+        fragensetViewModel = kendo.observable({
+            fragenset: vmFragensetList.editFragenset.Fragenset,
+            formChange: function () {
+                vmEditFragenset.IsModified = true;
+            },
+            update: function (e) {
+                if ($('#add-fragenset-form').valid()) {
+                    var funcName = vmFragensetList.editFragenset.IsEdit ? "updatefragenset" : "addfragenset";
+                    var theFragenset = this.fragenset;
+                    vmEditFragenset.saveChange(theFragenset, funcName);
+
+                }
+            },
+            formChange: function () {
+                vmEditFragenset.IsModified = true;
+            }
+           
+        });
+
+        vmEditFragenset.activeModelChange = function () {
+            vmEditFragenset.IsModified = true;
+        };
+        kendo.bind($('#pop-add-fragenset'), fragensetViewModel);
+       
+        vmEditFragenset.SetupValidate();
+        vmEditFragenset.setupLanguage();
+        limitedTabKey();
+    });
+   
+
+
+    vmEditFragenset.saveChange = function (data, funcName) {
+        if (vmEditFragenset.IsModified == true) {
+            var url = '../Handlers/CrmFragensetHandler.ashx?funcName=' + funcName + "&projid=" + projectId + "&strid=" + strategyId;
+            callAjax('add-fragenset-loading', url, JSON.stringify(data), vmEditFragenset.callBackData, AjaxConst.PostRequest);
+            vmEditFragenset.IsModified = false;
+        } else {
+            popUpAddFragenset.close();
+        }
+    };
+    vmEditFragenset.callBackData = function (res) {
+        if (res == vmCrmEnum.ResultStatus.CONFLICT) {
+            pAlert(kLg.projectConflict);
+        }
+        if (popUpAddFragenset != null) {
+            popUpAddFragenset.close();
+        }
+        vmFragensetList.dataservice.getfragensetbyproject(null, vmFragensetList.loadFragensetListTemplate);
+    };
+    
+</script>

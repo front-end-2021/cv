@@ -1,0 +1,136 @@
+﻿<div id="popUpLabelContent"></div>
+<script id="popLabelTemplate" type="text/html">
+    <div class="modal-body ms-modal-body">
+        <form>
+
+            <div class="form-group">
+                <label id="lblPopLabelEditName">Name</label><span style="font-weight: bold">*</span>
+                <div class="clear"></div>
+                <input id="labelName" name="labelName" class="modal-input txtInput w-98per" tabindex="1" value="#=htmlEscape(data.Name)#" maxlength="50" />
+            </div>
+            <hr class="modal-market-hr">
+            <div class="form-group">
+                <label id="lblPopLabelEditDes">Description</label>
+                <div class="clear"></div>
+                <textarea id="labelDescription" tabindex="2" class="modal-textarea w-98per">#if (data.Description != null){##=data.Description##}#</textarea>
+            </div>
+        </form>
+    </div>
+    <div class="modal-market-footer">
+        <button type="button" class="ms-button" tabindex="3" onclick="onCloseLabel()"><span class="icon-16 icon-close margin-right6"></span><span>Schliessen</span></button>
+    </div>
+</script>
+
+<script type="text/javascript">
+    var vmPopNonTypeEdit = {};
+    vmPopNonTypeEdit.isChange = false;
+
+    $(document).ready(function () {
+        //manh: file
+        vmFile.assginedIcon("popEditNonType");
+
+        bindTemplate("popUpLabelContent", "popLabelTemplate", vmCommon.currentMarket);
+        onCheckChangeNonType();
+        vmCommon.popEdit.bind("close", function (e) {
+            vmFile.enableAssignedIcon = false;
+            if (vmPopNonTypeEdit.isChange) {
+                if (!confirm(kLg.saveConfirmQuestion)) {
+                    vmCommon.popEdit.destroy();
+                    vmCommon.popEdit = null;
+                    $('.body-content').after('<div id="popEditNonType"></div>');
+                } else {
+                    if (validEditLabel()) {
+                        updateDataLabel(vmCommon.currentControl);
+                        vmCommon.popEdit.destroy();
+                        vmCommon.popEdit = null;
+                        $('.body-content').after('<div id="popEditNonType"></div>');
+                    } else {
+                        e.preventDefault();
+                    }
+
+                }
+
+            } else {
+                vmCommon.popEdit.destroy();
+                vmCommon.popEdit = null;
+                $('.body-content').after('<div id="popEditNonType"></div>');
+            }
+
+        });
+
+        setPopEditLabelLanguage();
+
+        $('#labelName').keydown(function (e) {
+            $('#labelName').tooltip('hide');
+            if (e.keyCode == 13) {
+                e.preventDefault();
+            }
+        });
+
+        limitedTabKey();
+        $('#labelName').focus();
+    });
+    
+
+    function onCloseLabel() {
+        if (validEditLabel()) {
+            vmPopNonTypeEdit.isChange = false;
+            updateDataLabel(vmCommon.currentControl);
+            vmCommon.popEdit.close();
+        }
+    }
+
+    function updateDataLabel(typeUpdate) {
+        var id = vmCommon.currentMarket.Id;
+        var name = $("input#labelName").val().trim();
+        var description = $("textarea#labelDescription").val();
+
+        var jsonObject = { Id: id, Name: name, Description: description, Mdf: vmCommon.currentMarket.Mdf };
+        vmSProduct.isExpandLabel = 1;
+        if (id == 0) {
+            editProduct(jsonObject, "insert" + typeUpdate);
+        } else {
+            editProduct(jsonObject, "update" + typeUpdate);
+        }
+
+
+    }
+
+    function onCheckChangeNonType() {
+        $("#labelName").on("change keyup paste", function () {
+            vmPopNonTypeEdit.isChange = true;
+        });
+
+        $("#labelDescription").on("change keyup paste", function () {
+            vmPopNonTypeEdit.isChange = true;
+        });
+    }
+
+    function setPopEditLabelLanguage() {
+        $("#lblPopLabelEditName").text(kLg.PopName);
+        $("#lblPopLabelEditDes").text(kLg.labelDes);
+        $("span.icon-close").next().text(kLg.lblClose);
+    }
+
+    function validEditLabel() {
+        $('#labelName').tooltip('destroy');
+        var labelName = $('#labelName').val().trim();
+        if (labelName == null || labelName == '') {
+            $('#labelName').attr('title', kLg.requiredName);
+            $('#labelName').tooltip({ placement: 'top', trigger: 'manual' }).tooltip('show');
+            $('#labelName').focus();
+            return false;
+        } else {
+            if (labelName.length > 100) {
+                $('#labelName').attr('title', kLg.msgMaxlenghName);
+                $('#labelName').tooltip({ placement: 'top', trigger: 'manual' }).tooltip('show');
+                $('#labelName').focus();
+                return false;
+            } else {
+                return true;
+            }
+
+        }
+    }
+
+</script>

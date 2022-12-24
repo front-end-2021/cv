@@ -1,0 +1,241 @@
+﻿<style type="text/css">
+    .k-autocomplete .k-input {
+        height: 1.65em;
+        line-height: 1.65em;
+        padding: 0.177em 0;
+        text-indent: 4px;
+        border: 0px !important;
+        margin: 0;
+    }
+
+    /* multiselect */
+    .divtag .k-multiselect-wrap input[class~="k-input"] {
+        /*display: none !important;*/
+        background-color:white!important;
+        border:none!important;
+    }
+    .divtag .k-multiselect-wrap {
+        border-radius: 0px !important; 
+    }
+
+    .divtag .k-multiselect.k-header {
+        border-color: #E7E7E7 !important;
+    }
+
+    .k-animation-container .k-state-focused {
+        border-width: 0;
+        border-color: #E7E7E7;
+        box-shadow: none;
+    }
+    /**/
+    .divtag .k-multiselect-wrap li[class~="k-button"] {
+        color: #2e2e2e;
+        border-color: #fafafa;
+        background-color: #fafafa;
+        border-radius: 30px;
+        max-width: 99%;
+    }
+
+    .divtag .k-multiselect-wrap li[class~="k-button"]:hover {
+        color: #2e2e2e;
+        border-color: #EBEBEB;
+        background-color: #EBEBEB;
+        border-radius: 30px;
+        max-width: 99%;
+    }
+
+    .divtag .k-multiselect, #ddlTags-list {
+        width: 393px !important;
+    }    
+</style>
+
+<div style="width: 600px; margin: 0 auto" class="pop-wrapper" id="edit-form-alltag">
+    <div class="loading" id="loadingEditInfo"></div>
+    <div class="modal-body ms-modal-body">
+        <div id="divAllTag">
+            <div class="div-item divtag" style="height: 220px;">
+                <label class="lable-md-organ" id="lblTag">Tags</label>
+                <div class="clear"></div>
+                <!--<select id="ddlTags" class="w-100per" data-text-field="Name" data-value-field="Id" data-bind="source: tagGroup, value: oldTags" multiple></select>-->
+
+                <select data-role="multiselect"
+                        data-placeholder=""
+                         data-filter="contains"
+                        data-text-field="Name"
+                        data-value-field="Id"
+                        data-bind="value: oldTags,source: allTagGroup,events:{change: changeTag,filtering: multiSelectFiltering} "
+                        id="ddlTags"></select>
+
+            </div>
+            <div class="modal-market-footer">
+                <button type="button" class="ms-button" id="btnSave" data-bind="events:{click: saveTag}"><span class="icon-16 icon-close margin-right6"></span><span id="lblClose">Speichern und schliessen</span></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    var vmAllTag = vmAllTag || {};
+    vmAllTag.Ultis = {};
+    var allTagGroup = [];
+    var oldTags = [];
+    var copyTags = [];
+    var parentType = vmCrmFilterControl.flagPage;
+    var type = vmCrmFilterControl.flagPage === vmCrmEnum.SettingType.Organisation ? vmCrmEnum.OrganisationSetting.Tags : vmCrmEnum.PersonSetting.Tags;
+    var idFilter = vmCrmFilterControl.viewModel.idFilter;
+    var textSearch = vmCrmFilterControl.viewModel.textSearchName ? vmCrmFilterControl.viewModel.textSearchName.trim() : "";
+
+    vmAllTag.getCategoryTag = function () {
+        var url = "../Handlers/CrmSettingHandler.ashx?funcName=getallcategoriesbytype&parentType=" + parentType + "&type=" + type + "&projid=" + projectId;
+        callAjax('div-loading-ucaccount', url, null, callback_loadTagGroup, AjaxConst.PostRequest);
+    };
+
+    vmAllTag.saveTag = function (entryData) {
+        var url = "../Handlers/CrmFilterHandler.ashx?funcName=savetag&projid=" + projectId;
+        callAjax('div-loading-ucaccount', url, JSON.stringify(entryData), callback_saveTagGroup, AjaxConst.PostRequest);
+    };
+
+    function callback_loadTagGroup(data) {
+
+        allTagGroup = data.value;
+        var listTagId = [];
+
+        if (parentType === vmCrmEnum.SettingType.Organisation) {
+            listTagId = vmViewOrg.viewModel.listtagids;
+        } else if (parentType === vmCrmEnum.SettingType.Person) {
+            listTagId = vmViewPerson.viewModel.listtagids;
+        }
+
+        if (listTagId !== null) {
+            for (var k = 0; k < allTagGroup.length; k++) {
+                if ($.grep(listTagId, function (it) { return it === allTagGroup[k].Id; }).length > 0) {
+                    var loadTag = vmCommon.deepCopy(allTagGroup[k]);
+                    loadTag.Status = 0; // 0 is default
+                    oldTags.push(loadTag);
+                }
+            }
+        }
+        
+        copyTags = vmCommon.deepCopy(oldTags);
+        vmAllTag.Ultis.loadForm();
+    }
+
+    function callback_saveTagGroup(data) {
+
+        if (data.value) {
+            vmAllTag.destroyPop();
+            vmAllTag.isModified = false;
+            vmCrmFilterControl.reloadfilter(vmCrmFilterControl.IdFocus, vmCrmFilterControl.flagPage);
+        }
+    }
+
+    vmAllTag.Ultis.loadForm = function () {
+        vmAllTag.viewModel = kendo.observable({
+            allTagGroup: allTagGroup,
+            oldTags: oldTags,
+            newTags: [],
+
+            multiSelectFiltering: function (e) {
+                var filter = e.filter;
+                if (filter) {
+                    filter.value = filter.value.replace(/\s\s+/g, ' ');
+                    if (filter.value.indexOf(' ') == 0) {
+                        filter.value = filter.value.slice(1);
+                    };
+                    e.sender.input.val(filter.value);
+                };
+
+            },
+
+            changeTag: function (e) {
+
+                if (copyTags.length > vmAllTag.viewModel.oldTags.length) {
+                    //delete
+                    for (var i = 0; i < copyTags.length; i++) {
+                        var deleteFlag = true;
+                        for (var j = 0; j < vmAllTag.viewModel.oldTags.length; j++) {
+                            if (copyTags[i].Id === vmAllTag.viewModel.oldTags[j].Id) {
+                                deleteFlag = false;
+                                break;
+                            }
+                        }
+                        if (deleteFlag) {
+                            var deleteTag = vmCommon.deepCopy(copyTags[i]);
+                            deleteTag.Status = 2; // Is Delete Tag
+                            vmAllTag.viewModel.newTags = $.grep(vmAllTag.viewModel.newTags, function (it) { return it.Id !== deleteTag.Id });
+                            vmAllTag.viewModel.newTags.push(deleteTag);
+                        }
+                    }
+                } else if (copyTags.length < vmAllTag.viewModel.oldTags.length) {
+                    //add
+
+                    var addTag = $.grep(vmAllTag.viewModel.oldTags, function (it) { return it.Status !== 0 });
+                    if (addTag.length > 0) {
+                        for (var i = 0; i < addTag.length; i++) {
+                            addTag[i].Status = 1; // Is Add Tag
+                            vmAllTag.viewModel.newTags = $.grep(vmAllTag.viewModel.newTags, function (it) { return it.Id !== addTag[i].Id });
+                            vmAllTag.viewModel.newTags.push(addTag[i]);
+                        }
+                        
+                    }
+                }
+                copyTags = vmCommon.deepCopy(vmAllTag.viewModel.oldTags);
+                vmAllTag.isModified = true;
+            },
+            saveTag: function () {
+
+                var newTags = [];
+                for (var i = 0; i < vmAllTag.viewModel.newTags.length; i++) {
+                    var newTag = { Id: vmAllTag.viewModel.newTags[i].Id, Status: vmAllTag.viewModel.newTags[i].Status };
+                    newTags.push(newTag);
+                }
+
+                //var crmFilterItems = null;
+                //if (idFilter > 0) {
+                //    var filterItem = $.grep(vmCrmFilterControl.viewModel.menuFilter, function (it) { return it.Id === vmCrmFilterControl.viewModel.idFilter });
+                //    var crmFilterData = JSON.parse(filterItem[0].FilterValue);
+                //    if (crmFilterData !== null && crmFilterData !== undefined) {
+                //        crmFilterItems = crmFilterData.CrmFilterItems;
+                //    }
+                //}
+                //var filterData = { TypeId: parentType, CrmFilterItems: crmFilterItems, IdFocus: 0, IdFilter: idFilter };
+
+                var entryData = { NewTags: newTags, ParrentType: parentType, Type: type, IdFilter: idFilter, ProjectId: projectId, SearchName: textSearch, FilterData: vmCrmFilterControl.CurrentFilter.FilterData }
+                
+                vmAllTag.saveTag(entryData);
+                
+            }
+        });
+        kendo.bind($("#edit-form-alltag"), vmAllTag.viewModel);
+    };
+
+    $(document).ready(function () {
+
+        $('#lblClose').text(kLg.lblClose);
+        vmAllTag.getCategoryTag();
+    });
+    
+    vmAllTag.destroyPop = function () {
+        if (vmCrmFilterControl.popSetAllTag !== null) {
+            vmCrmFilterControl.popSetAllTag.destroy();
+        }
+        vmCrmFilterControl.popSetAllTag = null;
+        $(".info-filter").after('<div id="pop-edit-alltag"></div>');
+        
+    };
+
+    vmCrmFilterControl.popSetAllTag.bind("close", function (e) {
+        if (vmAllTag.isModified) {
+            if (confirm(kLg.saveConfirmQuestion)) {
+                vmAllTag.viewModel.saveTag();
+                e.preventDefault();
+            } else {
+                vmAllTag.destroyPop();
+            }
+        } else {
+            vmAllTag.destroyPop();
+        }
+
+    });
+</script>

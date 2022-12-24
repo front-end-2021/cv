@@ -1,0 +1,733 @@
+﻿<!-- Manh: -->
+<style>
+    .show-img {
+        position: relative;
+    }
+
+    .show-img:hover .preview-img {
+        position: absolute;
+        display: block;
+        border: 2px solid #e7e7e7;
+        border-radius: 5px;
+        z-index: 1;
+        top: 15px;
+        max-width: 700px;
+        object-fit: cover;
+    }
+
+    .preview-img {
+        position: absolute;
+        display: none;
+    }
+
+    #grid-asn tr {
+        cursor: default;
+    }
+    .div-file-assign #uploadFile {
+        min-height: 19px;
+        max-height: 19px;
+        display: inline-flex;
+        margin-top: 6px;
+        margin-right: 0;
+    }
+    .dnb-h-center {
+        margin-top: -1px;
+        padding-bottom: 1px;
+        padding-right: 7px;
+    }
+</style>
+
+<div class="div-file-assign">
+
+    <button type="button" class="ms-button btn-uploadfileassign" name="uploadFile" id="uploadFile" onclick="showUploadFile()">
+        <span class="icon-16 icon-upload"></span><span id="lblUpload">Hochladen</span>
+    </button>
+
+</div>
+<div class="clear icon-pdf"></div>
+<div id="holder-asn" style="padding: 3px 12px 14px 14px; height: 474px">
+    <div id="grid-asn" style="max-height: 465px; min-height: 80px;">
+    </div>
+    <div style="box-sizing: border-box; overflow: hidden; margin-top: 0; border: 1px solid #d5d5d5; border-top: none;">
+        <video autoplay loop style=" width: 100%; height: 100%; margin-bottom: -10px;">
+            <source src="../Images/GUI. Animation.mp4">
+        </video>
+    </div>
+</div>
+<div class="clear"></div>
+
+<div class="modal-market-footer mass-footer-asn"
+     style="background-color:transparent;border-color:transparent; margin-top:160px">
+    <button type="button" class="ms-button margin-left12 icon-left-block" 
+            id="switchPop" onclick="switchPopUpFileAssign2();" style="z-index: 99999999;">
+        <span class="icon-20 icon-folder-white" style="padding-right:5px;"></span>
+        <span id="lblAddFile-asn">Associate files with file manager</span>
+    </button>
+    
+    <button type="button" class="ms-button margin-left12" onclick="assignedFile();" style="display:flex;">
+        <span class="icon-20 icon-add-file dnb-h-center"></span>
+        <span class="lblClose" style="align-self:center;">Save and Close</span>
+    </button>
+</div>
+
+<script type="text/javascript">
+    vmFile.popUpFileAssigned.bind("close", function (e) {
+        
+        if (vmFile.isSwitchPopUp || vmFile.popUpToAssign) {
+            destroyPopUpFileAssigned();
+        } else {            
+            if (vmFile.isChangeFileAssigned) {
+                if (vmFile.idFileAssigned.assigntype !== vmCommon.enumType.CrmStatusProtocol)
+                    reloadAssignIcon(vmFile.idFileAssigned.fileids.length > 0);
+
+                console.trace()
+
+                ynConfirm(kLg.msnIsChangedAssigned).then(
+                    function () {          // button yes              
+                        assignedFile();                        
+                        destroyPopUpFileAssigned();                        
+                        vmFile.isChangeFileAssigned = false;
+                    },
+                    function () {           // button no             
+                        vmFile.restoreFileAssigned();
+                                                
+                        void function updateIconAssignToParent() {
+                            if (document.getElementById('grid-asn')) {
+                                if ($("#grid-asn").data('kendoGrid')) {
+                                    var lstItem = $("#grid-asn").data('kendoGrid')._data.map(function (e) { return e.FromAssigned });
+
+                                    if (document.getElementById('iconEmpty')) {
+                                        if (lstItem.some(function (f) { return !f })) {
+                                            $('#iconEmpty').removeClass('icon-folder-white').addClass('icon-folder-full-white');
+                                        } else {
+                                            $('#iconEmpty').removeClass('icon-folder-full-white').addClass('icon-folder-white');
+                                        };
+                                    }                                    
+                                };
+                            }
+                        }();
+
+                        destroyPopUpFileAssigned();
+                    });                
+            } else { 
+                destroyPopUpFileAssigned();
+            }
+            e.preventDefault();
+        }
+
+        vmFile.popFileAssignedActive = false;
+        
+    });
+
+
+    
+
+
+    function destroyPopUpFileAssigned() {   
+        if (!vmFile.popUpFileAssigned) return;
+           
+        vmFile.popUpFileAssigned.destroy();
+        vmFile.popUpFileAssigned = null;
+        $('div[class="navbar-collapse collapse block-nav"]').after('<div id="pop-file-assigned"></div>');
+        //vmFile.checkChangeIconFileCrm(vmFile.idFileAssigned.assignidi, vmFile.idFileAssigned.assigntype);
+        vmFile.isSwitchPopUp = false;
+        vmFile.isFilterByImage = false;
+        //vmGoalAction.checkOpenPopup = false;
+    }
+    
+    function switchPopUpFileAssign2() {
+        vmFile.popFileAssignedOpen = true;
+        vmFile.switchPopUpFileAssign();
+    }
+
+    function setUpSetting() {
+        if (vmFile.RegionRole == undefined) {
+            if (vmFile.CurrentRole <= 0) {
+                $('#switchPop').hide();
+            }
+        } else {
+            if (vmFile.RegionRole <= 0) {
+                $('#switchPop').hide();
+            }
+        }
+
+        $('#pop-file-assigned').on('keydown', function (e) {
+            if (e.keyCode == 9) {
+                e.preventDefault();
+                return;
+            }
+        });
+
+        if (typeof (Uploading) === "undefined"
+            && (vmFile.idFileAssigned.assigntype === vmCommon.enumType.CrmOrganisation
+            || vmFile.idFileAssigned.assigntype === vmCommon.enumType.CrmPerson
+            || vmFile.idFileAssigned.assigntype === vmCommon.enumType.CrmActivity
+            || vmFile.idFileAssigned.assigntype === vmCommon.enumType.CrmStatusProtocol
+            || vmFile.idFileAssigned.assigntype === vmCommon.enumType.ActionTodoFile
+            || vmFile.idFileAssigned.assigntype === vmCommon.enumType.Action
+                || vmFile.idFileAssigned.assigntype === vmCommon.enumType.Goal
+                || vmFile.idFileAssigned.assigntype === vmCommon.enumType.SubGoal)) {
+            vmFile.switchPopUpFileAssign('openassign');
+        }
+
+        if (vmFile.idFileAssigned.assigntype !== vmCommon.enumType.CrmOrganisation
+            && vmFile.idFileAssigned.assigntype !== vmCommon.enumType.CrmPerson
+            && vmFile.idFileAssigned.assigntype !== vmCommon.enumType.CrmActivity
+            && vmFile.idFileAssigned.assigntype !== vmCommon.enumType.CrmStatusProtocol
+            && vmFile.idFileAssigned.assigntype !== vmCommon.enumType.ActionTodoFile
+            && vmFile.idFileAssigned.assigntype !== vmCommon.enumType.Action
+            && vmFile.idFileAssigned.assigntype !== vmCommon.enumType.Goal
+            && vmFile.idFileAssigned.assigntype !== vmCommon.enumType.SubGoal) {
+            $(".btn-uploadfileassign").hide();
+        }
+
+        if (vmFile.idFileAssigned.assigntype === vmCommon.enumType.CrmOrganisation
+            || vmFile.idFileAssigned.assigntype === vmCommon.enumType.CrmPerson
+            || vmFile.idFileAssigned.assigntype === vmCommon.enumType.CrmActivity
+            || vmFile.idFileAssigned.assigntype === vmCommon.enumType.CrmStatusProtocol
+            || vmFile.idFileAssigned.assigntype === vmCommon.enumType.ActionTodoFile
+            || vmFile.idFileAssigned.assigntype === vmCommon.enumType.Action
+            || vmFile.idFileAssigned.assigntype === vmCommon.enumType.Goal
+            || vmFile.idFileAssigned.assigntype === vmCommon.enumType.SubGoal) {
+            
+            var holderAssined = document.getElementById('holder-asn');
+
+            if (holderAssined !== undefined && holderAssined !== null) {
+                holderAssined.ondragover = function () { return false; };
+                holderAssined.ondragleave = function () { return false; };
+
+                holderAssined.ondrop = function (e) {
+                    if (!(vmFile.CurrentRole > 0)) {
+                        return false;
+                    }
+
+                    if (!e.dataTransfer) return false;
+                    currentPage = getCurrentPage();
+                    this.className = '';
+
+                    var files = e.dataTransfer.files,
+                        data = new FormData(),
+                        count = 0;
+                    if (overMaxLength(files)) {
+                        pAlert(kLg.msgTotalFileOverLoad);
+                        return false;
+                    }
+
+                    if (validFileUpload(files)) {
+                        for (var i = 0; i < files.length; i++) {
+                            data.append(files[i].name, files[i]);
+                            count++;
+                        }
+                    }
+                    e.preventDefault();
+
+                    if (count > 0) {
+                        if (vmFile.idFileAssigned.assignidi <= 0)
+                            vmFile.isChangeFileAssigned = true;
+
+                        if (vmFile.idFileAssigned.assigntype === vmCommon.enumType.ActionTodoFile
+                            || vmFile.idFileAssigned.assigntype === vmCommon.enumType.Action
+                            || vmFile.idFileAssigned.assigntype === vmCommon.enumType.SubGoal
+                            || vmFile.idFileAssigned.assigntype === vmCommon.enumType.Goal)
+                            Uploading(data, function (res) {
+                                //alert('xx');
+                            });
+                        else Uploading(data, loadFileAssigned);
+                    }
+
+                    return false;
+                };
+            }
+        }        
+    };
+
+    $(document).ready(function () {
+        vmFile.popFileAssignedActive = true;
+        $('#pop-file-assigned .lblClose').text(kLg.lblClose);
+        $('#lblAddFile-asn').text(kLg.lblAssociateWithFileManager);
+        $("#pop-file-assigned #lblUpload").text(kLg.lblNewDataUpload);
+        
+        loadFileAssigned(vmFile.idFileAssigned.contents);
+        setUpSetting();
+
+        void function setupTabindex() {
+            $('.div-file-assign #switchPop').attr('tabindex', 0);
+            $('#grid-asn tbody input').attr('tabindex', 0);
+            $('#grid-asn thead a').attr('tabindex', -1);
+        }();
+    });
+
+    function loadFileAssigned(res) {
+        if (typeof (actViewModel) !== "undefined" && vmFile.idFileAssigned.assigntype === vmCommon.enumType.CrmStatusProtocol) {
+
+            var act = actViewModel.get("activity");
+            if (typeof (act) !== "undefined") {
+                for (var i = 0; i < act.CrmStatusProtocolClients.length; i++) {
+                    if (act.CrmStatusProtocolClients[i].Id === vmFile.idFileAssigned.assignidi) {
+                        act.CrmStatusProtocolClients[i].StatusHasFileAssgined = res.length > 0 ? true : false;
+                        break;
+                    }
+                }
+
+                actViewModel.set("activity", act);
+
+                kendo.bind($('#edit-form-activity'), actViewModel);
+            }
+        }
+
+        $("#grid-asn").kendoGrid().empty();
+        var vsource = new kendo.data.DataSource({
+            data: res.map(function (el) { el.IsAssigned = true; return el }),
+            schema: {
+                model: {
+                    fields: {
+                        Name: { editable: true }
+                    }
+                }
+            },
+            pageSize: 10
+        });
+        
+        $("#grid-asn").kendoGrid({
+            dataSource: vsource,
+            scrollable: false,
+            sortable: true,
+            filterable: false,
+            pageable: {
+                input: true,
+                numeric: false,
+                messages: {
+                    display: "{0}-{1} " + kLg.charOf + " {2} " + kLg.charItems,
+                    empty: kLg.msgFileEmpty,
+                    page: kLg.charPage,
+                    of: kLg.charOf + " {0}"
+                }
+            },
+            columns: [
+                {
+                    title: "<span class='icon-20 icon-folder-add td-icon'></span>",
+                    width: "38px",
+                    template: "#=showIcon(ProjectId, PhysicalName, Type, Name)#"
+                },
+                { field: "Name", title: kLg.nameHeader, template: "#=showNameAssign(Id, Name, Type, PhysicalName)#", width: "250px", headerAttributes: { style: "background-color: #76838a;" } },
+                { field: "Description", title: kLg.descriptionHeader, template: "#=showDescription(PhysicalName, Description, Type, true)#", headerAttributes: { style: "background-color: #76838a;" } },
+                { field: "CreatedBy", title: kLg.createdByHeader, width: "170px", template: "#=showCreator(CreatedBy)#", headerAttributes: { style: "background-color: #76838a;" } },
+                { field: "CreatedDate", title: kLg.dateHeader, width: "110px", template: "#=showTime(CreatedDate)#", headerAttributes: { style: "background-color: #76838a;" } },
+                { title: "", width: "30px", template: "#=showCheckboxAsn(Id, Type, FromAssigned, IsAssigned)#", headerAttributes: { style: "background-color: #76838a;" } },
+                { title: "", template: "#=showMenuAssign(Id, Mdf, PhysicalName, Name, Type, Description, FromAssigned)#", width: "30px", headerAttributes: { style: "background-color: #76838a;" } }
+            ],
+            dataBinding: function (e) {
+                adjustPositionImgThumb(e);
+            },
+            page: function (e) {
+                adjustPositionImgThumb(e);
+            }
+        });
+        function adjustPositionImgThumb(e) {
+            setTimeout(function () {
+                if (e.sender.element)
+                    e.sender.element.find('.show-img').each(function () {
+                        
+                        var imgIconTop = $(this).offset().top,
+                            popupHeight = $('#pop-file-assigned').height(),
+                            $imgPreview = $(this).find('img.preview-img').first(),
+                            imgThumbHeight = $imgPreview.height();
+                        var imgOffset = imgIconTop + imgThumbHeight + 50,
+                            maxY = popupHeight + 128;
+
+                        imgOffset > maxY && $imgPreview.css({ 'top': (maxY - imgOffset - Math.floor(popupHeight / 9)) + 'px' });
+                    });
+            }, 567);
+        };
+
+    };
+
+    function showNameAssign(id, name, type, physicalname) {
+        if (type == 0) {
+            if (vmFile.CurrentRole > 0) {
+                return '<div id="' + id + '" type="' + type + '" style="width: 240px"><a href="javascript:openFolder(' + id + ');"><span class="value-folder file-sub" title="' + htmlEscape(name) + '" style="height: 20px;line-height:25px" fname="' + htmlEscape(name) + '" pname="' + htmlEscape(physicalname) + '" ftype="' + type + '" ondblclick="downloadFile(this)">' + htmlEscape(name) + '</span></a></div>';
+            }
+            return '<div id="' + id + '" type="' + type + '" style="width: 240px"><a href="javascript:openFolder(' + id + ');"><span class="value-folder file-sub" title="' + htmlEscape(name) + '" style="height: 20px;line-height:25px" fname="' + htmlEscape(name) + '" pname="' + htmlEscape(physicalname) + '" ftype="' + type + '" ondblclick="downloadFile(this)">' + htmlEscape(name) + '</span></a></div>';
+        } else {
+            if (vmFile.CurrentRole > 0) {
+                return '<div id="' + id + '" type="' + type + '" style="width: 240px"><span title="' + htmlEscape(name) + '" class="file-sub" style="height: 20px;line-height:25px" fname="' + htmlEscape(name) + '" pname="' + htmlEscape(physicalname) + '" ftype="' + type + '" ondblclick="downloadFile(this)" onclick="copyTitleToClipboard(this)">' + htmlEscape(name) + '</span></div>';
+            }
+            return '<div id="' + id + '" type="' + type + '" style="width: 240px"><span title="' + htmlEscape(name) + '"  class="file-sub" style="height: 20px;line-height:25px" fname="' + htmlEscape(name) + '" pname="' + htmlEscape(physicalname) + '" ftype="' + type + '" ondblclick="downloadFile(this)" onclick="copyTitleToClipboard(this)">' + htmlEscape(name) + '</span></div>';
+        }
+    };
+
+    function showMenuAssign(id, mdf, physicalName, name, type, description, canChecked) {
+        if (id > 0) {
+            var menu = '<div class="ms-dropdow" style="float:left;" ><span class="icon-16 icon-dropdow-folder menudropdownlis-assignfiled" data-toggle="dropdown" id="drpmenu-' + id + '"></span>';
+            menu += '<ul aria-labelledby="btnGroupVerticalDrop1" class="popup-menu dropdown-menu ms-popup-menu" role="menu" style="left: -143px;">';
+            //menu += '<ul aria-labelledby="btnGroupVerticalDrop1" class="dropdown-menu ms-popup-menu posAbsolute" role="menu" style="left: -143px;">';
+            if (vmFile.RegionRole == undefined) {
+                if (vmFile.CurrentRole > 0) {
+                    if (description == null) {
+                        menu += '<li onclick="showEditFileAssign(' + id + ')"><a class="dropdow-menu-li-a"><span class="icon-24  icon-left-block icon-command-gray"></span><span>' + kLg.btnRename + '</span></a></li>';
+                    } else {
+                        menu += '<li onclick="showEditFileAssign(' + id + ')"><a class="dropdow-menu-li-a"><span class="icon-24  icon-left-block icon-command-gray"></span><span>' + kLg.btnRename + '</span></a></li>';
+                    }
+
+                    if (type != 0) {
+                        menu += '<li role="presentation" class="divider"></li>';
+                        if (type == 8) {
+                            menu += '<li onclick=""><a href="' + htmlEscape(physicalName) + '" target="_blank" class="dropdow-menu-li-a"><span class="icon-24  icon-left-block icon-update-gray"></span><span>' + kLg.btnDownload + '</span></a></li>';
+                        } else {
+                            menu += '<li onclick=""><a href="../FileUpload/' + htmlEscape(physicalName) + '" target="_blank" download="' + name + '" class="dropdow-menu-li-a"><span class="icon-24  icon-left-block icon-update-gray"></span><span>' + kLg.btnDownload + '</span></a></li>';
+                        }
+
+                    }
+                    
+                    if (vmFile.CurrentRole > 0 && canChecked) {
+                        menu += '<li role="presentation" class="divider"></li>';
+                        menu += '<li class="assignedMenuCheckbox"><a class="dropdow-menu-li-a" id="bx' + id + '" onclick="checkToAssignFile(this);"><span class="icon-24 icon-left-block icon-new"></span><span>' + kLg.lblAssign + '</span></a></li>';
+                    }
+
+                    if (vmFile.CurrentRole > 0) {
+                        menu += '<li role="presentation" class="divider"></li>';
+                        menu += '<li onclick=""><a href="javascript:deleteFileAssign(' + id + ', ' + mdf + ', ' + type + ');" class="dropdow-menu-li-a"><span class="icon-24  icon-left-block icon-delete"></span><span>' + kLg.btnDelete + '</span></a></li>';
+                    }
+                    menu += '</ul></div>';
+                    return menu;
+                } else {
+                    if (type == 0) {
+                        return "";
+                    } else {
+                        menu += '<li onclick=""><a href="../FileUpload/' + htmlEscape(physicalName) + '" target="_blank" download="' + name + '" class="dropdow-menu-li-a"><span class="icon-24 icon-left-block icon-update-gray"></span><span>' + kLg.btnDownload + '</span></a></li>';
+                        menu += '</ul></div>';
+                        return menu;
+                    }
+                }
+            } else {
+                if (vmFile.RegionRole > 0) {
+                    if (vmFile.CurrentRole > 0) {
+                        if (description == null) {
+                            menu += '<li onclick="showEditFileAssign(' + id + ')"><a class="dropdow-menu-li-a"><span class="icon-24  icon-left-block icon-command-gray"></span><span>' + kLg.btnRename + '</span></a></li>';
+                            menu += '<li role="presentation" class="divider"></li>';
+                        } else {
+                            menu += '<li onclick="showEditFileAssign(' + id + ')"><a class="dropdow-menu-li-a"><span class="icon-24  icon-left-block icon-command-gray"></span><span>' + kLg.btnRename + '</span></a></li>';
+                            menu += '<li role="presentation" class="divider"></li>';
+                        }
+                    }
+
+                    if (type != 0) {
+                        //menu += '<li onclick=""><a href="../FileUpload/' + physicalName + '" target="_blank" download="' + name + '" class="dropdow-menu-li-a"><span class="icon-24  icon-left-block icon-update-gray"></span><span>' + kLg.btnDownload + '</span></a></li>';
+                        //menu += '<li role="presentation" class="divider"></li>';
+                        if (type == 8) {
+                            menu += '<li onclick=""><a href="' + htmlEscape(physicalName) + '" target="_blank" class="dropdow-menu-li-a"><span class="icon-24  icon-left-block icon-update-gray"></span><span>' + kLg.btnDownload + '</span></a></li>';
+                        } else {
+                            menu += '<li onclick=""><a href="../FileUpload/' + htmlEscape(physicalName) + '" target="_blank" download="' + name + '" class="dropdow-menu-li-a"><span class="icon-24  icon-left-block icon-update-gray"></span><span>' + kLg.btnDownload + '</span></a></li>';
+                        }
+                    }
+
+                    if (vmFile.CurrentRole > 0 && canChecked) {
+                        menu += '<li role="presentation" class="divider"></li>';
+                        menu += '<li class="assignedMenuCheckbox"><a class="dropdow-menu-li-a" id="bx' + id + '" onclick="checkToAssignFile(this);"><span class="icon-24  icon-left-block icon-new"></span><span>Assign</span></a></li>';
+                    }
+
+                    if (vmFile.CurrentRole > 0) {
+                        menu += '<li role="presentation" class="divider"></li>';
+                        menu += '<li onclick=""><a href="javascript:deleteFileAssign(' + id + ', ' + mdf + ', ' + type + ');" class="dropdow-menu-li-a"><span class="icon-24  icon-left-block icon-delete"></span><span>' + kLg.btnDelete + '</span></a></li>';
+                        menu += '</ul></div>';
+                    }
+                    return menu;
+                } else {
+                    if (type != 0) {
+                        menu += '<li onclick=""><a href="../FileUpload/' + htmlEscape(physicalName) + '" target="_blank" download="' + name + '" class="dropdow-menu-li-a"><span class="icon-24  icon-left-block icon-update-gray"></span><span>' + kLg.btnDownload + '</span></a></li>';
+                        menu += '</ul></div>';
+                        return menu;
+                    }
+                }
+
+                //if (type == 0) {
+                //    return "";
+                //} else {
+                //    menu += '<li onclick=""><a href="../FileUpload/' + physicalName + '" target="_blank" download="' + name + '" class="dropdow-menu-li-a"><span class="icon-24 icon-left-block icon-update-gray"></span><span>' + kLg.btnDownload + '</span></a></li>';
+                //    menu += '</ul></div>';
+                //    return menu;
+                //}
+            }
+        }
+        
+        return "";
+    };
+    
+
+
+    function showEditFileAssign(id) {
+        if (vmFile.CurrentRole > 0) {
+            var file = findFileAssign(id);
+            vmFile.FileEdit = file;
+
+            var ftype = file.Type;
+            var options = { height: (ftype == 8) ? 335 : 272, width: 500, resizable: false };
+
+            vmFile.popEditFile = showPopup(vmFile.popEditFile, $('#popEditFile'),
+                '/Contents/MsPopEditFile.html', options);
+            if (ftype > 0) {
+                vmFile.popEditFile.title(ftype == 8 ? kLg.editUrl : kLg.editFile);
+            } else {
+                vmFile.popEditFile.title(kLg.editFolder);
+            }
+        } else {
+            return;
+        }
+    };
+
+
+    function deleteFileAssign(id, mdf, type) {
+        var contents = [];
+        if (vmFile.CurrentRole > 0) {
+            pConfirm(type > 0 ? kLg.confirmDeleteFile : kLg.confirmDeleteFolder).then(function () {
+                vmFile.isChangeData = true;
+                if (type > 0) {
+                    var fileIndex = vmCommon.findIndexByFunc(vmFile.idFileAssigned.fileids, function (fileId) { return "cbx" + id == fileId; });
+                    if (fileIndex != -1) {
+                        vmFile.idFileAssigned.fileids.splice(fileIndex, 1);
+
+                        if (type == 7) { //image
+                            contents.push(vmFile.idFileAssigned.contents[fileIndex].PhysicalName);
+                        }
+
+                        vmFile.idFileAssigned.contents.splice(fileIndex, 1);
+                    }
+
+                    vmFile.removeFileAssigned(id);
+                }
+      
+                if (vmFile.openTodoFileAssign) {
+                    var newFileIds = $.grep(vmFile.tempAssignedFile.fileids, function (x) { return "cbx" + id !== x; });
+                    vmFile.tempAssignedFile.fileids = newFileIds;
+                    var newFileContents = $.grep(vmFile.idFileAssigned.contents, function (x) { return x.Id !== id; });
+                    vmFile.idFileAssigned.contents = newFileContents;
+
+                }
+                
+                vmFile.DeleteFile(id, mdf, type);
+
+                vmFile.afterDelete(contents);
+                //loadFileAssigned(vmFile.idFileAssigned.contents);
+            });
+        } else {
+            return;
+        }
+
+
+    };
+
+    function showCheckboxAsn(id, type, fromAssigned, IsAssigned) {
+        if (fromAssigned === true) return '';
+        if (vmFile.RegionRole == undefined) {
+            if (vmFile.CurrentRole > 0) {
+                return '<input type="checkbox" class="checkb" id="bx' + id + '" ' + (IsAssigned ? 'checked' : '') + ' onclick="checkToAssignAsn(this);"></input>';
+            }
+            return '<input x type="checkbox" class="checkb" id="bx' + id + '" ' + (IsAssigned ? 'checked' : '') + ' disabled></input>';
+        } else {
+            if (vmFile.RegionRole > 0) {
+                return '<input type="checkbox" class="checkb" id="bx' + id + '" ' + (IsAssigned ? 'checked' : '') + ' onclick="checkToAssignAsn(this);"></input>';
+            }
+            return '<input type="checkbox" class="checkb" id="bx' + id + '" ' + (IsAssigned ? 'checked' : '') + ' disabled></input>';
+        }
+    };
+
+    function checkToAssignFile(e) {        
+        setTimeout(function () {
+            $("#drpmenu-" + e.id.substring(2, e.id.length)).click();
+        }, 0);
+
+        vmFile.backupFileAssigned();
+
+        var isChecked = $("#" + e.id + " span:first").prop("class").indexOf("icon-new") !== -1;
+        if (isChecked) {            
+            var fileIndex = vmCommon.findIndexByFunc(vmFile.idFileAssigned.fileids, function (fileId) { return "c" + e.id == fileId; });
+            if (fileIndex != -1) {                
+                $("#" + e.id + " span:first").prop("class", "icon-24 icon-left-block icon-deactivate");
+                vmFile.idFileAssigned.fileids.splice(fileIndex, 1);
+                vmFile.idFileAssigned.contents.splice(fileIndex, 1);
+
+            }
+        }
+        else {            
+            vmFile.idFileAssigned.fileids.push('c' + e.id);
+            var item = vmCommon.findByFunc(vmFile.contentFileAssigned, function (obj) { return "c" + e.id == "cbx" + obj.Id; });
+            if (item != null) {
+                vmFile.idFileAssigned.contents.push(item);                                                
+                $("#" + e.id + " span:first").prop("class", "icon-24 icon-left-block icon-new");
+            }
+        }        
+    }
+
+    function checkToAssignAsn(e) {        
+        var checkb = undefined;
+        if (!e.checked) {
+            vmFile.backupFileAssigned();
+
+            var fileIndex = vmCommon.findIndexByFunc(vmFile.idFileAssigned.fileids, function (fileId) { return "c" + e.id == fileId; });
+            if (fileIndex != -1) {
+                checkb = document.getElementById(vmFile.idFileAssigned.fileids[fileIndex]);
+                if (checkb) {
+                    checkb.checked = false;
+                }
+                vmFile.idFileAssigned.fileids.splice(fileIndex, 1);
+                vmFile.idFileAssigned.contents.splice(fileIndex, 1);
+            }
+
+            //if (vmFile.openTodoFileAssign) {
+            //    //var newFileIds = $.grep(vmFile.tempAssignedFile.fileids, function (x) { return "c" + e.id !== x; });
+            //    //vmFile.tempAssignedFile.fileids = newFileIds;
+            //    var newFileContents = $.grep(vmFile.idFileAssigned.contents, function (x) { return "cbx" + x.Id !== "c" + e.id; });
+            //    vmFile.idFileAssigned.contents = newFileContents;
+            //}
+        }
+        else {
+            vmFile.idFileAssigned.fileids.push('c' + e.id);
+            var item = vmCommon.findByFunc(vmFile.contentFileAssigned, function (obj) { return "c" + e.id == "cbx" + obj.Id; });
+            if (item != null) {
+                vmFile.idFileAssigned.contents.push(item);
+                checkb = document.getElementById("cbx" + item.Id);
+                if (checkb) {
+                    checkb.checked = true;
+                }
+            }
+        }
+
+        void function changeCheckboxUIForSortable() {                              // replace changeMenuState function
+            var grdItems = $("#grid-asn").data().kendoGrid.dataSource.data();
+            grdItems.forEach(function (el, indx) {
+                if (parseInt(e.id.substring(2)) == el.Id)
+                    grdItems[indx].IsAssigned = e.checked;
+            });
+        }();
+        
+    };
+    
+
+</script>
+<style>
+    .mass-footer-asn {
+        margin-top: 90px;
+    }
+
+    input[type="checkbox"] {
+        margin: 8px 0 0;
+        line-height: normal;
+    }
+
+    div.k-window-content {
+        overflow: hidden;
+    }
+
+    .mass-footer {
+        margin-top: 33px;
+    }
+
+    .div-addfile {
+        margin-top: -5px;
+        padding-top: 110px;
+    }
+
+    .k-grid td {
+        border-style: solid;
+        border-width: 0 0 0 1px;
+        padding: .4em .6em;
+        overflow: visible;
+        line-height: 1.6em;
+        vertical-align: middle;
+        text-overflow: ellipsis;
+        /*height: 38px;*/
+        border-style: solid;
+        border: 1px solid #e7e7e7;
+        border-width: 1px 0 0 1px;
+    }
+
+    ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    #tree-data li {
+        display: inline;
+    }
+
+    .icon-dropdow-folder {
+        background-position: -82px -299px;
+        text-indent: -999px;
+        float: right;
+        display: block;
+    }
+
+    .icon-dropdow-visible {
+        background-position: -82px -81px;
+        text-indent: -999px;
+        float: right;
+        display: block;
+    }
+
+    /*custom grid kendo*/
+
+    .k-grid th.k-header,
+    .k-grid-header {
+        background: #38baf8;
+        font-weight: lighter;
+        text-align: left;
+        font-family: "Lato" !important;
+        height: 26px;
+    }
+
+
+    .k-grid th.k-header-gray {
+        background: gray;
+        font-weight: lighter;
+        text-align: left;
+        font-family: "Lato" !important;
+        height: 26px;
+    }
+
+    .k-grid th.k-header,
+    .k-grid th.k-header .k-link {
+        color: #FFFFFF;
+        text-decoration: none;
+    }
+
+    .k-grid-header .k-link > .k-icon {
+        vertical-align: text-top;
+        line-height: 16px;
+    }
+
+    .bg-boldgrey {
+        background-color: #5e696e;
+    }
+
+    .bg-grey {
+        background-color: #76838a;
+    }
+
+    .k-grid th.k-header-white {
+        background: #ffffff;
+        border-style: solid;
+        border: none;
+        padding: .4em .6em;
+        overflow: visible;
+        line-height: 1.6em;
+        vertical-align: middle;
+        text-overflow: ellipsis;
+        border-left: 1px solid #e7e7e7;
+        /*height: 38px;*/
+    }
+
+    th.k-icon {
+        width: 20px;
+        height: 20px;
+        background-position: -228px -334px;
+        background: url(../images/icon-sprite.png);
+        float: right;
+        display: block;
+    }
+
+    /* manh: resize tooltip */
+    .tooltip-inner {
+        max-width: 400px;
+    }
+</style>

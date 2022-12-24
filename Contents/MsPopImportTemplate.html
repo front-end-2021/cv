@@ -1,0 +1,132 @@
+﻿<div class="modal-body ms-modal-body" style="overflow:auto; height:300px">
+    <form>
+        <table id='myTable' class="tbgrid modal-table">
+            <thead>
+                <tr>
+                    <th class="title bg-grey lblPrjName"></th>
+                    <th class="title bg-grey" id="lblPrjOwner"></th>
+                    <th class="title bg-grey" id="lblTemplateName">Template name</th>
+                    <th class="title bg-grey" id="lblProjectName">Project name</th>
+                </tr>
+            </thead>
+            <tbody id="body-lstTemplate"></tbody>
+        </table>
+    </form>
+</div>
+<div class="modal-market-footer" id="divImportFooter">
+    <button type="button" class="ms-button" onclick="chooseTemplate()" tabindex="1"><span class="icon-20 icon-update margin-right6"></span><span class="btnChoose">Choose</span></button>
+    <button type="button" class="ms-button" onclick="closeImportPopup(this)"><span class="icon-20 icon-close margin-right6"></span><span class="btnCancel">Cancel</span></button>
+</div>
+<div id="loadingEditMaingoal" class="loading" />
+
+<script id="template-temp" type="text/x-kendo-template">
+    # for(var i = 0; i < data.length; i ++) { #
+        <tr id="#=data[i].Id#">
+            <td>#=i + 1#</td>
+            <td>
+                <input class="cbTemp" type="checkbox" /></td>
+            <td>#:data[i].Name#</td>
+            <td>#:data[i].ProjectName#</td>
+        </tr>
+    # } #
+</script>
+
+<script>
+    var vmIT = vmIT || {};
+    $(function () {
+        
+        var entryData = { templateType: vmIT.templateType };
+        if (vmIT.projectId > 0) {
+            callAjaxProductEvaluation('loadingProdEvaluation', "getTemplateByCreatedUser", vmIT.projectId,vmIT.regionId, entryData, AjaxConst.GetRequest,
+                function (serData) {
+                    if (!checkCopyRole(serData))
+                        return;
+
+                    var lstTemplate = serData.value;
+                    vmIT.lstAvaiTemplate = lstTemplate;
+                    bindTemplate("body-lstTemplate", "template-temp", vmIT.lstAvaiTemplate);
+                    importTempWindown.center();
+                    //adjustPopupHeight();
+                }
+            );
+        } else if (vmIT.projectId == 0) {
+            callAjaxProductEvaluation('loadingProdEvaluation', "getTemplateWithOutProject", vmIT.projectId,vmIT.regionId, entryData, AjaxConst.GetRequest,
+               function (serData) {
+                   if (!checkCopyRole(serData))
+                       return;
+
+                   var lstTemplate = serData.value;
+                   vmIT.lstAvaiTemplate = lstTemplate;
+                   bindTemplate("body-lstTemplate", "template-temp", vmIT.lstAvaiTemplate);
+                   importTempWindown.center();
+                   //adjustPopupHeight();
+               }
+           );
+        }
+        setupLabelLanguage();
+    });
+
+    function setupLabelLanguage() {
+        $('#lblImportTemplateTitle').text(kLg.btnImportTemp);
+        $('#lblTemplateName').text(kLg.lblTemplateName);
+        $('#lblProjectName').text(kLg.projectName);
+        $('span.btnChoose').text(kLg.btnChoose);
+        $('span.btnCancel').text(kLg.btnCancel);
+    }
+    function closeImportPopup() {
+        enableButtonPopup('divImportFooter');
+        if (importTempWindown)
+            importTempWindown.close();
+    }
+
+    function chooseTemplate() {
+        var lstId = [],
+            $selectedTemp = $('.cbTemp:checked');
+        $selectedTemp.each(function () {
+            lstId.push($(this).parents('tr').attr('id'));
+        });
+
+        var entryData = { TemplateType: vmIT.templateType, ListId: lstId.join(',') };
+        callAjaxProductEvaluation('loadingProdEvaluation', "copyTemplate", vmIT.projectId,vmIT.regionId, entryData, AjaxConst.GetRequest,
+            function (serData) {
+                switch (vmIT.templateType) {
+                    case templateType.Evaluation:
+                        initddlEvalTemp(vmSME.subMarketProduct.EvaluationTemplateId);
+                        break;
+                    case templateType.Competition:
+                        initddlCompeTemp(vmSME.subMarketProduct.CompetitionTemplateId);
+                        break;
+                    case templateType.ProductPosition:
+                        initddlPositionTemplate();
+                        break;
+                    case templateType.MarketSegmentReview:
+                        vmMSRE.event.initddlEvalTemp(vmMSRE.marketSegmentRegion.TemplateId);
+                        break;
+                    case templateType.ProductDesign:
+                        vmSTarget.initddlProdDesignTemplate(vmSME.subMarketProduct.ProductTemplateId);
+                        break;
+                }
+
+                closeImportPopup();
+            }
+        );
+    }
+
+    function checkCopyRole(data) {
+        
+        if (data.Role < 1) {
+            alert(kLg.msgNoEditPermission);
+            closeImportPopup();
+            return false;
+        }
+
+        return true;
+    }
+
+    adjustPopupHeight = function () {
+        if (importTempWindown) {
+            setHeightPopUp(importTempWindown, $('#myTable').height() + 350);
+        }
+    };
+
+</script>

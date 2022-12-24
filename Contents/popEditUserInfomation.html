@@ -1,0 +1,230 @@
+﻿<style type="text/css">
+    #divUserInfomation .ms-input {
+        width: 298px !important;
+    }
+</style>
+
+<div style="width: 710px; margin: 0 auto" class="pop-wrapper">
+    <div class="loading" id="loadingEditInfo"></div>
+    <div class="modal-body ms-modal-body">
+        <div id="ChangeInfoSucess"></div>
+        <div id="divUserInfomation">
+            <div style="float: left">
+                <label id="lblEmail">Email</label><span style="font-weight: bold">*</span>
+                <div class="clear"></div>
+                <input type="text" id="txtEmail" class="ms-input" maxlength="75" readonly="readonly" />
+            </div>
+            <div style="float: right">
+                <label id="lblDepartment">Department</label>
+                <div class="clear"></div>
+                <input type="text" id="txtDepartment" class="ms-input" maxlength="250" />
+            </div>
+            <div style="float: left">
+                <label id="lblFirstName">Firstname</label><span style="font-weight: bold">*</span>
+                <div class="clear"></div>
+                <input type="text" id="txtFirstName" class="ms-input" maxlength="50" />
+            </div>
+            <div style="float: right">
+                <label id="lblFirm">Firm</label>
+                <div class="clear"></div>
+                <input type="text" id="txtFirm" class="ms-input" maxlength="250" />
+            </div>
+            <div style="float: left">
+                <label id="lblLastName">Lastname</label><span style="font-weight: bold">*</span>
+                <div class="clear"></div>
+                <input type="text" id="txtLastName" class="ms-input" maxlength="50" />
+            </div>
+            <div style="float: right">
+                <label id="lblMobilePhone">MobilePhone</label>
+                <div class="clear"></div>
+                <input type="text" id="txtMobilePhone" class="ms-input" maxlength="50" />
+            </div>
+            <div style="float: left">
+                <label id="lblHomePhone">HomePhone</label>
+                <div class="clear"></div>
+                <input type="text" id="txtHomePhone" class="ms-input" maxlength="50" />
+            </div>
+            <div style="float: right">
+                <label id="lblGreeting">Greeting</label>
+                <div class="clear"></div>
+                <input type="text" id="txtGreeting" class="ms-input" />
+            </div>
+            <div style="float: left">
+                <label id="lblSigningOff">Signing Off</label>
+                <div class="clear"></div>
+                <input type="text" id="txtSigningOff" class="ms-input" />
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+    <div class="modal-market-footer">
+        <!--<button type="button" id="btnCancel" tabindex="8" onclick="vmChangeInfo.closeEditInfo()" class="ms-button"><span class="icon-20 icon-close margin-right6"></span><span id="textCancelButton">Abbrechen</span></button>-->
+        <button type="button" id="btnUpdate" tabindex="10" onclick="vmChangeInfo.updateInfo()" class="ms-button"><span class="icon-20 icon-update margin-right6"></span><span id="textUpdateButton">Aktualisieren</span></button>
+    </div>
+</div>
+
+
+<!-- mahn: resize tooltip -->
+<style type="text/css">
+    .tooltip-inner {
+        max-width: 400px;
+    }
+</style>
+
+<script type="text/javascript">
+    var isInfoChange = false;
+    var tempInfo;
+
+    var vmChangeInfo = vmChangeInfo || {};
+    vmChangeInfo.errorsMessage = [];
+    vmChangeInfo.updateSuccess = [];
+
+    $("#divUserInfomation").on("change", function () {
+        isInfoChange = true;
+    });
+
+    vmChangeInfo.updateInformation = function (myinfo) {
+        tempInfo = myinfo;
+        var url = `../Handlers/AccountHandler.ashx?funcName=editinformation&projid=${projectId}`;
+        callAjax('loadingEditInfo', url, JSON.stringify(myinfo), vmChangeInfo.updateInfoCallBack, AjaxConst.PostRequest);
+    };
+
+    vmChangeInfo.updateInfoCallBack = function (data) {
+        if (data !== "-1") {
+            location.reload();
+        } else {
+            pAlert(kLg.changeInfoFail).then(function () {
+                location.reload();
+            });
+        }
+    };
+
+    vmChangeInfo.getCurrentAccount = function () {
+        var url = "../Handlers/AccountHandler.ashx?funcName=getcurrentaccount";
+        callAjax('loadingEditInfo', url, null, vmChangeInfo.bindInformation, AjaxConst.GetRequest);
+    };
+
+    var curEmail;
+    vmChangeInfo.bindInformation = function(data) {
+        var user = data.value;
+        curEmail = user.Email;
+        $('#divUserInfomation #txtEmail').val((user.Email));
+        $('#divUserInfomation #txtFirstName').val((user.FirstName));
+        $('#divUserInfomation #txtLastName').val((user.LastName));
+        $('#divUserInfomation #txtFirm').val((user.Firm));
+        $('#divUserInfomation #txtDepartment').val(user.Department);
+        $('#divUserInfomation #txtMobilePhone').val((user.MobilePhone));
+        $('#divUserInfomation #txtHomePhone').val((user.HomePhone));
+        $('#divUserInfomation #txtGreeting').val((user.Greeting));
+        $('#divUserInfomation #txtSigningOff').val((user.SigningOff));
+    };
+
+    $(document).ready(function () {
+        $("#ChangeInfoSucess").hide();
+        
+        $("#textUpdateButton").text(kLg.btnUpdate);
+        $("#textCancelButton").text(kLg.cancel);
+        $(".ui-title").text(kLg.changeInforTitle);
+        $("#lblFirstName").text(kLg.firstName);
+        $("#lblLastName").text(kLg.lastName);
+        $("#lblFirm").text(kLg.firm);
+        $("#lblDepartment").text(kLg.lblFunction);
+        $("#lblMobilePhone").text(kLg.mobilePhone);
+        $("#lblHomePhone").text(kLg.homePhone);
+        $("#lblEmail").text(kLg.emailAddressloginview);
+        $("#lblGreeting").text(kLg.greeting);
+        $("#lblSigningOff").text(kLg.signingoff);
+
+        vmChangeInfo.getCurrentAccount();
+        limitedTabKey();
+
+    });
+
+    vmChangeInfo.ValidateEmail = function (value) {
+        var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+        if (value == null || value === "")
+            return true;
+        return reg.test(value);
+    };
+
+    vmChangeInfo.isChangeEmail = function (email) {
+        if (email !== curEmail) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+
+    vmChangeInfo.isValidInfo = function () {
+        //email = curEmail;
+        var firstName = $('#txtFirstName').val().trim(),
+        lastName = $('#txtLastName').val().trim(),
+        firm = $('#txtFirm').val().trim(),
+        department = $('#txtDepartment').val().trim(),
+        mobilePhone = $('#txtMobilePhone').val().trim(),
+        homePhone = $('#txtHomePhone').val().trim(),
+        greeting = $('#txtGreeting').val().trim(),
+        signingoff = $('#txtSigningOff').val().trim();
+
+        //mahn:
+        if (firstName == null || firstName === "") {
+            $('#txtFirstName').attr("title", kLg.requiredFirstName);
+            $('#txtFirstName').tooltip({ placement: 'top', trigger: 'manual' }).tooltip('show');
+        } else {
+            $('#txtFirstName').tooltip('destroy');
+        }
+
+        if (lastName == null || lastName === "") {
+            $('#txtLastName').attr('title', kLg.requiredLastName);
+            $('#txtLastName').tooltip({ placement: 'top', trigger: 'manual' }).tooltip('show');
+        } else {
+            $('#txtLastName').tooltip('destroy');
+        }
+
+        if ((firstName != null && firstName !== "") && (lastName != null && lastName !== "")) {
+            return { firstName: firstName, lastName: lastName, firm: firm, department: department, mobilePhone: mobilePhone, homePhone: homePhone, greeting: greeting, signingoff: signingoff }
+        }
+        return null;
+    }
+
+    vmChangeInfo.updateInfo = function () {
+        if (isInfoChange) {
+            var myinfo = vmChangeInfo.isValidInfo();
+            if (myinfo) {
+                vmChangeInfo.updateInformation(myinfo);
+            }
+            return;
+        } else {
+            vmChangeInfo.closeEditInfo();
+        }
+    };
+
+
+    vmChangeInfo.closeEditInfo = function () {
+        vmUser.popUpChangeInfomation.close();
+    };
+
+    vmUser.popUpChangeInfomation.bind("close", function (e) {
+        if (isInfoChange) {
+            if (confirm(kLg.saveConfirmQuestion)) {
+                var myinfo = vmChangeInfo.isValidInfo();
+                if (myinfo) {
+                    vmChangeInfo.updateInformation(myinfo);
+                } else {
+                    e.preventDefault();
+                }
+            } else {
+                destroyInfoPopUp();
+            }
+        } else {
+            destroyInfoPopUp();
+        }
+
+    });
+
+    function destroyInfoPopUp() {
+        vmUser.popUpChangeInfomation.destroy();
+        vmUser.popUpChangeInfomation = null;
+        $('.block-menu-icon').after('<div id="pop-changeInfo"></div>');
+    };
+</script>

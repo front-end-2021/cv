@@ -1,0 +1,1513 @@
+﻿<link href="../css/multiple-select.css" rel="stylesheet" />
+<style type="text/css">
+    .menu-place {
+        margin-bottom: 6px;
+    }
+
+        .menu-place .mail-item {
+            background-color: #33A6DC;
+            height: 20px;
+            padding: 8px;
+            color: white;
+            border-radius: 3px;
+        }
+
+        .menu-place .mail-content {
+            min-height: 50px;
+            border: 1px solid transparent;
+            border-color: #dddddd;
+            margin-top: -2px;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+            border-top: transparent;
+            padding: 18px;
+            position: relative;
+        }
+
+        .menu-place table {
+            width: 500px !important;
+            margin: 0 auto;
+        }
+
+        .menu-place tr {
+            height: 39px !important;
+        }
+
+        .menu-place td {
+            position: relative;
+        }
+
+        .menu-place .mail-title-group {
+            font-weight: bold;
+        }
+
+    .validitem {
+        color: red;
+        font-size: 21px;
+    }
+
+    .validpoint {
+        position: absolute;
+        width: 27px;
+        height: 27px;
+        right: -33px;
+        top: 6px;
+        display: none;
+        text-align: center;
+        padding-top: 4px;
+        cursor: help;
+        color: red;
+        font-size: 21px;
+    }
+
+    .crm-category .div-hover span.icon-arow-towway-vertical.icon-category {
+        position: absolute;
+        background-position: -154px -8px;
+        text-indent: -999px;
+        float: left;
+        display: none;
+    }
+
+    .listmail .td-hover:hover .icon-arow-towway-vertical, .crm-category .div-hover:hover span.icon-arow-towway-vertical.icon-category {
+        margin-top: 8px !important;
+        margin-left: -13px !important;
+        display: block;
+    }
+
+    .mail-content .tooltip.in {
+        min-width: 130px !important;
+    }
+
+    .mail-content .tooltip.in .tooltip-inner {
+        min-height: 32px !important;
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+
+    .dropdow-menu-li-a {
+    padding: 0px 40px 0px 10px !important;
+    clear: none !important;
+    width: 69% !important;
+    line-height: 1.7 !important;
+    margin-bottom: -9px;
+    margin-top: -9px;
+    cursor: pointer;
+    }
+    .category-parent-label {
+    float: left;
+    max-width: 619px;
+    white-space: pre;
+    overflow: hidden;
+    }
+</style>
+<div>
+    <div id="pop-setting-crm" class="modal-body ms-modal-body">
+        <div class="panel-group" id="pop-setting-place"></div>
+    </div>
+    <div id="pop-add-categories-place"></div>
+</div>
+<div id="categories-loading" class="loading"></div>
+<script type="text/html" id="template-setting">
+    #for(var i = 0; i< data.length; i++) {#
+    # var parentType = data[i];#
+    <div class="panel panel-default ms-parent w-full">
+        <div class="panel-heading panel-heading-mass-parent" style="height: 18px;padding-top: 7px;">
+            <h4 class="panel-title" style="line-height: normal">
+                <a data-toggle="collapse" data-parent="\\#pop-setting-place" href="\\#parentType#:parentType.Type#" class="panel-online collapsed" onclick="vmCrmEnum.GetType(#:parentType.Type #, this)">
+                    <span class="arrow-panel-online icon-24 icon-left-block arrow-collapse" style="margin-top: -2px;"></span>
+                    <span>#:parentType.Name#</span>
+                </a>
+            </h4>
+        </div>
+
+        <div id="parentType#:parentType.Type#" class="panel-collapse collapse height0px parent-body">
+            <!-- div gan teamplate template-setting-type-->
+            <div id="place-Type#:parentType.Type#" class="modal-body ms-modal-body" type="content-table-parent">
+            </div>
+            <!-- end div gan template template-setting-type -->
+        </div>
+    </div>
+    #}#
+</script>
+
+<script type="text/html" id="template-mailaccount">
+    <div id="listmails" data-bind="source: mails" data-template="template-mailitem" class="listmail"></div>
+    <span class="icon-32 cursor-pointer icon-add" style="margin-top: 15px;" data-bind="events:{click: addmail}, visible: isRole"></span>
+</script>
+
+<script type="text/html" id="template-mailitem">
+    <div class="menu-place td-hover">
+        <span class="icon-16  icon-arow-towway-vertical"></span>
+        <div class="mail-item" data-bind="events:{click: toggleContent}">
+            <span class="arrow-panel-online icon-24 icon-left-block #if(IsShow){# arrow-right-big #}else{ #arrow-collapse# }#" style="margin-top: -2px; margin-right: 6px;"></span>
+            <span data-bind="text:EmailAddress" class="cursor-pointer moment-span"></span>
+        </div>
+        <div class="clear"></div>
+        <div class="mail-content" data-bind="visible: IsShow">
+            <table>
+                <tbody>
+                    <tr>
+                        <td colspan="2" class="mail-title-group">#:kLg.maTitleUserInfo#</td>
+                    </tr>
+                    <tr>
+                        <td>#:kLg.maTitleMailAddress#:</td>
+                        <td>
+                            <input type="text" name="EmailAddress" class="w-100per modal-organ-input pull-left input-icon moment-input" data-bind="value: EmailAddress" #if(!vmCrmEnum.IsRole){#disabled="disabled" #}# maxlength="100" />
+                            <div class="validpoint" name="sEmailAddress" ptype="1">*</div>
+
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>#:kLg.maTitleUsername#:</td>
+                        <td>
+                            <input type="text" name="UserName" class="w-100per modal-organ-input pull-left input-icon" data-bind="value: UserName" #if(!vmCrmEnum.IsRole){#disabled="disabled" #}# maxlength="100" />
+                            <div class="validpoint" name="sUserName" ptype="2">*</div>
+
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>#:kLg.maTitlePassword#:</td>
+                        <td>
+                            <input type="password" name="Password" class="w-100per modal-organ-input pull-left input-icon moment-pass" data-bind="value: Password" #if(!vmCrmEnum.IsRole){#disabled="disabled" #}# maxlength="100" />
+                            <div class="validpoint" name="sPassword" ptype="3">*</div>
+
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2" class="mail-title-group">#:kLg.maTitleServerInfo#</td>
+                    </tr>
+                    <tr>
+                        <td>#:kLg.maTitleSmtp#:</td>
+                        <td>
+                            <input type="text" name="SmtpServer" class="w-100per modal-organ-input pull-left input-icon" data-bind="value: SmtpServer" #if(!vmCrmEnum.IsRole){#disabled="disabled" #}# maxlength="100" />
+                            <div class="validpoint" name="sSmtpServer" ptype="4">*</div>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#:kLg.maTitlePort#:</td>
+                        <td>
+                            <input type="text" name="Post" class="w-100per modal-organ-input pull-left input-icon" data-bind="value: Port" maxlength="5" #if(!vmCrmEnum.IsRole){#disabled="disabled" #}# />
+                            <div class="validpoint" name="sPort" ptype="5">*</div>
+
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>#:kLg.maTitleSsl#:</td>
+                        <td><input type="checkbox" name="SSL" data-bind="checked: SSL" #if(!vmCrmEnum.IsRole){#disabled="disabled" #}# /></td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+            <span data-bind="events:{ click: removeemail}, visible: enableRemoveEmail" class="icon-32 icon-bin pull-right" style="position: absolute; right: 11px; bottom: 8px;"></span>
+        </div>
+    </div>
+
+</script>
+
+<script type="text/html" id="template-setting-type">
+    #for(var i = 0; i< data.Data.length; i++) {#
+    # var categories = data.Data[i];#
+
+    <div class="panel panel-default ms-parent w-full">
+        <!-- Tiêu đê category -->
+        <div class="panel-heading panel-heading-mass-parent" style="height: 18px; padding-top: 7px;">
+            <h4 class="panel-title" style="line-height: normal">
+                <a data-toggle="collapse" data-parent="\\#place-Type#:data.ParentType#" href="\\#categories#:categories.Type#" class="panel-online collapsed" onclick=" vmCrmEnum.GetCategories(#:data.ParentType #,#:categories.Type #, false) ">
+                    <span class="arrow-panel-online icon-24 icon-left-block arrow-collapse" style="margin-top: -2px;"></span>
+                    <span class="truncate" style="width: 660px;">#:categories.Name #</span>
+                </a>
+            </h4>
+        </div>
+        <!-- end tiêu đề category -->
+        <div id="categories#:categories.Type#" class="crm-category panel-collapse collapse height0px parent-body">
+            <form id="categories-form-crm#:categories.Type#" class="valid-form" type="#:categories.Type#">
+                <!-- div gan teamplate template-table-categories-->
+                <div id="place-categories#:categories.Type#" class="modal-body ms-modal-body" type="content-table-categories">
+                </div>
+                <!-- end div gan template template-table-categories -->
+                <!-- Text nhap -->
+                #if(data.ParentType == vmCrmEnum.SettingType.Organisation && categories.Type == vmCrmEnum.OrganisationSetting.KundenNr){#
+                <div style="display: flex;">
+                    <input id="cbKundenNr" #if(vmCrmEnum.Role < 1){#disabled#}# type="checkbox" style="margin-left: 20px; height: 20px; width: 20px;" onchange=" vmCrmEnum.AddCategory(#:data.ParentType #,#:categories.Type #) "/>
+                    <label id="lblKundenNr" style="margin-left: 20px;margin-top: 5px; font-weight: lighter;font-size: 15px;">kLg.kundenNrSetting</label>
+                </div>
+                #} else{#
+                #if(!(data.ParentType == vmCrmEnum.SettingType.Activities && categories.Type == vmCrmEnum.ActivitieSetting.Priority) && vmCrmEnum.Role > 0){#
+                <div>
+                    <table class="popup-table-email">
+                        <tr>
+                            <td style="padding-bottom: 7px !important;"><span>#:categories.Name#</span></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input value="" name="CategoryName" class="popup-input" id="txtName#:categories.Type#" />
+                            </td>
+                            <td valign="bottom"><span class="icon-32  icon-add" onclick="vmCrmEnum.AddCategory(#:data.ParentType #,#:categories.Type #)"></span></td>
+                        </tr>
+                    </table>
+                </div>
+                #}#
+                #}#
+                <!--  End text nhap-->
+                <p class="clear4px"></p>
+            </form>
+        </div>
+
+    </div>
+    #}#
+</script>
+
+<script type="text/html" id="template-table-categories">
+    #
+    var ptype = data[0].ParentType;
+    var ctype = data[0].Type;
+    var isOrgAddr = ptype == vmCrmEnum.SettingType.Organisation && ctype == vmCrmEnum.OrganisationSetting.Address;
+    var isPerAddr = ptype == vmCrmEnum.SettingType.Person && ctype == vmCrmEnum.PersonSetting.Address;
+    #
+    <table class="table-bordered" style="width: 100%">
+        <!-- Tiêu đề Categories -->
+        <tr>
+            <td class="title" style="padding-left: 20px; padding-right: 20px">Id</td>
+            <td class="title" style="padding-left: 15px; padding-right: 10px">
+                #var isOrgSort = data[0].ParentType == vmCrmEnum.SettingType.Organisation
+                && (data[0].Type == vmCrmEnum.OrganisationSetting.Resource
+                || data[0].Type == vmCrmEnum.OrganisationSetting.Competence
+                || data[0].Type == vmCrmEnum.OrganisationSetting.Category
+                || data[0].Type == vmCrmEnum.OrganisationSetting.LegalForm
+                || data[0].Type == vmCrmEnum.OrganisationSetting.Branch
+                || data[0].Type == vmCrmEnum.OrganisationSetting.Tags);#
+
+                #var isPersonSort = data[0].ParentType == vmCrmEnum.SettingType.Person
+                && (data[0].Type == vmCrmEnum.PersonSetting.Land
+                || data[0].Type == vmCrmEnum.PersonSetting.Network
+                || data[0].Type == vmCrmEnum.PersonSetting.Resource
+                || data[0].Type == vmCrmEnum.PersonSetting.Competence
+                || data[0].Type == vmCrmEnum.PersonSetting.Tags
+                || data[0].Type == vmCrmEnum.PersonSetting.Position
+                || data[0].Type == vmCrmEnum.PersonSetting.Category);#
+
+                <span #if(isOrgSort || isPersonSort){# onclick="vmCrmEnum.sortCategoriesByName(#:data[0].ParentType#,#:data[0].Type#);" style="cursor: pointer;" #}#>
+                    #:kLg.labelCategories#
+                </span>
+
+                #if(!(data[0].ParentType == vmCrmEnum.SettingType.Activities && data[0].Type == vmCrmEnum.ActivitieSetting.Priority) && vmCrmEnum.Role > 0){#
+                <span class="icon-16 icon-right-block icon-plus" onclick=" vmCrmEnum.OpenPopUpAddCategory(#:ptype#, #:ctype#) "></span>
+                #}#
+            </td>
+        </tr>
+        <!-- End -->
+        #if(data.length > 0 && data[0].Id != 0) {#
+        #for( var j = 0; j < data.length; j++){#
+        # var item = data[j];#
+
+        <tr class="td-hover">
+            <td style="padding-left: 20px; padding-right: 20px" class="td-v-align-top divDroppable" val="#:item.Id#">
+                <div class="itemDraggable" type="#:item.Type#" parenttype="#:item.ParentType#" val="#:item.Id#">
+                    <span class="icon-16  icon-arow-towway-vertical"></span>
+                    <span class="icon-left-block">#:item.Id#</span>
+                </div>
+            </td>
+            <td class="td-v-align-top td-hover" style="padding-left: 20px; padding-right: 20px" val="#:item.Id#">
+                <div> </div>
+                
+                <span class="icon-left-block crm-text-justify">#:item.Name#</span>
+                <!-- Drop Edit and Delete -->
+                #if(!(item.ParentType == vmCrmEnum.SettingType.Activities && item.Type == vmCrmEnum.ActivitieSetting.Priority) && !(item.ParentType == vmCrmEnum.SettingType.Person && item.Type == vmCrmEnum.PersonSetting.Email && item.Extension == 'SourcingEmail' ) ){#
+                #if(vmCrmEnum.Role > 0){#
+                <div class="ms-dropdow">
+                    <span class="icon-16 icon-dropdow icon-dropdown-position" data-toggle="dropdown"></span>
+                    <ul aria-labelledby="btnGroupVerticalDrop1" class="popup-menu dropdown-menu ms-popup-menu posAbsolute" role="menu" style="top: inherit; left: inherit; right: inherit; bottom: inherit;">
+                        <li><a class="dropdow-menu-li-a" data-toggle="modal" data-target=".bs-example-modal-lg" onclick=" vmCrmEnum.OpenPopUpAddCategory(#:item.ParentType #,#:item.Type #,#:j #) "><span class="icon-24  icon-left-block icon-edit"></span>#=kLg.edit#</a></li>
+                        <li role="presentation" class="divider"></li>
+                        <li><a class="dropdow-menu-li-a" onclick=" vmCrmEnum.DeleteCategories(#:item.ParentType #,#:item.Type #,#:item.Id #) "><span class="icon-24  icon-left-block icon-delete"></span>#:kLg.Delele#</a></li>
+                        
+                        #if(isPerAddr){#
+                        <li role="presentation" class="divider"></li>
+                        <li>
+                            <a class="dropdow-menu-li-a" onclick="vmCrmEnum.checkAddrControl(this, #:ptype#, #:ctype#, #:item.Id#, #:!item.AddrControl#,#:j #);">
+                            <span class="icon-24 icon-left-block  #if(item.AddrControl){# icon-relative #}else{# icon-not-relative #}# relative"></span>
+                            <span>#:kLg.Department#</span></a>
+                        </li>
+                        #}#
+
+                    </ul>
+                </div>
+                #}#
+                #}#
+                <!-- End -->
+                <!--</div>-->
+
+            </td>
+        </tr>
+        #}#
+        #}#
+    </table>
+    #if((data[0].ParentType == vmCrmEnum.SettingType.Activities && data[0].Type == vmCrmEnum.ActivitieSetting.Status) && vmCrmEnum.Role > 0){#
+    <div style="margin-top: 8px;">
+        <table class="popup-table-email">
+            <tr>
+                <td style="padding-bottom: 7px !important;"><span>#:kLg.titleAStatusCrm#</span></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>
+                    <input value="" name="ChildCategoryName" maxlength="100" class="popup-input" id="txtChildName#:data[0].Type#" onkeydown=" vmCrmEnum.OnChildNameKeyDown(#:data[0].Type#) ">
+                </td>
+                <td valign="bottom"><span class="icon-32  icon-add" onclick=" vmCrmEnum.AddChildCategory(#:data[0].ParentType #,#:data[0].Type#,#:data[0].ParentId#) "></span></td>
+            </tr>
+        </table>
+    </div>
+
+    #}#
+
+
+
+</script>
+
+<script type="text/html" id="template-parent-categories">
+
+    <!-- End -->
+    #if(data.length > 0 && data[0].Id != 0) {#
+    #for( var j = 0; j < data.length; j++){#
+    # var item = data[j];#
+
+    <div style="position: relative" class="div-hover">
+        <span class="icon-16 icon-arow-towway-vertical icon-category"></span>
+        <div class="panel panel-default ms-parent w-full">
+            <div class="panel-heading panel-heading-mass-parent" style="height: 18px; padding-top: 7px;">
+                <h4 class="panel-title" style="float: left; line-height: normal;">
+                    <a data-toggle="collapse" data-parent="\\#place-categories#:item.Type#" href="\\#childType#:item.Id#" class="panel-online collapsed childcategories" onclick=" vmCrmEnum.GetChildCategories(#:item.Id #) ">
+                        <span class="arrow-panel-online icon-24 icon-left-block arrow-collapse" style="margin-top: -2px;"></span>
+                        <div class="category-parent-label"><span>#:item.Id# - #:item.Name#</span></div>
+                    </a>
+                </h4>
+            </div>
+
+            <div id="childType#:item.Id#" class="panel-collapse collapse height0px parent-body">
+
+                <!-- div gan teamplate template-setting-type-->
+                <div id="child-place-Type#:item.Id#" class="modal-body ms-modal-body" type="content-table-child-categories">
+                </div>
+                <!-- end div gan template template-setting-type -->
+
+            </div>
+        </div>
+        #if(vmCrmEnum.Role > 0){#
+        <div>           
+            <span class="icon-20  icon-right-block cursor-pointer icon-edit-white-independency" data-toggle="dropdown" style="position: absolute; right: 6px; top: 10px;"></span>
+            <ul role="menu" class="popup-menu dropdown-menu ms-popup-menu-left">
+                <li><a class="dropdow-menu-li-a" onclick=" vmCrmEnum.OpenPopUpAddCategory(#:item.ParentType #,#:item.Type #,#:j #) "><span class="icon-24  icon-left-block icon-edit"></span>#:kLg.edit#</a></li>
+                <li role="presentation" class="divider"></li>
+                <li><a class="dropdow-menu-li-a" onclick=" vmCrmEnum.DeleteCategories(#:item.ParentType #,#:item.Type #,#:item.Id #) "><span class="icon-24  icon-left-block icon-delete"></span>#:kLg.lblDelete#</a></li>
+            </ul>
+        </div>
+            #}#
+    </div>
+    #}#
+    #}#
+
+</script>
+
+<script src="../Scripts/jquery.multiple.select.js"></script>
+<script type="text/javascript">
+    vmCrmEnum.arrayLabel = [
+        { Type: vmCrmEnum.SettingType.Organisation, Title:kLg.titleOrganisation, Name: kLg.titleOrganisation, Required: '', MaxLength: '' },
+        { Type: vmCrmEnum.SettingType.Person, Title: kLg.titlePerson, Name: kLg.titlePerson, Required: '', MaxLength: '' },
+        { Type: vmCrmEnum.SettingType.Activities, Title: kLg.titleActivitie, Name: kLg.titleActivitie, Required: '', MaxLength  : '' }        
+    ];
+    vmCrmEnum.arrayData = [];
+    vmCrmEnum.arrayData[vmCrmEnum.SettingType.Organisation] = [
+        { Type: vmCrmEnum.OrganisationSetting.Address, Title: kLg.titleAddressCrm, Name:  kLg.titleAddressCrm, Required: '', MaxLength: '' },
+        { Type: vmCrmEnum.OrganisationSetting.Telephone, Title: kLg.titleTelephoneCrm, Name:  kLg.titleTelephoneCrm, Required: '', MaxLength: '' },
+        { Type: vmCrmEnum.OrganisationSetting.Fax, Title: kLg.titleFaxCrm, Name: kLg.titleFaxCrm , Required: '', MaxLength: ''},
+        { Type: vmCrmEnum.OrganisationSetting.Email, Title: kLg.titleE_mailCrm, Name: kLg.titleE_mailCrm , Required: '', MaxLength: ''},
+        { Type: vmCrmEnum.OrganisationSetting.Website, Title: kLg.titleWebsiteCrm, Name: kLg.titleWebsiteCrm , Required: '', MaxLength: ''},
+        { Type: vmCrmEnum.OrganisationSetting.Network, Title: kLg.titleNetworkCrm , Name: kLg.titleNetworkCrm , Required: '', MaxLength: ''},
+        { Type: vmCrmEnum.OrganisationSetting.Resource, Title:  kLg.titleResourceCrm, Name: kLg.titleResourceCrm , Required: '', MaxLength: ''},
+        { Type: vmCrmEnum.OrganisationSetting.Competence, Title: kLg.titleCompetenceCrm, Name: kLg.titleCompetenceCrm , Required: '', MaxLength: ''},
+        { Type: vmCrmEnum.OrganisationSetting.Category, Title: kLg.titleCategoryCrm, Name:  kLg.titleCategoryCrm, Required: '', MaxLength: ''},
+        { Type: vmCrmEnum.OrganisationSetting.LegalForm, Title: kLg.titleOLegal_FormCrm , Name:  kLg.titleOLegal_FormCrm, Required: '', MaxLength: ''},
+        { Type: vmCrmEnum.OrganisationSetting.Employee, Title: kLg.titleOEmployeeCrm , Name: kLg.titleOEmployeeCrm , Required: '', MaxLength: ''},
+        { Type: vmCrmEnum.OrganisationSetting.Branch, Title:  kLg.titleOBranchCrm, Name:  kLg.titleOBranchCrm, Required: '', MaxLength: ''},
+        { Type: vmCrmEnum.OrganisationSetting.Tags, Title: kLg.titleTagsCrm, Name: kLg.titleTagsCrm , Required: '', MaxLength: '' },
+        { Type: vmCrmEnum.OrganisationSetting.KundenNr, Title: kLg.titleKundenNrCrm, Name: kLg.titleKundenNrCrm , Required: '', MaxLength: '' },
+        { Type: vmCrmEnum.OrganisationSetting.ArtOfRelationship, Title: kLg.titlePArt_Of_RelationshipCrm, Name: kLg.titlePArt_Of_RelationshipCrm, Required: '', MaxLength: '' },
+        { Type: vmCrmEnum.OrganisationSetting.Revenue, Title: kLg.lblOrgRevenue, Name: kLg.lblOrgRevenue, Required: '', MaxLength: '' }
+    ];
+
+    vmCrmEnum.arrayData[vmCrmEnum.SettingType.Person] = [
+        { Type: vmCrmEnum.PersonSetting.Address, Title: kLg.titleAddressCrm, Name: kLg.titleAddressCrm, Required: '', MaxLength: '' },
+        { Type: vmCrmEnum.PersonSetting.Land, Title: kLg.titlePLandCrm, Name: kLg.titlePLandCrm, Required: '', MaxLength: '' },
+        { Type: vmCrmEnum.PersonSetting.Telephone, Title: kLg.titleTelephoneCrm, Name: kLg.titleTelephoneCrm, Required: '', MaxLength: '' },
+        { Type: vmCrmEnum.PersonSetting.Fax, Title: kLg.titleFaxCrm, Name: kLg.titleFaxCrm, Required: '', MaxLength: '' },
+        { Type: vmCrmEnum.PersonSetting.Email, Title: kLg.titleE_mailCrm, Name: kLg.titleE_mailCrm, Required: '', MaxLength: '' },
+        { Type: vmCrmEnum.PersonSetting.Website, Title: kLg.titleWebsiteCrm, Name: kLg.titleWebsiteCrm, Required: '', MaxLength: '' },
+        { Type: vmCrmEnum.PersonSetting.Network, Title: kLg.titleNetworkCrm, Name: kLg.titleNetworkCrm, Required: '', MaxLength: '' },
+        { Type: vmCrmEnum.PersonSetting.Resource, Title: kLg.titleResourceCrm, Name: kLg.titleResourceCrm, Required: '', MaxLength: '' },
+        { Type: vmCrmEnum.PersonSetting.Competence, Title: kLg.titleCompetenceCrm, Name: kLg.titleCompetenceCrm, Required: '', MaxLength: '' },
+        { Type: vmCrmEnum.PersonSetting.Tags, Title: kLg.titleTagsCrm, Name: kLg.titleTagsCrm, Required: '', MaxLength: '' },
+        { Type: vmCrmEnum.PersonSetting.Position, Title: kLg.titlePositionCrm, Name: kLg.titlePositionCrm, Required: '', MaxLength: '' },
+        { Type: vmCrmEnum.PersonSetting.ArtOfRelationship, Title: kLg.titlePArt_Of_RelationshipCrm, Name: kLg.titlePArt_Of_RelationshipCrm, Required: '', MaxLength: '' },
+        { Type: vmCrmEnum.PersonSetting.Salutation, Title: kLg.Salutation, Name: kLg.Salutation, Required: '', MaxLength: '' },
+        { Type: vmCrmEnum.PersonSetting.Title, Title: kLg.Title, Name: kLg.Title, Required: '', MaxLength: '' },
+        { Type: vmCrmEnum.PersonSetting.Category, Title: kLg.textCategory, Name: kLg.textCategory, Required: '', MaxLength: '' }
+    ];
+    vmCrmEnum.arrayData[vmCrmEnum.SettingType.Activities] = [
+        { Type: vmCrmEnum.ActivitieSetting.Category, Title: kLg.titleCategoryCrm, Name: kLg.titleCategoryCrm, Required: '', MaxLength: '' },
+        { Type: vmCrmEnum.ActivitieSetting.Priority, Title: kLg.titleAPriorityCrm, Name: kLg.titleAPriorityCrm, Required: '', MaxLength: '' },        
+        { Type: vmCrmEnum.ActivitieSetting.Rolle, Title: kLg.role, Name: kLg.role, Required: '', MaxLength: '' }
+
+    ];
+
+    vmCrmEnum.enumsRoleConflict = {
+        conflict: -1,
+        noRole: 0,
+        using: -2,
+        nameExist: -3
+    };
+
+    $("#pop-setting-crm").on('keydown', function(e) {
+        if (e.keyCode === 9 || e.keyCode === 13 ) {
+            e.preventDefault();
+            return;
+        }
+    });
+
+    vmCrmEnum.SetupValidate = function (type) {
+        $('#categories-form-crm' + type).validate({
+            rules: {
+                CategoryName: {
+                    required: true,
+                    maxlength: 100
+                }
+            },
+            messages: {
+                CategoryName: {
+                    required: kLg.requiredName,
+                    maxlength: kLg.msgMaxlenghName
+                }
+            }
+        });
+    };
+
+    vmCrmEnum.dataService = function() {
+        var callAjaxCrm = function (divId, funcName, entryData, requestType, successCallBack) {
+            var url = "../Handlers/CrmSettingHandler.ashx?funcName=" + funcName + "&projid=" + projectId + "&strid=" + strategyId;
+            return callAjax(divId, url, entryData, successCallBack, requestType);
+        };
+
+        var callAjaxByPost = function (funcName, entryData, successFunc, loadingdiv) {
+            return callAjaxCrm(loadingdiv || "categories-loading", funcName, JSON.stringify(entryData), AjaxConst.PostRequest, successFunc);
+        };
+
+        var callAjaxByGet = function (funcName, entryData, successFunc, loadingdiv) {
+            callAjaxCrm(loadingdiv || "categories-loading", url, null, successFunc, AjaxConst.GetRequest);
+        };
+
+        var getMailAccount = function(entryData, successFunc) {
+            return callAjaxByPost("getmailaccount", entryData, successFunc);
+        };
+
+        var removeMailAccount = function(entryData, successFunc) {
+            return callAjaxByPost("removemailaccount", entryData, successFunc);
+        };
+
+        var createMailAccount = function(entryData, successFunc) {
+            return callAjaxByPost("createmailaccount", entryData, successFunc);
+        };
+
+        var updateMailAccount = function(entryData, successFunc) {
+            return callAjaxByPost("updatemailaccount", entryData, successFunc);
+        };
+
+        var updateMailIndex = function(entryData, successFunc) {
+            return callAjaxByPost("updatemailindex", entryData, successFunc);
+        };
+
+        var getCategoriesExtensions = function (entryData, successFunc) {
+            callAjaxByPost("getstatusextension", entryData, successFunc);
+        };
+
+        return {
+            getMailAccount: getMailAccount,
+            removeMailAccount: removeMailAccount,
+            updateMailAccount: updateMailAccount,
+            createMailAccount: createMailAccount,
+            updateMailIndex: updateMailIndex,
+            getCategoriesExtensions: getCategoriesExtensions
+        };
+    }();
+
+    vmSetting.popUpSetting.bind("close", function() {
+        vmCrmEnum.MailModel = undefined;
+        (vmSetting && vmSetting.popUpSetting) && vmSetting.popUpSetting.destroy();
+        vmSetting.popUpSetting = null;
+        $("#icon").after("<div id='setting-pop'></div>");
+    });
+
+    vmCrmEnum.DynamicContentTab = [vmCrmEnum.SettingType.EMailContent];
+    $(document).ready(function () {
+        $('#pop-setting-place').empty();
+
+        if(vmCrmEnum.projectId !== 0) {
+            var url = "../Handlers/ProjectHandler.ashx?funcName=getbyid&projid="+ projectId+"&strid="+strategyId;
+            callAjax("categories-loading", url, null, function(data) {
+
+                vmCrmEnum.projectName = data.value.Name;
+                vmCrmEnum.Role = data.value.Role || 0;
+                vmCrmEnum.IsOwner = data.value.IsOwner;
+
+                if (vmCrmEnum.IsOwner) {
+                    vmCrmEnum.arrayLabel.push({ Type: vmCrmEnum.SettingType.EMailContent, Title: kLg.titleMainAccount, Name: kLg.titleMainAccount, Required: '', MaxLength  : '' });
+                }
+
+                bindTemplate('pop-setting-place', 'template-setting', vmCrmEnum.arrayLabel);
+                vmCrmEnum.BindOnchange();
+            }, AjaxConst.PostRequest);
+        } else {
+            bindTemplate('pop-setting-place', 'template-setting', vmCrmEnum.arrayLabel);
+            vmCrmEnum.BindOnchange();
+        }
+    });
+
+    vmCrmEnum.GetType = function (parentType, e) {
+        if (vmCrmEnum.DynamicContentTab.indexOf(parentType) === -1) {
+            var divId = "place-Type" + parentType;
+            $("div[type=content-table-parent]").html("");
+
+            var data = { ParentType: parentType, Data: vmCrmEnum.arrayData[parentType] };
+            bindTemplate(divId, "template-setting-type", data);
+        } else {
+            vmCrmEnum.BindDynamicTab(parentType);
+        }
+
+        vmCommon.bindChangeIcon();
+
+        if (!!e)
+            $(e).children('span.arrow-right-big').first().addClass('arrow-collapse').removeClass('arrow-right-big');
+
+        $(`#parentType${parentType}`).off('hide.bs.collapse').on('hide.bs.collapse', function (e) {
+            $(this).css({ 'overflow': 'hidden' });
+        }).off('shown.bs.collapse').on('shown.bs.collapse', function (e) {
+            $(this).css({ 'overflow': '' });
+        });
+    };
+
+    vmCrmEnum.BindDynamicTab = function(parentType) {        
+        switch (parentType) {
+            case vmCrmEnum.SettingType.EMailContent:
+                vmCrmEnum.bindMailAccountTab();
+                break;
+        }
+    };
+
+    vmCrmEnum.reCreateIndex = function(mails) {
+        if (!mails || mails.length === 0)
+            return;
+
+        for (var i = 0; i < mails.length; i++) {
+            mails[i].MIndex = i;            
+        }
+    };
+
+    vmCrmEnum.MailModel = undefined;
+    vmCrmEnum.IsRole = false;
+    vmCrmEnum.bindMailAccountTab = function() {
+        var divId = "#place-Type" + vmCrmEnum.SettingType.EMailContent;
+
+        $(divId).css({"display":"none"});
+        $(divId).html($("#template-mailaccount").html());
+        vmCrmEnum.dataService.getMailAccount(null, function(res) {
+
+            var srcIndex = 0, desIndex = 0, isChangePosition = false, maxIndex = 0;
+            var bindSortTable = function (el) {
+                $(el).sortable({
+                    axis: "y",
+                    items: "div.menu-place",
+                    cancel: "div.mail-content",
+                    //helper: "clone",
+                    cursor: "n-resize",
+                    revert: false,
+                    opacity: 0.8,
+                    tolerance: "pointer",
+                    containment: "parent",
+                    start: function (event, ui) {
+                        srcIndex = ui.item.index();
+                    },
+                    stop: function (event, ui) {
+                        desIndex = ui.item.index();
+
+                        if (srcIndex === desIndex) return;
+
+                        var tempMails = vmCommon.deepCopy(vmCrmEnum.MailModel.mails);
+                        var temp = tempMails.splice(srcIndex, 1);
+                        tempMails.splice(desIndex, 0, temp[0]);
+
+                        vmCrmEnum.reCreateIndex(tempMails);
+
+                        vmCrmEnum.dataService.updateMailIndex({mails: tempMails});
+                        vmCrmEnum.MailModel.set("mails", tempMails);
+                        $(divId + " " + "input[name='Post']").preventPressAlphabetChar();
+                    }
+                });
+            };
+
+            function isEmptyItem(mail) {
+                if (!mail) return true;
+                if (mail.Id) return false;
+
+                if (mail.EmailAddress.trim() || mail.UserName.trim() || mail.Password.trim() || mail.SmtpServer.trim() || mail.Port.trim())
+                    return false;
+
+                return true;
+            };
+
+            var mails = res.value.Mails;
+            var mrole = res.value.Role;
+
+            vmCrmEnum.IsRole = mrole >= vmCommon.MemberRole.Edit;
+            
+            vmCrmEnum.MailModel = kendo.observable({
+                mails: mails,
+                isRole: mrole >= vmCommon.MemberRole.Edit,
+                enableRemoveEmail: (mails.length > 1) && (mrole >= vmCommon.MemberRole.Edit),
+                addmail: function() {
+                    if (mrole < vmCommon.MemberRole.Edit) return;
+
+                    var newItem = new CrmAccountSmtp();
+                    newItem.MIndex = vmCrmEnum.getMaxValueBy(this.mails, "MIndex") + 1;
+                    this.mails.push(newItem);
+
+                    this.set("enableRemoveEmail", (this.mails.length > 1) && (mrole >= vmCommon.MemberRole.Edit));
+                    $(divId + " " + "input[name='Post']").preventPressAlphabetChar();
+
+                    //fix arrow for new item
+                    var elem = $("#listmails").children("div.menu-place:eq(" + (this.mails.length - 1) + ")");
+                    $(elem).find("span.arrow-panel-online").removeClass("arrow-collapse").addClass("arrow-right-big");
+                },
+                removeemail: function(e) {
+                    if (mrole < vmCommon.MemberRole.Edit) return;
+
+                    var item = e.data;
+                    var index = this.mails.indexOf(item);
+
+                    function removeItem() {
+                        vmCrmEnum.MailModel.mails.splice(index, 1);
+                        vmCrmEnum.MailModel.set("enableRemoveEmail", (vmCrmEnum.MailModel.mails.length > 1) && (mrole >= vmCommon.MemberRole.Edit));
+                    };
+
+                    //if (isEmptyItem(item)) {
+                    //    removeItem();
+                    //    return;
+                    //}
+
+                    pConfirm(kLg.confirmDeleteMail).then(function() {
+                        if (item.Id > 0) {
+                            vmCrmEnum.dataService.removeMailAccount(item, function(resx) {
+                                if (resx.value === vmCrmEnum.ResultStatus.USING) {
+                                    pAlert(kLg.msgMailAreUsing);
+                                } else {
+                                    removeItem();
+                                    return;
+                                }
+                            });
+                        } else {
+                            removeItem();
+                            return;
+                        }
+                    });
+                },
+                toggleContent: function(e) {
+                    var elem = $(e.currentTarget);
+                    var item = e.data;
+                    var isShow = item.IsShow;
+
+                    //toggle icon
+                    var temp = $(elem).children("span.arrow-panel-online");
+                    if (temp.length === 0) return;
+
+                    var ico = temp[0];
+                    if (!isShow) {
+                        $(ico).removeClass("arrow-collapse").addClass("arrow-right-big");
+                    } else {
+                        $(ico).removeClass("arrow-right-big").addClass("arrow-collapse");
+                    }
+
+                    //update model
+                    item.set("IsShow", !isShow);
+                }
+            });
+            kendo.bind($(divId), vmCrmEnum.MailModel);
+            $(divId + " " + "input[name='Post']").preventPressAlphabetChar();
+
+            if (mrole >= vmCommon.MemberRole.Edit) {
+                bindSortTable($(divId));
+            } else {
+                $(divId).find("span.icon-arow-towway-vertical").remove();
+            }
+
+            $(divId).css({"display":"block"});
+        });
+    };
+
+    //ENTITY: [CrmAccountSmtp]
+    function CrmAccountSmtp() {
+        this.Id = 0;
+        this.EmailAddress = "";
+        this.UserName = "";
+        this.Password = "";
+        this.SmtpServer = "";
+        this.Port = "";
+        this.SSL = false;
+        this.MIndex = 0;
+        this.IsShow = true;
+        //this.IsShowPass = false;
+
+        return this;
+    };
+
+    vmCrmEnum.getKey = function(parentType, type) {
+        return parentType + "_" + type;
+    };
+
+    var srcIndex = 0, desIndex = 0, isChangePosition = false, maxIndex = 0;
+    vmCrmEnum.bindCategorySortable = function(typeId) {
+        $("#place-categories"+ typeId).sortable({
+            axis: "y",
+            items: "div.div-hover",
+            cancel: "h4.panel-title,a.childcategories,input.popup-input",
+            cursor: "n-resize",
+            revert: false,
+            opacity: 0.8,
+            tolerance: "pointer",
+            containment: "parent",
+            start: function (event, ui) {
+                srcIndex = ui.item.index();
+            },
+            stop: function (event, ui) {
+                desIndex = ui.item.index();
+                if (srcIndex === desIndex) return;
+
+                var src = vmCrmEnum.arrCategories["4_1"] || [];
+                if (src.length === 0) return;
+
+                var srcId = src[srcIndex].Id;
+                var desId = src[desIndex].Id;
+
+                vmCrmEnum.ChangePositionCategories(desId, srcId, 4, 1, srcIndex > desIndex ? 0: 1);
+            }
+        });
+    }
+
+    vmCrmEnum.GetCategories = function (parentType, type, loadRequired) {
+        $("div[type=content-table-categories]").html("");
+        $("input[name='CategoryName']").tooltip('destroy');
+        var divId = "place-categories" + type;
+        var key = vmCrmEnum.getKey(parentType, type);
+        //Tien7383
+        if (parentType === vmCrmEnum.SettingType.Organisation && type === vmCrmEnum.OrganisationSetting.KundenNr) {
+            vmCrmEnum.GetKundeCategories(parentType, type);
+            return;
+        }
+
+        if (loadRequired === false && vmCrmEnum.arrCategories.hasOwnProperty(key)) {
+            if (parentType === vmCrmEnum.SettingType.Activities && type === vmCrmEnum.ActivitieSetting.Category) {
+                bindTemplate(divId, "template-parent-categories", vmCrmEnum.arrCategories[key]);
+
+                if (vmCrmEnum.Role > 0 && type === 1) {
+                    vmCrmEnum.bindCategorySortable(type);
+                }
+            } else {
+                bindTemplate(divId, "template-table-categories", vmCrmEnum.arrCategories[key]);
+            }
+            vmCrmEnum.SetupValidate(type);
+            vmCommon.bindChangeIcon();
+            vmCrmEnum.setUpMouseClick();
+            if(vmCrmEnum.Role > 0)
+                vmCrmEnum.SetUpDragDrop();
+            vmCommon.setupMenuIcon('#pop-setting-crm span[data-toggle=dropdown]', '#setting-pop');
+            return;
+        }
+        var url = "../Handlers/CrmSettingHandler.ashx?funcName=getallcategoriesbytype&parentType=" + parentType +"&type="+type+ "&projid="+ projectId;
+        callAjax('categories-loading', url, null, function (data) {
+            vmCrmEnum.arrCategories[key] = data.value;
+            if (vmCrmEnum.arrCategories[key].length === 0) {
+                var cate = {
+                    Id: 0,
+                    Type: parseInt(type),
+                    ParentType :parseInt(parentType)
+                };
+                vmCrmEnum.arrCategories[key].push(cate);
+            }
+            if (parentType === vmCrmEnum.SettingType.Activities && type === vmCrmEnum.ActivitieSetting.Category) {
+                bindTemplate(divId, "template-parent-categories", vmCrmEnum.arrCategories[key]);
+            } else {
+                bindTemplate(divId, "template-table-categories", vmCrmEnum.arrCategories[key]);
+            }
+
+            if (vmCrmEnum.Role > 0 && type === 1) {
+                vmCrmEnum.bindCategorySortable(type);
+            }
+
+            vmCrmEnum.SetupValidate(type);
+            vmCrmEnum.setUpMouseClick();
+            if(vmCrmEnum.Role > 0)
+                vmCrmEnum.SetUpDragDrop();
+            vmCommon.setupMenuIcon('#pop-setting-crm span[data-toggle=dropdown]', '#setting-pop');
+        }, AjaxConst.GetRequest);
+
+    };
+
+    vmCrmEnum.GetChildCategories = function (id) {
+
+        $("div[type=content-table-child-categories]").html("");
+        $('.childcategories').not(this).find("span.arrow-panel-online").removeClass("arrow-right-big").addClass("arrow-collapse");
+        
+        var divChildType = $("div[id^='childType'][id!='childType" + id + "']");
+        divChildType.height(0);
+        divChildType.removeClass("in");
+        
+        $("input[name='CategoryName']").tooltip('destroy');
+        var divId = "child-place-Type" + id;
+
+
+        var url = "../Handlers/CrmSettingHandler.ashx?funcName=getcategoriesbyparentId&parentId=" + id + "&projid="+ projectId;
+        callAjax('categories-loading', url, null, function (data) {
+            var serData = data.value;
+            var type = serData[0].Type;
+            var parentType = serData[0].ParentType;
+            var key = vmCrmEnum.getKey(parentType, type);
+
+            vmCrmEnum.arrCategories[key] = data.value;
+            bindTemplate(divId, "template-table-categories", data.value);
+
+            vmCrmEnum.SetupValidate(type);
+            vmCommon.bindChangeIcon();
+            vmCrmEnum.setUpMouseClick();
+            if(vmCrmEnum.Role > 0)
+                vmCrmEnum.SetUpDragDrop();
+            vmCommon.setupMenuIcon('#pop-setting-crm span[data-toggle=dropdown]', '#setting-pop');
+        }, AjaxConst.GetRequest);
+
+    };
+
+    vmCrmEnum.redirectCategories = function (parentType, type,parentId) {
+        if (parentType === vmCrmEnum.SettingType.Activities && type === vmCrmEnum.ActivitieSetting.Status) {
+            vmCrmEnum.GetChildCategories(parentId);
+        } else {
+            vmCrmEnum.GetCategories(parentType, type, true);
+        }
+    }
+
+    vmCrmEnum.GetKundeCategories = function(parentType, type) {
+        $('#lblKundenNr').text(kLg.kundenNrSetting);
+        var url = "../Handlers/CrmSettingHandler.ashx?funcName=getallcategoriesbytype&parentType=" + parentType +"&type="+type+ "&projid="+ projectId;
+        callAjax('categories-loading', url, null, function (data) {
+            var serverData = data.value;
+            if (serverData && serverData.length) {
+                var valueChecked = serverData[0].Name;
+            } else {
+                valueChecked = "1";
+            }
+            if (valueChecked === "1") {
+                $('#cbKundenNr').prop("checked", true);
+            } else {
+                $('#cbKundenNr').prop("checked", false);
+            }
+
+        }, AjaxConst.GetRequest);
+    }
+
+    vmCrmEnum.findParentType = function (parentType) {
+
+        for(var i = 0; i < vmCrmEnum.arrayLabel.length; i++) {
+            if(vmCrmEnum.arrayLabel[i].Type === parentType) {
+                return vmCrmEnum.arrayLabel[i];
+            }
+        }
+        return null;
+    };
+
+    vmCrmEnum.findType = function (parentType,type) {
+        var finfType = vmCrmEnum.arrayData[parentType];
+        if (finfType.length === 0) return null;
+        for(var i = 0; i < finfType.length; i++) {
+            if(finfType[i].Type === type) {
+                return finfType[i];
+            }
+        }
+        return null;
+    };
+    var popUpCategories = undefined;
+    vmCrmEnum.OpenPopUpAddCategory = function (parentType, type, j) {
+        vmCrmEnum.tmpParentType = parseInt(parentType);
+        vmCrmEnum.tmpType = parseInt(type);
+        vmCrmEnum.tmpTitle = vmCrmEnum.getTittleCategory(parentType, type);
+        var key = vmCrmEnum.getKey(parentType, type);
+        var category = vmCrmEnum.arrCategories[key];
+        
+        if (j == null) {
+            vmCrmEnum.tmpId = 0;
+            vmCrmEnum.tmpName = '';
+            vmCrmEnum.tmpDes = '';
+            vmCrmEnum.tmpMdf = 0;
+            vmCrmEnum.tmpParentId = category[0].ParentId;
+            if (type === vmCrmEnum.PersonSetting.Salutation) {
+                vmCrmEnum.tmpExtension = '';
+            }
+            vmCrmEnum.tmpAddrControl = false;
+            
+        } else {
+            for (var i = 0; i < category.length; i++) {
+                if (i === j) {
+
+                    vmCrmEnum.tmpId = category[i].Id;
+                    vmCrmEnum.tmpName = category[i].Name;
+                    vmCrmEnum.tmpDes = category[i].Description;
+                    vmCrmEnum.tmpMdf = category[i].Mdf;
+                    vmCrmEnum.tmpParentId = category[i].ParentId;
+                    if (type === vmCrmEnum.PersonSetting.Salutation || type === vmCrmEnum.ActivitieSetting.Status) {
+                        vmCrmEnum.tmpExtension = category[i].Extension;
+                    }
+                    vmCrmEnum.tmpAddrControl = category[i].AddrControl;
+                }
+            }
+        }
+
+        if (parentType === vmCrmEnum.SettingType.Activities && type == vmCrmEnum.ActivitieSetting.Status) {
+            vmCrmEnum.statusOptions = {};
+            vmCrmEnum.statusOptions.IsEdit = vmCrmEnum.tmpId > 0;
+
+            vmCrmEnum.statusOptions.Status = {
+                Id: vmCrmEnum.tmpId,
+                Name: vmCrmEnum.tmpName,
+                Description: vmCrmEnum.tmpDes,
+                Mdf: vmCrmEnum.tmpMdf,
+                ParentId: vmCrmEnum.tmpParentId,
+                tempExtension: vmCrmEnum.tmpExtension,
+                Type: vmCrmEnum.ActivitieSetting.Status,
+                ParentType: vmCrmEnum.SettingType.Activities
+            };
+
+            var extensionEntry = { CategoryId: vmCrmEnum.statusOptions.Status.Id, Type: vmCrmEnum.ActivitieSetting.Status, ParentType: vmCrmEnum.SettingType.Activities };
+            vmCrmEnum.dataService.getCategoriesExtensions(extensionEntry, function (res) {
+                vmCrmEnum.statusOptions.ExtensionData = res.value;
+                vmCrmEnum.openPopEditStatus();
+            });
+
+        } else {
+            popUpCategories = showPopup(popUpCategories,
+                $('#pop-add-categories-place'),
+                '../Contents/popAddCategories.html',
+                {
+                    title: vmCrmEnum.tmpTitle,
+                    height: 295,
+                    width: 500,
+                    resizable: false
+                });
+        }
+
+    };
+
+    vmCrmEnum.popEditStatus = undefined;
+    vmCrmEnum.openPopEditStatus = function () {
+        vmCrmEnum.popEditStatus = showPopup(popUpCategories,
+            $('#pop-add-categories-place'),
+            '../Contents/CrmPopEditStatus.html',
+            {
+                title: vmCrmEnum.tmpTitle,
+                height: 432,
+                width: 500,
+                resizable: false
+            });
+    };
+
+    vmCrmEnum.getTittleCategory = function(parentType, type) {
+        if (parentType === vmCrmEnum.SettingType.Activities && type === vmCrmEnum.ActivitieSetting.Status) {
+            return kLg.titleActivitie + "/" + kLg.titleAStatusCrm;
+        }
+        return vmCrmEnum.findParentType(vmCrmEnum.tmpParentType).Title +"/"+ vmCrmEnum.findType(parentType,type).Title;
+    }
+
+    vmCrmEnum.DeleteCategories = function (parentType,type,id) {
+        var key = vmCrmEnum.getKey(parentType, type);
+        var category = vmCrmEnum.arrCategories[key];
+        var parentId;
+        for (var i = 0; i < category.length; i++) {
+            if (category[i].Id === id) {
+                var objCat = { id: category[i].Id, mdf: category[i].Mdf };
+                parentId = category[i].ParentId;
+            }
+        }
+        var url = '../Handlers/CrmSettingHandler.ashx?funcName=deletecategories&projid=' + projectId;
+        pConfirm(kLg.confirmDeleteCategories).then(function () {
+            callAjax('categories-loading', url, JSON.stringify(objCat), function (data) {
+                var state = data;
+                vmCrmEnum.UpdateCallBack(state,parentType,type,parentId);
+            }, AjaxConst.PostRequest);
+        });
+    };
+
+    vmCrmEnum.UpdateCallBack = function(state,parentType,type,parentId) {
+        switch (state) {
+            case vmCrmEnum.enumsRoleConflict.conflict:
+                pAlert(kLg.msgConflickData).then(function() {
+                    vmCrmEnum.redirectCategories(parentType,type,parentId);
+                });
+                break;
+            case vmCrmEnum.enumsRoleConflict.using:
+                pAlert(kLg.msgCategoryAreUsing).then(function() {
+                    vmCrmEnum.redirectCategories(parentType,type,parentId);
+                });
+                break;
+            case vmCrmEnum.enumsRoleConflict.nameExist:
+                pAlert(kLg.msgNameIsExisted).then(function() {
+                    vmCrmEnum.redirectCategories(parentType,type,parentId);
+                });
+                break;
+            default:
+                vmCrmEnum.redirectCategories(parentType,type,parentId);
+                break;
+        }
+    };
+    vmCrmEnum.BindOnchange = function() {
+        $('body').on("keyup", '#pop-setting-crm .popup-input', function() {
+            $(this).attr("data-original-title", "");
+        });
+    };
+
+    vmCrmEnum.AddCategory = function (parentType, type) {
+        if (!$('#categories-form-crm' + type).valid()) return;
+        var txtName = $("#txtName" + type);
+
+        var name = "";
+
+        //Tien7383
+        if (type !== vmCrmEnum.OrganisationSetting.KundenNr) {
+            name = txtName.val().trim();
+            if(name.length === 0) {
+                $("#txtName" + type).attr('title', kLg.requiredName);
+                $("#txtName" + type).tooltip('show');
+                return;
+            }
+        }
+
+        var obj = {
+            Name: name,
+            Type: parseInt(type),
+            ParentType : parentType
+        };
+        if(type === 3) {
+            obj.NonArchive = false;
+        }
+        var url = "../Handlers/CrmSettingHandler.ashx?funcName=addcategories&projid=" + projectId;
+        callAjax('categories-loading', url, JSON.stringify(obj), function (data) {
+            $("#txtName" + type).tooltip('destroy');
+            var state = data;
+            switch (state) {
+                case vmCrmEnum.enumsRoleConflict.using:
+                    pAlert(kLg.msgCategoryAreUsing).then(function () {
+                        vmCrmEnum.GetCategories(parentType,type,true);
+                    });
+                    break;
+                case vmCrmEnum.enumsRoleConflict.nameExist:
+                    txtName.attr('data-original-title', kLg.msgNameIsExisted);
+                    txtName.tooltip('show');
+                    break;
+
+                default:
+                    vmCrmEnum.GetCategories(parentType,type,true);
+                    break;
+            }
+
+            $(txtName).val("");
+
+        }, AjaxConst.PostRequest);
+    };
+
+    vmCrmEnum.AddChildCategory = function (parentType, type,parentId) {
+        //if (!$('#categories-form-crm' + type).valid()) return;
+        var txtName = $("#txtChildName" + type).val().trim();
+        if (!vmCrmEnum.ValidateChildCategory(type)) return;
+
+        var obj = {
+            Name: txtName,
+            Type: parseInt(type),
+            ParentType : parentType,
+            ParentId: parentId
+        };
+        var url = "../Handlers/CrmSettingHandler.ashx?funcName=addcategories&projid=" + projectId;
+        callAjax('categories-loading', url, JSON.stringify(obj), function (data) {
+            $("#txtChildName" + type).tooltip('destroy');
+            var state = data;
+            switch (state) {
+                case vmCrmEnum.enumsRoleConflict.using:
+                    pAlert(kLg.msgCategoryAreUsing).then(function () {
+                        vmCrmEnum.GetChildCategories(parentId);
+                    });
+                    break;
+                case vmCrmEnum.enumsRoleConflict.nameExist:
+                    ShowToolTip2($("#txtChildName" + type), kLg.msgNameIsExisted, "top");
+                    break;
+
+                default:
+                    vmCrmEnum.GetChildCategories(parentId);
+                    break;
+            }
+
+        }, AjaxConst.PostRequest);
+    };
+
+    vmCrmEnum.ValidateChildCategory = function(type) {
+        var txtName = $("#txtChildName" + type).val().trim();
+        if (txtName.length === 0) {
+            ShowToolTip2($("#txtChildName" + type), kLg.msgRequired, "top");
+            return false;
+        }
+
+        if (txtName.length >  100) {
+            ShowToolTip2($("#txtChildName" + type), kLg.msgMaxlenghName, "top");
+            return false;
+        }
+
+
+        return true;
+    }
+
+    vmCrmEnum.OnChildNameKeyDown  = function(type) {
+        $("#txtChildName" + type).tooltip("destroy");
+    }
+
+    vmCrmEnum.findCategory = function (parentType,type, id) {
+
+        var key = vmCrmEnum.getKey(parentType, type);
+        var categories = vmCrmEnum.arrCategories[key];
+        if (categories.length === 0) return null;
+        for(var i = 0; i < categories.length; i++) {
+            if(categories[i].Id === id) {
+                return categories[i];
+            }
+        }
+        return null;
+    };
+    vmCrmEnum.ChangePositionCategories = function (desId, sourceId,parentType,type, position) {
+
+        var source = vmCrmEnum.findCategory(parentType,parseInt(type), sourceId);
+        var des = vmCrmEnum.findCategory(parentType,parseInt(type), desId);
+        var parentId = source.ParentId;
+        var moving = {
+            SourceId: sourceId,
+            DesId: desId,
+            SourceMdf: source.Mdf,
+            DesMdf: des.Mdf,
+            ParentType : parentType,
+            Type: type,
+            Position: position
+        };
+        var url = "../Handlers/CrmSettingHandler.ashx?funcName=updatemindex&projid=" + projectId;
+        callAjax('categories-loading', url, JSON.stringify(moving), function (data) {
+            var state = data;
+            switch (state) {
+                case vmCrmEnum.enumsRoleConflict.using:
+                    pAlert(kLg.msgCategoryAreUsing).then(function () {
+                        vmCrmEnum.redirectCategories(parentType,parseInt(type),parentId);
+                    });
+                    break;
+                case vmCrmEnum.enumsRoleConflict.nameExist:
+                    pAlert(kLg.msgNameIsExisted).then(function () {
+                        vmCrmEnum.redirectCategories(parentType,parseInt(type),parentId);
+                    });
+                    break;
+                default:
+                    vmCrmEnum.redirectCategories(parentType,parseInt(type),parentId);
+                    break;
+            }
+        }, AjaxConst.PostRequest);
+    };
+
+    var divDragDropQG;                      // TienPM disable drag-drop when click
+
+    vmCrmEnum.setUpMouseClick = function() {
+        $('.icon-dropdow').click(function() {
+            if ($('.ms-dropdow').hasClass('open')) {
+                $('table.tbgrid td').removeClass('td-hovers');
+                $('table.tbgrid td').addClass('td-hover');
+                $('table.table-bordered td').removeClass('td-hovers');
+                $('table.table-bordered td').addClass('td-hover');
+            } else {
+                $('table.tbgrid td').removeClass('td-hover');
+                $('table.table-bordered td').removeClass('td-hover');
+                $(this).parents('td').addClass('td-hovers');
+                $(this).parents('.itemDraggable').draggable({ disabled: true });
+                divDragDropQG = $(this).parents('.itemDraggable');
+            }
+            $(document).mouseup(function(e) {
+                var container = $('.icon-dropdow');
+                if (!container.is(e.target)) {
+                    $('table.tbgrid td').removeClass('td-hovers');
+                    $('table.tbgrid td').addClass('td-hover');
+                    $('table.table-bordered td').removeClass('td-hovers');
+                    $('table.table-bordered td').addClass('td-hover');
+                    divDragDropQG.draggable({ disabled: false });
+                };
+            });
+        });
+    };
+    vmCrmEnum.SetUpDragDrop = function() {
+        var sourceId, desId,tc, tcell, parentType, type, hDrag, wDrag, position, xDrag, yDrag;
+
+        $('#pop-setting-place .itemDraggable').draggable({
+            revert: true,
+            cursor: 'default',
+            cursorAt: { top: 0, left: 0 },
+            handler: 'icon-arow-towway-vertical',
+            axis: 'y',
+            scroll: true,
+            start: function () {
+                $(this).addClass('onDragging');
+                var dragOff = $(this).offset();
+                xDrag = dragOff.left;
+                yDrag = dragOff.top;
+                tcell = $(this).closest('td');
+                sourceId = parseInt($(this).attr('val'));
+                type = parseInt($(this).attr('type'));
+                tc = $(this).closest('div');
+                parentType = parseInt($(this).attr('parenttype'));
+                hDrag = tcell.height();
+                wDrag = tcell.width();
+            },
+            stop: function () {
+                $(this).removeClass('onDragging');
+            }
+        });
+
+        $('.divDroppable').droppable({
+            hoverClass: 'ui-state-hover',
+            accept: '.itemDraggable',
+            tolerance: 'intersect',
+            drop: function (event, ui) {
+
+                desId = parseInt($(this).attr('val'));
+                if (sourceId === desId) { return; }
+                position = vmCommon.getPositionByY(this, ui, yDrag);
+
+                vmCrmEnum.ChangePositionCategories(desId, sourceId, parentType, type, position);
+            }
+        });
+    };
+
+
+    vmCrmEnum.CheckNoSpaces = function(e) {
+        return e.trim().indexOf(' ') === -1;
+    };
+
+    $("#setting-pop").on("keyup", "input.moment-input", function() {
+        $(this).closest("div.menu-place").children("div.mail-item").children("span.moment-span").text($(this).val().trim());
+    });
+
+    vmCrmEnum.timeOutSaving = undefined;
+    $("#setting-pop").on("change", "div.menu-place", function(e) {
+        if (!vmCrmEnum.IsRole || vmCrmEnum.MailModel == undefined) return;
+        
+        var mailModel = vmCrmEnum.MailModel;
+        var index = $(e.currentTarget).index();
+        if (index < 0) return;
+
+        var item = mailModel.mails[index];
+        var flag = vmCrmEnum.validMailItem(e.currentTarget, item);
+
+        if (!flag) return;
+
+        if (item.Id) {
+            //update
+            vmCrmEnum.dataService.updateMailAccount(item, function(res) {
+            });
+        } else {
+            //create
+            if (vmCrmEnum.timeOutSaving) {
+                clearTimeout(vmCrmEnum.timeOutSaving);
+                vmCrmEnum.timeOutSaving = undefined;
+            }
+
+            vmCrmEnum.timeOutSaving = setTimeout(function() {
+                vmCrmEnum.dataService.createMailAccount(item, function(res) {
+                    var newId = res.value;
+                    item.set("Id", isNaN(Number(newId))? 0: Number(newId));
+                });
+            }, 100);
+        }
+
+    });
+
+    vmCrmEnum.getMaxValueBy = function(lst, prop) {
+        var tempLst = vmCommon.deepCopy(lst);
+        if (tempLst.length === 0) return 0;
+
+        var max = tempLst[0][prop];
+
+        if (tempLst.length === 1) return max;
+
+        for (var i = 1; i < tempLst.length; i++) {
+            var temp = tempLst[i][prop] || 0;
+            if (temp > max) max = temp;
+        }
+
+        return max || 0;
+    };
+
+    vmCrmEnum.validMailItem = function(divPanel, item) {
+        var flag = true;
+
+        var emailAddress = $(divPanel).find("div[name='sEmailAddress']");
+        if (emailAddress.length === 0) return false;
+        emailAddress = emailAddress[0];
+
+        var userName = $(divPanel).find("div[name='sUserName']");
+        if (userName.length === 0) return false;
+        userName = userName[0];
+
+        var smtpServer = $(divPanel).find("div[name='sSmtpServer']");
+        if (smtpServer.length === 0) return false;
+        smtpServer = smtpServer[0];
+
+        var port = $(divPanel).find("div[name='sPort']");
+        if (port.length === 0) return false;
+        port = port[0];
+
+        $(emailAddress).css({"display": "none"});
+        if (!vmCommon.CheckEmailSetting(item.EmailAddress)) {
+            flag = false;
+            $(emailAddress).css({"display": "block"});
+        }
+
+        $(userName).css({"display": "none"});
+        if (!item.UserName.trim()) {
+            flag = false;
+            $(userName).css({"display": "block"});
+        }
+
+        $(smtpServer).css({"display": "none"});
+        if (!item.SmtpServer.trim()) {
+            flag = false;
+            $(smtpServer).css({"display": "block"});
+        }
+
+        $(port).css({"display": "none"});
+        if (!item.Port.trim() || isNaN(Number(item.Port.trim()))) {
+            flag = false;
+            $(port).css({"display": "block"});
+        }
+
+        return flag;
+    };
+
+    $("#setting-pop").on("mouseenter", "div.validpoint", function() {
+        var ptype = $(this).attr("ptype");
+        if (!ptype) return;
+
+        var msg = "";
+
+        switch (ptype) {
+            case "1":
+                var text = $(this).prev().val().trim();
+                if (text) {
+                    msg = kLg.msgInvalidEmail;
+                } else {
+                    msg = kLg.msgRequired;
+                }
+                break;
+            case "2":
+            case "3":
+            case "4":
+            case "5":
+                msg = kLg.msgRequired;
+                break;
+        };
+
+        ShowToolTip2($(this), msg, "top");
+
+    });
+
+    $("#setting-pop").on("mouseout", "div.validpoint", function() {
+        $(this).tooltip("destroy");
+    });
+
+    vmCrmEnum.sortCategoriesByName = function (parentType, type) {
+        if (!parentType || !type || !projectId) return;
+        var url = "../Handlers/CrmSettingHandler.ashx?funcName=sortcategories&projid=" + projectId;
+        var entry = {
+            ProjectId: projectId,
+            ParentType: parentType,
+            Type: type
+        };
+        
+        callAjax('categories-loading', url, JSON.stringify(entry), function (result) {
+            if (result > 0) {
+                vmCrmEnum.GetCategories(parentType, type, true);
+            }            
+        }, AjaxConst.PostRequest);
+
+    };
+
+    vmCrmEnum.checkAddrControl = function (element, parentType, type, id, ischeck, j) {
+      
+        var div = $(element).parent().closest('div');
+        var tr = div.closest('tr');
+        var cl = !ischeck ? 'icon-relative' : 'icon-not-relative';
+
+        var key = vmCrmEnum.getKey(parentType, type);
+        vmCrmEnum.arrCategories[key][j].AddrControl = ischeck;
+
+        vmCommon.mnuDropdownTimeoutOpen($(tr), 650);
+        
+        var url = "../Handlers/CrmSettingHandler.ashx?funcName=checkaddrcontrol&projid=" + projectId;
+        var entry = {
+            ProjectId: projectId,
+            ParentType: parentType,
+            Type: type,
+            CatId: id,
+            IsChecked: ischeck
+        };
+        callAjax('categories-loading', url, JSON.stringify(entry), function (result) {
+            if (result > 0) {                
+                //Process UI                                                                 
+                var span = div.find('span[class~="' + cl + '"]')[0];
+                if (span) {
+                    $(span).removeClass(cl);
+                    if (ischeck) {
+                        $(span).addClass('icon-relative');
+                    }
+                    else {
+                        $(span).addClass('icon-not-relative');
+                    }
+
+                    var a = $(span).closest('a');
+                    if (a)
+                        $(a).attr("onclick", "return vmCrmEnum.checkAddrControl(this," + parentType + "," + type + "," + id + "," + !ischeck + "," + j + ");");
+                }
+
+
+
+            }
+        }, AjaxConst.PostRequest);
+        
+    };
+</script>
+
+
+<style>
+    .tooltip {
+        z-index: 30000 !important;
+    }
+
+    #pop-setting-place .tbgrid {
+        margin-left: -2px;
+    }
+</style>

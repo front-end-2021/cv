@@ -1,0 +1,2171 @@
+﻿<!--Author: MANHLV-->
+<style type="text/css">
+    .div-item .ms-drop {
+        margin-top: 4px;
+        margin-left: 142px !important;
+    }
+
+    .clear35px {
+        height: 35px;
+    }
+
+    .crm-label {
+    }
+
+    .crm-drop {
+        width: 190px !important;
+    }
+
+    /*.k-autocomplete > input {
+        width: 100% !important;
+    }*/
+
+    .posdragable {
+        cursor: pointer !important;
+    }
+
+    #groupPos .tooltip-arrow {
+        /*top: 50% !important;*/
+    }
+
+    #groupPos .tooltip {
+        /*top: 4px !important;*/
+        left: 0 !important;
+    }
+
+    #groupPos .tooltip-arrow {
+        /*border-left-color: #CE3838;*/
+    }
+
+    #relationPer-control .tooltip-arrow {
+        border-bottom-color: #CE3838;
+    }
+
+    .k-window .k-widget {
+        z-index: initial !important;
+    }
+
+    .remove-item {
+        margin-left: 3px !important;
+    }
+
+    .k-list-container {
+        width: 174px !important;
+    }
+
+    .info-value.iv-textedit-box { position: relative; margin-top:-8px}
+
+    .info-value .tooltip {
+        left: 436px !important;
+    }
+
+    .div-lastname .tooltip {
+        top: 129px !important;
+        left: 414px !important;
+    }
+
+    .div-lastname .tooltip-inner {
+        max-width: 314px !important;
+    }
+
+    .k-autocomplete .k-input {
+        height: 1.65em;
+        line-height: 1.65em;
+        padding: 0.177em 0;
+        text-indent: 4px;
+        border: 0px !important;
+        margin: 0;
+    }
+
+    /* multiselect */
+    .divtag .k-multiselect-wrap input[class~="k-input"] {
+        /*  display: none !important;*/
+        border: none !important;
+        background-color: white !important;
+    }
+    .divtag .k-multiselect-wrap {
+        border-radius: 0px !important; 
+    }
+
+    .divtag .k-multiselect.k-header {
+        border-color: #E7E7E7 !important;
+    }
+
+    .k-animation-container .k-state-focused {
+        border-width: 0;
+        border-color: #E7E7E7;
+        box-shadow: none;
+    }
+    /**/
+    .divtag .k-multiselect-wrap li[class~="k-button"] {
+        color: #2e2e2e;
+        border-color: #fafafa;
+        background-color: #fafafa;
+        border-radius: 30px;
+        max-width: 99%;
+    }
+
+    .divtag .k-multiselect-wrap li[class~="k-button"]:hover {
+        color: #2e2e2e;
+        border-color: #EBEBEB;
+        background-color: #EBEBEB;
+        border-radius: 30px;
+        max-width: 99%;
+    }
+
+    .divtag .k-multiselect, #ddlTags-list {
+        width: 393px !important;
+    }
+
+    .divtag li[class~="k-button"] span {
+            word-wrap: break-word;
+    }
+    /* multiselect */
+    .dropdow-menu-li-a {
+        padding: 0px 40px 0px 10px !important;
+        clear: none !important;
+        width: 68%;
+        line-height: 1.7 !important;
+        margin-bottom: -9px;
+        margin-top: -9px;
+        cursor: pointer;
+    }
+    .person-datetime {
+        background-color: white !important;
+        width: 96% !important;
+    }
+    .margin17 {
+        margin-left: 17px;
+    }
+    .height40 {
+        height: 40px;
+    }
+    .w140 {
+        width: 140px;
+    }
+    .margintop5 {
+        margin-top: 5px;
+    }
+    .marginbot7 {
+        margin-bottom: 7px
+    }
+
+    .div-birthday .tooltip {
+        left: 0 !important;
+    }
+
+    .person-datetime .tooltip {
+        width: 136px;
+    }
+    /*#region text editor*/
+    .iv-textedit-removebtn {
+        position: absolute; top:10px;right:154px;
+        display:inline-flex;margin-top:3px;
+    }
+    .iv-textedit-removebtn .remove-item {margin-top: 5px;}
+    .dnbTextAreaEditor {
+        width: 202px; max-height:42px;
+        margin-right: -3px;
+        margin-left: -3px;
+    }
+    .dnbTextAreaEditor > table.k-editor {
+        border: none; 
+        max-height: 36px; min-height:36px;
+        background-color: transparent;
+    }
+    .dnbTextAreaEditor > table.k-editor iframe.k-content {
+        background-color: #F7F7F7;
+        max-height: 32px; min-height:32px;
+    }
+    .dnbTextAreaEditor > table.k-editor .k-editable-area {
+        border-color: #E7E7E7;
+    }
+    .dnbTextAreaEditor td.k-editor-toolbar-wrap {
+        height: 0
+    }
+    .dnbTextAreaEditor .modal-textarea {
+        min-height: 70px;
+        display: inline-block;
+        width: 91%;
+        max-height: 155px;
+    }
+    .dnbTextAreaEditor[data-crm-id="crmPersonNotes"], 
+    .dnbTextAreaEditor[data-crm-id="-crmPersonNotes"] {   /* Addnew Person*/
+        width: 404px;
+    }
+    .iv-relationship-box {position:relative;margin-top:-8px;}
+    .iv-relationship-box .dnbTextAreaEditor.txtedit-relationship-box {
+        width: 174px;
+    }
+    .iv-relationship-box .dnbTextAreaEditor.txtedit-relationship-box .k-editor iframe.k-content{
+        box-sizing: border-box;
+    }
+    .iv-relationship-box .iv-textedit-removebtn{
+        right: -50px;
+    }
+    .dnbTextAreaEditor[data-crm-id="crmPersonNotes"] > table.k-editor iframe.k-content,
+    .dnbTextAreaEditor[data-crm-id="-crmPersonNotes"] > table.k-editor iframe.k-content { /* Addnew Person*/
+        min-height: 165px;
+    }
+    .dnbTextAreaEditor[data-crm-id="crmPersonNotes"] + .iv-icexpand-texteditor,
+    .dnbTextAreaEditor[data-crm-id="-crmPersonNotes"] + .iv-icexpand-texteditor { /* Addnew Person*/
+        position: absolute;
+        top: -15px;
+        right: 111px;
+    }
+    .iv-icexpand-texteditor {margin-right:5px;}
+    .k-editor-toolbar-wrap span.k-widget.k-colorpicker.k-header.k-editor-widget[role="textbox"] {
+        width: 30px
+    }
+    /*endregion text editor*/
+    #edit-form-person {display:flex;flex-direction:column;height:711px;}
+    #edit-form-person .modal-market-footer {flex-grow:1; min-height: 57px;}
+</style>
+<link href="../Css/multiple-select.css" rel="stylesheet"/>
+<div id="pop-Reminder"></div>
+<div id="edit-form-person" data-bind="events:{change: formChange}">
+    <div class="modal-body ms-modal-body organ-modal" style="flex-grow: 1; overflow-x: hidden; overflow-y: scroll;">
+        <div class="div-name-organ">
+            <div class="pull-left div-vorname">
+                <label class="lable-md-organ" id="lblSalutation">Salutation</label>
+                <div class="clear"></div>
+                <!--can use data-option-label = "{ Name: '[ None ]', Value: '0' }"-->
+                <select class="crm-drop"
+                        data-option-label=" "
+                        data-value-primitive="true"
+                        data-role="dropdownlist"
+                        data-text-field="Name"
+                        data-value-field="Id"
+                        data-bind="value: person.SalutationId, source: salutionCate"></select>
+            </div>
+            <div class="pull-left margin-item div-lastname">
+                <label class="lable-md-organ" id="lblTittle">Title</label>
+                <div class="clear"></div>
+                <select class="crm-drop"
+                        data-option-label=" "
+                        data-value-primitive="true"
+                        data-role="dropdownlist"
+                        data-text-field="Name"
+                        data-value-field="Id"
+                        data-bind="value: person.TitleId, source: titleCate"></select>
+            </div>
+            <div class="pull-right margin-item">
+                <span class="icon-55 icon-person" style="margin-top: 20px;margin-right: 10px;"></span>
+            </div>
+        </div>
+        <div class="clear"></div>
+        <hr class="modal-organ-hr">
+        <div class="div-name-organ">
+            <div class="pull-left div-vorname">
+                <label class="lable-md-organ" id="lblFirstName">Vorname</label>
+                <div class="clear"></div>
+                <input class="modal-organ-input input-icon" id="txtFirstName" data-value-update="keyup" data-bind="value: person.FirstName, events: {paste: onPaste}" maxlength="100">
+            </div>
+            <div class="pull-left margin-item">
+                <label class="lable-md-organ" id="lblLastName">Nachname</label>
+                <div class="clear"></div>
+                <input class="modal-organ-input input-icon" id="txtLastName" data-value-update="keyup" data-bind="value: person.LastName, events: {paste: onPaste}" maxlength="100">
+            </div>
+            <div class="pull-left div-birthday" style="margin-left: 237px;">
+                <label class="lable-md-organ" id="lblBirthDay">BirthDay</label>
+                <div class="clear"></div>
+                <div class="input-append date w140">
+                    <input class="person-datetime" id="txtBirthDay" data-role="datepicker" data-bind="value: person.BirthDay, events:{change: dateChange}"/>
+                </div>
+            </div>
+            <div id="divReminder" style="width: 15px;float: left;" data-bind="visible: checkBirthDay">
+                <div class="icon-24 iconright-modal-mass margin-right6" data-toggle="dropdown" style="width: 23px; height: 23px;margin-top: 38px;"></div>
+                <ul role="menu" class="dropdown-menu ms-popup-menu posAbsolute" style="left: auto;top: auto; bottom: auto;">
+                    <li class="reminder" data-bind="click: openReminder"><a class="dropdow-menu-li-a a69" data-toggle="modal" data-target=".bs-example-modal-lg"> <span class="icon-24  icon-left-block icon-reminder"></span><span id="lblReminder" style="margin-left: 10px;">Erinnerung</span></a></li>
+                    <!--<li role="presentation" class="divider icon-divider reminder"></li>-->
+                </ul>
+            </div>
+        </div>
+        <div class="clear"></div>
+        <hr class="modal-organ-hr">
+        <div class="div-detail-organ">
+            <div class="col-div-52 pull-left">
+                <div>
+                    <div id="address-control" data-bind="source: person.CrmAddress" data-template="temp-address"></div>
+                    <div class="pull-right col-div-2 row-item">
+                        <a class="add-net pull-left" id="linkAddAddress" data-bind="events: {click: addControl}">Addresse hinzufügen</a>
+                    </div>
+                </div>
+                <div>
+                    <div id="phone-control" data-bind="source: infoGroup.telephone" data-template="temp-info">
+                    </div>
+
+                    <div class="pull-right col-div-2 row-item">
+                        <a class="add-net pull-left" id="linkAddTelephone" data-bind="events:{click: addControl}">Telefon hinzufügen</a>
+                    </div>
+                </div>
+
+                <div>
+                    <div id="fax-control" data-bind="source: infoGroup.fax" data-template="temp-info">
+                    </div>
+
+                    <div class="pull-right col-div-2 row-item">
+                        <a class="add-net pull-left" id="linkAddFax" data-bind="events:{click: addControl}">Fax hinzufügen</a>
+                    </div>
+                </div>
+                <div>
+                    <div id="email-control" data-bind="source: infoGroup.email" data-template="temp-info">
+                    </div>
+
+                    <div class="pull-right col-div-2 row-item">
+                        <a class="add-net pull-left" id="linkAddEmail" data-bind="events:{click: addControl}">E-Mail hinzufügen</a>
+                    </div>
+                </div>
+                <div>
+                    <div id="website-control" data-bind="source: infoGroup.website" data-template="temp-info">
+                    </div>
+                    <div class="pull-right col-div-2 row-item">
+                        <a class="add-net pull-left" id="linkAddWebsite" data-bind="events:{click: addControl}">Website hinzufügen</a>
+                    </div>
+                </div>
+
+                <div class="clear"></div>
+                <hr class="modal-organ-hr">
+
+                <div>
+                    <div>
+                        <div class="col-div pull-left">
+                            <label class="lable-md-organ" id="lblNetwork">Netzwerk</label>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="col-div-2 pull-left">
+                            <label class="lable-md-organ" id="lblUrl">URL</label>
+                            <div class="clear"></div>
+                        </div>
+                    </div>
+                    <div id="network-control" data-bind="source: infoGroup.network" data-template="temp-info"></div>
+
+                    <div class="pull-right col-div-2 row-item">
+                        <a class="add-net pull-left" id="linkAddNetwork" data-bind="events:{click: addControl}">Netzwerk hinzufügen</a>
+                    </div>
+                </div>
+
+                <div class="clear"></div>
+                <hr class="modal-organ-hr">
+                <div>
+                    <div>
+                        <div class="col-div pull-left">
+                            <label class="lable-md-organ" id="lblResource">Ressource</label>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="col-div-2 pull-left">
+                            <label class="lable-md-organ crm-label">Bezeichnung</label>
+                            <div class="clear"></div>
+                        </div>
+                    </div>
+                    <div id="resource-control" data-bind="source: infoGroup.resource" data-template="temp-info-texteditor"></div>
+
+                    <div class="pull-right col-div-2 row-item">
+                        <a class="add-ressource pull-left" id="linkAddResource" data-bind="events:{click: addControl}">Ressource hinzufügen</a>
+                    </div>
+                </div>
+                <div class="clear"></div>
+                <div>
+                    <div>
+                        <div class="col-div pull-left">
+                            <label class="lable-md-organ" id="lblCompetence">Kompetenz</label>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="col-div-2 pull-left">
+                            <label class="lable-md-organ crm-label">Bezeichnung</label>
+                            <div class="clear"></div>
+                        </div>
+                    </div>
+
+                    <div id="competence-control" data-bind="source: infoGroup.competence" data-template="temp-info-texteditor"></div>
+
+                    <div class="pull-right col-div-2 row-item">
+                        <a class="add-compet pull-left" id="linkAddCompetence" data-bind="events:{click: addControl}">Kompetenz hinzufügen</a>
+                    </div>
+                </div>
+                <div class="clear"></div>
+
+                <div class="clear"></div>
+                <hr class="modal-organ-hr">
+                <div>
+                    <div>
+                        <div class="col-div pull-left">
+                            <label class="lable-md-organ" id="lblCategory">Kategorie</label>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="col-div-2 pull-left">
+                            <label class="lable-md-organ crm-label">Bezeichnung</label>
+                            <div class="clear"></div>
+                        </div>
+                    </div>
+
+                    <div id="category-control" data-bind="source: infoGroup.category" data-template="temp-info-texteditor"></div>
+
+                    <div class="pull-right col-div-2 row-item">
+                        <a class="add-compet pull-left" id="linkAddCategory" data-bind="events:{click: addControl}">Kategorie hinzufügen</a>
+                    </div>
+                </div>
+                <div class="clear"></div>
+
+                <hr class="modal-organ-hr">
+                <div>
+                    <div>
+                        <div class="pull-left col-div-33">
+                            <label class="lable-md-organ" id="lblRelationship">Organisation</label>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="pull-left col-div-33">
+                            <label class="lable-md-organ" id="lblTypeOfRelationship">Beziehung</label>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="pull-left">
+                            <label class="lable-md-organ" id="lblNote">Bemerkung</label>
+                            <div class="clear"></div>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+
+                    <div id="relationPer-control" data-template="temp-addRelationship" data-bind="source: person.CrmRelationships"></div>
+
+                    <div class="pull-right col-div-2 row-item">
+                        <a class="add-compet pull-left" id="linkAddRelationship" data-bind="events:{click: addControl}">Persion hinzufügen</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-div-40 pull-left" style="width: 44% !important;">
+                <div>
+                    <div class="pull-left w-100per">
+                        
+                        <div class="div-item">
+                            <div class=" pull-left" style="width:10%">
+                                <label class="lable-md-organ" style="margin-left: 4px;" id="lblIsActive">Active</label>
+                                <div class="clear"></div>
+                            </div>
+
+                            <div class="col-div-30 pull-left" style="width:21%">
+                                <label class="lable-md-organ" id="lblWorkingDate">Seit</label>
+                                <div class="clear"></div>
+                            </div>
+
+                            <div class="col-div-35 pull-left" style="width:36%">
+                                <label class="lable-md-organ" id="lblOrganisation">Organisation</label>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="col-div-35 pull-left" style="width:30%">
+                                <label class="lable-md-organ" id="lblPosition">Position</label>
+                                <div class="clear"></div>
+                            </div>
+                        </div>
+                        <div data-template="temp-addPosition" data-bind="source: person.CrmPositions" id="groupPos"></div>
+                        <div class="div-item">
+                            <div class="col-div-48 pull-left"></div>
+                            <div class="col-div-30 pull-right margintop5">
+                                <a class="add-ressource pull-left" id="linkAddPosition" data-bind="events:{click: addControl}">Ressource hinzufügen</a>
+                            </div>
+
+                        </div>
+                        <!-- -->
+                        <div class="div-item-2">
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="clear"></div>
+
+                <div class="div-item divtag">
+                    <label class="lable-md-organ" id="lblResponbility"></label>
+
+                    <div class="clear"></div>
+
+                    <select data-role="multiselect"
+                            data-placeholder=""
+                             data-filter="contains"
+                            data-text-field="Name"
+                            data-value-field="Id"
+                            data-bind="value: respAcc, source: accounts, events:{change: onChangeAccount, filtering:multiSelectFiltering }"
+                            id="ddlResponbility"></select>
+
+                </div>
+                <div class="clear"></div>
+
+                <div class="div-item divtag">
+                    <label class="lable-md-organ" id="lblTag">Tags</label>
+                    <div class="clear"></div>
+                    <!--<select id="ddlTags" class="w-100per" data-text-field="Name" data-value-field="Id" data-bind="source: tagCate, value: oldTags" multiple></select>-->
+                    <select data-role="multiselect"
+                            data-placeholder=""
+                             data-filter="contains"
+                            data-text-field="Name"
+                            data-value-field="Id"
+                            data-bind="value: oldTags, source: tagCate, events:{filtering:multiSelectFiltering} "
+                            id="ddlTags"></select>
+                </div>
+                <div class="clear"></div>
+                <div class="div-item-2">
+                    <label class="lable-md-organ" id="lblNotes" style="margin-bottom:0">Notizen</label>
+                    <div class="clear"></div>
+                    <div style="position:relative">
+                        <div class="dnbTextAreaEditor" data-crm-id="crmPersonNotes">
+                            <textarea rows="1" class="modal-textarea" data-value-update="keyup"
+                                      data-role="editor" data-tools="[]"
+                                      data-bind="value: person.Note,
+                                        events: {
+                                            keyup: onKeyUpChangeNoteEditor,
+                                            paste: onKeyUpChangeNoteEditor,
+                                            change: onChangeNoteEditor
+                                        }">
+                            </textarea>
+                        </div>
+                        <span class="icon-16 iv-icexpand-texteditor"
+                              data-bind="events: {click: onExpandNotesPopup}"> </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="clearx2"></div>
+        
+    </div>
+    <div class="modal-market-footer">
+        <button type="button" class="ms-button" id="btnSave" data-bind="events:{click: update}"><span class="icon-16 icon-close margin-right6"></span><span id="lblClose">Speichern und schliessen</span></button>
+        <span class="pull-right foot-last-change" data-bind="text: person.LastChange"></span>
+        <span class="pull-left foot-confirm-address k-icon k-i-calendar" data-bind="events:{click: confirmAddress}"></span>
+        <span class="pull-left foot-confirm-address" data-bind="visible: person.IsApproved, text: person.FullMessage"  ></span>
+    </div>
+</div>
+
+<script type="text/html" id="temp-info-texteditor">
+    <div data-bind="visible: IsVisible, events: {change: onChange}">
+        <div class="clear"></div>
+        <div class="col-div pull-left">
+            <input class="crm-drop"
+                   data-auto-bind="false"
+                   data-role="dropdownlist"
+                   data-text-field="Name"
+                   data-value-field="Id"
+                   data-bind="value: CategoryId, source: src" />
+        </div>
+        <div class="col-div-2 pull-left info-value iv-textedit-box">
+            <div class="dnbTextAreaEditor dnbHideScroll" 
+                 data-bind="attr: { typeCate: TypeCate, mailId: Value, cateExt: CategoryExt, data-crm-id: Id}">
+                <textarea rows="1" class="modal-textarea" data-value-update="keyup"
+                          data-role="editor" data-tools="[]"
+                          data-bind="value: Value,
+                                events: {
+                                    keyup: onChangeEditor,
+                                    paste: onChangeEditor,
+                                    change: onChangeInfoEditor
+                                }">
+                </textarea>
+            </div>
+            <span class="iv-textedit-removebtn">
+                <span class="icon-16 iv-icexpand-texteditor"
+                      data-bind="events: {click: onExpandTextEditorPopup}"> </span>
+                <span class="icon-16 icon-remove-blue remove-item"
+                      data-bind="events:{click: removeControl}"></span>
+            </span>
+        </div>
+        <div class="clearx2"></div>
+    </div>
+</script>
+<script type="text/html" id="temp-info">
+    <div data-bind="visible: IsVisible, events: {change: onChange}">
+        <div class="clear"></div>
+        <div class="col-div pull-left">
+            <input class="crm-drop"
+                   data-auto-bind="false"
+                   data-role="dropdownlist"
+                   data-text-field="Name"
+                   data-value-field="Id"
+                   data-bind="value: CategoryId, source: src" />
+        </div>
+        <div class="col-div-2 pull-left info-value">
+            <input class="modal-organ-input pull-left input-icon" data-value-update="keyup" 
+                   data-bind="value: Value, attr: { typeCate: TypeCate, mailId: Value, cateExt: CategoryExt}" maxlength="100">
+            <span class="icon-16 icon-remove-blue pull-left remove-item" data-bind="events:{click: removeControl}"></span>
+        </div>
+        <div class="clearx2"></div>
+    </div>
+</script>
+
+<script type="text/html" id="temp-address">
+    <div data-bind="visible: IsVisible, events: {change: onChange}">
+        <div class="clear"></div>
+
+        <div data-bind="visible: IsAddressControl">
+            <div class="min-height-65 col-div pull-left">
+            </div>
+            <div class="div-item col-div pull-left">
+                <label class="lable-md-organ" data-bind="text: AddressLanguageLabel.Department" ></label>
+                <input class="modal-add-address-input input-icon" data-value-update="keyup" data-bind="value: Department" maxlength="100">
+            </div>
+
+        </div>
+        <div class="clear"></div>
+
+        <div class="div-row">
+            <div class="col-div pull-left">
+                <div class="clear35px"></div>
+                <div data-bind="style: {margin-top: DrpChangeAddrType.marginTop ,height: DrpChangeAddrType.height}">
+                    <select class="crm-drop"
+                            data-role="dropdownlist"
+                            data-text-field="Name"
+                            data-value-field="Id"
+                            data-bind="value: CategoryId, source: addressCate,events: {select: changeAdressType}"></select>
+                </div>
+               
+            </div>
+            <div class="col-div pull-left">
+                <label class="lable-md-organ" data-bind="text: AddressLanguageLabel.Street">Straße</label>
+                <div class="clear"></div>
+                <input class="modal-organ-input input-icon" data-value-update="keyup" data-bind="value: Street" maxlength="100">
+            </div>
+            <div class="col-div pull-left">
+                <label class="lable-md-organ" data-bind="text: AddressLanguageLabel.Number">Nr</label>
+                <div class="clear"></div>
+                <input class="modal-organ-input input-icon" data-value-update="keyup" data-bind="value: Nr" maxlength="100">
+            </div>
+        </div>
+
+        <div class="clear"></div>
+
+        <div>
+            <div class="min-height-65 col-div pull-left">
+            </div>
+            <div class="div-item col-div pull-left">
+                <label class="lable-md-organ" data-bind="text: AddressLanguageLabel.AdditionAddress">Additional Address</label>
+                <input class="modal-add-address-input input-icon" data-value-update="keyup" data-bind="value: AdditionAddress" maxlength="400">
+            </div>
+
+        </div>
+        <div class="clear"></div>
+
+        <div>
+            <div class="min-height-65 col-div pull-left">
+            </div>
+            <div class="div-item col-div pull-left">
+                <label class="lable-md-organ" data-bind="text: AddressLanguageLabel.Zipcode">PLZ</label>
+                <!--<input class="modal-organ-input input-icon" data-value-update="keyup" data-bind="value: Plz" maxlength="100">-->
+                <input class="modal-organ-input input-icon classPlz" data-value-update="keyup" data-bind="value: Plz" maxlength="6">
+            </div>
+            <div class="div-item col-div pull-left">
+                <label class="lable-md-organ" data-bind="text: AddressLanguageLabel.Place">Ort</label><br/>
+                <input class="modal-organ-input pull-left input-icon" data-value-update="keyup" data-bind="value: Ort" maxlength="100">
+            </div>
+        </div>
+        <div class="clear"></div>
+        <div>
+            <div class="min-height-65 col-div pull-left">
+            </div>
+            <div class="pull-left col-div-2 row-item">
+                <label class="lable-md-organ">Land</label>
+                <div class="clear"></div>
+                <div>
+                    <select class="pull-left crm-drop"
+                            data-option-label=" "
+                            data-value-primitive="true"
+                            data-role="dropdownlist"
+                            data-text-field="Name"
+                            data-value-field="Id"
+                            data-bind="value: CrmLandId, source: landCate"></select>
+
+                    <span class="icon-16 icon-remove-blue pull-left remove-item" data-bind="events:{click: removeControl}"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script id="temp-addPosition" type="text/html">
+    <div data-bind="visible: IsVisible, events: {change: onChange}" class="posdragable posdropable hover-arrow table" 
+         style="display: inline" valid="#=Id#">
+        <div class="block-arrow height40">
+            <div><span class="icon-16 icon-arow-towway marginbot7"></span></div>
+            <div class="pull-left1 pos-left">
+        
+                <div  style="display: inline-block;"> <input style="float: left;margin-top: 10px;" type="checkbox" data-bind="checked: IsActive}" /></div>
+                <div class="input-append date w140" style="width: 79%;float: right;margin-top: 4px;">
+                    <input class="person-datetime" data-role="datepicker" data-bind="value: WorkingDate" />
+                </div>
+            </div>
+            <div class="pull-left1 pos-left">
+                <div class="autosearch" data-bind="attr: {CrmOrgId: CrmOrgId }">
+                    <input class="input-search"
+                           data-placeholder=" "
+                           data-value-primitive="false"
+                           data-role="autocomplete"
+                           data-auto-bind="true"
+                           data-text-field="Name"
+                           data-value-field="Id"
+                           data-filter="contains"
+                           data-bind="value: TempName, source: srcProOrg, events: { select: autoPosition }" />
+                    <span class="iconsearch"></span>
+                </div>
+            </div>
+
+            <div class="pull-left1 pos-right">
+                <select class="crm-drop"
+                        data-role="dropdownlist"
+                        data-text-field="Name"
+                        data-value-field="Id"
+                        data-bind="value: CategoryId, source: positionCate"></select>
+
+                <span class="icon-16 icon-remove-blue pull-right remove-item" data-bind="events:{click: removeControl}"></span>
+            </div>
+            <div class="clearx2"></div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+</script>
+
+<script id="temp-addRelationship" type="text/html">
+    <div class="div-item" data-bind="visible: IsVisible, events: {change: onChange}">
+        <div class="pull-left col-div-33">
+            <div class="autosearch">
+                <input class="input-search"
+                       data-role="autocomplete"
+                       data-placeholder=" "
+                       data-value-field="Id"
+                       data-text-field="Name"
+                       data-filter="contains"
+                       data-bind="value: TempName, source: srcproOrgPerson, events:{select: autoRelationship}" />
+                <span class="iconsearch"></span>
+            </div>
+        </div>
+        <div class="pull-left col-div-33">
+            <select class="crm-drop pull-left"
+                    data-role="dropdownlist"
+                    data-text-field="Name"
+                    data-value-field="Id"
+                    data-bind="value: CategoryId, source: relationCate"></select>
+        </div>
+        <div class="pull-left iv-relationship-box">
+            <div class="dnbTextAreaEditor dnbHideScroll txtedit-relationship-box" data-bind="attr: { data-relation-crm-id: Id}">
+                <textarea rows="1" class="modal-textarea" data-value-update="keyup"
+                          data-role="editor" data-tools="[]"
+                          data-bind="value: Note,
+                                events: {
+                                    keyup: onChangeEditor,
+                                    paste: onChangeEditor,
+                                    change: onChangeRelationEditor
+                                }">
+                </textarea>
+            </div>
+            <span class="iv-textedit-removebtn">
+                <span class="icon-16 iv-icexpand-texteditor"
+                      data-bind="events: {click: onExpandNoteRelationshipPopup}"> </span>
+                <span class="icon-16 icon-remove-blue remove-item"
+                      data-bind="events:{click: removeControl}"></span>
+            </span>
+        </div>
+        <div class="clearx2"></div>
+    </div>
+</script>
+
+<script src="../Scripts/jquery.multiple.selectwithicon.js"></script>
+<!-- ReSharper disable once JsUnreachableCode -->
+<script type="text/javascript">
+    var personViewModel = undefined,
+        selectedPos = [],
+        isProcessing = false,
+        posIndentity = 0;
+    var itemIsValid = true;
+    vmEditPerson.isModified = false,
+
+    vmEditPerson.thePerson = {};
+
+    // Nguyen Hai Updated: 23/07/2015
+    vmEditPerson.RemovedOrgs = [];
+    vmEditPerson.RemovedRelations = [];
+    //    
+
+    vmEditPerson.popEditPerson.bind("close", function (e) {
+        vmEditPerson.perOptions.resetData();
+
+        if (vmEditPerson.isModified) {
+            if (confirm(kLg.saveConfirmQuestion)) {
+                
+                if (vmEditPerson.isValidForm() && vmEditPerson.ValidBirthDay() && vmEditPerson.ValidOrganisation() && vmEditPerson.ValidRelationShip()) {
+                    var checkperson = vmCommon.deepCopy(personViewModel.get("person"));
+                    checkperson.ProjectId = projectId;
+                    var srcMailDropDown = vmEditPerson.Cate[4];
+                    var crmInfos = personViewModel.get("infoGroup");
+
+                    for (var i = 0; i < crmInfos.email.length; i++) {
+                        for (var j = 0; j < srcMailDropDown.length; j++) {
+                            if (crmInfos.email[i].CategoryId === srcMailDropDown[j].Id) {
+                                crmInfos.email[i].CategoryExt = srcMailDropDown[j].Extension;
+                                if (crmInfos.email[i].Value != null)
+                                    $("input[typecate~='4'][mailId~='" + crmInfos.email[i].Value.trim() + "']:visible:first").attr("cateExt", srcMailDropDown[j].Extension);
+                            }
+                        }
+                    }
+                    
+                    vmCommon.pushApply(checkperson.CrmInformations, generateInfoList(crmInfos));
+
+                        personViewModel.update();
+                        vmFile.setOffMenuIcon();
+                        vmCommon.PopupInstance.close("person");
+                        vmEditPerson.popEditPerson.close();
+
+
+                    e.preventDefault();
+                }
+                else {
+                    e.preventDefault();
+                }
+                
+            } else {
+                vmEditPerson.destroyPop();
+            }
+
+        } else {
+            vmEditPerson.destroyPop();
+        }
+
+    });
+
+    vmEditPerson.destroyPop = function () {
+        if (vmEditPerson.popEditPerson) {
+            vmEditPerson.popEditPerson.destroy();
+            vmEditPerson.popEditPerson = null;
+        }
+        $('.body-content').after('<div id="pop-edit-crm"></div>');
+        vmFile.setOffMenuIcon();
+        vmCommon.PopupInstance.close("person");
+    };
+
+    var sourceEditClear;        //TienPM - Source All Organisation
+    var fromCrm;                //TienPM - Organisation source default
+
+    $(function () {
+
+        sourceEditClear = vmEditPerson.perOptions.ProOrg;
+        vmFile.assginedIcon("pop-edit-crm", vmEditPerson.popEditPerson);
+        var oldTags = [], i, respAcc = [];
+        var addressLanguageLabel = { Street: kLg.textStreet, Number: kLg.textNumber, Zipcode: kLg.textZipcode, Place: kLg.textPlace, AdditionAddress: kLg.AdditionAddress, Department: kLg.Department };
+        vmEditPerson.thePerson = vmEditPerson.perOptions.person;
+
+        var tagCate = vmEditPerson.Cate[vmCrmEnum.PersonSetting.Tags];
+        if (vmEditPerson.perOptions.IsEdit) {
+            //vmCommon.pushApply(oldTags, vmEditPerson.thePerson.CrmTags, function (item) { return item.CategoryId; });
+            for (var i = 0; i < tagCate.length; i++) {
+                if ($.grep(vmEditPerson.thePerson.CrmTags, function (it) { return it.CategoryId == tagCate[i].Id; }).length > 0) {
+                    oldTags.push(tagCate[i]);
+                }
+            }
+
+            if (vmEditPerson.thePerson.CrmAddress.length > 0) {
+                for (i = 0; i < vmEditPerson.thePerson.CrmAddress.length; i++) {
+                    vmEditPerson.thePerson.CrmAddress[i].IsVisible = true;
+                    vmEditPerson.thePerson.CrmAddress[i].DataState = dataState.Unchanged;
+                    vmEditPerson.thePerson.CrmAddress[i].TypeCate = vmCrmEnum.PersonSetting.Address;
+                    var isAddrControl = vmEditPerson.thePerson.CrmAddress[i].IsAddressControl;
+                    vmEditPerson.thePerson.CrmAddress[i].DrpChangeAddrType = isAddrControl ? vmCommon.cssMarginTopDepartment : vmCommon.cssMarginTopStreet;                    
+                }
+            }
+
+            if (vmEditPerson.thePerson.CrmPositions.length > 0) {
+                for (i = 0; i < vmEditPerson.thePerson.CrmPositions.length; i++) {
+                    vmEditPerson.thePerson.CrmPositions[i].IsVisible = true;
+                    vmEditPerson.thePerson.CrmPositions[i].TempName = vmEditPerson.thePerson.CrmPositions[i].OrgName;
+                    vmEditPerson.thePerson.CrmPositions[i].DataState = dataState.Unchanged;
+                    vmEditPerson.thePerson.CrmPositions[i].TypeCate = vmCrmEnum.PersonSetting.Position;
+                }
+            }
+
+            if (vmEditPerson.thePerson.CrmRelationships.length > 0) {
+                for (i = 0; i < vmEditPerson.thePerson.CrmRelationships.length; i++) {
+                    vmEditPerson.thePerson.CrmRelationships[i].IsVisible = true;
+                    vmEditPerson.thePerson.CrmRelationships[i].TempName = vmEditPerson.thePerson.CrmRelationships[i].CrmName;
+                    vmEditPerson.thePerson.CrmRelationships[i].DataState = dataState.Unchanged;
+                    vmEditPerson.thePerson.CrmRelationships[i].TypeCate = vmCrmEnum.PersonSetting.ArtOfRelationship;
+                }
+            }
+
+            //Fix Person A can relationship with Person A
+            vmEditPerson.perOptions.ProOrgPerson = $.grep(vmEditPerson.perOptions.ProOrgPerson, function (p) {
+                return p.Id !== vmEditPerson.perOptions.person.Id && p.TypeId !== vmCrmEnum.SettingType.Person;
+            });
+            if (vmEditPerson.thePerson.ApprovedDate) {
+                vmEditPerson.thePerson.FullMessage = kendo.toString(vmEditPerson.thePerson.ApprovedDate.jsonToDate(), "d") + " " + kLg.confirmApproveBy + " " + vmEditPerson.thePerson.ApprovedName;
+            }
+
+        } else {
+            
+            if (vmEditPerson.perOptions.AddFromOrg && vmEditPerson.Cate[vmCrmEnum.PersonSetting.Position].length > 0) {
+                var crm = vmEditPerson.perOptions.AddFromOrg;
+                var dItem = {
+                    Id: 0, CrmOrganisationId: vmEditPerson.perOptions.AddFromOrg.Id,
+                    TempName: vmEditPerson.perOptions.AddFromOrg.Name, OrgName: vmEditPerson.perOptions.AddFromOrg.Name,
+                    CategoryId: -1, TypeCate: vmCrmEnum.PersonSetting.Position, DataState: dataState.Added, IsVisible: true,
+                    CrmOrgId: vmEditPerson.perOptions.AddFromOrg.Id, WorkingDate: null, IsActive: true
+                };
+                dItem.CategoryId = vmEditPerson.Cate[vmCrmEnum.PersonSetting.Position][0].Id;
+                vmEditPerson.thePerson.CrmPositions.push(dItem);
+
+                fromCrm = crm;      //Item default
+                //Fix Person A can relationship with Person A
+
+                
+
+                vmEditPerson.perOptions.ProOrg = $.grep(vmEditPerson.perOptions.ProOrg, function (p) {
+                    return p.Id !== dItem.CrmOrganisationId && p.TypeId !== vmCrmEnum.SettingType.Organisation;
+                });
+
+                vmEditPerson.perOptions.AddFromOrg = undefined;
+            }
+        }
+
+        if (vmEditPerson.thePerson.ModifiedDate) {
+            vmEditPerson.thePerson.LastChange = kLg.LastChange + ": " + kendo.toString(vmEditPerson.thePerson.ModifiedDate.jsonToDate(), "d") + " " + vmEditPerson.thePerson.ModifiedName;
+        }
+
+        var accs = vmEditPerson.perOptions.Accounts;
+        for (i = 0; i < accs.length; i++) {
+            if ($.grep(vmEditPerson.perOptions.person.Responsibility, function (it) { return it.AccountId == accs[i].Id; }).length > 0) {
+                respAcc.push(accs[i]);
+            }
+        }
+        function getCreatedDate(person) {
+            var createDate = person.CreatedDate;
+            if (Object.prototype.toString.call(createDate) === "[object Date]")
+                return createDate;
+
+            if (createDate && typeof createDate == 'string') {
+                if (createDate.includes('-')) {
+                    person.CreatedDate = new Date();
+                    return person.CreatedDate;
+                } else {
+                    return createDate.jsonToDate();
+                }
+            }
+            person.CreatedDate = new Date();
+            return person.CreatedDate;
+        }
+        personViewModel = kendo.observable({
+            onPaste: function (e) {
+                vmEditPerson.isModified = true;
+            },
+            AddressLanguageLabel: addressLanguageLabel,
+            person: vmEditPerson.thePerson,
+            titleCate: vmEditPerson.Cate[vmCrmEnum.PersonSetting.Title],
+            salutionCate: vmEditPerson.Cate[vmCrmEnum.PersonSetting.Salutation],
+            infoGroup: vmEditPerson.perOptions.infoGroup,
+            landCate: vmEditPerson.Cate[vmCrmEnum.PersonSetting.Land],
+            tagCate: tagCate,
+            positionCate: vmEditPerson.Cate[vmCrmEnum.PersonSetting.Position],
+            relationCate: vmEditPerson.Cate[vmCrmEnum.PersonSetting.ArtOfRelationship],
+            addressCate: vmEditPerson.Cate[vmCrmEnum.OrganisationSetting.Address],
+            oldTags: oldTags,
+            accounts: vmEditPerson.perOptions.Accounts,
+            respAcc: respAcc,
+
+            multiSelectFiltering: function (e) {
+                var filter = e.filter;
+                if (filter) {
+                    filter.value = filter.value.replace(/\s\s+/g, ' ');
+                    if (filter.value.indexOf(' ') == 0) {
+                        filter.value = filter.value.slice(1);
+                    };
+                    e.sender.input.val(filter.value);
+                };
+
+            },
+
+            onChangeAccount: function (e) {
+                var listAcc = vmCommon.deepCopy(this.get("respAcc")).sort(SortByLastName);
+                this.set("respAcc", listAcc);
+            },
+            addControl: function (e) {
+                addPersonControl(e.target.id);
+                vmEditPerson.reCheckEmail();
+                vmCommon.resetTabIndex('edit-form-person');
+            },
+            removeControl: function (e) {
+                e.target.focus();
+                removeOrgControl(e.data);
+                vmEditPerson.reCheckEmail();
+                //vmEditPerson.reCheckSourcingEmail();
+                vmCommon.resetTabIndex('edit-form-person');
+            },
+            dateChange: function (e) {
+                var elem = e.sender.element;
+                var text = $(e.sender.element).val().trim();
+                
+                $(elem).tooltip("destroy");
+                if (this.person.BirthDay == null && text.length > 0) {
+                    var temp = vmCommon.formatStringToDate(text, kLg.language);
+
+                    if (temp == null) {
+                        ShowToolTip2($(elem), kLg.msgDateInValid);
+                        $('#divReminder').hide();
+                        return;
+                    }
+                    this.person.set("BirthDay", temp);
+
+                }
+
+                this.person.BirthDay = changeHourOfDate(this.person.BirthDay);
+
+                if (typeof this.person.BirthDay === "string") {
+                    if (this.person.BirthDay.indexOf("/Date") === -1) {
+                        this.person.set("BirthDay", new Date(this.person.BirthDay));
+                    } else {
+                        this.person.set("BirthDay", this.person.BirthDay.jsonToDate());
+                    }
+                }
+
+                if (this.person.BirthDay == null) {
+                    $('#divReminder').hide();
+                    return;
+                }
+                $('#divReminder').show();
+            },
+            //changeWorkingDate: function (e) {
+            //    var elem = e.sender.element;
+            //    $(elem).tooltip("destroy");
+            //    var dateChange = $(e.sender.element).val().trim();
+            //    if (dateChange.length > 0) {
+            //        var tempDate = vmCommon.formatStringToDate(dateChange, kLg.language);
+            //        if (tempDate == null) {
+            //            ShowToolTip2($(elem), kLg.msgDateInValid,"bottom");
+            //            return;
+            //        }
+            //        tempDate = changeHourOfDate(tempDate);
+            //        e.data.set("WorkingDate", tempDate);
+            //    }
+            //},
+            checkBirthDay: function(e) {
+                if (this.person.BirthDay === undefined || this.person.BirthDay === null) {
+                    return false;
+                } 
+                return true;
+            },
+            openReminder: function (e) {
+                vmEditPerson.openPopReminder(e, vmCommon.EnumTypeReminder.Person);
+            },
+            update: function (e) {
+                if (vmEditPerson.isModified || !vmEditPerson.perOptions.IsEdit) {
+                    this.person.set("FirstName", $("#txtFirstName").val().trim());
+                    this.person.set("LastName", $("#txtLastName").val().trim());
+
+                    if (vmEditPerson.isValidForm() && vmEditPerson.ValidBirthDay() && vmEditPerson.ValidOrganisation() && vmEditPerson.ValidRelationShip()) {
+                        if (isProcessing) return;
+                        isProcessing = true;
+
+                        //HoaND - re update extension
+                        var srcMailDropDown = vmEditPerson.Cate[4];
+                        for (var i = 0; i < this.infoGroup.email.length; i++) {
+                            for (var j = 0; j < srcMailDropDown.length; j++) {
+                                if (this.infoGroup.email[i].CategoryId === srcMailDropDown[j].Id) {
+                                    this.infoGroup.email[i].CategoryExt = srcMailDropDown[j].Extension;
+                                    if (this.infoGroup.email[i].Value != null)
+                                        $("input[typecate~='4'][mailId~='" + this.infoGroup.email[i].Value.trim() + "']:visible:first").attr("cateExt", srcMailDropDown[j].Extension);
+                                }
+                            }
+                        }
+                        //
+                        this.person.set("CrmInformations", generateInfoList(this.infoGroup));
+                        //var tags = $('#edit-form-person #ddlTags').multipleSelect("getSelects");
+
+                        var listTags = vmCommon.pushApply([], this.oldTags, function (item) { return { CategoryId: item.Id }; });
+                        //var listTags = vmCommon.pushApply([], tags, function (item) { return { CategoryId: item }; });
+                        this.person.set("CrmTags", listTags);
+                        this.person.Reminder = vmEditPerson.thePerson.Reminder;
+
+                        var listResponsibility = vmCommon.pushApply([], this.respAcc, function (item) { return { AccountId: item.Id }; });
+                        this.person.set("Responsibility", listResponsibility);
+
+                        var thePerson = this.person;
+                        var funcname = vmEditPerson.perOptions.IsEdit ? "update" : "create";
+
+                        filterElementPersonChanged(thePerson);
+
+                        thePerson.CrmPositions.push.apply(thePerson.CrmPositions, vmEditPerson.RemovedOrgs);
+                        thePerson.CrmRelationships.push.apply(thePerson.CrmRelationships, vmEditPerson.RemovedRelations);
+
+                        vmEditPerson.isModified = false;
+
+                        var checkperson = vmCommon.deepCopy(this.person);
+                        checkperson.ProjectId = projectId;
+
+                        var newHTMLValue = '';
+                        thePerson.CrmInformations.filter(crmRlsh => {
+                            if (crmRlsh.Id < 0) {
+                                crmRlsh.Id = 0;
+                            }
+                            newHTMLValue = vmCommon.getClearAttrNotNeed(crmRlsh.Value);
+                            crmRlsh.Value = newHTMLValue;
+                            return true;
+                        });
+                        thePerson.CrmRelationships.filter(crmRlsh => {
+                            if (crmRlsh.Id < 0) {
+                                crmRlsh.Id = 0;
+                            }
+                            newHTMLValue = vmCommon.getClearAttrNotNeed(crmRlsh.Note);
+                            crmRlsh.Note = newHTMLValue;
+                            return true;
+                        });
+
+                        vmEditPerson.dataservice.savePerson(funcname, thePerson, function (res) {
+                            if (res.value === vmCrmEnum.ResultStatus.CONFLICT) {
+                                pAlert(kLg.msgConflickData);
+                            }
+                            vmEditPerson.destroyPop();
+                            vmCrmFilterControl.reloadfilter(res.value, vmCrmEnum.SettingType.Person);
+                        });
+
+                    } else {
+                        isProcessing = false;
+                    }
+                } else {
+                    vmEditPerson.destroyPop();
+                }
+            },
+            autoPosition: function (e) {
+                var itemx = e.sender.dataItem(e.item.index());
+                e.data.set("CrmOrganisationId", itemx.Id);
+                e.data.set("OrgName", itemx.Name);
+                e.data.set("CrmOrgId", itemx.Id);           //TienPM - Add ID with Organisation
+
+                vmEditPerson.perOptions.ProOrg = $.grep(vmEditPerson.perOptions.ProOrg, function(it) {
+                    return it.Id !== itemx.Id;
+                });
+
+                setupDragDrop();
+                
+            },
+            autoRelationship: function (e) {
+                
+                var item = e.sender.dataItem(e.item.index());
+                e.data.set("CrmId", item.Id);
+                e.data.set("CrmName", item.Name);
+                //1:Person, 2:Organisation
+                e.data.set("TypeId", item.Type == vmCrmEnum.SettingType.Organisation ? 2 : 1);
+            },
+            onExpandNoteRelationshipPopup: function (e) {
+                var dataItem = e.data;
+                var SaveBtn;
+                var createdDate = getCreatedDate(this.person);
+                if (dataItem.Id > 0) {
+                    SaveBtn = function (newValue) {
+
+                        if (dataItem.Note == newValue) {
+                            return;
+                        }
+                        newValue = vmCommon.getClearAttrNotNeed(newValue);
+                        dataItem.set('Note', newValue);
+
+                        vmEditPerson.dataservice.updateRelationshipNotePopup({ Id: dataItem.Id, Note: newValue }, function (res) {
+                            vmEditPerson.isModified = true;
+                        });
+                    }
+                }
+
+                vmCommon.TexEditor.addWindowEditor(`[data-relation-crm-id="${dataItem.Id}"]`,
+                    SaveBtn,
+                    function Close(newValue) {
+                        if (dataItem.Note == newValue) {
+                            return;
+                        }
+                        if (newValue.trim() == '' && !vmCommon.TexEditor.hasImg(newValue)) {
+                            dataItem.set('Note', '');
+                        } else
+                            dataItem.set('Note', newValue);                 // run viewModel.bind('change')
+                    }, createdDate
+                );
+            },
+            onKeyUpChangeNoteEditor: function (e) {
+                vmEditPerson.isModified = true;
+            },
+            onChangeNoteEditor: function (e) {
+                let isHasImg = e.sender.body.innerHTML.includes('<img ');
+                var newHTMLValue = vmCommon.getClearAttrNotNeed(e.sender.body.innerHTML);
+                var dataItem = e.data.person;
+                if (e.sender.body.innerText.trim() == '' && !isHasImg) {
+                    dataItem.set('Note', '');
+                } else
+                    dataItem.set('Note', newHTMLValue);
+            },
+            onExpandNotesPopup: function (e) {
+                var dataItem = e.data.person;
+                var fakePersonId = -(Date.now()), SaveBtn;
+                var createdDate = getCreatedDate(this.person);
+                if (dataItem.Id < 1) {
+                    fakePersonId = '-crmPersonNotes';
+                    $(`[data-crm-id="crmPersonNotes"]`).attr('data-crm-id', fakePersonId);
+                } else {
+                    fakePersonId = 'crmPersonNotes';
+                    SaveBtn = function (newValue) {
+                        if (dataItem.Note == newValue) {
+                            return;
+                        }
+                        newValue = vmCommon.getClearAttrNotNeed(newValue);
+                        dataItem.set('Note', newValue);
+
+                        vmEditPerson.dataservice.updateOrgNoteEditorPopup({ Id: dataItem.Id, Note: newValue }, function (res) {
+                            vmEditPerson.isModified = true;
+                        });
+                    }
+                }
+                vmCommon.TexEditor.addWindowEditor(`[data-crm-id="${fakePersonId}"]`,
+                    SaveBtn,
+                    function Close(newValue) {
+                        if (dataItem.Note == newValue) {
+                            return;
+                        }
+                        if (newValue.trim() == '' && !vmCommon.TexEditor.hasImg(newValue)) {
+                            dataItem.set('Note', '');
+                        } else
+                            dataItem.set('Note', newValue);                 // run viewModel.bind('change')
+                    }, createdDate
+                );
+            },
+            onExpandTextEditorPopup: function (e) {
+                var dataItem = e.data, SaveBtn;
+                var createdDate = getCreatedDate(this.person);
+                if (dataItem.Id > 0) {
+                    SaveBtn = function (newValue) {
+                        if (dataItem.Value == newValue) {
+                            return;
+                        }
+                        newValue = vmCommon.getClearAttrNotNeed(newValue);
+                        if (dataItem.Id > 0) {
+                            dataItem.set('Value', newValue);                 // run viewModel.bind('change')
+                            dataItem.set('DataState', dataState.Unchanged);             // run viewModel.bind('change')
+                            var newInfos = vmViewPerson.viewModel.infos.filter(info => {
+                                if (info.Id == dataItem.Id) {
+                                    info.Value = newValue;
+                                }
+                                return true;
+                            });
+                            vmViewPerson.viewModel.set('infos', newInfos);
+
+                            vmEditPerson.dataservice.updateInfoFromEditorPopup({ Id: dataItem.Id, Value: newValue }, function (res) {
+                                vmEditPerson.isModified = true;
+                            });
+                        } else if (dataItem.Id < 0) {
+                            dataItem.set('Value', newValue);                 // run viewModel.bind('change')
+                        }
+                    }
+                }
+
+                vmCommon.TexEditor.addWindowEditor(`[data-crm-id="${dataItem.Id}"]`,
+                    SaveBtn,
+                    function Close(newValue) {
+                        if (dataItem.Value == newValue) {
+                            return;
+                        }
+                        if (dataItem.Id > 0) {
+                            setValue();                 // run viewModel.bind('change')
+                            dataItem.set('DataState', dataState.Modified);             // run viewModel.bind('change')
+                        } else if (dataItem.Id < 0) {
+                            setValue();                 // run viewModel.bind('change')
+                        }
+
+                        function setValue() {
+                            if (newValue.trim() == '' && !vmCommon.TexEditor.hasImg(newValue)) {
+                                dataItem.set('Value', '');
+                            } else
+                                dataItem.set('Value', newValue);
+                        }
+                    }, createdDate
+                );
+            },
+            onChangeEditor: function (e) {
+                if (e.data.Id > 0) {
+                    e.data.set("DataState", dataState.Modified);
+                }
+            },
+            onChangeRelationEditor: function (e) {
+                var dataItem = e.data;
+                let isHasImg = e.sender.body.innerHTML.includes('<img ');
+                var newHTMLValue = vmCommon.getClearAttrNotNeed(e.sender.body.innerHTML);
+                if (e.sender.body.innerText.trim() == '' && !isHasImg) {
+                    dataItem.set('Note', '');
+                } else
+                    dataItem.set('Note', newHTMLValue);
+            },
+            onChangeInfoEditor: function (e) {
+                var dataItem = e.data;
+                let isHasImg = e.sender.body.innerHTML.includes('<img ');
+                var newHTMLValue = vmCommon.getClearAttrNotNeed(e.sender.body.innerHTML);
+                if (e.sender.body.innerText.trim() == '' && !isHasImg) {
+                    dataItem.set('Value', '');
+                } else
+                    dataItem.set('Value', newHTMLValue);
+                
+            },
+            onChange: function (e) {
+                //HoaND - Check SourcingEmail
+                if (e.target.className === "crm-drop" && e.target.value !== undefined) {
+                    var srcMailDropDown = vmEditPerson.Cate[4];
+                    var mails = $.grep(srcMailDropDown, function (it) { return it.Id === parseInt(e.target.value); });
+                    if (mails != null && mails.length > 0) {
+                        var extName = mails[0].Extension;                        
+                        if (extName != null)
+                            $(e.target).parent().parent().next('div').find('input').attr("cateExt", extName);
+                        else
+                            $(e.target).parent().parent().next('div').find('input').attr("cateExt", "");                        
+                    }
+                }
+                //<!--
+
+                if (e.data.Id > 0) {
+                    e.data.set("DataState", dataState.Modified);
+                }
+            },
+            formChange: function () {
+                vmEditPerson.isModified = true;
+            },
+            changeAdressType: function (e) {
+                var isAddrControl = e.dataItem.AddrControl;
+                e.data.set("IsAddressControl", isAddrControl);                
+                e.data.set("DrpChangeAddrType", isAddrControl ? vmCommon.cssMarginTopDepartment : vmCommon.cssMarginTopStreet);
+            },
+            confirmAddress: function () {
+                pConfirm(kLg.confirmApproveAddress).then(function() {
+                    personViewModel.person.set("IsApproved", true);
+                    personViewModel.person.set("IsChangeApproved", true);
+                    var fullMessage = kendo.toString(kendo.date.today(), "d") + " " + kLg.confirmApproveBy + " " + vmUser.currentAccount.Name;
+                    personViewModel.person.set("FullMessage", fullMessage);
+                    
+                });
+            }
+        });
+
+        personViewModel.bind('change', function () {
+            vmEditPerson.isModified = true;
+        });
+
+        kendo.bind($('#edit-form-person'), personViewModel);
+        $("input[data-role=datepicker]").preventPressAlphabetChar(kLg.language === "de"|"pm" ? [46] : [47]);
+        $("input[data-role='datepicker']").kendoDatePicker({
+            weekNumber: true
+        });
+      
+        $('.classPlz').preventPressAlphabetChar();
+        
+        getCreatedDate(personViewModel.person);
+        setupDragDrop();
+        vmEditPerson.setupLanguage();
+        limitedTabKey();
+        //$('#edit-form-person #txtFirstName').focus();
+        vmCommon.resetTabIndex('edit-form-person');
+        
+        $('.div-vorname:first .k-dropdown').focus();
+
+        $('#edit-form-person #groupPos').on("blur change", 'input[data-role=datepicker]', function (e) {
+            $(this).tooltip('destroy');
+            var strDate = $(this).val().trim();
+            if (strDate.length === 0) {
+                $(this).tooltip('destroy');
+                return;
+            }
+
+            var tempDate = vmCommon.formatStringToDate(strDate, kLg.language);
+
+            if (tempDate == null) {
+                ShowToolTip2($(this), kLg.msgDateInValid, "bottom");
+                return;
+            }
+
+            var index = $(e.target).closest("div.posdragable").index();
+
+            var lst = personViewModel.person.CrmPositions;
+            lst[index].set("WorkingDate", tempDate);
+        });
+
+        $('#edit-form-person .k-widget.k-multiselect.k-header > div.k-multiselect-wrap.k-floatwrap').attr('tabindex', '0');
+        void function setupOverflow() {
+            $('.dnbTextAreaEditor.dnbHideScroll > table.k-editor .k-editable-area').find('textarea').each(function () {
+                $($(this).data('kendoEditor').body).css({
+                    'overflow': 'hidden', 'padding-top': '9px'
+                })
+            });
+
+            var bodyTxtEditor = $('.dnbTextAreaEditor[data-crm-id="crmPersonNotes"] > table.k-editor .k-editable-area').find('textarea').data('kendoEditor').body;
+            $(bodyTxtEditor).css({ 'overflow-y': 'scroll' });
+        }();
+    });
+
+    function generateInfoList(infoGroup) {
+        var listInfo = [];
+        vmCommon.pushApply(listInfo, infoGroup.telephone);
+        vmCommon.pushApply(listInfo, infoGroup.fax);
+        vmCommon.pushApply(listInfo, infoGroup.email);
+        vmCommon.pushApply(listInfo, infoGroup.website);
+        vmCommon.pushApply(listInfo, infoGroup.network);
+        vmCommon.pushApply(listInfo, infoGroup.resource);
+        vmCommon.pushApply(listInfo, infoGroup.competence);
+        vmCommon.pushApply(listInfo, infoGroup.category);
+
+        return listInfo;
+    }
+
+    function removeOrgControl(ctrl) {
+        var typecate = ctrl.get("TypeCate");
+        var index;
+        var list = getSourceByPersonSetting(typecate);
+        /// Nguyen Hai Updated: 24/07/2015
+        index = list.indexOf(ctrl);
+        var objItem = list[index];
+
+        var cateP = { Id: objItem.CrmOrganisationId, MIndex: 0, Mdf: 0, Name: objItem.OrgName, ParentId: 0, ParentIndex: 0 };
+        if (objItem.CrmOrganisationId && $.grep(vmEditPerson.perOptions.ProOrg, function (it) { return it.Id === cateP.Id }).length === 0) {
+            vmEditPerson.perOptions.ProOrg.push(cateP);
+        }
+        //}
+        //------------------------------------
+
+        vmEditPerson.perOptions.ProOrg.sort(function (a, b) { return a.Name > b.Name; });
+
+        if (list[index].Id < 1) {
+            list.splice(index, 1);
+        } else {
+            vmEditPerson.isModified = true;
+            list[index].set("IsVisible", false);
+            list[index].set("DataState", dataState.Deleted);
+            vmEditPerson.RemoveItem(typecate, list, index, objItem);
+        }
+        vmEditPerson.SelectItemIsFalse(typecate, objItem);
+        
+    };
+
+    function getSourceByPersonSetting(personSetting) {
+        switch (personSetting) {
+            case vmCrmEnum.PersonSetting.Address:
+                return personViewModel.person.CrmAddress;
+            case vmCrmEnum.PersonSetting.Telephone:
+                return personViewModel.infoGroup.telephone;
+            case vmCrmEnum.PersonSetting.Fax:
+                return personViewModel.infoGroup.fax;
+            case vmCrmEnum.PersonSetting.Email:
+                return personViewModel.infoGroup.email;
+            case vmCrmEnum.PersonSetting.Website:
+                return personViewModel.infoGroup.website;
+            case vmCrmEnum.PersonSetting.Network:
+                return personViewModel.infoGroup.network;
+            case vmCrmEnum.PersonSetting.Resource:
+                return personViewModel.infoGroup.resource;
+            case vmCrmEnum.PersonSetting.Competence:
+                return personViewModel.infoGroup.competence;
+            case vmCrmEnum.PersonSetting.Position:
+                return personViewModel.person.CrmPositions;
+            case vmCrmEnum.PersonSetting.ArtOfRelationship:
+                return personViewModel.person.CrmRelationships;
+            case vmCrmEnum.PersonSetting.Category:
+                return personViewModel.infoGroup.category;
+        }
+        return [];
+    }
+    function getPersonSetting(id) {
+        switch (id) {
+            case "linkAddAddress":
+                return vmCrmEnum.PersonSetting.Address;
+            case "linkAddTelephone":
+                return vmCrmEnum.PersonSetting.Telephone;
+            case "linkAddFax":
+                return vmCrmEnum.PersonSetting.Fax;
+            case "linkAddEmail":
+                return vmCrmEnum.PersonSetting.Email;
+            case "linkAddWebsite":
+                return vmCrmEnum.PersonSetting.Website;
+            case "linkAddNetwork":
+                return vmCrmEnum.PersonSetting.Network;
+            case "linkAddResource":
+                return vmCrmEnum.PersonSetting.Resource;
+            case "linkAddCompetence":
+                return vmCrmEnum.PersonSetting.Competence;
+            case "linkAddPosition":
+                return vmCrmEnum.PersonSetting.Position;
+            case "linkAddRelationship":
+                return vmCrmEnum.PersonSetting.ArtOfRelationship;
+            case "linkAddCategory":
+                return vmCrmEnum.PersonSetting.Category;
+        }
+        return null;
+    }
+    
+    function addPersonControl(id) {        
+        setupDragDrop();
+        var personSetting = getPersonSetting(id);
+        switch (personSetting) {
+            case vmCrmEnum.PersonSetting.Address:
+                if (vmEditPerson.Cate[personSetting].length == 0 || vmEditPerson.Cate[vmCrmEnum.PersonSetting.Land].length == 0) {
+                    pAlert(kLg.msgNotExistSetting);
+                    return;
+                }
+                var perSetting = vmEditPerson.Cate[personSetting][0];
+                var addressItem = { Id: 0, CategoryId: -1, Street: '', Nr: '', Plz: '', Ort: '', AdditionAddress: '', Department: '', CrmLandId: -1, TypeCate: vmCrmEnum.PersonSetting.Address, DataState: dataState.Added, IsVisible: true, IsAddressControl: perSetting.AddrControl };
+                addressItem.CategoryId = perSetting.Id;
+                addressItem.DrpChangeAddrType = addressItem.IsAddressControl ? vmCommon.cssMarginTopDepartment : vmCommon.cssMarginTopStreet;
+                personViewModel.person.CrmAddress.push(addressItem);
+                $('.classPlz').preventPressAlphabetChar();
+                break;
+            case vmCrmEnum.PersonSetting.Position:
+                var poslen = $.grep(personViewModel.person.CrmPositions, function (p) {
+                    return p.DataState != dataState.Deleted;
+                });
+                SetMIndex(poslen);
+                if (vmEditPerson.Cate[personSetting].length == 0) {
+                    pAlert(kLg.msgNotExistSetting);
+                    return;
+                }
+                var positionItem = {
+                    Id: --posIndentity, CrmOrganisationId: null, TempName: '', OrgName: '', CategoryId: -1,
+                    TypeCate: personSetting, DataState: dataState.Added, IsVisible: true, IsActive: true,
+                    srcProOrg: vmEditPerson.GetFilterSource(vmEditPerson.perOptions.ProOrg), CrmOrgId: null, WorkingDate: null
+                };    //TienPM: Add Id with Orgnisation
+                positionItem.CategoryId = vmEditPerson.Cate[personSetting][0].Id;
+                positionItem.MIndex = (poslen.length + 1) * 1000;
+                personViewModel.person.CrmPositions.push(positionItem);
+                setupDragDrop();
+
+                setTimeout(function() {
+                    $("input[data-role='datepicker']").kendoDatePicker({
+                        weekNumber: true
+                    });
+                }, 10);
+                break;
+            case vmCrmEnum.PersonSetting.ArtOfRelationship:
+                if (vmEditPerson.Cate[personSetting].length == 0) {
+                    pAlert(kLg.msgNotExistSetting);
+                    return;
+                }
+                var relationItem = {
+                    Id: -(Date.now()),  // use for text-editor
+                    CrmId: 0, TempName: '', CrmName: '', TypeId: 0, CategoryId: 0,
+                    Note: '', TypeCate: personSetting, DataState: dataState.Added, IsVisible: true,
+                    srcproOrgPerson: vmEditPerson.GetFilterSource(vmEditPerson.perOptions.ProOrgPerson)
+                };
+                relationItem.CategoryId = vmEditPerson.Cate[personSetting][0].Id;
+                personViewModel.person.CrmRelationships.push(relationItem);
+                break;
+            default:
+                if (personSetting == null) {
+                    return;
+                }
+                if (vmEditPerson.Cate[personSetting].length == 0) {
+                    pAlert(kLg.msgNotExistSetting);
+                    return;
+                }
+                var infoItem = { Id: 0, CategoryId: -1, CategoryExt: '', Value: '', TypeCate: 0, src: [], DataState: dataState.Added, IsVisible: true };
+                infoItem.src = vmEditPerson.Cate[personSetting];
+                infoItem.CategoryId = infoItem.src[0].Id;
+                infoItem.CategoryExt = infoItem.src[0].Extension;
+                infoItem.TypeCate = personSetting;
+                if (personSetting == vmCrmEnum.PersonSetting.Resource || personSetting == vmCrmEnum.PersonSetting.Competence || personSetting == vmCrmEnum.PersonSetting.Category) {
+                    infoItem.Id = -(Date.now());  // use for text-editor
+                }
+                var list = getSourceByPersonSetting(personSetting);
+                list.push(infoItem);
+                break;
+        }
+
+        if (personSetting === vmCrmEnum.PersonSetting.Email) {
+            vmEditPerson.validFormTooltip(false);
+        }
+        //else {
+        //    vmEditPerson.reCheckSourcingEmail();
+        //}
+    };
+
+    function setupDragDrop() {
+        var xDrag, yDrag, srcId, desId, position;
+        $('.posdragable').draggable({
+            revert: true,
+            cursor: 'default',
+            handler: 'icon-arow-towway',
+            axis: 'y',
+            scroll: true,
+            zIndex: 9999999,
+            start: function () {
+                $(this).addClass('');
+                var dragOff = $(this).offset();
+                xDrag = dragOff.left;
+                yDrag = dragOff.top;
+                srcId = Number($(this).attr('valid'));
+
+            },
+            stop: function () {
+                $(this).removeClass('');
+            }
+        });
+
+        $('.posdropable').droppable({
+            hoverClass: 'ui-state-hover',
+            accept: '.posdragable',
+            tolerance: 'intersect',
+            drop: function (event, ui) {
+                desId = Number($(this).attr('valid'));
+                if (srcId == desId) {
+                    return;
+                }
+                position = vmCommon.getPositionByY(this, ui, yDrag);
+                changePosition(srcId, desId, position);
+            }
+        });
+
+        //$("input[data-role=datepicker]").preventPressAlphabetChar(kLg.language === "de" ? [46] : [47]);
+        //$("input[data-role='datepicker']").kendoDatePicker({
+        //    weekNumber: true
+        //});
+        //vmEditPerson.DestroyToolTip($("input[data-role='datepicker']"));
+    }
+
+    function changePosition(sourceid, desid, position) {
+        var person = personViewModel.get("person");
+        var listPosition = person.CrmPositions;
+
+        var srcindex = -1;
+        var desindex = -1;
+        for (var j = 0; j < listPosition.length; j++) {
+            if (listPosition[j].Id == desid) {
+                desindex = j;
+            }
+            if (listPosition[j].Id == sourceid) {
+                srcindex = j;
+            }
+        }
+
+        ChangedIndex(listPosition, srcindex, desindex, position);
+        person.CrmPositions = listPosition;
+        personViewModel.set("person", person);
+
+        //kendo.bind($('#edit-form-person'), personViewModel);
+        setupDragDrop();
+    };
+
+    function SetMIndex(listPosition) {
+        var mIndex = 1000;
+        for (var j = 0; j < listPosition.length; j++) {
+            listPosition[j].MIndex = mIndex;
+            mIndex = mIndex + 1000;
+            if (listPosition[j].DataState == dataState.Unchanged) {
+                listPosition[j].DataState = dataState.Modified;
+            }
+        }
+    }
+
+    function ChangedIndex(listPosition, sourceIndex, desIndex, position) {
+        if (position == 0 && desIndex != 0) {
+            listPosition.splice(desIndex, 0, listPosition[sourceIndex]);
+            listPosition.splice(sourceIndex + 1, 1);
+            SetMIndex(listPosition);
+            return;
+        }
+        if (position == 0 && desIndex == 0) {
+            listPosition.splice(0, 0, listPosition[sourceIndex]);
+            listPosition.splice(sourceIndex + 1, 1);
+            SetMIndex(listPosition);
+            return;
+        }
+        listPosition.splice(desIndex + 1, 0, listPosition[sourceIndex]);
+        var deleteIndex = desIndex < sourceIndex ? sourceIndex + 1 : sourceIndex;
+        listPosition.splice(deleteIndex, 1);
+        SetMIndex(listPosition);
+
+    }
+
+    function filterElementPersonChanged(person) {
+        // 1. Infomations
+        var infos = person.CrmInformations, i;
+        if (infos.length > 0) {
+            for (i = infos.length - 1; i >= 0 ; i--) {
+                if ((infos[i].Id === 0 && infos[i].Value === "" && !vmEditPerson.isAllowEmpty(infos[i].TypeCate)) || (infos[i].Id !== 0 && infos[i].Value === "" && infos[i].DataState !== dataState.Deleted) && !vmEditPerson.isAllowEmpty(infos[i].TypeCate)) {
+                    infos.splice(i, 1);
+                }
+            }
+        }
+
+        // 2. Address
+        if (person.CrmAddress.length > 0) {
+            var adds = person.CrmAddress;
+            for (i = adds.length - 1; i >= 0 ; i--) {
+                if ((adds[i].Id === 0 && adds[i].Street === "" && adds[i].Nr === "" && adds[i].Plz === "" && adds[i].Ort === "" && adds[i].AdditionAddress === "" && adds[i].CrmLandId <= 0) && adds[i].Department === "" ||
+                    (adds[i].Id !== 0 && adds[i].Street === "" && adds[i].Nr === "" && adds[i].Plz === "" && adds[i].Ort === "" && adds[i].AdditionAddress === "" && adds[i].CrmLandId <= 0 && adds[i].Department === "" && adds[i].DataState !== dataState.Deleted)) {
+                    adds.splice(i, 1);
+                }
+            }
+        }
+
+        // 3. Format some data
+        person.TitleId = person.TitleId === 0 ? null : person.TitleId;
+        person.SalutationId = person.SalutationId === 0 ? null : person.SalutationId;
+        
+
+        return person;
+    }
+
+    /// Nguyễn Hải Updated: 24/07/2015
+    var currAutocomplete = 'input[data-role=autocomplete]';
+    var currDropdownlist = 'select[data-role=dropdownlist]';
+    var currDatePerson = 'input[data-role=datepicker]';
+    // Organisation
+    $('#groupPos').on('blur', currAutocomplete, function (e) {
+        var orgId = this.kendoBindingTarget.source.CrmOrganisationId;
+        var orgName = this.kendoBindingTarget.source.OrgName;
+        var currVal = this.value;
+        var isValid = vmEditPerson.IsValidOrganisationForPerson(orgId, orgName, currVal);
+        var sources = vmEditPerson.perOptions.ProOrg;
+        var item = vmCommon.findByFunc(sources, function (obj) { return obj.Id == orgId; });
+        if (isValid) {
+            if (item != null) { item.selected = true; }
+            vmEditPerson.DestroyToolTip($(this));
+        } else {
+            if (item != null) { item.selected = false; }
+            this.kendoBindingTarget.source.set("CrmOrganisationId", null);
+            vmEditPerson.ShowToolTip($(this), kLg.InvalidData, "bottom");
+        }
+    });
+
+    $('#groupPos').on('focus', currAutocomplete, function (e) {
+        var sources = vmEditPerson.perOptions.ProOrg;
+
+        if (vmEditPerson.perOptions.IsEdit || (vmEditPerson.perOptions.AddFromOrg != undefined)) {
+            var list = personViewModel.person.CrmPositions;
+            for (var i = 0; i < list.length; i++) {
+                var objItem = list[i];
+                var currItem = vmCommon.findByFunc(sources, function (obj) { return obj.Id == objItem.CrmOrganisationId; });
+                if (currItem != null) {
+                    currItem.selected = true;
+                }
+            }
+        }
+
+        var myThis = this;
+        if ($(this).closest("div[class='autosearch']").attr("isdefault") === "1") {
+            var positions = personViewModel.person.CrmPositions;
+            var pos;
+            for (var i = 0; i < positions.length; i++) {
+                if (positions[i].IsDefault === 1 && positions[i].DataState !== dataState.Deleted) {
+                    pos = positions[i];
+                }
+            }
+
+            if (pos != undefined && pos.CrmOrganisationId == null) {
+                var cate = { Id: fromCrm.Id, MIndex: 0, Mdf: 0, Name: fromCrm.Name, ParentId: 0, ParentIndex: 0, Type: 2 };
+                if ($.grep(sources, function (it) { return it.Id === cate.Id }).length === 0) {
+                    sources.push(cate);
+                }
+            }
+        };
+
+        var item = vmCommon.findByFunc(sources, function (obj) { return obj.Id == myThis.kendoBindingTarget.source.CrmOrganisationId; });
+        if (item != null) { item.selected = false; }
+        sources.sort(function (a, b) { return a.Name > b.Name; });
+        myThis.kendoBindingTarget.source.set("srcProOrg", vmEditPerson.GetFilterSource(sources));
+    });
+
+    $('#groupPos').on('keyup', currAutocomplete, function (e) {
+        var orgId = this.kendoBindingTarget.source.CrmOrganisationId;
+        var orgName = this.kendoBindingTarget.source.OrgName;
+        var currVal = this.value;
+        var isValid = vmEditPerson.IsValidOrganisationForPerson(orgId, orgName, currVal);
+        var sources = vmEditPerson.perOptions.ProOrg;
+        var item = vmCommon.findByFunc(sources, function (obj) { return obj.Id == orgId; });
+        if (isValid) {
+            if (item != null) { item.selected = true; }
+        } else {
+            if (item != null) { item.selected = false; }
+            this.kendoBindingTarget.source.set("CrmOrganisationId", null);
+        }
+    });
+
+    $('#groupPos').on('keyup', currAutocomplete, function (e) {
+        var sources = vmEditPerson.perOptions.ProOrg;
+        if (vmEditPerson.perOptions.IsEdit || (vmEditPerson.perOptions.AddFromOrg != undefined)) {
+            var list = personViewModel.person.CrmPositions;
+            for (var i = 0; i < list.length; i++) {
+                var objItem = list[i];
+                var currItem = vmCommon.findByFunc(sources, function (obj) { return obj.Id == objItem.CrmOrganisationId; });
+                if (currItem != null) {
+                    currItem.selected = true;
+                }
+            }
+        }
+
+        var myThis = this;
+        var checkId = $(this).closest("div[class='autosearch']").attr("crmorgid");
+        
+        var positions = personViewModel.person.CrmPositions;
+        var pos;
+        for (var i = 0; i < positions.length; i++) {
+            if (positions[i].CrmOrgId === Number(checkId)) {
+                pos = positions[i];
+            }
+        }
+
+        if (pos != undefined && pos.CrmOrganisationId == null) {
+            for (var i = 0; i < sourceEditClear.length; i++) {
+                if (sourceEditClear[i].Id === Number(checkId)) {
+                    if ($.grep(sources, function (it) { return it.Id === sourceEditClear[i].Id }).length === 0) {
+                        sources.push(sourceEditClear[i]);
+                    }
+                    break;
+                }
+            }
+        }
+        
+        
+
+        var item = vmCommon.findByFunc(sources, function (obj) { return obj.Id == myThis.kendoBindingTarget.source.CrmOrganisationId; });
+        if (item != null) { item.selected = false; }
+        sources.sort(function (a, b) { return a.Name > b.Name; });
+        myThis.kendoBindingTarget.source.set("srcProOrg", vmEditPerson.GetFilterSource(sources));
+    });
+    
+    vmEditPerson.IsValidOrganisationForPerson = function (orgId, orgName, currVal) {
+        if (orgId == null || (orgName != currVal)) {
+            return false;
+        }
+        return true;
+    };
+
+    $('#groupPos').on('keypress', currAutocomplete, function (e) {
+        vmEditPerson.DestroyToolTip($(this));
+    });
+
+    $('#groupPos').on('change', currDropdownlist, function (e) {
+        var idex = $('#groupPos ' + currDropdownlist).index(this);
+        var elem = $('#groupPos ' + currAutocomplete)[idex];
+        var orgId = elem.kendoBindingTarget.source.CrmOrganisationId;
+        var orgName = elem.kendoBindingTarget.source.OrgName;
+        var currVal = elem.value;
+        var isValid = vmEditPerson.IsValidOrganisationForPerson(orgId, orgName, currVal);
+        if (!isValid) {
+            var currTarget = $(elem);
+            vmEditPerson.customFocus(currTarget);
+            vmEditPerson.DestroyToolTip(currTarget);
+        }
+    });
+
+    //RelationShip
+    $('#relationPer-control').on('focus', currAutocomplete, function (e) {
+        var sources = vmEditPerson.perOptions.ProOrgPerson;
+        if (vmEditPerson.perOptions.IsEdit) {
+            var list = personViewModel.person.CrmRelationships;
+            for (var i = 0; i < list.length; i++) {
+                var objItem = list[i];
+                var currItem = vmCommon.findByFunc(sources, function (obj) { return obj.Id == objItem.CrmId; });
+                if (currItem != null) {
+                    currItem.selected = true;
+                }
+            }
+        }
+        var myThis = this;
+        var item = vmCommon.findByFunc(sources, function (obj) { return obj.Id == myThis.kendoBindingTarget.source.CrmId; });
+        if (item != null) { item.selected = false; }
+        this.kendoBindingTarget.source.set("srcproOrgPerson", vmEditPerson.GetFilterSource(sources));
+    });
+
+    $('#relationPer-control').on('blur', currAutocomplete, function (e) {
+        var crmId = this.kendoBindingTarget.source.CrmId;
+        var crmName = this.kendoBindingTarget.source.CrmName;
+        var currVal = this.value;
+        var isValid = vmEditPerson.IsValidRelationShipForPerson(crmId, crmName, currVal);
+        var sources = vmEditPerson.perOptions.ProOrgPerson;
+        var item = vmCommon.findByFunc(sources, function (obj) { return obj.Id == crmId; });
+        if (isValid) {
+            if (item != null) { item.selected = true; }
+            vmEditPerson.DestroyToolTip($(this));
+        } else {
+            if (item != null) { item.selected = false; }
+            this.kendoBindingTarget.source.set("CrmId", 0);
+            vmEditPerson.ShowToolTip($(this), kLg.InvalidData, "bottom");
+        }
+    });
+
+    vmEditPerson.IsValidRelationShipForPerson = function (crmId, crmName, currVal) {
+        if (crmId == 0 || (crmName != currVal)) {
+            return false;
+        }
+        return true;
+    };
+
+    $('#relationPer-control').on('keypress', currAutocomplete, function (e) {
+        vmEditPerson.DestroyToolTip($(this));
+    });
+
+    $('#relationPer-control').on('change', currDropdownlist, function (e) {
+        var idex = $('#relationPer-control ' + currDropdownlist).index(this);
+        var elem = $('#relationPer-control ' + currAutocomplete)[idex];
+        var crmId = elem.kendoBindingTarget.source.CrmId;
+        var crmName = elem.kendoBindingTarget.source.CrmName;
+        var currVal = elem.value;
+        var isValid = vmEditPerson.IsValidRelationShipForPerson(crmId, crmName, currVal);
+        if (!isValid) {
+            var currTarget = $(elem);
+            vmEditPerson.customFocus(currTarget);
+            vmEditPerson.DestroyToolTip(currTarget);
+        }
+    });
+    //
+    // Common Methods
+    vmEditPerson.SelectItemIsFalse = function (typecate, objItem) {
+        switch (typecate) {
+            case vmCrmEnum.PersonSetting.Position:
+                var sources = vmEditPerson.perOptions.ProOrg;
+                var item = vmCommon.findByFunc(sources, function (obj) { return obj.Id == objItem.CrmOrganisationId; });
+                if (item != null) { item.selected = false; }
+                break;
+            case vmCrmEnum.PersonSetting.ArtOfRelationship:
+                var sources = vmEditPerson.perOptions.ProOrgPerson;
+                var item = vmCommon.findByFunc(sources, function (obj) { return obj.Id == objItem.CrmId; });
+                if (item != null) { item.selected = false; }
+                break;
+        }
+    };
+
+    vmEditPerson.RemoveItem = function (typecate, list, index, objItem) {
+        switch (typecate) {
+            case vmCrmEnum.PersonSetting.Position:
+                vmEditPerson.RemovedOrgs.push(objItem);
+                list.splice(index, 1);
+                break;
+            case vmCrmEnum.PersonSetting.ArtOfRelationship:
+                vmEditPerson.RemovedRelations.push(objItem);
+                list.splice(index, 1);
+                break;
+        }
+    };
+
+    vmEditPerson.GetFilterSource = function (source) {
+        var res = vmCommon.pushApply([], source, null, function (item) { return item.selected != true; });
+        return res;
+    };
+
+    vmEditPerson.ValidOrganisation = function () {
+        var list = personViewModel.person.CrmPositions;
+        for (var i = 0; i < list.length; i++) {
+            var objItem = list[i];
+            var orgId = objItem.CrmOrganisationId;
+            var orgName = objItem.OrgName;
+            var currVal = orgName;
+
+            var currDate = $($('#groupPos ' + currDatePerson)[i]);
+            var isDateValid = vmEditPerson.ValidPersonDate(currDate);
+            if (!isDateValid) {
+                vmEditPerson.ShowToolTip(currDate, kLg.InvalidData, "bottom");
+                return false;
+            }
+            var isValid = vmEditPerson.IsValidOrganisationForPerson(orgId, orgName, currVal);
+            if (!isValid) {
+                var currInput = $($('#groupPos ' + currAutocomplete)[i]);
+                vmEditPerson.customFocus(currInput);
+                vmEditPerson.ShowToolTip(currInput, kLg.InvalidData, "bottom");
+                return false;
+            }
+        }
+        return true;
+    };
+
+    vmEditPerson.ValidBirthDay = function () {
+        var currDate = $("#txtBirthDay");
+        var isDateValid = vmEditPerson.ValidPersonDate(currDate);
+        if (!isDateValid) {
+            vmEditPerson.ShowToolTip(currDate, kLg.InvalidData, "bottom");
+            return false;
+        }
+        return true;
+    }
+
+    vmEditPerson.ValidRelationShip = function () {
+        var list = personViewModel.person.CrmRelationships;
+        for (var i = 0; i < list.length; i++) {
+            var objItem = list[i];
+            var crmId = objItem.CrmId;
+            var crmName = objItem.CrmName;
+            var currVal = crmName;
+            var isValid = vmEditPerson.IsValidRelationShipForPerson(crmId, crmName, currVal);
+            if (!isValid) {
+                var currInput = $($('#relationPer-control ' + currAutocomplete)[i]);
+                vmEditPerson.customFocus(currInput);
+                vmEditPerson.ShowToolTip(currInput, kLg.InvalidData, "bottom");
+                return false;
+            }
+        }
+        return true;
+    };
+
+    vmEditPerson.ValidPersonDate = function (dateWorking) {
+        if (dateWorking.val() == "") return true;
+        if (dateWorking.data("kendoDatePicker").value() == null) {
+            dateWorking.focus();
+            return false;
+        }
+        return true;
+    };
+
+
+
+    vmEditPerson.ShowToolTip = function (currTarget, title, tPostition) {
+        currTarget.attr("title", title);
+        currTarget.tooltip({ trigger: "manual", placement: tPostition }).tooltip('show');
+    };
+
+    vmEditPerson.DestroyToolTip = function (currTarget) {
+        currTarget.tooltip('destroy');
+    };
+
+    vmEditPerson.customFocus = function (currTarget) {
+        currTarget.val('');
+        currTarget.focus();
+        currTarget[0].scrollIntoView(true);
+    };
+
+    vmEditPerson.isAllowEmpty = function (typeCate) {
+        switch (typeCate) {
+            case vmCrmEnum.PersonSetting.Competence:
+            case vmCrmEnum.PersonSetting.Resource:
+            case vmCrmEnum.PersonSetting.Network:
+                return true;
+            default:
+                return false;
+        }
+    };
+
+    $('#edit-form-person').on("change", 'input[typecate="' + vmCrmEnum.OrganisationSetting.Email + '"]', function (e) {
+        vmCommon.CheckEmail(this, kLg.msgInvalidEmail, "right");
+    });
+
+    $("#edit-form-person #txtFirstName, #edit-form-person #txtLastName").on("keypress", function () {
+        vmEditPerson.validFormTooltip(false);
+    });
+
+    $("#edit-form-person #txtBirthDay").on("blur", function () {
+        
+        $(this).tooltip('destroy');
+        if ($(this).val().length == 0) {
+            $(this).tooltip('destroy');
+            return;
+        }
+        var dt = $(this).data("kendoDatePicker").value();
+        if (dt == null) {
+            //$(this).attr("title", kLg.msgDateInValid);
+            //$(this).tooltip({ trigger: "manual", placement: "bottom" }).tooltip('show').attr("title", "");
+            ShowToolTip2($(this), kLg.msgDateInValid);
+            return;
+        }
+        $(this).tooltip('destroy');
+        return;
+    });
+
+    vmEditPerson.isValidEmail = function () {
+        var lst = $("#edit-form-person input[typecate=" + vmCrmEnum.PersonSetting.Email + "]:visible");
+        var rs = true;
+        for (var i = lst.length - 1; i >= 0; i--) {
+            var it = lst[i];
+            if (!vmCommon.CheckEmail($(it), kLg.msgInvalidEmail, "right")) {
+                rs = false;
+            }
+        }
+
+        return rs;
+    };
+
+    vmEditPerson.reCheckEmail = function () {
+        var lst = $("#edit-form-person input[typecate=" + vmCrmEnum.PersonSetting.Email + "]:visible");
+        var rs = true;
+        for (var i = lst.length - 1; i >= 0; i--) {
+            var it = $(lst[i]);
+            if (it.parent().has("div[class~='tooltip']").length > 0) {
+                if (!vmCommon.CheckEmail2(it, kLg.msgInvalidEmail, "right")) {
+                    rs = false;
+                }
+            }
+        }
+
+        return rs;
+    };
+
+    vmEditPerson.isHasSourcingEmail = function () {
+        var cates = vmEditPerson.Cate[vmCrmEnum.PersonSetting.Email];
+        var seId = 0;
+        for (var i = 0; i < cates.length; i++) {
+            if (cates[i].Extension !== "SourcingEmail") {
+                continue;
+            }
+            seId = cates[i].Id;
+            break;
+        }
+
+        if (seId) {
+            var emails = $.grep(personViewModel.get("infoGroup").email, function (it) {
+                return it.TypeCate === vmCrmEnum.PersonSetting.Email && it.CategoryId === seId && it.DataState !== dataState.Deleted;// && it.Value !== null && it.Value !== "";
+            });
+            var rs = emails.length > 0;
+
+            return rs;
+        }
+
+        return false;
+    };
+
+    //vmEditPerson.reCheckSourcingEmail = function () {
+    //    if ($("#linkAddEmail").parent().has("div[class~='tooltip']").length > 0) {
+    //        ShowToolTip2($("#linkAddEmail"), "abc", "right");
+    //    }
+    //};
+
+    vmEditPerson.isValidForm = function () {
+        var isFn = $("#edit-form-person #txtFirstName").val().trim().length > 0;
+        var isLn = $("#edit-form-person #txtLastName").val().trim().length > 0;
+        var isSr = vmEditPerson.isHasSourcingEmail();
+
+        var rs = !isFn && !isLn && !isSr;
+        if (rs) {
+            vmEditPerson.validFormTooltip(true);
+            $("#edit-form-person #txtFirstName").focus();
+        } else {
+            vmEditPerson.validFormTooltip(false);
+        }
+
+        return !rs && vmEditPerson.isValidEmail();
+    };
+
+    vmEditPerson.validFormTooltip = function (flag) {
+        var tg = $("#edit-form-person #txtLastName");
+        if (flag) {
+            $("#edit-form-person input[typecate=" + vmCrmEnum.PersonSetting.Email + "]").tooltip("destroy");
+            ShowToolTip2(tg, kLg.msgValidPerson, "right");
+        } else {
+            tg.tooltip("destroy");
+        }
+        return false;
+    };
+
+    vmEditPerson.validSameName = function (p) {
+        
+        vmEditPerson.dataservice.checkNamePerson(p, function (resName) {
+            var nBack = resName.value.NameData;
+            if (nBack !== undefined && nBack.trim().length > 0) {
+                var isValid = false;
+                switch (resName.value.NameType) {
+                case "PersonName":
+                    ShowToolTip2($("#edit-form-person #txtLastName"), kLg.msgPersonNameExisted, "right");
+                    $("#edit-form-person #txtLastName").focus();
+                    isValid = true;                    
+                    break;
+                case "PersonMail":
+                    var targetElement = $("input[typecate~='4'][cateExt~='SourcingEmail'][mailId~='" + nBack + "']:visible:first");
+                    vmCommon.CustomShowToolTip(targetElement, kLg.msgPersonMailExisted, "right");
+                    targetElement.focus();
+                    isValid = true;                    
+                    break;
+                default:                        
+                    break;}
+
+                isProcessing = false;
+                vmEditPerson.isModified = true;
+                return !isValid;
+            } else {
+                return true;
+            }
+            
+
+        });
+    };
+</script>

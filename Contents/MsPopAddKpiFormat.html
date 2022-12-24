@@ -1,0 +1,137 @@
+﻿<div id="pop-add-kpiformat">
+    <form id="add-kpiformat-form" data-bind="events:{change: formChange}">
+        <div class="ms-modal-body" id="pop-add-kpi-format">
+
+            <div class="form-group">
+                <label id="lblNameCategories">Name</label>
+                <p class="clear"></p>
+                <input class="modal-input txtInput w-98per" name="CategoryName" id="txtNameCategories" data-bind="value: kpiFormat.Name" tabindex="1" maxlength="100" />
+            </div>
+            <hr class="modal-market-hr" />
+            
+            
+        <label id="lblDescriptionCategories" style="float: left"></label>
+               <p class="clear"></p>
+    <textarea class="modal-textarea w-98per" id="txtDescriptionCategories" tabindex="2" data-bind="value: kpiFormat.Description"></textarea>
+            
+
+        </div>
+
+    <div class="modal-market-footer">
+        <button type="button" class="ms-button" id="btnCloseCategories" data-bind="events:{click: updateFormat}" tabindex="3">
+            <span class="icon-16 icon-close margin-right6" ></span>
+            <span id="lblCloseKpiCategories">Speichern und schliessen</span>
+        </button>
+    </div>
+        </form>
+</div>
+
+<div class="loading" id="add-categori-loading"></div>
+<script type="text/javascript">
+
+    var popKpiFormatViewModel;
+
+    var vmPopKpiFormat = vmPopKpiFormat || {};
+    vmPopKpiFormat.IsModified = false;
+
+
+    vmPopKpiFormat.SetLang = function () {
+        $("#pop-add-kpiformat #lblNameCategories").text(kLg.PopName);
+        $("#pop-add-kpiformat #lblDescriptionCategories").text(kLg.Description);
+        $("#pop-add-kpiformat #lblCloseKpiCategories").text(kLg.lblClose);
+    };
+
+    vmPopKpiFormat.dataService = function() {
+        var callAjaxCrm = function (divId, funcName, entryData, requestType, successCallBack) {
+            var url = "../Handlers/SettingHandler.ashx?funcName=" + funcName + "&projid=" + projectId + "&strid=" + strategyId + "&lang=" + language;
+            return callAjax(divId, url, entryData, successCallBack, requestType);
+        };
+
+        var callAjaxByPost = function (funcName, entryData, successFunc, loadingdiv) {
+            return callAjaxCrm(loadingdiv || "categories-loading", funcName, JSON.stringify(entryData), AjaxConst.PostRequest, successFunc);
+        };
+
+        var updateKpiFormat = function(entryData, successFunc) {
+            return callAjaxByPost("updatekpiformat", entryData, successFunc);
+        }
+
+        return {
+            updateKpiFormat: updateKpiFormat
+        }
+    }();
+
+    vmPopKpiFormat.SetupValidate = function() {
+        $('#add-kpiformat-form').validate({
+            rules: {
+                CategoryName: {
+                    required: true
+                }
+            },
+            messages: {
+                CategoryName: {
+                    required: kLg.requiredName
+                }
+            }
+        });
+    };
+
+    popUpKpiFormat.bind("close", function (e) {
+        if (vmPopKpiFormat.IsModified === true) {
+            if (!confirm(kLg.saveConfirmQuestion)) {
+                popUpKpiFormat.destroy();
+                popUpKpiFormat = null;
+                $('#pop-kpisettingindex').after('<div id="divSelectKpiIndex"></div>');
+
+            } else {
+                if (!$('#add-kpiformat-form').valid()) { 
+                    e.preventDefault();
+                    return;
+                };
+                popKpiFormatViewModel.updateFormat();
+                $('#pop-kpisettingindex').after('<div id="divSelectKpiIndex"></div>');
+            }
+        } else {
+            popUpKpiFormat.destroy();
+            popUpKpiFormat = null;
+            $('#pop-kpisettingindex').after('<div id="divSelectKpiIndex"></div>');
+        }
+    });
+
+
+
+    $(document).ready(function () {
+
+        popKpiFormatViewModel = kendo.observable({
+            kpiFormat: vmCommon.deepCopy(vmPopSetting.FormatItem),
+            updateFormat: function () {
+                if (!$('#add-kpiformat-form').valid()) return;
+                var entryData = this.kpiFormat;
+                vmPopKpiFormat.dataService.updateKpiFormat(entryData, function (res) {
+                    if (res.value === vmPopSetting.enumsRoleConflict.nameExist) {
+                        vmPopSetting.ShowToolTip($("#pop-add-kpi-format #txtNameCategories"), kLg.msgUsingKpiFormat.format(kLg.lblKpiFormat), 'top');
+                    } else {
+                        //TODO: change text
+                        vmPopSetting.FormatItem.set("Name", entryData.Name.trim());
+
+                        vmPopKpiFormat.IsModified = false;
+                        popUpKpiFormat.destroy();
+                        popUpKpiFormat = null;
+                        $('#pop-kpisettingindex').after('<div id="divSelectKpiIndex"></div>');
+                    }
+                });
+            },
+            formChange: function () {
+                vmPopKpiFormat.IsModified = true;
+            }
+
+        });
+
+        vmPopKpiFormat.SetupValidate();
+        vmPopKpiFormat.SetLang();
+        kendo.bind($('#pop-add-kpiformat'), popKpiFormatViewModel);  
+    });
+
+
+
+</script>
+

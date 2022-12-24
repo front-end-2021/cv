@@ -1,0 +1,473 @@
+﻿<div id="popUpMainContent"></div>
+<div id="editsubproductname"></div>
+<div id="editMarketLoading" class=""></div>
+<link href="../Css/multiple-select.css" rel="stylesheet" />
+
+<style>
+    .k-widget.k-notification.k-notification-info.k-popup {
+        border: none;
+    }
+
+    #div.k-animation-container div.k-notification-wrap {
+        padding-top: 4px !important;
+    }
+
+    div.k-animation-container div.k-notification-wrap span.k-i-close {
+        display: none;
+    }
+
+    div.k-animation-container div.k-notification-wrap .k-i-note {
+        display: none;
+    }
+
+    div.k-animation-container div.k-notification-wrap .k-icon.k-i-info {
+        margin-top: -4px;
+    }
+
+    .k-widget.k-notification.k-notification-info {
+        background-color: #38baf8;
+        border-color: #38baf8;
+    }
+
+    #hoand-k-notification-8290 {
+        display: inline-block;
+        white-space: normal;
+        margin-left: 30px;
+    }
+
+    .k-icon.k-i-info {
+        float: left;
+        padding-top: 5px;
+    }
+
+    .w-100per {
+        width: 98% !important;
+    }
+
+    .btnApplySubProSe {
+        margin-top: -23px;
+        background-position: -81px -299px;
+        text-indent: -999px;
+        float: right;
+        display: block;
+        width: 20px;
+        position: absolute;
+        right: 16px;
+    }
+
+    .btnChildApplySubProSe {
+        margin-top: -5px;
+        background-position: -81px -299px;
+        text-indent: -999px;
+        float: right;
+        display: block;
+        width: 20px;
+        position: absolute;
+        left: 246px;
+    }
+
+    td.td-v-align-top {
+        width: 558px !important;
+    }
+
+    tr.ui-sortable-helper {
+        background-color: white;
+        width: 96% !important;
+        -webkit-box-shadow: 0 0 10px 0 rgba(0,0,0,0.75);
+        -moz-box-shadow: 0 0 10px 0 rgba(0,0,0,0.75);
+        box-shadow: 0 0 10px 0 rgba(0,0,0,0.75);
+    }
+</style>
+
+<div id="popSelectCustomerJourneySeHolder"></div>
+<div id="popSelectCustomerJourneySe"></div>
+
+<script src="../Scripts/jquery.multiple.select.js"></script>
+<div id="popCustomerJourneySeAssignColunm">
+    <div class="modal-body ms-modal-body" id="popMarketSegmentBody" style="">
+        <div id="formEditMarket">
+            <div class="form-group">
+                <label id="lblPopName">Name</label><span style="font-weight: bold">*</span>
+                <div class="clear"></div>
+                <input type="text" id="cusJourneyName" name="cusJourneyName" tabindex="0" class="modal-input txtInput w-100per" data-bind="value: Name , events: {change: changeName}" maxlength="50" />
+                <span class="icon-16 icon-dropdow btnApplySubProSe" data-bind="events: {click: linkCustomerJourneySe}"></span>
+            </div>
+            <hr class="modal-market-hr" />
+            <div class="form-group">
+                <label id="lblPopDescription">Description</label>
+                <div class="clear"></div>
+                <textarea id="marketDescription" data-bind="value: Description" class="modal-textarea w-100per" tabindex="0"></textarea>
+            </div>
+            <div class="form-inline">
+                <label id="lblSelectColumnCount">
+                    Number of action per column
+                </label>
+                <select class=""
+                        style="width:100px;margin-left:10px;"
+                        data-value-primitive="true"
+                        data-role="dropdownlist"
+                        data-text-field="Name"
+                        data-value-field="Id"
+                        data-bind="value: MCount, source: countArr"></select>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-market-footer">
+        <button type="button" class="ms-button" tabindex="0" onclick="closeEditMarket()"><span class="icon-16 icon-close margin-right6"></span><span>Schliessen</span></button>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var isEdit = false;
+    var vmJourneyAssignColunm = vmJourneyAssignColunm || {};
+    vmJourneyAssignColunm.isChange = false;
+    vmJourneyAssignColunm.nameChanged = false;
+    vmJourneyAssignColunm.askForCloneAlbe = false;
+    vmJourneyAssignColunm.AdjustHeight = function () {
+        var popFooterH = $('#popCustomerJourneySeAssignColunm .modal-market-footer').height() + 2; // border 1px
+        var popBodyH = 350;
+        var subProduct = $('#popCustomerJourneySeAssignColunm .hoand-rg-subproduct');
+        if (subProduct.is(':hidden')) {
+            popBodyH = $('#formEditMarket').height() + 38;
+        } else {
+            popBodyH = $('#formEditMarket').height() + 50;
+        }
+        var popHeight = vmCommon.getPopupHeight(popBodyH, popFooterH);
+        var popWidth = $('#popCustomerJourneySeAssignColunm .modal-body').width() + 20; // padding 10px
+        $('#popMarketSegmentBody').height(popHeight - popFooterH - 20);
+        resizePopUp(vmCommon.popEditType, { width: popWidth, height: popHeight });
+    }
+    vmJourneyAssignColunm.dataservice = (function () {
+        function callAjaxHandler(divId, funcName, entryData, requestType, successCallBack, urlPara = '') {
+            var _url = "../Handlers/MsGoalAction.ashx?funcName=" + funcName + "&projid=" + projectId + "&strid=" + strategyId + urlPara;
+            callAjax(divId, _url, entryData, successCallBack, requestType);
+        }
+
+        var callAjaxByPost = function (funcName, entryData, successFunc) {
+            callAjaxHandler('loadingRegionMatrix', funcName, JSON.stringify(entryData), AjaxConst.PostRequest, successFunc);
+        };
+
+        var callAjaxByGet = function (funcName, urlPara, successFunc) {
+            callAjaxHandler('loadingRegionMatrix', funcName, null, AjaxConst.GetRequest, successFunc, urlPara);
+        };
+
+        var getColunmById = function (colunmId, successFunc) {
+            callAjaxByGet("actionplan_colunm_getbyid", '&colunmId=' + colunmId, successFunc);
+        };
+
+        var updateColunm = function (entryData, successFunc) {
+            callAjaxByPost("actionplan_update_colunm", entryData, successFunc);
+        };
+
+        var addColunm = function (entryData, successFunc) {
+            callAjaxByPost("actionplan_add_colunm", entryData, successFunc);
+        };
+
+        return {
+            updateColunm: updateColunm,
+            addColunm: addColunm,
+            getColunmById: getColunmById
+        };
+    })();
+
+    vmJourneyAssignColunm.countArr = [
+        { Id: 1, Name: 1 },
+        { Id: 2, Name: 2 },
+        { Id: 3, Name: 3 },
+        { Id: 4, Name: 4 },
+        { Id: 5, Name: 5 },
+        { Id: 6, Name: 6 },
+        { Id: 7, Name: 7 },
+        { Id: 8, Name: 8 },
+        { Id: 9, Name: 9 },
+        { Id: 10, Name: 10 }
+    ];
+
+    vmJourneyAssignColunm.alterColunm = function (entryData) {
+        var that = this;
+
+        function callback (columnId) {
+            var isReset = false;
+
+            if (isEdit && msFilter.controlService.hasCriteria(mFilter.enumFilter.customerJourney)) {
+                var isHasResult = vmGoalAction.hasColumnResultFilter(columnId, vmCommon.currentMarket.MainGoalId);
+                isReset = !isHasResult &&
+                          !msFilter.controlService.checkFitFilter([{ ObjectId: Number(entryData.CustomerJourneyId), TypeId: Number(entryData.LinkType) }], mFilter.enumFilter.customerJourney);
+            }
+
+            if (isReset) {
+                vmGoalAction.listNavMaingoalVM = {};
+                msFilter.controlService.reLoadData();
+            } else {
+                that.CallbackFunc != undefined && that.CallbackFunc != null && that.CallbackFunc(columnId);
+            }
+
+            //setTimeout(function () {
+            //    msFilter.controlService.reLoadDataFilter();
+            //}, 1000);
+
+            setTimeout(function () {
+                msFilter.controlService.reLoadDataFilter();
+            }, 100);
+
+            //vmGoalAction.redirectTo(columnId);
+        };
+
+        if (entryData.Id == 0) {
+            that.dataservice.addColunm(entryData, (rs) => {
+                callback(rs.value);
+            });
+        } else {
+            that.dataservice.updateColunm(entryData, (rs) => {
+                callback(rs.value);
+            });
+        };
+
+        vmJourneyAssignColunm.isChange = false;
+        vmCommon.popEditType.close();
+    };
+
+    function closeEditMarket() {
+        if (!vmCommon.currentMarket.RoleMaster) {
+            vmCommon.popEditType.close();
+            return;
+        }
+
+        if (validEditMarket()) {
+            vmJourneyAssignColunm.checkDuplicateNameThenSave();
+        }
+    }
+
+    function onCheckChange() {
+        $("#cusJourneyName").on("change keyup paste", function () {
+            vmJourneyAssignColunm.isChange = true;
+        });
+
+        $("#marketDescription").on("change keyup paste", function () {
+            vmJourneyAssignColunm.isChange = true;
+        });
+
+        $("#marketType").on("change", function () {
+            vmJourneyAssignColunm.isChange = true;
+        });
+    }
+
+    function setPopEditMarketSegmentLanguage() {
+        $("#lblPopName").text(kLg.PopName);
+        $("#lblPopDescription").text(kLg.labelDes);
+        $("#popCustomerJourneySeAssignColunm #lblSelectColumnCount").text(kLg.labelSelectCountColumn);
+        $("span.icon-close").next().text(kLg.lblClose);
+        $("#marketType").next().text(kLg.newLandRegion);
+        $("#marketType").next().text(kLg.newLandRegion);
+    }
+
+    function validEditMarket() {
+        $('#cusJourneyName').tooltip('destroy');
+        var cusJourneyName = $('#cusJourneyName').val().trim();
+        if (cusJourneyName == null || cusJourneyName == '') {
+            $('#cusJourneyName').attr('title', kLg.requiredName);
+            $('#cusJourneyName').tooltip({ placement: 'top', trigger: 'manual' }).tooltip('show');
+            $('#cusJourneyName').focus();
+            return false;
+        } else {
+            if (cusJourneyName.length > 100) {
+                $('#cusJourneyName').attr('title', kLg.msgMaxlenghName);
+                $('#cusJourneyName').tooltip({ placement: 'top', trigger: 'manual' }).tooltip('show');
+                $('#cusJourneyName').focus();
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
+
+    //Check Duplicate Name and Update if the name is not duplicate
+    vmJourneyAssignColunm.checkDuplicateNameThenSave = (function () {
+
+        var vm = vmJourneyAssignColunm.viewModel;
+        var entry = {};
+        entry.Name = vm.get("Name");
+        entry.Description = vm.get("Description");
+        entry.CustomerJourneyId = vm.get("LinkId");
+        entry.LinkType = vm.get("LinkType");
+        entry.MCount = vm.get("MCount");
+        entry.Id = vmCommon.currentMarket.Id;
+        entry.GoalId = vmCommon.currentMarket.GoalId;
+        vmJourneyAssignColunm.alterColunm(entry);
+ 
+    });
+
+    var vmEditSubsProduct = undefined;
+
+    vmJourneyAssignColunm.init = function () {
+        var that = this;
+
+        if (vmCommon.currentMarket.SubProducts && vmCommon.currentMarket.SubProducts.length > 1)
+            vmCommon.currentMarket.SubProducts.sort(function (a, b) {
+                return a.MIndex - b.MIndex;
+            });
+        if (vmJourneyAssignColunm.viewModel) vmJourneyAssignColunm.viewModel = null;
+
+        var newCusJourneyObj = {
+            Id: vmCommon.currentMarket.Id,
+            GoalId: vmCommon.currentMarket.GoalId,
+            LinkId: 0,// vmCommon.currentMarket.LinkId,
+            LinkType: 0,// vmCommon.currentMarket.LinkType,
+            Name: '',//vmCommon.currentMarket.Name,
+            Description: '',//vmCommon.currentMarket.Description,
+            MCount: 1
+        }
+
+        if (vmCommon.currentMarket.Id != 0) {
+            isEdit = true;
+            that.dataservice.getColunmById(vmCommon.currentMarket.Id, (data) => {
+                newCusJourneyObj.LinkId = data.value.CustomerJourneyId;
+                newCusJourneyObj.Name = data.value.Name;
+                newCusJourneyObj.Description = data.value.Description;
+                newCusJourneyObj.MCount = data.value.MCount;
+                newCusJourneyObj.GoalId = data.value.GoalId;
+
+                vmCommon.currentMarket.GoalId = data.value.GoalId;
+
+                bindViewModel(newCusJourneyObj);
+            });
+        }
+        else {
+            bindViewModel(newCusJourneyObj);
+        }
+
+        function bindViewModel(data) {
+            that.viewModel = kendo.observable({
+                Id: data.Id,
+                LinkId: data.LinkId,
+                LinkType: data.LinkType,
+                Name: data.Name,
+                Description: data.Description,
+                MCount: data.MCount,
+                GoalId: vmCommon.currentMarket.GoalId,
+                countArr: vmJourneyAssignColunm.countArr,
+                textChange: function () {
+                    $('.subProductName').tooltip('destroy');
+                },
+                linkCustomerJourneySe: function (e) {
+                    that.showSelectSubProSe(e.data.LinkId, e.data.LinkType);
+                },
+                changeName: function (e) {
+                    that.viewModel.set("LinkId", 0);
+                    $('#cusJourneyName').tooltip('destroy');
+                },
+            });
+
+            kendo.bind($("#popCustomerJourneySeAssignColunm"), vmJourneyAssignColunm.viewModel);
+        }
+    };
+
+    function getRemoveIdCallback(e, callbackCheckTime, callbackTime) {
+        if (!callbackCheckTime) callbackCheckTime = 10;
+        if (!callbackTime) callbackTime = 0;
+        callbackTime++;
+
+        var c = $(e.target).parent().parent().parent();
+        var idx = parseInt(c.parent(".divDragDrop").attr("mindex"));
+        if (callbackTime >= callbackCheckTime)
+            return -1;
+        if (isNaN(idx))
+            idx = getRemoveIdCallback(e, callbackCheckTime, callbackTime);
+        return idx;
+    }
+
+    function removeAllHover() {
+        $('table.tbgrid-marketing td').removeClass('td-hover');
+        $('table.tbgrid td').removeClass('td-hover');
+    }
+
+    function addAllHover() {
+        $('table.tbgrid td').addClass('td-hover');
+        $('table.tbgrid td.is-null').removeClass('td-hover');
+        $('table.tbgrid-marketing td').addClass('td-hover');
+        $('table.tbgrid-marketing td.is-null').removeClass('td-hover');
+    }
+
+    function buildEntryObject() {
+        var id = vmCommon.currentMarket.Id;
+        var name = $("input#cusJourneyName").val().trim();
+
+        var jsonObject = {
+            Id: id,
+            Name: name
+        };
+
+        return jsonObject;
+    }
+
+    vmJourneyAssignColunm.showSelectSubProSe = function (linkId, linkType) {
+
+        vmCommon.popSelectSubProOptions.OldLinkId = linkId;
+        vmCommon.popSelectSubProOptions.OldLinkType = linkType;
+
+        vmCommon.popSelectSubProOptions.CallbackFunc = function (checkSubSource) {
+
+        };
+        vmCommon.popSelectSubmarketProductSe = showPopup(vmCommon.popSelectSubmarketProductSe,
+            $('#popSelectCustomerJourneySe'),
+            '/Contents/MsPopCustomerJourneySe_Seclect.html',
+            {
+                title: kLg.strSelectionFormat.format(kLg.vtextCustomerJourney),
+                height: 525,
+                width: 650,
+                resizable: false
+            });
+    };
+
+    //Pageload
+    $(document).ready(function () {
+        vmCommon.currentMarket.RoleMaster = true;//vmSMarket.MarketData.Role > 0 ? true : false;
+        vmJourneyAssignColunm.CallbackFunc = vmCommon.popEditType.CallbackFunc;
+
+        vmJourneyAssignColunm.init();
+
+        onCheckChange();
+
+        vmCommon.popEditType.bind("close", function (e) {
+            vmFile.enableAssignedIcon = false;
+            if (vmJourneyAssignColunm.isChange) {
+                if (!window.confirm(kLg.saveConfirmQuestion)) {
+                    vmCommon.popEditType.destroy();
+                    vmCommon.popEditType = null;
+                    $('.body-content').after('<div id="popCustomerJourneySeAssignColunm"></div>');
+                } else {
+                    e.preventDefault();
+                    if (validEditMarket()) {
+                        vmJourneyAssignColunm.checkDuplicateNameThenSave();
+                    }
+                }
+            } else {
+                vmCommon.popEditType.destroy();
+                vmCommon.popEditType = null;
+                $('.body-content').after('<div id="popCustomerJourneySeAssignColunm"></div>');
+            }
+            MsaApp.canReaction();
+        });
+
+        setPopEditMarketSegmentLanguage();
+
+        $("#cusJourneyName").bind("change keyup paste", function () {
+            vmJourneyAssignColunm.nameChanged = true;
+
+            $(this).tooltip('destroy');
+        });
+
+        vmJourneyAssignColunm.nameChanged = false;
+
+        vmJourneyAssignColunm.isChange = false;
+
+        limitedTabKey();
+        $('#cusJourneyName').focus();
+    });
+
+</script>
+
+
+
+

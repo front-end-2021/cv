@@ -1,0 +1,46 @@
+﻿<!-- css -->
+<style type="text/css">
+    .download-css {
+        margin: 15px auto 2px 10px;
+        font-size: 15px;
+    }
+
+    #download-css-form table {
+        margin-bottom: 23px;
+    }
+</style>
+<!-- html -->
+<div id="download-css-form">
+    <div class="modal-body ms-modal-body organ-modal">
+        <table id="css-data">
+            <tbody data-bind="source: cssData" data-template="temp-css"></tbody>
+        </table>
+    </div>
+    <div class="modal-market-footer">
+        <button type="button" class="ms-button" id="btnSave" onclick="vmAdmin.closePopDownload()" tabindex="6"><span class="icon-16 icon-close margin-right6"></span><span id="lblClose">Schließen</span></button>
+    </div>
+</div>
+
+<script id="temp-css" type="text/html">
+    <tr>
+        <td>
+            <div class="download-css">
+                <a class="download-item" data-bind="attr:{href: Link, download: Name}"><span title="" data-bind="text: Name"></span></a>
+            </div>
+        </td>
+    </tr>
+</script>
+
+<!-- script -->
+<script type="text/javascript">
+    var cssData = vmAdmin.cssData,
+        cssViewModel = undefined;
+
+    $(function () {
+        cssViewModel = kendo.observable({
+            cssData: cssData
+        });
+
+        kendo.bind($('#download-css-form'), cssViewModel);
+    });
+</script>

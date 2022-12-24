@@ -1,0 +1,2217 @@
+﻿<head>
+    <link href="../MarketingMixTheme/DefaultTheme.css" rel="stylesheet" />
+</head>
+<style>
+    .export-left {
+        height: 800px;
+        padding-left: 0;
+        padding-right: 0;
+        border-right: #d2d2d2;
+        width: 18%;
+        margin: 20px 0px 0px 20px;
+    }
+
+    .export-right {
+        min-height: 800px; position:relative;
+        padding-left: 0;
+        padding-right: 0;
+        width: 80%;
+    }
+    .tdleft {
+        text-align: right;
+        max-width: 163px;
+        overflow: hidden;
+    }
+    .k-picker-wrap.k-state-default > .k-select{
+        padding-right:4px!important;
+    }
+    .k-state-default > .k-select
+    .tdright {
+        text-align: left;
+        padding-left: 15px;
+    }
+
+    .tdoptionleft {
+        text-align: right;
+        padding-right: 10px;
+        padding-left: 10px;
+        width: 160px;
+    }
+
+    .tdoptionright {
+        text-align: left;
+        width: 100px;            
+    }
+
+    .tableSetting {
+        color: gray;
+        width: 97%;
+    }
+
+    .headerSetting {
+        font-size: 16px;
+        padding-left: 25px;
+        font-weight: bold;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    .headerOptionSetting {
+        font-size: 16px;
+        padding-left: 10px;
+        font-weight: normal;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    .showhide {
+        color: #3e3838;
+        font-size: 12px;
+        padding-left: 1px;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+    a.showhide:hover {
+        color: black;
+    }
+
+    div.k-loading-mask {
+        z-index: 3; /* must be larger than the z-index:2 of #container */
+    }
+
+    .k-loading-mask .k-loading-image {
+        background-image: url(/images/ajax-loader.gif);
+    }
+        
+    #calendar-split-view-a .titlegoalname {
+        width: 220px;
+        position: absolute;
+    }
+
+    #calendar-split-view-a .titleactionname {
+        width: 190px;
+        position: absolute;
+    }
+
+    .noHeight {
+        height: 0px !important;
+    }
+    #bodyOption > tr:nth-child(2) > td.tdoptionright > span > span {
+        padding-right: 23px;
+    }
+    #bodyOption > tr:nth-child(2) > td.tdoptionright > span {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    #bodyOption > tr:nth-child(3) > td.tdoptionright > span > span {
+        padding-right: 23px;
+    }
+    #bodyOption > tr:nth-child(3) > td.tdoptionright > span {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    .table-field_freezed {
+        position: absolute; height: 53px; top: 0; left: 0; z-index: 5;
+    }
+    .table-field_freezed .month-cell { min-width:34px; }
+    .table-field_freezed tr[rtype="month"], .table-field_freezed tr[rtype="day"], .table-field_freezed tr[rtype="month"]+tr {height:25px;}
+    #divField.dnb-freezed_col_head-less_than_5 {position: absolute; background: white; z-index: 5; top: 27px; }
+    #calendar-split-view-a .overEnd.dnb_hls { background-color: hsl(17deg, 100%, 27.3%) !important; }
+</style>
+
+<div id="divExportSetting">
+    <div class="export-left col-md-4">
+        <div style="height: 110px; padding: 10px; background-color: #f6f6f6;border: 1px solid #d2d2d2;border-bottom: none;">
+            <label style="font-size: 18px;color: #635c5c;" id="lblExSetting">Export Settings</label><br />
+            <div class="form-group pull-right" style="margin-top: 15px;">
+                <button class="ms-button" onclick=" closePopupExport() ">
+                    <span class="icon-20 icon-close" style="float: left"></span>
+                    <span id="lblClose">Close</span>
+                </button>
+                <button class="ms-button" onclick="exportFormPU(this)" id="btnExport">
+                    <span class="icon-20 icon-download" style="float: left"></span>
+                    <span id="lblExport">Export</span>
+                </button>
+            </div>
+        </div>
+        <div style="text-align: center;border: 1px solid #d2d2d2;height: 930px;background-color: #f6f6f6;">
+            <div style="margin-top: 20px;">
+
+                <table class="tableSetting">
+                    <thead>
+                        <tr style="height: 0px"></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="tdleft">PDF Export:</td>
+                            <td class="tdright"><input type="checkbox" onchange="validateCheckbox()" checked="true" id="chkPDF" /></td>
+                        </tr>
+                        <tr>
+                            <td class="tdleft">Excel:</td>
+                            <td class="tdright"><input type="checkbox" onchange="validateCheckbox()" id="chkExcel" /></td>
+                        </tr>
+                        <tr id="previewOpt" style="display: none;">
+                            <td class="tdleft" id="lblPreview">Preview Link:</td>
+                            <td class="tdright"><input type="checkbox" onchange="validateCheckbox()" id="chkPreview" /></td>
+                        </tr>
+                    </tbody>
+                    <thead>
+                        <tr>
+                            <th colspan="2" class="headerSetting" id="thPaper">Paper Settings:</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="tdoptionleft" id="tdPaperSize">Paper Size:</td>
+                            <td class="tdoptionright">
+                                <select data-role="dropdownlist" class="w-100per" style="width: 140px !important;"
+                                        data-value-primitive="true"
+                                        data-text-field="Name"
+                                        data-value-field="Id"
+                                        onchange=" changePaperSize() "
+                                        id="sltPaperSize"
+                                        data-bind="source: paperSize, value: paperSizeDefault"></select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tdoptionleft" style="padding-top: 10px;" id="tdOrien">Orientation:</td>
+                            <td class="tdoptionright">
+                                <select data-role="dropdownlist" class="w-100per" style="margin-top: 10px;"
+                                        data-value-primitive="true"
+                                        data-text-field="Name"
+                                        data-value-field="Id"
+                                        onchange=" changeOrientation() "
+                                        id="sltOrientation"
+                                        data-bind="source: orientation, value: orientationDefault"></select>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <thead>
+                        <tr>
+                            <th colspan="2" class="headerSetting" id="thAddColumn">Additional Columns:</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="tdleft" id="tdName">Massnahme / Ziele:</td>
+                            <td class="tdright"><input type="checkbox" checked="true" onchange="setColumn('name', getWidthColumn('name'))" id="chkname" /></td>
+                        </tr>
+                        <tr>
+                            <td class="tdleft" id="tdBegin">Beginn:</td>
+                            <td class="tdright"><input type="checkbox" checked="true" onchange="setColumn('begin', getWidthColumn('begin'))" id="chkbegin" /></td>
+                        </tr>
+                        <tr>
+                            <td class="tdleft" id="tdEnd">Ende:</td>
+                            <td class="tdright"><input type="checkbox" checked="true" onchange="setColumn('end', getWidthColumn('end'))" id="chkend" /></td>
+                        </tr>
+                        <tr>
+                            <td class="tdleft" id="tdResponsible">Verantwortlich:</td>
+                            <td class="tdright"><input type="checkbox" checked="true" onchange="setColumn('responsible', getWidthColumn('responsible'))" id="chkresponsible" /></td>
+                        </tr>
+                        <tr>
+                            <td class="tdleft" id="tdInvolvedpeople">Weitere involvierte personen:</td>
+                            <td class="tdright"><input type="checkbox" checked="true" onchange="setColumn('involvedpeople', getWidthColumn('involvedpeople'))" id="chkinvolvedpeople" /></td>
+                        </tr>
+                        <tr>
+                            <td class="tdleft" id="tdStackholder">Anspruchsgruppen:</td>
+                            <td class="tdright"><input type="checkbox" checked="true" onchange="setColumn('stackholder', getWidthColumn('stackholder'))" id="chkstackholder" /></td>
+                        </tr>
+                        <tr>
+                            <td class="tdleft" id="tdJourney">Customer Journey:</td>
+                            <td class="tdright"><input type="checkbox" checked="true" onchange="setColumn('customerjourney', getWidthColumn('customerjourney'))" id="chkcustomerjourney" /></td>
+                        </tr>
+                        <tr>
+                            <td class="tdleft" id="tdInstrument">Instrumente:</td>
+                            <td class="tdright"><input type="checkbox" checked="true" onchange=" setColumn('instrument', getWidthColumn('instrument')) " id="chkinstrument" /></td>
+                        </tr>
+                        <tr>
+                            <td class="tdleft" id="tdAdvertising">Advertising:</td>
+                            <td class="tdright"><input type="checkbox" checked="true" onchange=" setColumn('advertising', getWidthColumn('advertising')) " id="chkadvertising" /></td>
+                        </tr>
+                        <tr>
+                            <td class="tdleft" id="tdAdvertiser">Advertiser:</td>
+                            <td class="tdright"><input type="checkbox" checked="true" onchange=" setColumn('advertiser', getWidthColumn('advertiser')) " id="chkadvertiser" /></td>
+                        </tr>
+                        <tr>
+                            <td class="tdleft" id="tdSubjetThema">Subjet\Thema:</td>
+                            <td class="tdright"><input type="checkbox" checked="true" onchange="setColumn('subjetthema', getWidthColumn('subjetthema'))" id="chksubjetthema" /></td>
+                        </tr>
+                        <tr>
+                            <td class="tdleft" id="tdCategory">Kategorie:</td>
+                            <td class="tdright"><input type="checkbox" checked="true" onchange="setColumn('category', getWidthColumn('category'))" id="chkcategory" /></td>
+                        </tr>
+                        <tr>
+                            <td class="tdleft" id="tdStatus">Status:</td>
+                            <td class="tdright"><input type="checkbox" checked="true" onchange="setColumn('status', getWidthColumn('status'))" id="chkstatus" /></td>
+                        </tr>
+                        <tr>
+                            <td class="tdleft" id="tdField">Bereich:</td>
+                            <td class="tdright"><input type="checkbox" checked="true" onchange="setColumn('field', getWidthColumn('field'))" id="chkfield" /></td>
+                        </tr>
+                        <tr>
+                            <td class="tdleft" id="tdExCost">Geplante Kosten:</td>
+                            <td class="tdright"><input type="checkbox" checked="true" onchange="setColumn('exCost', getWidthColumn('exCost'))" id="chkexCost" /></td>
+                        </tr>
+                        <tr>
+                            <td class="tdleft" id="tdAcCost">Effektive Kosten:</td>
+                            <td class="tdright"><input type="checkbox" checked="true" onchange="setColumn('acCost', getWidthColumn('acCost'))" id="chkacCost" /></td>
+                        </tr>
+                        <tr>
+                            <td class="tdleft" id="tdBudget">Budget:</td>
+                            <td class="tdright"><input type="checkbox" checked="true" onchange="setColumn('budget', getWidthColumn('budget'))" id="chkbudget" /></td>
+                        </tr>
+                        <tr>
+                            <td class="tdleft" id="tdDescription">Beschreibung:</td>
+                            <td class="tdright"><input type="checkbox" checked="true" onchange="setColumn('description', getWidthColumn('description'))" id="chkdescription" /></td>
+                        </tr>
+
+                        <tr>
+                            <td class="tdleft" id="tdEffect">Erwartetes Ergebnis / Situation:</td>
+                            <td class="tdright"><input type="checkbox" checked="true" onchange="setColumn('effect', getWidthColumn('effect'))" id="chkeffect" /></td>
+                        </tr>
+                        <tr>
+                            <td class="tdleft" id="tdArrived">Eingetroffenes Ergebnis / Situation:</td>
+                            <td class="tdright"><input type="checkbox" checked="true" onchange=" setColumn('arrived', getWidthColumn('arrived')) " id="chkarrived" /></td>
+                        </tr>
+                        <tr>
+                            <td class="tdleft" id="tdGoalEvaluation">Zweck / Grundsätze:</td>
+                            <td class="tdright"><input type="checkbox" checked="true" onchange="setColumn('evaluation', getWidthColumn('evaluation'))" id="chkevaluation" /></td>
+                        </tr>
+                        <tr>
+                            <td class="tdleft" id="tdDiagram">Show Diagram</td>
+                            <td class="tdright"><input type="checkbox" checked="true" onchange="showHideDiagram()" id="chkdiagram" /></td>
+                        </tr>
+                        <!--  -->
+                        <tr>
+                            <td class="tdleft" style="padding-top: 10px;" id="tdTheme">Theme:</td>
+                            <td class="tdright" style="padding-bottom: 3px;padding-left: 5px;">
+                                <div style="word-wrap: break-word;width: 130px;">
+                                    <select data-role="dropdownlist" class="w-100per" style="margin-top: 10px;"
+                                            data-value-primitive="true"
+                                            data-text-field="Name"
+                                            data-value-field="Index"
+                                            onchange=" changeTheme()"
+                                            id="sltTheme"
+                                            data-bind="source: theme, value: defaultTheme"></select>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tdleft" id="tdDateStart">Date Range (start):</td>
+                            <td class="tdright kgv-style-icon-input" style="padding: 3px 0 3px 0;">
+                                <input id="txtStartDateEx" maxlength="10" data-role="datepicker" tabindex="4" style="width: 130px;" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tdleft" id="tdDateEnd">Date Range (end):</td>
+                            <td class="tdright" style="padding: 3px 0 3px 0;">
+                                <input id="txtEndDateEx" maxlength="10" data-role="datepicker" tabindex="5" style="width: 130px;" />
+                            </td>
+                        </tr>
+                        <!--  -->
+                    </tbody>
+                    
+                </table>
+
+                <div id="testtheme">
+                    <div class="goal-type"></div>
+                    <div class="goal-action-finish"></div>
+                    <div class="overEnd"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="export-right col-md-8">
+        <div style="width: 100% !important">
+            <div class="" id="lblMarkettingMixId-a"></div>
+            <div id="calendar-split-view-a" class="dnb_calendar-split-view-a_cache dnb-c_export-view" 
+                 style="height: auto; width: 4710px; overflow: hidden;position:relative;">
+                <div style="float: left; width: 100%; visibility: hidden;margin-bottom: 10px;" id="divLogo"></div>
+                <div style="float: left; width: 3406px;" id="divField">
+                    <div class="ms-modal-body-mk">
+                        <div id="calendar-field-a"></div>
+                    </div>
+                </div>
+                <div style="float: left;" id="divTime">
+                    <div class="ms-modal-body-mk">
+                        <div id="calendar-time-a"></div>
+                    </div>
+                </div>
+            </div>
+            <div style="position:relative">
+                <div style="position: absolute; top: 900px; left: 0;">
+                    <div id="dnb_calendar-split-view-a_cache"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var vmExport = vmExport || {};
+    var widthPathStart = 0;
+    var widthPathOld = 0;
+
+    var nextTopModel = undefined;
+    var exportSetting = {
+        exportPdf: true,
+        exportExcel: false,
+        paperSize: kLg.AutoSize,
+        orientation: kLg.landscape,
+        columns: {
+            name: true, begin: true, end: true, responsible: true, involvedpeople: true, stackholder: true, customerjourney: true, instrument: true, advertising: true, advertiser: true, subjetthema: true, category: true, status: true,
+            field: true, exCost: true, acCost: true, budget: true, description: true, evaluation: true, effect: true, arrived: true, diagram: true
+        },
+        startDate: new Date(),
+        endDate: new Date(),
+        theme: [],
+        themeSelected: "DefaultTheme"
+    }
+
+    vmExport.enumFilter = {
+        paperSize: { AutoSize : 1, A1: 2, A2: 2, A3: 3, A4: 4}
+    };
+
+    vmExport.GetTheme = function () {
+        var url = '../Handlers/DFolderHandler.ashx?funcName=getmsfile';
+        return callAjax("", url, null, function (data) {
+            exportSetting.theme = data;
+
+            var exportModel = kendo.observable({
+                paperSize: [{ Id: 1, Name: kLg.AutoSize }, { Id: 2, Name: "A1" }, { Id: 3, Name: "A2" }, { Id: 4, Name: "A3" }, { Id: 5, Name: "A4" }],
+                paperSizeDefault: 1,
+                orientation: [{ Id: 1, Name: kLg.landscape }, { Id: 2, Name: kLg.portrait }],
+                orientationDefault: 1,
+                theme: exportSetting.theme,
+                defaultTheme: 1
+            });
+
+            kendo.bind($("div#divExportSetting"), exportModel);
+
+        }, AjaxConst.PostRequest);
+    };
+
+    function saveSettings() {
+        if (!vmExport.isValid) return;
+
+        var entryData = {
+            projectId: projectId,
+            lastActionValue: JSON.stringify({
+                IsLinkPreview: exportSetting.IsLinkPreview,
+                PdfExport: exportSetting.exportPdf,
+                Excel: exportSetting.exportExcel,
+                PaperSize: parseInt($("#sltPaperSize").data("kendoDropDownList").value()),
+                Orientation: parseInt($("#sltOrientation").data("kendoDropDownList").value()),
+
+                Name: exportSetting.columns.name,
+                Begin: exportSetting.columns.begin,
+                End: exportSetting.columns.end,
+                Responsibility: exportSetting.columns.responsible,
+                Involvedpeople: exportSetting.columns.involvedpeople,
+                Stackholder: exportSetting.columns.stackholder,
+                CustomerJourney: exportSetting.columns.customerjourney,
+                Instruments: exportSetting.columns.instrument,
+                Advertising: exportSetting.columns.advertising,
+                Advertiser: exportSetting.columns.advertiser,
+                SubjetThema: exportSetting.columns.subjetthema,
+                Category: exportSetting.columns.category,
+                Status: exportSetting.columns.status,
+                Field: exportSetting.columns.field,
+                ExpectedCost: exportSetting.columns.exCost,
+                TrueCost: exportSetting.columns.acCost,
+                Budget: exportSetting.columns.budget,
+
+                Description: exportSetting.columns.description,
+                
+                Evaluation: exportSetting.columns.evaluation,
+                ExpectedSituation: exportSetting.columns.effect,
+                ArrivedSituation: exportSetting.columns.arrived,
+                Diagram: $("#chkdiagram").is(":checked"),
+
+                Template: parseInt($("#sltTheme").data("kendoDropDownList").value()),
+                DateRangeStart: changeHourOfDate($('#txtStartDateEx').data("kendoDatePicker").value()),
+                DateRangeEnd: changeHourOfDate($('#txtEndDateEx').data("kendoDatePicker").value()),
+                ViewBy: vmCalendar.TimelineView,
+                TimeLineStart: changeHourOfDate(exportSetting.TimeLineStart),
+                TimeLineEnd: changeHourOfDate(exportSetting.TimeLineEnd)
+            })
+        };
+        
+        var url = '../Handlers/CalendarHandler.ashx?funcName=savepreviewmmsettings&projectId=' + projectId + '&projid=' + projectId + "&lang=" + kLg.language + "&strid=" + strategyId;
+
+        callAjax("loading", url, JSON.stringify(entryData), function() {}, AjaxConst.PostRequest);
+
+    };
+
+    function reSetPath() {
+        var count = $("#calendar-split-view-a #table-field td[colid]:visible").length;
+
+        $("#calendar-split-view-a #table-field tr.xpath td:eq(0)").attr("colspan", count);
+        if (count == 0) {
+            $("#calendar-split-view-a #table-field tr.xpath").hide();
+        } else {
+            $("#calendar-split-view-a #table-field tr.xpath").show();
+        }
+    };
+
+    function loadSettings() {
+        var url = '../Handlers/CalendarHandler.ashx?funcName=getpreviewmmsettings&projectId=' + projectId + '&projid=' + projectId + "&lang=" + kLg.language + "&strid=" + strategyId;
+
+        callAjax("loading", url, JSON.stringify({ projectId: projectId }), function (data) {    
+            if (data.value == null) return;
+
+            exportSetting.PreviewLink = data.value.PreviewLink;
+            exportSetting.LinkSharepoints = vmCommon.getLinkSharepoint().getItems(data.value.LinkSharepoints, true);
+
+            if (data.value.TimeLineStart && typeof data.value.TimeLineStart == "string" && data.value.TimeLineStart.startsWith("/Date"))
+                exportSetting.TimeLineStart = data.value.TimeLineStart.jsonToDate();
+
+            if (data.value.TimeLineEnd && typeof data.value.TimeLineEnd == "string" && data.value.TimeLineEnd.startsWith("/Date"))
+                exportSetting.TimeLineEnd = data.value.TimeLineEnd;
+
+            if (data.value.PdfExport != $('#chkPDF').is(":checked")) $("#chkPDF").click();
+
+            if (data.value.IsOwner) $("#previewOpt").show();
+            if (data.value.IsLinkPreview != $('#chkPreview').is(":checked")) $("#chkPreview").click();
+
+            if (data.value.Excel != $('#chkExcel').is(":checked"))
+                $("#chkExcel").click();
+
+            if (data.value.PaperSize) {
+                $("#sltPaperSize").data("kendoDropDownList").value(data.value.PaperSize);
+                changePaperSize();
+            }
+            if (data.value.Orientation) {
+                $("#sltOrientation").data("kendoDropDownList").value(data.value.Orientation);
+                changeOrientation();
+            }
+
+            if (data.value.Name != $('#chkname').is(":checked"))
+                $("#chkname").click();
+            if (data.value.Begin != $('#chkbegin').is(":checked"))
+                $("#chkbegin").click();
+            if (data.value.End != $('#chkend').is(":checked"))
+                $("#chkend").click();
+            if (data.value.Responsibility != $('#chkresponsible').is(":checked"))
+                $("#chkresponsible").click();
+            if (data.value.Involvedpeople != $('#chkinvolvedpeople').is(":checked"))
+                $("#chkinvolvedpeople").click();
+            if (data.value.Stackholder != $('#chkstackholder').is(":checked"))
+                $("#chkstackholder").click();
+            if (data.value.CustomerJourney != $('#chkcustomerjourney').is(":checked"))
+                $("#chkcustomerjourney").click();
+            if (data.value.Instruments != $('#chkinstrument').is(":checked"))
+                $("#chkinstrument").click();    
+
+            if (data.value.Advertising != $('#chkadvertising').is(":checked"))
+                $("#chkadvertising").click(); 
+            if (data.value.Advertiser != $('#chkadvertiser').is(":checked"))
+                $("#chkadvertiser").click(); 
+
+            if (data.value.SubjetThema != $('#chksubjetthema').is(":checked"))
+                $("#chksubjetthema").click();
+            if (data.value.Category != $('#chkcategory').is(":checked"))
+                $("#chkcategory").click();
+            if (data.value.Status != $('#chkstatus').is(":checked"))
+                $("#chkstatus").click();
+            if (data.value.Field != $('#chkfield').is(":checked"))
+                $("#chkfield").click();
+            if (data.value.ExpectedCost != $('#chkexCost').is(":checked"))
+                $("#chkexCost").click();
+            if (data.value.TrueCost != $('#chkacCost').is(":checked"))
+                $("#chkacCost").click();
+            if (data.value.Budget != $('#chkbudget').is(":checked"))
+                $("#chkbudget").click();
+
+            if (data.value.Description != $('#chkdescription').is(":checked"))
+                $("#chkdescription").click();
+            if (data.value.Evaluation != $('#chkevaluation').is(":checked"))
+                $("#chkevaluation").click();
+            if (data.value.ExpectedSituation != $('#chkeffect').is(":checked"))
+                $("#chkeffect").click();
+            if (data.value.ArrivedSituation != $('#chkarrived').is(":checked"))
+                $("#chkarrived").click();
+
+            if (data.value.Diagram != $('#chkdiagram').is(":checked"))
+                $("#chkdiagram").click();
+
+            $("#sltTheme").data("kendoDropDownList").value(data.value.Template);
+
+            if ($("#sltTheme").data("kendoDropDownList").text() === "")
+                $("#sltTheme").data("kendoDropDownList").value(1);
+
+            changeTheme();
+
+            var startElm = $('#txtStartDateEx').data("kendoDatePicker");
+            var endElm = $('#txtEndDateEx').data("kendoDatePicker");
+
+            startElm.value(data.value.DateRangeStart);
+            endElm.value(data.value.DateRangeEnd);
+
+            var startDate = startElm.value();
+            var endDate = endElm.value();
+
+            var start, end;
+            if (startDate) {
+                vmCalendar.VBDStartDay = startDate;
+
+                start = { Year: startDate.getFullYear(), Month: startDate.getMonth() + 1, Date: startDate.getDate() };
+                if (endDate) {
+                    end = { Year: endDate.getFullYear(), Month: endDate.getMonth() + 1, Date: endDate.getDate() };
+                    vmCalendar.VBDEndDay = endDate;
+                }
+                    
+            }
+            else if (endDate) {
+                vmCalendar.VBDStartDay = endDate;
+                start = { Year: endDate.getFullYear(), Month: endDate.getMonth() + 1, Date: endDate.getDate() };
+            }
+
+            //vmCalendar.VBDStartDay = start;
+            var wr = msFilter.controlService.getWorkingRange();
+            if (msFilter.controlService.isHasRedirect() && (wr.Start != null || wr.End != null)) {
+                var s = start ? new Date(start.Year, start.Month - 1, start.Date) : null;
+                var e = end ? new Date(end.Year, end.Month - 1, end.Date) : null;
+
+                var ts, te;
+
+                if (typeof wr.Start === "string") ts = wr.Start.toDate(); else ts = wr.Start ? new Date(+wr.Start) : null;
+                if (typeof wr.End === "string") te = wr.End.toDate(); else te = wr.End ? new Date(+wr.End) : null;
+
+                if (ts != null && s != null) {
+                    if (vmCommon.compareDate2(ts, s) > 0) s = ts;
+                } else {
+                    s = s || ts;
+                }
+
+                if (te != null && e != null) {
+                    if (vmCommon.compareDate2(te, e) < 0) e = te;
+                } else {
+                    e = e || te;
+                }
+
+                if (s) start = { Year: s.getFullYear(), Month: s.getMonth() + 1, Date: s.getDate() };
+                if (e) end = { Year: e.getFullYear(), Month: e.getMonth() + 1, Date: e.getDate() };
+            }
+
+            vmExport.timelineScrollToDateExport(start, end);
+            
+            setFirstLoader();
+
+            if (vmCalendar.hasLogo) {
+                $('#divLogo').append('<img id="imgLogo" />');
+                if (data.value.LogoPath !== null) {
+                    $("#imgLogo").attr('src', "../FileUpload/" + data.value.LogoPath);
+
+                    $("#imgLogo").attr('style', "height: 100px; margin-left: 45%;margin-top: 20px;");
+                    $("#divLogo").css('visibility', 'visible');
+                    $('#calendar-field-a #table-field #trWhiteField').removeClass('noHeight');
+                    $('#table-time #bnnTr').removeClass('noHeight');
+                } else {
+                    $('#calendar-field-a #table-field #trWhiteField').addClass('noHeight');
+                    $('#table-time #bnnTr').addClass('noHeight');
+                }
+                
+            } else {
+                $('#divLogo').empty();
+                $("#divLogo").css('visibility', 'hidden');               
+            }
+
+        }, AjaxConst.PostRequest);
+    };
+
+    function bindLanguageSetting() {
+        $('#lblExSetting').text(kLg.exSettings);
+        $('#lblClose').text(kLg.lblCloseForm);
+        $('#thPaper').text(kLg.paperSetting);
+        $('#tdPaperSize').text(kLg.paperSize);
+        $('#tdOrien').text(kLg.orientation);
+        $('#thAddColumn').text(kLg.addColumn);
+        $('#thAdvance').text(kLg.advanceOption);
+        $('#tdTheme').text(kLg.theme);
+        $('#tdDateStart').text(kLg.exDateRangeStart);
+        $('#tdDateEnd').text(kLg.exDateRangeEnd);
+        $('#tdName').text(kLg.exName);
+        $('#tdBegin').text(kLg.exBegin);
+        $('#tdEnd').text(kLg.exEnd);
+        $('#tdResponsible').text(kLg.exResponsible);
+        $('#tdInvolvedpeople').text(kLg.labelPeopleInvolved);
+        $('#tdStackholder').text(vmCommon.SubmarketTitle ? vmCommon.SubmarketTitle : kLg.titleStackholderGroups);
+        $('#tdJourney').text(kLg.vtextCustomerJourney);
+        $('#tdInstrument').text(kLg.menuInstrument);   
+
+        $('#tdAdvertising').text(kLg.lblNameAdvertisingMaterials);
+        $('#tdAdvertiser').text(kLg.lblNameAdvertiser);
+
+        $('#tdSubjetThema').text(kLg.lblNameSubjetThema);
+        $('#tdCategory').text(kLg.exCategory);
+        $('#tdStatus').text(kLg.exStatus);
+        $('#tdField').text(kLg.gaLblField);
+        $('#tdExCost').text(kLg.exExCost);
+        $('#tdAcCost').text(kLg.exAcCost);
+        $('#tdBudget').text(kLg.exBudget);
+        $('#tdDescription').text(kLg.labelDes);        
+        $('#tdEffect').text(kLg.labelEstimate);
+        $('#tdArrived').text(kLg.labelArrived);
+        $('#tdGoalEvaluation').text(kLg.labelEvaluation);
+        $('#tdDiagram').text(kLg.showDiagram);
+        $('#thaShowOption').text(kLg.showOption);
+        $('#lblPreview').text(kLg.lblLinkPreview + ":");
+    }
+
+    function cloneFieldHeader() {
+        var $fieldHead, height;
+        var arrW = [], i = 0, len;
+        var $fieldHeadClone, left;
+        if ($('#divField').width() > 109) {
+            $fieldHead = $('#divField #calendar-field-a #table-field.field-table.table-calendar');
+            $fieldHead.find('thead').children('tr').last().children('td').each(function () {
+                if ($(this).css('display') != 'none')
+                    arrW.push($(this).width());
+            });
+            $fieldHeadClone = $fieldHead.clone();
+            $fieldHeadClone.attr('id', '');
+            $('#divExportSetting .export-right').append($fieldHeadClone);
+            $fieldHeadClone.addClass('table-field_freezed');
+            if ($fieldHeadClone.find('#colume-name-id').length)
+                $fieldHeadClone.find('#colume-name-id').attr('id', '');
+
+            i = 0, len = arrW.length;
+            $fieldHeadClone.find('thead').children('tr').last().children('td').each(function () {
+                if ($(this).css('display') != 'none') {
+                    var w = i < len ? arrW[i] : '';
+                    $(this).css({ 'min-width': `${w}px`, 'max-width': `${w}px`, 'width': `${w}px` });
+                    i++;
+                } else {
+                    $(this).remove();
+                }
+            });
+            $fieldHeadClone.find('tbody').remove();
+            $fieldHeadClone.find('tr#trWhiteField').remove();
+            height = $fieldHeadClone.find('thead').height();
+            $fieldHeadClone.css('height', height);
+            left = $fieldHeadClone.outerWidth();
+        }
+        
+        if ($('#divTime #calendar-time-a').css('display') == 'none') {
+            $fieldHeadClone.find('.dnb-column_head-field').remove();
+            return $('#divExportSetting .export-right .table-field_freezed');
+        }            
+
+        (left == undefined) && (left = 97);
+        $fieldHead = $('#divTime #calendar-time-a #table-time.field-table.table-calendar');
+        arrW = [];
+        $fieldHead.find('thead').children('tr[rtype="day"]').children('td').each(function () {
+            arrW.push($(this).width());
+        });
+        $fieldHeadClone = $fieldHead.clone();
+        $fieldHeadClone.attr('id', '');
+        $('#divExportSetting .export-right').append($fieldHeadClone);
+        $fieldHeadClone.addClass('table-field_freezed');
+        i = 0; len = arrW.length;
+        $fieldHeadClone.find('thead').children('tr[rtype="day"]').children('td').each(function () {
+            var w = i < len ? arrW[i] : '';
+            $(this).css({ 'min-width': `${w}px`, 'max-width': `${w}px`, 'width': `${w}px` });
+            i++;
+        });
+        $fieldHeadClone.find('tbody').remove();
+        $fieldHeadClone.find('tr#bnnTr').remove();
+        $fieldHeadClone.css({ 'height': height, 'left': `${left - 1}px` });
+        $fieldHeadClone.find('.dnb-column_head-field').remove();
+        return $('#divExportSetting .export-right .table-field_freezed');
+    }
+    function freezedFieldHeader(scrollTop) {
+        const $divLogo = $('#popexportmix #divLogo');
+        const h = $divLogo.length > 0 ? $divLogo.height() + 51 : 51;
+        if (scrollTop > h) {
+            var $fieldHeadFreezed = $('#divExportSetting .export-right .table-field_freezed');
+            if ($fieldHeadFreezed.length < 1) {    // clone
+                $fieldHeadFreezed = cloneFieldHeader();
+            } else if ($('.master-row.dnb-table_field').length > 0) {
+                $('.master-row.dnb-table_field').each(function () {
+                    const _offT1 = $(this).offset().top;
+                    const deltaY = _offT1 - $fieldHeadFreezed.offset().top;
+
+                    if (-21 < deltaY && deltaY < 48) {
+                        const mTitle = $(this).find('.mastertitle').text();
+                        const $headF = $fieldHeadFreezed.first().find('td').first().find('.header-first');
+                        var $aTitle;
+                        $headF.find('.mastertitle').each(function () {
+                            if ($(this).text() == mTitle) {
+                                $aTitle = $(this);
+                            }
+                        });
+                        //console.log($aTitle)
+                        if ($aTitle && $aTitle.length > 0) {
+                            $headF.find('.mastertitle').hide();
+                            $aTitle.show();
+                        } else {
+                            $headF.append(`<span class="mastertitle" style="max-height: 41px;overflow: hidden;display: inline-block;line-height: 1">${mTitle}</span>`);
+                            $headF.children().hide();
+                            $headF.find('.mastertitle').last().show();
+                        }
+                    } else if (48 < deltaY && deltaY < 102) {
+                        const mTitle = $(this).find('.mastertitle').text();
+                        const $headF = $fieldHeadFreezed.first().find('td').first().find('.header-first');
+                        var $aTitle;
+                        $headF.find('.mastertitle').each(function () {
+                            if ($(this).text() == mTitle) {
+                                $aTitle = $(this);
+                            }
+                        });
+                        if ($aTitle && $aTitle.length > 0) {
+                            $aTitle.remove();
+                        }
+                        if ($headF.find('.mastertitle').length < 1)
+                            $headF.children().show();
+                        $headF.find('.mastertitle').last().show();
+                    }
+                });
+            }
+            $fieldHeadFreezed.css('top', `${scrollTop}px`);
+            const $divField = $('#popexportmix .dnb-freezed_col_head-less_than_5');
+            if ($divField.length > 0) {
+                const $fHeadF1 = $fieldHeadFreezed.first();
+                $fHeadF1.addClass('dnb-has_col_head-less_5');
+                const _left = $divField.css('left');
+                $fHeadF1.css({ 'left': _left, 'z-index' : 6});
+            }
+        } else if (scrollTop < h - 3) {
+            const $fieldHeadFreezed = $('#divExportSetting .export-right .table-field_freezed');
+            if ($fieldHeadFreezed.length > 0) {
+                $fieldHeadFreezed.remove();
+            }
+        }
+    }
+    function checkAndFreezedHead(scrollLeft) {
+        if (scrollLeft > 354) {
+            const tColVisible = $('#popexportmix .dnb-column_head-field').first().children().length - $('#popexportmix .dnb-column_head-field').first().children().not(":visible").length;
+            if ($('#popexportmix .table-field_freezed .dnb-column_head-field').width() / $('#popexportmix').width() > 0.75) {   // view > 75%
+
+            }
+
+            if (tColVisible < 5) {
+                const _h = $('#popexportmix #calendar-split-view-a').height();
+                const $divField = $('#popexportmix #divField');
+                $divField.addClass('dnb-freezed_col_head-less_than_5');
+
+                const _left = scrollLeft - 354;
+                const _top = $('#popexportmix #divTime').offset().top - $('#popexportmix #calendar-split-view-a').offset().top;
+                $divField.css({ 'left': `${_left}px`, 'top': `${_top}px` });
+                $('#popexportmix .dnb-has_col_head-less_5').css({ 'left': `${_left}px` });
+                $('#popexportmix #divTime').css({ 'margin-left': `${$divField.width()}px` });
+                $('#popexportmix #calendar-split-view-a').css({ 'min-height': _h })
+            }
+        } else {
+            const $divField = $('#popexportmix .dnb-freezed_col_head-less_than_5');
+            if ($divField.length > 0) {
+                $divField.removeClass('dnb-freezed_col_head-less_than_5');
+                $divField.css({ 'left': '', 'top': '' });
+                $('#popexportmix #divTime').css({ 'margin-left': '' });
+                
+                $('#popexportmix .dnb-has_col_head-less_5').css({ 'left': '', 'z-index': '' });
+                $('#popexportmix .dnb-has_col_head-less_5').removeClass('dnb-has_col_head-less_5');
+            }
+        }
+    }
+    $(document).ready(function () {
+        vmCalendar.isShow4Column = true;
+        vmCalendar.isPreview = true;
+        vmCalendar.isTitleMaster = vmCalendar.hasLogo;
+
+        vmExport.VBDStartDay = new Date(vmCommon.deepCopy(vmCalendar.VBDStartDay));
+
+        vmCalendar.AdjustPopupHeight();
+        
+        vmExport.DataCalendar = vmCommon.deepCopy(vmCalendar.DataCalendar);
+        vmExport.DataCalendar.CalendarObjectMainGoals = vmExport.DataCalendar.CalendarObjectMainGoals.filter(t => !t.IsOverView);
+
+        vmExport.isValid = true;
+        
+        setPreviewVariables();
+        updateVmCalendarStartDate();
+        bindLanguageSetting();
+        bindTemplate('calendar-field-a', 'template-field-table', vmExport.DataCalendar);
+        bindTemplate('calendar-time-a', 'template-time-table', vmExport.DataCalendar);
+
+        $('#calendar-time-a table thead').css('visibility', 'visible');
+        $('#calendar-field-a table thead').css('visibility', 'visible');
+        $('#calendar-time-a #table-time thead tr td div#navi-place').hide();
+        
+        if (vmCalendar.TimelineView === vmCalendar.EnumItems.ViewByDay) {            
+            $('#calendar-field-a #table-field thead tr#trWhiteField').css("height", "23px");
+            $('#calendar-field-a #table-field thead tr#trWhiteField').next().css("height", "75px");
+            $('#calendar-time-a #table-time thead tr#bnnTr').css("height", "23px");
+        } else {
+            $('#calendar-field-a #table-field thead tr#trWhiteField').css("height", "20px");
+            $('#calendar-time-a #table-time thead tr#bnnTr').css("height", "20px");
+        }
+        
+        vmCalendar.bindSavedPositionExport();
+        $('div#calendar-field-a table#table-field tbody tr.calendar-path-row-field td:first-child').attr('style', 'overflow: hidden;');
+        $('div#calendar-field-a table#table-field-show thead tr td div.goal-popover').attr('style', 'display: none');
+
+        widthPathStart = $('#calendar-split-view-a .pathName span:first').width();
+        widthPathOld = $('#calendar-split-view-a .pathName').width();
+
+        //Fix IE display
+        if (vmCommon.getCurrentBrowser() === "IE" || vmCommon.getCurrentBrowser() === "Edge" || vmCommon.getCurrentBrowser() === "FireFox") {
+            $('.face-table').height(70);
+        }
+
+        adjustTotalLabelPosition();
+        setFirstLoader();
+        try {
+            vmExport.GetTheme().then(function () {
+                loadSettings();
+                //setFirstLoader();
+            });
+        } catch (e) {
+            console.log(e);
+        }
+
+        reSetPath();
+
+        $('#popexportmix').on('scroll', function () {
+            freezedFieldHeader($(this).scrollTop());
+            checkAndFreezedHead($(this).scrollLeft());
+        });
+    });
+
+    function changeTheme() {
+        var themeSelectedHref = "../MarketingMixTheme/" + exportSetting.themeSelected + ".css";
+        var themeNewHref = "../MarketingMixTheme/" + $("#sltTheme option:selected").text() + ".css";
+        $('link[href=\"' + themeSelectedHref + '\"]').remove();
+        $('head').append('<link href=\"' + themeNewHref + '\" rel="stylesheet" />');
+        exportSetting.themeSelected = $("#sltTheme option:selected").text();
+
+        setFirstLoader();
+    }
+
+    function changeScale(paperSize, orientation) {
+        var lengthTableFull = $('.dnb_calendar-split-view-a_cache').width();
+        const paddingLR = 2; //cm
+        switch (true) {
+            case (paperSize === "A1" && orientation === kLg.landscape): // w = 84.1 cm;
+                return (getCmToPx(84.1 - paddingLR) / lengthTableFull);     //return (2327.2272 / lengthTableFull);       // 2383.92
+            case (paperSize === "A1" && orientation === kLg.portrait):  // w = 59.4 cm;
+                return (getCmToPx(59.4 - paddingLR) / lengthTableFull);     //return (1627.3872 / lengthTableFull);       // 1683.792
+            case (paperSize === "A2" && orientation === kLg.landscape): // w = 59.4 cm;
+                return (getCmToPx(59.4 - paddingLR) / lengthTableFull);     //return (1627.3872 / lengthTableFull);       // 1683.792
+            case (paperSize === "A2" && orientation === kLg.portrait):  // w = 42 cm;
+                return (getCmToPx(42 - paddingLR) / lengthTableFull);       //return (1134.1872 / lengthTableFull);       // 1190.52
+            case (paperSize === "A3" && orientation === kLg.landscape): // w = 42 cm;
+                return (getCmToPx(42 - orientation) / lengthTableFull);     //return (1134.1872 / lengthTableFull);       // 1190.52
+            case (paperSize === "A3" && orientation === kLg.portrait):  // w = 29.7 cm;
+                return (getCmToPx(29.7 - paddingLR) / lengthTableFull);     //return (784.9872 / lengthTableFull);        // 841.896
+            case (paperSize === "A4" && orientation === kLg.landscape): // w = 29.7 cm;
+                return (getCmToPx(29.7 - paddingLR) / lengthTableFull);     //return (784.9872 / lengthTableFull);        // 841.896
+            case (paperSize === "A4" && orientation === kLg.portrait):  // w = 21 cm;
+                return (getCmToPx(21 - paddingLR) / lengthTableFull);       //return (538.7472 / lengthTableFull);        // 595.296
+            default:
+                return 1;
+        }
+    }
+    
+    function exportToPDF() {
+        var colCount = 0;
+        $('#calendar-split-view-a #table-time > thead > tr:nth-child(2) td').each(function () {
+            if ($(this).attr('colspan')) {
+                colCount += +$(this).attr('colspan');
+            } else {
+                colCount++;
+            }
+        });
+        $('#calendar-split-view-a #table-time tr#bnnTr td').attr("colspan", colCount);
+        $('#calendar-split-view-a #table-time tbody tr.calendar-path-row-field td').attr("colspan", colCount);
+        if (vmExport.isValid) {
+            const _scale = changeScale(exportSetting.paperSize, exportSetting.orientation);
+            const optionPdf = {
+                allPages: true,
+                avoidLinks: true,
+                paperSize: exportSetting.paperSize,
+                margin: { top: "2cm", left: "1cm", right: "1cm", bottom: "2cm" },
+                landscape: true,
+                scale: _scale
+            };
+            
+            var element = $("#calendar-split-view-a");
+           
+            if (!$('#btnExport').hasClass("bg-disable")) {
+                var defaultOddCell = $("#calendar-split-view-a .oddCell").css('background-color');
+                var defaultEvenCell = $("#calendar-split-view-a .evenCell").css('background-color');
+
+                $("#calendar-split-view-a .oddCell, #calendar-split-view-a .evenCell").css({ 'background-color': 'transparent' });
+
+                if (exportSetting.paperSize === kLg.AutoSize) {
+                    delete optionPdf.paperSize;
+                    delete optionPdf.scale;
+
+                    kendo.drawing.drawDOM(element, optionPdf).then(function (group) {
+                        savePdfFileAndResetCell(group, defaultOddCell, defaultEvenCell);
+                    });
+                }
+                else if (exportSetting.orientation === kLg.landscape) {
+                    const $element = cloneAndModifyDOM(element);
+                    optionPdf.scale -= 0.015;
+                    optionPdf.forcePageBreak = '.dnb_pdf_page-break';
+
+                    kendo.drawing.drawDOM($element, optionPdf).then(function (group) {
+                        savePdfFileAndResetCell(group, defaultOddCell, defaultEvenCell);
+                    });
+                }
+                else if (exportSetting.orientation === kLg.portrait) {
+                    const $element = cloneAndModifyDOM(element);
+                    optionPdf.landscape = false;
+                    optionPdf.forcePageBreak = '.dnb_pdf_page-break';
+                    kendo.drawing.drawDOM($element, optionPdf).then(function (group) {
+                        savePdfFileAndResetCell(group, defaultOddCell, defaultEvenCell);
+                    });
+                }
+                function cloneAndModifyDOM($element) {
+                    $('#dnb_calendar-split-view-a_cache').html('');
+                    var indexToField = -1, indexToTime = -1;
+
+                    var height1Paper = getHeightPx(exportSetting.paperSize, exportSetting.orientation, _scale);
+                    var pageNum = $element.height() / height1Paper;
+                    pageNum = Math.ceil(pageNum);
+
+                    var hasNextPage = false;
+                    var count = 0;
+                    do {
+                        hasNextPage = caculateTableWith(height1Paper);
+                        count += 1;
+                    } while (hasNextPage || count < pageNum + 2)
+                    
+                    removeEmptyBody();
+                    
+                    $('#dnb_calendar-split-view-a_cache').find('.dnb_calendar-split-view-a_cache').each(function () {
+                        const leftViewW = $(this).find('.dnb_c-export_left-slide').outerWidth();
+                        const rightViewW = $(this).find('.dnb_c-export_right-side').outerWidth();
+                        $(this).css({ 'width': `${leftViewW + rightViewW + 50}px` });
+                    });
+                    $('#dnb_calendar-split-view-a_cache').find('.dnb_calendar-split-view-a_cache.dnb-c_export-view').each(function () {
+                        if ($(this).height() < 1) $(this).remove();
+                    })
+                    
+                    return $('#dnb_calendar-split-view-a_cache');
+
+                    function getHeightPx(paperSize, orientation, scale) {
+                        const paddingTD = 4;//cm (top = 2cm, down = 2cm)
+                        let cmToPx = 0;
+                        switch (true) {
+                            case (paperSize === "A1" && orientation === kLg.landscape):
+                                cmToPx = getCmToPx(59.4 - paddingTD);
+                            case (paperSize === "A1" && orientation === kLg.portrait):
+                                cmToPx = getCmToPx(84.1 - paddingTD);
+                            case (paperSize === "A2" && orientation === kLg.landscape):
+                                cmToPx = getCmToPx(42 - paddingTD);
+                            case (paperSize === "A2" && orientation === kLg.portrait):
+                                cmToPx = getCmToPx(59.4 - paddingTD);
+                            case (paperSize === "A3" && orientation === kLg.landscape):
+                                cmToPx = getCmToPx(29.7 - paddingTD);
+                            case (paperSize === "A3" && orientation === kLg.portrait):
+                                cmToPx = getCmToPx(42 - paddingTD);
+                            case (paperSize === "A4" && orientation === kLg.landscape):
+                                cmToPx = getCmToPx(21 - paddingTD);
+                            case (paperSize === "A4" && orientation === kLg.portrait):
+                                cmToPx = getCmToPx(29.7 - paddingTD);
+                            default:
+                                cmToPx = getCmToPx(21 - paddingTD);
+                        }
+                        const times = cmToPx / scale;
+                        return Math.floor(times);
+                    }
+
+                    function caculateTableWith(height_1Paper) {
+                        var $sourceDOM = $element.clone();
+                        const $elementC = $('#dnb_calendar-split-view-a_cache');
+                        $elementC.append($sourceDOM);
+                        if ($elementC.find('#imgLogo').length > 0) {      // Khog remove thi se bi loi export pdf khi chọn khổ giấy
+                            if (!$elementC.find('#imgLogo').attr('src'))
+                                $elementC.find('#imgLogo').remove();
+                        }
+                        $('#dnb_calendar-split-view-a_cache #divField').addClass('dnb_c-export_left-slide');
+                        $('#dnb_calendar-split-view-a_cache #divTime').addClass('dnb_c-export_right-side');
+
+                        var hasNextP = false;
+                        const logoHeight = $('#dnb_calendar-split-view-a_cache #divLogo').height();
+                        var $tableFieldHeader = $('#dnb_calendar-split-view-a_cache #table-field > thead');
+                        $tableFieldHeader.addClass('dnb_head_table-field');
+                        var tblFieldHeadH = $tableFieldHeader.height();
+                        var $tableFieldBody = $('#dnb_calendar-split-view-a_cache #table-field > tbody');
+                        //const ttHeight = $('#dnb_calendar-split-view-a_cache #table-time-show').height();
+                        const $tableTimeHeader = $('#dnb_calendar-split-view-a_cache #table-time > thead');
+                        $tableTimeHeader.css('height', tblFieldHeadH + 'px');
+                        $tableTimeHeader.addClass('dnb_head_table-time');
+
+                        var $tableTimeBody = $('#dnb_calendar-split-view-a_cache #table-time > tbody');
+
+                        $tableFieldBody.find('tr').each(function (index) {
+                            if (index <= indexToField) {
+                                $(this).remove();
+                            }
+                        })
+                        $tableTimeBody.find('tr').each(function (index) {
+                            if (index <= indexToTime) {
+                                $(this).remove();
+                            }
+                        })
+
+                        $tableFieldBody = $('#dnb_calendar-split-view-a_cache #table-field > tbody');
+                        $tableTimeBody = $('#dnb_calendar-split-view-a_cache #table-time > tbody');
+
+                        let maxIndexF = 0;
+                        var h = logoHeight + ($tableFieldHeader.length > 0 ? $tableFieldHeader.height() : 0);
+                        $tableFieldBody.find('tr').each(function (index) {
+                            if (h < height_1Paper) {
+                                h += $(this).height();
+                                $(this).removeAttr('id');
+                                maxIndexF = index;
+                            } else {
+                                $(this).remove();
+                                hasNextP = true;
+                            }
+                        })
+                        const txtField = $tableFieldBody.text().trim();
+
+                        let maxIndexT = 0;
+                        $tableTimeBody.find('tr').each(function (index) {
+                            if (index <= maxIndexF) {
+                                $(this).removeAttr('id');
+                                maxIndexT = index;
+                            } else {
+                                $(this).remove();
+                                hasNextP = true;
+                            }
+                            $(this).find('td').css('padding-left', '0');
+                        })
+
+                        indexToField += (maxIndexF + 1);
+                        indexToTime += (maxIndexT + 1);
+
+                        if (txtField == '') {
+                            $tableFieldHeader.remove();
+                            $tableFieldBody.remove();
+                            $tableTimeHeader.remove();
+                            $tableTimeBody.remove();
+                        }
+                        $sourceDOM.children().each(function () {            // xóa bỏ những table có body trống 
+                            if ($(this).children().length < 1 && $(this).height() < 1) $(this).remove();
+                        });
+                        
+                        if (count > 0) $sourceDOM.addClass('dnb_pdf_page-break');
+
+                        $('#dnb_calendar-split-view-a_cache #table-time').removeAttr('id');
+                        $('#dnb_calendar-split-view-a_cache #table-time-show').removeAttr('id');
+                        $('#dnb_calendar-split-view-a_cache #calendar-time-a').removeAttr('id');
+                        $('#dnb_calendar-split-view-a_cache #divTime').removeAttr('id');
+                        $('#dnb_calendar-split-view-a_cache #table-field').removeAttr('id');
+                        $('#dnb_calendar-split-view-a_cache #table-field-show').removeAttr('id');
+                        $('#dnb_calendar-split-view-a_cache #calendar-field-a').removeAttr('id');
+                        $('#dnb_calendar-split-view-a_cache #divField').removeAttr('id');
+                        $('#dnb_calendar-split-view-a_cache #divLogo').removeAttr('id');
+                        $('#dnb_calendar-split-view-a_cache #calendar-split-view-a').removeAttr('id');
+                        
+                        return hasNextP;
+                    }
+                    function removeEmptyBody() {
+                        $('#dnb_calendar-split-view-a_cache .dnb_c-export_left-slide .field-table.table-calendar tbody').each(function () {
+                            if ($(this).html().trim() == '') {
+                                $(this).closest('.dnb-c_export-view').remove();
+                            }
+                        })
+                    }
+                }
+            }
+        }
+    };
+
+    function savePdfFileAndResetCell(group, defaultOddCell, defaultEvenCell) {
+        kendo.drawing.pdf.saveAs(group, "MarketingMix.pdf", "../api/imagebrowser/savefile");
+        $("#calendar-split-view-a .oddCell").css({ 'background-color': defaultOddCell });
+        $("#calendar-split-view-a .evenCell").css({ 'background-color': defaultEvenCell });
+        $('#dnb_calendar-split-view-a_cache').html('');
+    }
+
+    function rebindAfterExport() {
+        var startDate = $('#txtStartDateEx').data("kendoDatePicker").value();
+        var endDate = $('#txtEndDateEx').data("kendoDatePicker").value();
+
+        if (startDate === null && endDate === null) {
+            return;
+        }
+
+        var start, end;
+        if (startDate) {
+            start = { Year: startDate.getFullYear(), Month: startDate.getMonth() + 1, Date: startDate.getDate() };
+            if (endDate)
+                end = { Year: endDate.getFullYear(), Month: endDate.getMonth() + 1, Date: endDate.getDate() };
+        }
+        else if (endDate) {
+            start = { Year: endDate.getFullYear(), Month: endDate.getMonth() + 1, Date: endDate.getDate() };
+        }
+
+
+        vmExport.timelineScrollToDateExport(start, end);
+        setFirstLoader();
+    }
+
+    function rgb2hex(rgb) {
+        if (rgb === undefined) {
+            return "";
+        } else {
+            rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+            function hex(x) {
+                return ("0" + parseInt(x).toString(16)).slice(-2);
+            }
+            return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+        }
+    }
+
+    function cusCss(id, func) {
+        if ($(id)) { return func($(id)); }
+        return "";
+    }
+
+    function getCssThemeForExcel() {
+        //???
+        var css1 = cusCss('#calendar-field-a #table-field thead:first tr:eq(1) td:first', function (elm) { return rgb2hex(elm.css('background-color')); });
+        var css2 = cusCss('#calendar-field-a #table-field thead:first tr:eq(1) td:first', function (elm) { return rgb2hex(elm.css('color')); });
+        var css3 = cusCss('#calendar-split-view-a .calendar-maingoal-row-field', function (elm) { return rgb2hex(elm.css('background-color')); });
+
+        var css9 = (cusCss('#calendar-split-view-a .calendar-maingoal-row-field', function (elm) { return elm.css('font-weight'); }) || "").toLowerCase().indexOf("bold") > -1;
+        var css10 = (cusCss('#calendar-split-view-a .calendar-path-row-field', function (elm) { return elm.css("font-weight"); }) || "").toLowerCase().indexOf("bold") > -1;
+
+        var css11 = (cusCss('#calendar-split-view-a', function (elm) { return elm.css("font-family"); }) || "");
+
+        //master-path: font-size
+        var css12 = cusCss("#calendar-split-view-a .calendar-path-row-field .master-path", function (elm) { return elm != undefined && elm.css('font-size') != undefined ? elm.css('font-size').replace('px', '') : ''; });
+        var css13 = cusCss("#calendar-split-view-a .calendar-path-row-field .master-budget", function (elm) { return elm != undefined && elm.css('font-size') != undefined ? elm.css('font-size').replace('px', '') : ''; });
+
+        var css4 = cusCss('#calendar-split-view-a .calendar-path-row-field', function (elm) { return rgb2hex(elm.css('color')); });
+        var css5 = cusCss('#calendar-split-view-a .calendar-path-row-field', function (elm) { return elm != undefined && elm.css('font-size') != undefined ? elm.css('font-size').replace('px', '') : ''; });
+        var css6 = cusCss('#calendar-split-view-a .table-calendar tbody', function (elm) { return elm.css('font-size').replace('px', ''); });
+        var cssFontColor = cusCss('#calendar-split-view-a .table-calendar tbody', function (elm) { return rgb2hex(elm.css('color')); });
+
+        var css7 = cusCss('#testtheme .goal-type', function (elm) { return rgb2hex(elm.css('background-color')); });
+        var css8 = cusCss('#testtheme .overEnd', function (elm) { return rgb2hex(elm.css('background-color')); });
+        var cssFontColorFinish = cusCss('#testtheme .goal-action-finish', function (elm) { return rgb2hex(elm.css('color')); });
+
+        return { header: css1, headerColor: css2, maingoalColor: css3, pathColor: css4, pathFont: css5, textFont: css6, goalTypeColor: css7, overEndColor: css8, textFontColor: cssFontColor, textFontColorFinish: cssFontColorFinish, mainBold: css9, pathBold: css10, parentFont: css11, masterPathFontSize: css12, masterBudgetFontSize: css13}
+    } 
+
+    vmExport.getField4ExcelReport = function () {
+        var columns = vmCalendar.DbPosition[vmCommon.DbPositionType.MarketingMix] || vmCalendar.defaultHeaderPosition;
+        var except4Column = vmCalendar.isShow4Column ? [] : [15, 16, 17, 18];
+        var rs = [];
+
+        for (var i = 0; i < columns.length; i++) {
+            var col = columns[i];
+            if (except4Column.indexOf(col) >= 0) continue;
+
+            if ((col == 0 && exportSetting.columns.name) || (col == 1 && exportSetting.columns.begin) || (col == 2 && exportSetting.columns.end) || (col == 3 && exportSetting.columns.responsible)
+                || (col == 4 && exportSetting.columns.involvedpeople) || (col == 5 && exportSetting.columns.stackholder) || (col == 18 && exportSetting.columns.customerjourney) || (col == 6 && exportSetting.columns.instrument) || (col == 19 && exportSetting.columns.advertising) || (col == 20 && exportSetting.columns.advertiser)
+                || (col == 7 && exportSetting.columns.subjetthema)
+                || (col == 8 && exportSetting.columns.category) || (col == 9 && exportSetting.columns.status) || (col == 10 && exportSetting.columns.field) || (col == 11 && exportSetting.columns.exCost)
+                || (col == 12 && exportSetting.columns.acCost) || (col == 13 && exportSetting.columns.budget) || (col == 14 && exportSetting.columns.description) || (col == 15 && exportSetting.columns.effect)
+                || (col == 16 && exportSetting.columns.arrived) || (col == 17 && exportSetting.columns.evaluation))
+            {
+                rs.push(col);
+            }
+                
+        }
+
+        return rs.unique();
+        //for (var i = 0; i < 18; i++) {
+        //    if (except4Column.indexOf(i) >= 0) continue;
+        //    if (columns.indexOf(i) == -1) columns.push(i);
+        //}
+
+        //return columns;
+    };
+
+    function exportToExcel() {
+        if (vmExport.isValid) {
+            var option = getCssThemeForExcel();
+
+            var faceHead = $("#calendar-split-view-a #table-field thead:first tr:eq(1) td:visible");
+            var lst = [];
+
+            for (var i = 0; i < faceHead.length; i++) {
+                lst.push(Number($(faceHead[i]).attr("colId")));
+            }
+            //inject  submastername
+            for (var i = 0; i < vmExport.DataCalendar.CalendarObjectMainGoals.length; i++) {
+                var item = vmExport.DataCalendar.CalendarObjectMainGoals[i];
+                if (!item.SubMasterName || item.SubMasterName == null || item.SubMasterName.length == 0) {
+                    item.SubMasterName = kLg.titleFilterDept;
+                }
+            }
+            //end
+            option = $.extend(option, { IsMainGoal: vmCalendar.mg8270IsChecked == undefined ? true : vmCalendar.mg8270IsChecked, IsSubGoal: vmCalendar.sg8270IsChecked == undefined ? true : vmCalendar.sg8270IsChecked, IsAction: vmCalendar.ac8270IsChecked == undefined ? true : vmCalendar.ac8270IsChecked });
+            vmCalendar.exportService.exportFile(
+            {
+                FieldData: vmExport.DataCalendar.CalendarObjectMainGoals,
+                TimeData: vmExport.CreateTimeDataExport(),
+                Headers: vmExport.getField4ExcelReport(),
+            },
+                option,
+                vmCalendar.TimelineView
+            );
+        }
+    };
+
+    function exportFormPU(e) {
+        var isShow = $("#previewOpt").is(":visible");
+
+        if (exportSetting.exportPdf || exportSetting.exportExcel || (isShow && exportSetting.IsLinkPreview))
+            saveSettings();
+        if (exportSetting.exportPdf && !exportSetting.exportExcel) {
+            exportToPDF();
+        }
+        else if (!exportSetting.exportPdf && exportSetting.exportExcel) {
+            exportToExcel();
+        }
+        else if (exportSetting.exportPdf && exportSetting.exportExcel) {
+            setTimeout(function () {
+                exportToPDF();
+                setTimeout(function () {
+                    exportToExcel();
+                }, 100);
+            }, 1000);
+        }
+
+        if (isShow && exportSetting.IsLinkPreview && exportSetting.PreviewLink) {
+            openPopupLinkSharepoint(e);
+
+        }
+    }
+
+    function openPopupLinkSharepoint(target) {
+        var linkSharepoint = msFilter.getLinkSharepoint();
+        
+        var entry = linkSharepoint.fromMix(vmCalendar.TimelineView);
+        var checkDuplicate = checkDuplicateLS();
+                
+        if (checkDuplicate.IsDuplicate) {
+            var item = checkDuplicate.Item;
+
+            vmCommon.getLinkSharepoint().editService().updateExportTime(item);
+
+            window.open(item.Link, '_blank');
+            //ShowToolTip2($(target), kLg.msgUsingKpiFormat.format('Link'), 'top');
+            
+        } else
+            popName(kLg.linksName).then(function ok () {
+                var nameLink = popName.Data;
+                entry = modifyEntry(nameLink);
+                entry.FilterQuery = msFilter.controlService.getQueryFilter();
+           
+                vmCommon.getLinkSharepoint().editService().add(entry, function (data) {
+                    var newDatas = data.value.TheObject;
+                    exportSetting.LinkSharepoints = vmCommon.getLinkSharepoint().getItems(newDatas, true);
+
+                    vmExport.IsDateRangeChange = false;
+                    msFilter.controlService.getCurrentModel().resetCheckChange();
+
+                    var previewLink = data.value.Message;
+                    window.open(previewLink, '_blank');
+                });
+
+                return;     // close popup
+            }, function cancelOrClose() {
+                    return;
+            });
+
+        function modifyEntry(nameLink) {
+            entry.OptionColumn = JSON.stringify(entry.OptionColumn);        // convert to string
+
+            entry.Name = nameLink;
+            entry.IsActive = true;
+            entry.CreatedDate = new Date();
+            
+            return entry;
+        }
+
+        function checkDuplicateLS() {
+            if (typeof exportSetting == 'object') {
+                var filterHaschange = msFilter.controlService.getCurrentModel().hasChange();
+                if (filterHaschange || vmExport.IsDateRangeChange) {
+
+                    return { IsDuplicate: false };
+                }
+
+                return vmCommon.getLinkSharepoint().checkDuplicateWithOptions(
+                    exportSetting.LinkSharepoints,
+                    { Start: entry.StartDate, End: entry.EndDate },
+                    entry.OptionColumn,
+                    vmCalendar.TimelineView
+                );
+            }
+            return { IsDuplicate: false};
+        }
+
+    }
+
+    vmCalendar.popExportMix.bind("close", function (e) {
+        vmCalendar.VBDEndDay = null;
+        vmCalendar.VBDStartDay = new Date(vmCommon.deepCopy(vmExport.VBDStartDay));//vmExport.VBDStartDay ? (typeof vmExport.VBDStartDay == "string" ? new Date(vmExport.VBDStartDay) : vmExport.VBDStartDay) : new Date();
+
+        vmCalendar.isShow4Column = false;
+        vmCalendar.isTitleMaster = false;
+        vmCalendar.isPreview = false;
+        setBackupVariables();
+
+        var themeSelectedHref = "../MarketingMixTheme/" + exportSetting.themeSelected + ".css";
+        $('link[href=\"' + themeSelectedHref + '\"]').remove();
+        $('head').append('<link href="../MarketingMixTheme/DefaultTheme.css" rel="stylesheet" />');
+
+        setTimeout(function () {
+            if (msFilter.controlService.isHasRedirect()) {
+                vmCalendar.setTimeRange(vmCalendar.VBDStartDay, null);
+            } else {
+                var sD = vmCalendar.VBDStartDay;
+                vmCalendar.timelineScrollToDate({ Year: sD.getFullYear(), Month: sD.getMonth(), Date: sD.getDate() });
+            }
+        }, 100);
+    });
+
+    function closePopupExport() {
+        //var themeSelectedHref = "../MarketingMixTheme/" + exportSetting.themeSelected + ".css";
+        //$('link[href=\"' + themeSelectedHref + '\"]').remove();
+        //$('head').append('<link href="../MarketingMixTheme/DefaultTheme.css" rel="stylesheet" />');
+        vmCalendar.popExportMix.close();
+    }
+
+    function updateVmCalendarStartDate() {
+        vmExport.DataCalendar.TimeLine = vmCalendar.CreateTimeLineArray(vmCalendar.StartDate);
+    }
+
+    function monthDiff(d1, d2) {
+        if (!(d1 instanceof Date) || !(d2 instanceof Date) || d1.getTime() > d2.getTime()) return 0;
+
+        return ((d2.getFullYear() - d1.getFullYear())) * 12 + (d2.getMonth() - d1.getMonth()) + 1;
+    }
+
+    function monthAdds(d, n) {
+        if (isNaN(n) || !(d instanceof Date)) return new Date();
+
+        var dt = new Date(d);
+
+        dt.setMonth(dt.getMonth() + n);
+
+        return dt;
+    }
+
+    function setPreviewStartDay() {
+        if (vmExport.storeViewByDay === undefined)
+            vmExport.storeViewByDay = vmCalendar.VBDStartDay;
+
+        var isT1 = $('#txtStartDateEx').val() !== "" && startDateValue() != null;
+        var isT2 = $('#txtEndDateEx').val() !== "" && endDateValue() != null;
+        var t1, t2;
+
+        switch (true) {
+            case isT1 && isT2:
+            case isT1 && !isT2:
+                t1 = startDateValue();
+                vmCalendar.VBDStartDay = t1;
+
+                if (isT2) {
+                    t2 = endDateValue();
+                    vmCalendar.VBDEndDay = t2;
+                }
+                break;
+            case !isT1 && isT2:
+                t2 = endDateValue();
+                if (vmCalendar.TimelineView === vmCalendar.EnumItems.ViewByDay)
+                    vmCalendar.VBDStartDay = t2;
+                else {
+                    var sD = monthAdds(t2, -4);
+                    vmCalendar.StartDate = { Year: sD.getFullYear(), Month: sD.getMonth(), Date: sD.getDate() };
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    function setPreviewVariables() {
+
+        if (vmExport.storeMonthArr === undefined)
+            vmExport.storeMonthArr = vmCalendar.ArrMonthRange;
+        if ($('#txtStartDateEx') != undefined && $('#txtEndDateEx') != undefined) {
+            var isT1 = $('#txtStartDateEx').val() !== "" && (startDateValue() != null);
+            var isT2 = $('#txtEndDateEx').val() !== "" && (endDateValue() != null);
+            switch (true) {
+                case isT1 && isT2:
+                    var t1 = startDateValue();
+                    var t2 = endDateValue();
+                    var months = monthDiff(t1, t2);
+                    setPreview(vmCalendar.TimelineView, months);
+                    break;                    
+                default:
+                    setPreview(vmCalendar.TimelineView, 0);
+                    break;
+            }
+        } else {
+            setPreview(vmCalendar.TimelineView, 0);
+        }
+    }
+
+    function setPreview(type, val) {
+        
+        switch (type) {
+            case vmCalendar.EnumItems.ViewByDay:
+                //vmCalendar.ArrMonthRange = val > 0 ? val : vmCalendar.TimeLineDayRange;
+                if (val > 0) {
+                    vmCalendar.ArrMonthRange = val < 1 ? val : (val > 5 ? 5 : val);
+                } else {
+                    vmCalendar.ArrMonthRange = vmCalendar.TimeLineDayRange < 1 ? vmCalendar.TimeLineDayRange : (vmCalendar.TimeLineDayRange > 5 ? 5 : vmCalendar.TimeLineDayRange);
+                }
+                break;
+            case vmCalendar.EnumItems.ViewByWeek:
+                //vmCalendar.ArrMonthRange = val > 0 ? val : vmCalendar.TimeLineMonthRange;
+                if (val > 0) {
+                    vmCalendar.ArrMonthRange = val < 1 ? val : (val > 24 ? 24 : val);
+                } else {
+                    vmCalendar.ArrMonthRange = vmCalendar.TimeLineMonthRange < 1 ? vmCalendar.TimeLineMonthRange : (vmCalendar.TimeLineMonthRange > 24 ? 24 : vmCalendar.TimeLineMonthRange);
+                }
+                break;
+        }
+    }
+
+    function setBackupVariables() {
+        //backup
+        if (vmExport.storeMonthArr !== undefined)
+            vmCalendar.ArrMonthRange = vmExport.storeMonthArr;
+
+        if (vmExport.storeViewByDay !== undefined)
+            vmCalendar.VBDStartDay = vmExport.storeViewByDay;
+
+        vmCalendar.VBDStartDay = new Date(vmCommon.deepCopy(vmExport.VBDStartDay));
+
+        updateVmCalendarStartDate();
+    }
+
+    function getViewWidth(val) {
+        var tbw = 0;
+        if (vmCalendar.TimelineView === vmCalendar.EnumItems.ViewByDay) {
+            tbw = val * 18;
+        } else {
+            tbw = val * 52;
+        }
+
+        if (tbw > 1320)
+            tbw = 1320;
+
+        return tbw;
+    }
+
+    function calWidthTimelineTable() {
+        var startDate = $('#txtStartDateEx').val() !== "" ? startDateValue() : null;
+        var endDate = $('#txtEndDateEx').val() !== "" ? endDateValue() : null;
+        if (startDate != null && endDate != null) {
+            if (vmCalendar.TimelineView === vmCalendar.EnumItems.ViewByDay) {
+                var oneDay = 1000 * 60 * 60 * 24;//minisec
+                var days = Math.round((endDate.getTime() - startDate.getTime()) / oneDay);
+                return getViewWidth(days);
+            }
+            else
+                return getViewWidth(monthDiff(startDate, endDate));
+        }
+
+        var day = startDate == null && endDate == null
+            ? vmCalendar.VBDStartDay
+            : startDate == null ? endDate : startDate;
+
+        if (vmCalendar.TimelineView === vmCalendar.EnumItems.ViewByDay)
+            return getViewWidth((new Date(day.getFullYear(), day.getMonth(), 0)).getDate() - day.getDate() + 1);
+        else
+            return getViewWidth(vmCalendar.TimeLineMonthRange);
+    }
+
+    function validateCheckbox() {
+        var isShow = $("#previewOpt").is(":visible");
+        exportSetting.exportPdf = $('#chkPDF').is(":checked") === true;
+        exportSetting.exportExcel = $('#chkExcel').is(":checked") === true;
+        exportSetting.IsLinkPreview = $('#chkPreview').is(":checked") === true;
+
+        if (exportSetting.exportPdf || exportSetting.exportExcel || (isShow && exportSetting.IsLinkPreview)) {
+            if ($('#btnExport').hasClass("bg-disable")) {
+                $('#btnExport').removeClass("bg-disable");
+            }
+        } else {
+            if (!$('#btnExport').hasClass("bg-disable")) {
+                $('#btnExport').addClass("bg-disable");
+            }
+        }
+    }
+
+    function setFirstLoader() {
+        var widthDivField = parseInt($('div#calendar-split-view-a #divField').css("width"));
+        $('#calendar-split-view-a').css("width", (widthDivField + 8000) + "px");
+
+        var widthDivTime = parseInt($('div#calendar-split-view-a #divTime').css("width"));
+        $('#calendar-split-view-a').css("width", (widthDivField + ($('div#calendar-split-view-a #divTime').is(":visible") ? widthDivTime + 30 : 0 )) + "px");
+    }
+
+    function getWidthColumn(nameColumn) {
+        if (msFilter.controlService.hasCriteria(mFilter.enumFilter.masterGoal)) {
+            switch (nameColumn) {
+                case 'name':
+                    return 300;
+                case 'begin':
+                    return 82;
+                case 'end':
+                    return 85;
+                case 'responsible':
+                    return 161;
+                case 'instrument':
+                case 'advertising':
+                case 'advertiser':
+                    return 131;
+                case 'subjetthema':
+                    return 131;
+                case 'category':
+                    return 131;
+                case 'status':
+                    return 189;
+                case 'field':
+                    return 139;
+                case 'exCost':
+                    return 126;
+                case 'acCost':
+                    return 126;
+                case 'budget':
+                    return 128;
+
+                case 'description':
+                    return 189;                
+                case 'effect':
+                    return 189;
+                case 'arrived':
+                    return 189;
+                case 'evaluation':
+                    return 189;
+                default:
+                    return 0;
+            }
+        } else {
+            switch (nameColumn) {
+                case 'name':
+                    return 277;
+                case 'begin':
+                    return 83;
+                case 'end':
+                    return 88;
+                case 'responsible':
+                    return 161;
+                case 'instrument':
+                case 'advertising':
+                case 'advertiser':
+                    return 131;
+                case 'subjetthema':
+                    return 131;
+                case 'category':
+                    return 131;
+                case 'status':
+                    return 187;
+                case 'field':
+                    return 137;
+                case 'exCost':
+                    return 124;
+                case 'acCost':
+                    return 122;
+                case 'budget':
+                    return 122;
+
+                case 'description':
+                    return 187;                
+                case 'effect':
+                    return 187;
+                case 'arrived':
+                    return 187;
+                case 'evaluation':
+                    return 187;
+                default:
+                    return 0;
+            }
+        }
+    }
+
+    function setPathRow() {
+        var colnames = ["name", "begin", "end", "responsible", "instrument", "advertising", "advertiser" ,"subjetthema", "category", "status", "field", "exCost", "acCost", "budget", "description", "purpose", "effect", "arrived"];
+        var colspan = 0;
+        for (var i = 0; i < colnames.length; i++) {
+            if (exportSetting.columns[colnames[i]])
+                colspan += 1;
+        }
+
+        $("#trWhiteField > td").attr("colspan", "" + colspan);
+        $("#table-field > tbody > tr .prow").attr("colspan", "" + colspan);
+    }
+
+    function showHideDiagram() {
+        var widthDivField = parseInt($('div#calendar-split-view-a #divField').css("width"));
+
+        if ($('#chkdiagram').is(":checked")) {
+            $("#calendar-split-view-a").css("width", (widthDivField + 5000) + "px");
+            $("#calendar-split-view-a #calendar-time-a").attr("style", "display: block");
+            var widthDivTime = parseInt($('div#calendar-split-view-a #divTime').css("width"));
+            $("#calendar-split-view-a").css("width", (widthDivField + widthDivTime + 30) + "px");
+            $('#calendar-split-view-a .truncate-fix-break').addClass("truncate-fix");
+            $('#calendar-split-view-a .truncate-fix').removeClass("truncate-fix-break");
+        } else {
+            $("#calendar-split-view-a #calendar-time-a").attr("style", "display: none");
+            $("#calendar-split-view-a").css("width", (widthDivField) + "px");
+            $('#calendar-split-view-a .truncate-fix').addClass("truncate-fix-break");
+            $('#calendar-split-view-a .truncate-fix-break').removeClass("truncate-fix");
+        }
+        reRenderFreezedHead();
+    }
+    function reRenderFreezedHead() {
+        var $fieldHeadFreezed = $('#divExportSetting .export-right .table-field_freezed');
+        if ($fieldHeadFreezed.length > 0) {
+            var mTitles = [];
+            if ($fieldHeadFreezed.find('.mastertitle').length > 0) {
+                $fieldHeadFreezed.find('.mastertitle').each(function () {
+                    mTitles.push($(this).text());
+                });
+            }
+            $fieldHeadFreezed.remove();   // remove from DOM
+            $fieldHeadFreezed = cloneFieldHeader(); // add to DOM and re find on DOM
+            const scrollTop = $('#popexportmix').scrollTop();
+            if (scrollTop > 54) {
+                $fieldHeadFreezed.css('top', `${scrollTop}px`);
+                if (mTitles.length > 0) {
+                    const $headF = $fieldHeadFreezed.first().find('td').first().find('.header-first');
+                    $headF.children().hide();
+
+                    mTitles.forEach(function (mTitle) {
+                        $headF.append(`<span class="mastertitle" style="max-height: 41px;overflow: hidden;display: inline-block;line-height: 1">${mTitle}</span>`);
+                    });
+                    $headF.find('.mastertitle').hide();
+                    $headF.find('.mastertitle').last().show();
+                }
+            }
+        }
+    }
+    function setColumn(colName, colWidth) {
+        var widthDivField = parseInt($('div#calendar-split-view-a #divField').css("width"));
+
+        var columnIndex = $('div#calendar-split-view-a td #colume-' + colName + '-id').parent().index() + 1;
+        
+        var isCheck = $('#chk' + colName).is(":checked");
+        exportSetting.columns[colName] = isCheck;
+
+        var colWidth2 = 0;
+
+        if (isCheck) {
+            showHideElement($('div#calendar-split-view-a #table-field tr:not(.xpath) td:nth-child(' + columnIndex + ')'), isCheck);
+            showHideElement($('div#calendar-split-view-a td #colume-' + colName + '-id').parent(), isCheck);
+
+            colWidth2 = $('div#calendar-split-view-a td #colume-' + colName + '-id').width();
+        } else {
+            colWidth2 = $('div#calendar-split-view-a td #colume-' + colName + '-id').width();
+
+            showHideElement($('div#calendar-split-view-a #table-field tr:not(.xpath) td:nth-child(' + columnIndex + ')'), isCheck);
+            showHideElement($('div#calendar-split-view-a td #colume-' + colName + '-id').parent(), isCheck);
+        }
+
+        var reDivWidth = widthDivField + (isCheck ? colWidth2 : (0 - colWidth2));
+
+        $('div#calendar-split-view-a #divField').css("width", reDivWidth + "px");
+        
+        $('#calendar-field-a #table-field-show').attr('style', 'min-width:' + reDivWidth + 'px !important');
+        $('#calendar-field-a #table-field').attr('style', 'min-width:' + reDivWidth + 'px !important');
+        $('div#calendar-split-view-a #divField').css("width", $('#calendar-field-a #table-field').width() + "px");
+
+        setFirstLoader();
+
+        adjustTotalLabelPosition();
+
+        //Fix IE display
+        if (vmCommon.getCurrentBrowser() === "IE" || vmCommon.getCurrentBrowser() === "Edge" || vmCommon.getCurrentBrowser() === "FireFox") {
+            $('.face-table').height(70);
+        }
+        reSetPath();
+        reRenderFreezedHead();
+    }
+
+    function adjustTotalLabelPosition() {
+        var totalCols = $("#calendar-split-view-a #table-field tbody .totalcolumn");
+        if (totalCols.length > 0) {
+            for (var i = 0; i < totalCols.length; i++) {
+                $(totalCols[i]).html('');
+                $(totalCols[i]).removeClass("totalcolumn");
+            }
+        }
+
+        var rowTotal = $("#calendar-split-view-a #table-field tbody tr.rowTotal");
+
+        if (rowTotal.length > 0) {
+            for (var i = 0; i < rowTotal.length; i++) {
+                var tdNextTotal = $(rowTotal[i]).closest("tr").find("td.tdTotal:first");
+                var tdTotal = $(tdNextTotal);
+                do {
+                    tdTotal = tdTotal.prev();
+                } while (tdTotal.length && tdTotal.is(':hidden'));
+
+                if (tdTotal && !$(tdTotal).hasClass("mastername")) {
+                    tdTotal.html("<div class=\"truncate\"><span>Total:</span></div>");
+                    if (!$(tdTotal).hasClass("totalcolumn"))
+                        tdTotal.addClass("totalcolumn");
+                } else {
+                    const $mN = $(rowTotal[i]).find('td.mastername');
+                    if ($mN.length > 0) {
+                        $mN.addClass('totalcolumn');
+                        const $tC = $mN.children('div');
+                        $tC.addClass('truncate');
+                        $tC.children('span').text('Total:');
+                    }
+                }
+            }
+        }
+
+    }
+
+    function checkColumnShowHide()
+    {
+        var colnames = ["name", "begin", "end", "responsible", "instrument", "advertising", "advertiser", "subjetthema", "category", "status", "field", "exCost", "acCost", "budget"];
+        
+        for (var i = 0; i < colnames.length; i++) {
+            if (!exportSetting.columns[colnames[i]]) {
+                setColumn(colnames[i], getWidthColumn(colnames[i]));
+            }
+        }
+    }
+
+    function showHideElement(elm, isShow) {
+        if (isShow) elm.show();
+        else elm.hide();
+    }
+
+    function changePaperSize() {
+        exportSetting.paperSize = $("#sltPaperSize option:selected").text();
+    }
+
+    function changeOrientation() {
+        exportSetting.orientation = $("#sltOrientation option:selected").text();
+    }
+
+    $("#txtEndDateEx").blur(function (e) {
+        onStartEndDateChange(e);
+    });
+
+    $("#txtEndDateEx").preventPressAlphabetChar(kLg.language === "de" | "pm" ? [46] : [47]);
+    //$("#txtEndDateEx").kendoDatePicker({
+    //    weekNumber: true
+    //});
+
+    $("#txtEndDateEx").kendoDatePicker({
+        change: function (e) { onStartEndDateChange(e); },
+        weekNumber: true
+    });
+
+    function comparedateEx(sdateEx, edateEx) {
+        if (sdateEx == null || edateEx == null)
+            return true;
+        sdateEx.setHours(0, 0, 0, 0);
+        edateEx.setHours(0, 0, 0, 0);
+        return edateEx >= sdateEx;
+    }
+
+    function disabledButtonExport(state) {
+        vmExport.isValid = state;
+        if (state == false) {
+            if (!$('#btnExport').hasClass("bg-disable")) {
+                $('#btnExport').addClass("bg-disable");
+            }
+        } else {
+            if ($('#btnExport').hasClass("bg-disable")) {
+                $('#btnExport').removeClass("bg-disable");
+            }
+        }
+    }
+
+    function startDateValue() {
+        return $('#txtStartDateEx').data("kendoDatePicker").value();
+    }
+
+    function endDateValue() {
+        return $('#txtEndDateEx').data("kendoDatePicker").value();
+    }
+
+    function onStartEndDateChange(e) {
+        vmExport.isValid = true;
+        
+        var elm;
+        if (e.type == "blur")
+            elm = '#' + $(e.currentTarget).attr('id');
+        else
+            elm = '#' + e.sender.element[0].id;
+
+        if ($(elm).val() === "") {
+            $(elm).tooltip('destroy');
+            if ($('#txtStartDateEx').val() !== "" || $('#txtEndDateEx').val() !== "") {
+                sDate = $('#txtStartDateEx').val() !== "" ? startDateValue() : null;
+                eDate = $('#txtEndDateEx').val() !== "" ? endDateValue() : null;
+                if (sDate == null && eDate == null) {
+                    vmExport.isValid = false;
+        
+                    return;
+                }
+            } else {
+                return;
+            }
+
+        }
+
+        var isStartDate = false;
+        var isEndDate = false;
+
+        if ($('#txtStartDateEx').val() !== "" && (startDateValue() == null)) {
+            $('#txtStartDateEx').tooltip('destroy');
+            $('#txtStartDateEx').attr("title", kLg.msgDateInValid);
+            $('#txtStartDateEx').tooltip({ trigger: "manual", placement: "top" }).tooltip('show');
+            
+            isStartDate = true;
+            vmExport.isValid = false;
+        }
+
+        if ($('#txtStartDateEx').val() !== "" && (startDateValue() != null))
+            $('#txtStartDateEx').tooltip('destroy');
+
+        if ($('#txtEndDateEx').val() !== "" && (endDateValue() == null)) {
+            $('#txtEndDateEx').tooltip('destroy');
+            $('#txtEndDateEx').attr("title", kLg.msgDateInValid);
+            $('#txtEndDateEx').tooltip({ trigger: "manual", placement: "bottom" }).tooltip('show');
+            
+            isEndDate = true;
+            vmExport.isValid = false;
+        }
+
+        if ($('#txtEndDateEx').val() !== "" && (endDateValue() != null))
+            $('#txtEndDateEx').tooltip('destroy');
+
+        if (isStartDate || isEndDate) return;
+
+        var cdate = $(elm).data("kendoDatePicker").value();
+        if ($(elm).val() !== "" && cdate == null) {
+            $(elm).tooltip('destroy');
+            $(elm).attr("title", kLg.msgDateInValid);
+            if (elm.indexOf("txtStartDateEx") != -1)
+                $(elm).tooltip({ trigger: "manual", placement: "top" }).tooltip('show');
+            else
+                $(elm).tooltip({ trigger: "manual", placement: "bottom" }).tooltip('show');
+            
+            vmExport.isValid = false;
+        }
+
+        var startDate = $('#txtStartDateEx').val() !== "" ? startDateValue() : null;
+        var endDate = $('#txtEndDateEx').val() !== "" ? endDateValue() : null;
+        if (startDate == null && endDate == null) {
+            startDate = new Date();
+            vmCalendar.VBDStartDay = startDate;
+        }
+
+        if (startDate != null && endDate != null && !comparedateEx(startDate, endDate)) {
+            $(elm).tooltip('destroy');
+            $(elm).attr("title", kLg.msgValidateStartEndDate);
+            if (elm.indexOf("txtStartDateEx") != -1)
+                $(elm).tooltip({ trigger: "manual", placement: "top" }).tooltip('show');
+            else
+                $(elm).tooltip({ trigger: "manual", placement: "bottom" }).tooltip('show');
+            vmExport.isValid = false;
+        } else {
+            $(elm).tooltip('destroy');
+            setPreviewStartDay();
+
+            var start, end;
+            vmCalendar.VBDEndDay = null; vmCalendar.VBDStartDay = new Date();
+            var wr = msFilter.controlService.getWorkingRange();
+
+            if (msFilter.controlService.isHasRedirect() && (wr.Start != null || wr.End != null)) {
+                var s = startDate ? new Date(+startDate) : null;
+                var e = endDate ? new Date(+endDate) : null;
+
+                var ts, te;
+
+                if (typeof wr.Start === "string") ts = wr.Start.toDate(); else ts = wr.Start ? new Date(+wr.Start) : null;
+                if (typeof wr.End === "string") te = wr.End.toDate(); else te = wr.End ? new Date(+wr.End) : null;
+
+                if (ts != null && s != null) {
+                    if (vmCommon.compareDate2(ts, s) > 0) s = ts;
+                } else {
+                    s = s || ts;
+                }
+
+                if (te != null && e != null) {
+                    if (vmCommon.compareDate2(te, e) < 0) e = te;
+                } else {
+                    e = e || te;
+                }
+
+                if (s != null || e != null) {
+                    if (s) {
+                        vmCalendar.VBDStartDay = s;
+                        start = { Year: s.getFullYear(), Month: s.getMonth() + 1, Date: s.getDate() };
+                    }
+                    else {
+                        var tempStart = new Date(+e);
+                        tempStart.setMonth(tempStart.getMonth() - vmCalendar.getArrMonthRange() + 1);
+                        vmCalendar.VBDStartDay = tempStart;
+                        start = { Year: tempStart.getFullYear(), Month: tempStart.getMonth() + 1, Date: tempStart.getDate() };
+                    }
+
+                    if (e) {
+                        vmCalendar.VBDEndDay = e;
+                        end = { Year: e.getFullYear(), Month: e.getMonth() + 1, Date: e.getDate() };
+                    }
+
+                } else {
+                    vmCalendar.VBDStartDay = new Date();
+                    start = { Year: vmCalendar.VBDStartDay.getFullYear(), Month: vmCalendar.VBDStartDay.getMonth() + 1, Date: vmCalendar.VBDStartDay.getDate() };
+                }
+            } else {
+                if (startDate) {
+                    vmCalendar.VBDStartDay = startDate;
+                    start = { Year: startDate.getFullYear(), Month: startDate.getMonth() + 1, Date: startDate.getDate() };
+                    if (endDate) {
+                        vmCalendar.VBDEndDay = endDate;
+                        end = { Year: endDate.getFullYear(), Month: endDate.getMonth() + 1, Date: endDate.getDate() };
+                    }
+                }
+                else if (endDate) {
+                    vmCalendar.VBDStartDay = endDate;
+                    start = { Year: endDate.getFullYear(), Month: endDate.getMonth() + 1, Date: endDate.getDate() };
+                }
+            }
+
+            vmExport.timelineScrollToDateExport(start, end);
+        }
+        reRenderFreezedHead();
+        setFirstLoader();
+    }
+
+    $("#txtStartDateEx").preventPressAlphabetChar(kLg.language === "de" | "pm" ? [46] : [47]);
+
+    $("#txtStartDateEx").kendoDatePicker({
+        change: function (e) { onStartEndDateChange(e); },
+        weekNumber: true
+    });
+
+    $("#txtStartDateEx").blur(function (e) {
+        onStartEndDateChange(e);
+    });
+
+    $("#divExportSetting").on("change", "#txtStartDateEx", function (e) {
+        correctDate(e.currentTarget);
+    });
+
+    $("#divExportSetting").on("change", "#txtEndDateEx", function (e) {
+        correctDate(e.currentTarget);
+    });
+
+    function bindPreview() {
+        bindLanguageSetting();
+        
+        bindTemplate('calendar-time-a', 'template-time-table', vmExport.DataCalendar);
+        
+        $('#calendar-time-a table thead').css('visibility', 'visible');
+        $('#calendar-time-a #table-time thead tr td div#navi-place').hide();
+
+        $('#calendar-field-a #table-field thead tr#trWhiteField').css({"display": "none"});
+        $('#calendar-time-a #table-time thead tr#bnnTr').css({ "display": "none" });
+
+        if (!$('#chkname').is(":checked")) {
+            $('#calendar-field-a table#table-field tbody tr.calendar-path-row-field').attr('style', "display: none");
+            $('#calendar-time-a table#table-time tbody tr.calendar-path-row-field').attr('style', "display: none");
+        }
+        
+        $('#calendar-time-a #divTime').css('visibility', 'visible');
+        setFirstLoader();
+    }
+
+    function correctDate(elem) {
+        vmExport.IsDateRangeChange = true;
+
+        var str = $(elem).val().trim();
+        var newDate = vmCommon.formatStringToDate(str, kLg.language);
+
+        if (str.length > 0 && newDate == null) {
+            ShowToolTip2($(elem), kLg.msgDateInValid, "top");
+            return;
+        }
+
+        DestroyToolTip($(elem));
+
+        if (newDate != null) $(elem).val(kendo.toString(newDate, "d"));
+    }
+    
+    vmExport.timelineScrollToDateExport = function (d, e) {
+        if (d == undefined) return;
+
+        vmExport.StartDate = d;
+        vmExport.DataCalendar.TimeLine = vmCalendar.CreateTimeLineArray(d, e);//vmExport.CreateTimeLineArrayExport(d, e);
+
+        bindPreview();
+    };
+
+    vmExport.CreateTimeLineArrayExport = function (start, end) {
+        setPreviewVariables();
+        var years = [];
+        var months = [];
+        var year = start.Year;
+
+        var rowNumber = vmCalendar.dataRowNumber(vmCalendar.isPreview ? vmExport.DataCalendar : vmExport.DataCalendar);
+        var arrMonthRange = rowNumber > vmCalendar.CompactRn ? (vmCalendar.TimelineView == vmCalendar.EnumItems.ViewByDay ? 1 : 12) : vmCalendar.ArrMonthRange;
+
+        if (start && end) {
+            var temp = vmCommon.monthDiff(new Date(start.Year, start.Month - 1, start.Date), new Date(end.Year, end.Month - 1, end.Date));
+            if (temp && temp.length > 0 && temp.length < arrMonthRange) arrMonthRange = temp.length;
+        }
+
+        var end = start.Month + arrMonthRange;
+        for (var i = start.Month; i < end; i++) {
+            var month = i % 12;
+            if (month == 0) month = 12;
+
+            months.push(month);
+            if (month == 12 || i == end - 1) {
+                var time = { Year: year, Months: months };
+                years.push(time);
+                year += 1;
+                months = [];
+            }
+        }
+        return years;
+    };
+
+    vmExport.CreateTimeDataExport = function () {
+        var startDate = $("#divExportSetting #txtStartDateEx").data("kendoDatePicker").value();
+        var endDate = $("#divExportSetting #txtEndDateEx").data("kendoDatePicker").value();
+
+        if (startDate == null && endDate == null) return vmCalendar.CreateTimeLineArrayDefault(vmCalendar.StartDate); //vmCommon.deepCopy(vmExport.DataCalendar.TimeLine);
+
+        var maxMonthRange = vmCalendar.TimelineView == vmCalendar.EnumItems.ViewByDay ? 24 : 24;
+        var arrMonthRange = undefined;
+
+        if (startDate && endDate) {
+            var temp = monthDiff(startDate, endDate);
+            arrMonthRange = temp > maxMonthRange ? maxMonthRange : temp;
+        }
+        else {
+            arrMonthRange = maxMonthRange;
+        }
+
+        if (arrMonthRange == undefined) return vmCommon.deepCopy(vmExport.DataCalendar.TimeLine);
+
+        var startTemp = startDate ? startDate : endDate;
+        var start = { Year: startTemp.getFullYear(), Month: startTemp.getMonth() + 1 };
+
+        var years = [];
+        var months = [];
+        var year = start.Year;
+        var end = start.Month + arrMonthRange;
+        for (var i = start.Month; i < end; i++) {
+            var month = i % 12;
+            if (month == 0) month = 12;
+
+            months.push(month);
+            if (month == 12 || i == end - 1) {
+                var time = { Year: year, Months: months };
+                years.push(time);
+                year += 1;
+                months = [];
+            }
+        }
+        return years;
+    };
+
+    vmExport.BindTimeTableExport = function (dataTime) {
+        bindTemplate('calendar-time-a', 'template-time-table', dataTime);
+
+        $("#calendar-time-a #table-time-show thead:first").html($("#calendar-time-a #table-time thead:first")[0].innerHTML);
+
+        var faceTrYear = $("#calendar-time-a #table-time-show thead:first tr:eq(1) td");
+        var curtTrYear = $("#calendar-time-a #table-time thead:first tr:eq(1) td");
+
+        for (var i = 0; i < faceTrYear.length; i++) {
+            $(faceTrYear[i]).css({ "width": curtTrYear[i].clientWidth + 2 }); //2: border table
+        }
+
+        var faceTrMonth = $("#calendar-time-a #table-time-show thead:first tr:eq(2) td");
+        var curtTrMonth = $("#calendar-time-a #table-time thead:first tr:eq(2) td");
+
+        for (var j = 0; j < faceTrMonth.length; j++) {
+            $(faceTrMonth[j]).css({ "width": curtTrMonth[j].clientWidth + 2 }); //2: border table
+        }
+
+        showConnect();
+    };
+
+    vmExport.changePositionHeaderExport = function (newpos) {
+        //fix in IE
+        if (vmCommon.getCurrentBrowser() === vmCommon.Browser.Ie) newpos -= 10;
+
+        $("#calendar-time-a #table-field-show").css({ top: newpos });
+        $("#calendar-time-a #table-time-show").css({ top: newpos });
+    };
+
+    function getStyle(className_) {
+
+        var styleSheets = window.document.styleSheets;
+        var styleSheetsLength = styleSheets.length;
+        for (var i = 0; i < styleSheetsLength; i++) {
+            var classes = styleSheets[i].rules || styleSheets[i].cssRules;
+            if (!classes)
+                continue;
+            var classesLength = classes.length;
+            for (var x = 0; x < classesLength; x++) {
+                if (classes[x].selectorText === className_) {
+                    var ret;
+                    if (classes[x].cssText) {
+                        ret = classes[x].cssText;
+                    } else {
+                        ret = classes[x].style.cssText;
+                    }
+                    if (ret.indexOf(classes[x].selectorText) === -1) {
+                        ret = classes[x].selectorText + "{" + ret + "}";
+                    }
+                    return ret;
+                }
+            }
+        }
+
+        return "";
+    }
+
+    function getStyleRuleValue(style, selector, sheetS) {
+        var sheets = typeof sheetS !== 'undefined' ? [sheetS] : document.styleSheets;
+        for (var i = 0, l = sheets.length; i < l; i++) {
+            var sheet = sheets[i];
+            if (!sheet.cssRules) { continue; }
+            for (var j = 0, k = sheet.cssRules.length; j < k; j++) {
+                var rule = sheet.cssRules[j];
+                if (rule.selectorText && rule.selectorText.split(',').indexOf(selector) !== -1) {
+                    return rule.style[style];
+                }
+            }
+        }
+        return null;
+    }
+</script>
+
+<script type="x/kendo-template" id="page-template">
+    <div class="page-template">
+        <div class="header">
+            <div style="float: right">Page #: pageNum # of #: totalPages #</div>
+            Multi-page grid with automatic page breaking
+        </div>
+        <div class="watermark">KENDO UI</div>
+        <div class="footer">Page #: pageNum # of #: totalPages #</div>
+    </div>
+</script> 

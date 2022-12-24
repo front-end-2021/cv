@@ -1,0 +1,219 @@
+﻿<style>
+    .menu-title, .item-title {
+        height: 30px;
+        background-color: #33a6dc; 
+        line-height: 28px;
+        padding-left: 5px;
+        color: white;
+        padding: 1px;
+    }
+
+        .menu-title a {
+            color: white;
+        }
+
+    .menu-content {
+        width: 96%;
+        float: right;
+        display: none;
+    }
+
+    .menu-place {
+        margin-top: 4px;
+        position: relative;
+    }
+
+    .arrow-panel-online:hover {
+        cursor: pointer;
+    }
+
+    .info-title {
+        background-color: #38baf8 !important;
+    }
+
+    .selected-item {
+        cursor: pointer;
+    }
+</style>
+
+<div id="pop-subgoal" class="pop-wrapper">
+    <form id="fsubgoal" role="form" class="form-horizontal">
+        <div class="modal-body ms-modal-body">
+            <div data-bind="source: parents" data-template="listSub"></div>
+        </div>
+    </form>
+</div>
+
+<script type="text/html" id="listSub">
+    <div class="menu-place" data-bind="attr:{mtype: TypeId}">
+        <div class="menu-title">
+            <span class="arrow-panel-online icon-24 icon-left-block arrow-collapse" style="margin-top: 2px" data-bind="attr:{sid: Id, stype: TypeId, slevel: Level}" onclick="vmSelectGoal.openSubItem(this);"></span>
+            <span data-bind="text:Name" style="white-space: pre; width: 576px;max-width:566px; overflow: hidden; text-overflow: ellipsis; float: left;"></span>
+        </div>
+        <div class="clear"></div>
+        <div class="menu-content">
+        </div>
+        <div class="clear"></div>
+    </div>
+</script>
+
+<script type="text/html" id="listSub2">
+    #for(var i = 0; i< data.length; i++){#
+    #var item = data[i];#
+    <div class="menu-place" mtype="#:item.TypeId#">
+        #if(item.Level === 5){#
+        <div class="menu-title info-title">
+            <span style="margin-left: 10px"></span>
+            <span style="white-space: pre; width: 505px; overflow: hidden; text-overflow: ellipsis; float: left;">#:item.Name#</span>
+        </div>
+        #}else{#
+        #if(item.Level === 4){#
+            <div class="menu-title #if(item.RoleId > 0){#selected-item#}#" sid="#:item.Id#" stype="#:item.TypeId#" slevel="#:item.Level#">
+                <span class="arrow-panel-online icon-24 icon-left-block arrow-collapse" style="margin-top: 2px" 
+                      sid="#:item.Id#" stype="#:item.TypeId#" slevel="#:item.Level#" onclick="vmSelectGoal.openSubItem(this);"></span>
+                <span style="white-space: pre; width: 497px; overflow: hidden; text-overflow: ellipsis; float: left;">#:item.Name#</span>
+            </div>
+        #}else{#
+            <div class="menu-title">
+                <span class="arrow-panel-online icon-24 icon-left-block arrow-collapse" 
+                      style="margin-top: 2px" sid="#:item.Id#" stype="#:item.TypeId#" 
+                      slevel="#:item.Level#" onclick="vmSelectGoal.openSubItem(this);"></span>
+                <span style="white-space: pre; width: 526px; max-width: 522px; overflow: hidden; text-overflow: ellipsis; float: left;">#:item.Name#</span>
+            </div>
+        #}#
+        #}#
+        <div class="clear"></div>
+        <div class="menu-content">
+        </div>
+        <div class="clear"></div>
+    </div>
+    #}#
+</script>
+
+<script type="text/javascript">
+    vmSelectGoal = {};
+
+    vmSelectGoal.subModel = undefined;
+
+    vmEditAct.popSelectGoal.bind("close", function () {
+        vmEditAct.popSelectGoal.destroy();
+        vmEditAct.popSelectGoal = null;
+        $("#pop-edit-crm").after("<div id='popselectgoal'></div>");
+    });
+
+    var subs = vmEditAct.optGoal.SubGoals;
+    var actModel = vmEditAct.optGoal.actModel;
+    $(function() {
+        var parents = getChildData(subs, null, null);
+
+        vmSelectGoal.subModel = kendo.observable({
+            parents: parents
+        });
+
+        kendo.bind($("#pop-subgoal"), vmSelectGoal.subModel);
+    });
+
+    vmSelectGoal.openSubItem = function (e) {
+        var id = $(e).attr("sid"), typeId = $(e).attr("stype"), level = $(e).attr("slevel");
+        if (id === undefined || typeId === undefined || level === undefined)
+            return;
+
+        typeId = Number(typeId);
+
+        var panel = $(e).closest("div.menu-place").children("div.menu-content");
+        if (panel.length === 0) return;
+
+        if ($(e).hasClass("hasdata")) {
+            if ($(panel).is(":visible")) {
+                $(panel).hide(120);
+                vmSelectGoal.toggleIcon(e, false);
+            } else {
+                $(panel).show(120);
+                vmSelectGoal.toggleIcon(e, true);
+            }
+        } else {
+            var childs = getChildData(subs, id, typeId);
+
+            var template = kendo.template($("#listSub2").html());
+            $(panel).html(template(childs));
+            $(panel).show(120);
+            $(e).addClass("hasdata");
+
+            vmSelectGoal.toggleIcon(e, true);
+        }
+    };
+
+    vmSelectGoal.toggleIcon = function (elem, isOpen) {
+        if (isOpen) {
+            $(elem).removeClass("arrow-collapse").addClass("arrow-right-big");
+        } else {
+            $(elem).removeClass("arrow-right-big").addClass("arrow-collapse");
+        }
+    };
+
+    function getChildData(lst, parentId, typeId) {
+        return $.grep(lst, function (it) { return it.ParentId === parentId && (typeId == null || it.TypeId === typeId); });
+    };
+
+    vmSelectGoal.isProcessing = false;
+    $("#pop-subgoal").on("click", "div.selected-item", function (e) {
+
+        var elem = e.target;
+        if ($(elem).hasClass("arrow-panel-online")) return;
+
+        if (vmSelectGoal.isProcessing) {
+            return;
+        }
+        vmSelectGoal.isProcessing = true;
+
+        var pan = e.currentTarget;
+        var id = $(pan).attr("sid"), typeId = $(pan).attr("stype"), level = $(pan).attr("slevel");
+        if (id === undefined || typeId === undefined || level === undefined)
+            return;
+
+        level = Number(level);
+
+        var sub = vmCommon.findByFunc(subs, function(it) { return it.Id === id && it.Level === level; });
+        if (sub == null) {
+            vmSelectGoal.isProcessing = false;
+            return;
+        };
+
+        //create action
+        if (actModel.activity.Id) {
+            vmEditAct.dataservice.createActionLink({ activity: actModel.buildingActivityData(), subGoalId: id }, function (res) {
+                vmSelectGoal.isProcessing = false;
+                var actionLink = res.value;
+                
+                if (actionLink == null) {
+                    //TODO: conflict
+                } else {
+                    //var newActionId = res.value;
+                    actModel.activity.set("ActionId", actionLink.ActionId);
+                    actModel.activity.set("FisrtSubGoalId", actionLink.SubGoalId);
+                    actModel.activity.set("SubGoalId", actionLink.SubGoalId);
+                    actModel.activity.set("SubGoalName", actionLink.SubGoalName);
+                    actModel.activity.set("SubPath", actionLink.SubPath);
+
+                    actModel.set("visibleSelectGoal", false);
+                    actModel.activity.set("ActionClass", "goal-truncate ms-link");
+                    actModel.activity.set("Mdf", actionLink.Mdf);
+
+                    actModel.activity.set("IsDeleteAction", null);
+
+                    actModel.activity.set("IsLink", actionLink.IsLink);
+                    actModel.activity.set("MaingoalId", actionLink.MaingoalId);                    
+
+                    vmEditAct.popSelectGoal.close();
+                }
+
+            });
+            
+        }
+        else {
+            actModel.activity.set("ActionId", null);
+            vmEditAct.popSelectGoal.close();
+        }
+    });
+    
+</script>

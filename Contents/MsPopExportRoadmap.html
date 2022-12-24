@@ -1,0 +1,1238 @@
+﻿<div id="roadmappreview"> </div>
+
+<script type="text/javascript">
+    var popExportRM;//, timeModel;
+    $.get("/Popup/ExportRoadmap.html").done(template => {
+        popExportRM = new Vue({
+            el: '#roadmappreview',
+            template: template,
+            data: () => {
+                const lstVsb = vmCommon.deepCopy(msRoadmapApp.LstVisibleInView);
+                lstVsb.filter(block => {
+                    block.IsVisibleInView = true;
+                    block.IsBlockExpand = true;
+                    return true;
+                });
+
+                return {
+                    DateLine: msRoadmapApp.DateLine,
+                    ViewHeight: 850,
+                    ViewWidth: msRoadmapApp.ViewWidth,
+                    MaxRowElements: undefined,
+                    ViewTypeId: msRoadmapApp.ViewTypeId,
+                    LstVisibleInView: lstVsb,
+                    validateCheckbox: [],
+                    IsHidePath: false,
+                    isPreviewCheck: false,
+                    isExportPdf: false,
+                    isExportExcel: false,
+                    LinkSharepoints: [],
+                    isHasSharePointLinks: false,
+                    IsOwner: false,
+                    DateRange: {
+                        Start: null, End: null, IsChange: false, IsValid: true
+                    },
+                    LstLabelingIdCollapse: [],
+                    ListExpands: vmCommon.deepCopy(msRoadmapApp.ListExpands),
+                    isShowDepth: false,
+                    MenuLabeling: vmCommon.deepCopy(msRoadmapApp.MenuLabeling),
+                    ScrollLeft: 0,
+                    IsAllItemNull: msRoadmapApp.IsAllItemNull,
+                }
+            },
+            created() {
+                msRoadmapApp.IsOpenPopPreview = true;
+            },
+            updated() {
+                this.$nextTick(function () {
+                    this.setHeightView();
+                    this.setWidthView();
+                    if (!this.IsHidePath)
+                        this.reClonePath();
+                    else {
+                        const colClone = popExportRM.$el.querySelector('.dnb_25880_freezed_col_clone');
+                        if (colClone) {
+                            colClone.remove();
+                        }
+                    }
+                });
+            },
+            mounted() {
+                var that = this;
+                that.dataservice().loadSettingRoadmap().then(function (res) {
+                    var data = res.value;
+                    var dateRangeStart = data.DateRangeStart ? data.DateRangeStart.jsonToDate() : null;
+                    var dateRangeEnd = data.DateRangeEnd ? data.DateRangeEnd.jsonToDate() : null;
+
+                    that.bindDateRange(dateRangeStart, dateRangeEnd);
+                    that.IsHidePath = data.HidePath;
+                    that.isExportPdf = data.PdfExport;
+                    that.isExportExcel = data.Excel;
+                    that.isPreviewCheck = data.IsLinkPreview;
+                    that.IsOwner = data.IsOwner;
+
+                    $("#sltPaperSize").kendoDropDownList({
+                        dataTextField: "Name",
+                        dataValueField: "Id",
+                        value: data.PaperSize,
+                        dataSource:
+                            [{ Id: 1, Name: kLg.AutoSize }, { Id: 2, Name: "A1" }, { Id: 3, Name: "A2" }, { Id: 4, Name: "A3" }, { Id: 5, Name: "A4" }],
+                    });
+                    $("#sltOrientation").kendoDropDownList({
+                        dataTextField: "Name",
+                        dataValueField: "Id",
+                        value: data.Orientation,
+                        dataSource: [{ Id: 1, Name: kLg.landscape }, { Id: 2, Name: kLg.portrait }],
+                    });
+                });
+                that.dataservice().getSharePointLinks().then(function (res) {
+                    that.LinkSharepoints = res.value;
+                    that.isHasSharePointLinks = true;
+                });
+               
+                var widthcreen = screen.width;
+                var width = 0;
+                
+                switch (true) {
+                    case widthcreen < 1800:
+                        width = 623;
+                        left = 390;
+                        maxheight = 27;
+                        break;
+                    case (widthcreen >= 1800 && widthcreen <= 3400):
+                        width = 323;
+                        left = 525 ;
+                        maxheight = 30;
+                        break;
+                    case widthcreen > 3400:
+                        width = 1100;
+                        left = 525;
+                        maxheight = 30;
+                        break;
+                }
+                $('#popExportRoadmap').on('scroll', function () {
+                    if (popExportRM.IsHidePath) {
+                        const colClone = popExportRM.$el.querySelector('.dnb_25880_freezed_col_clone');
+                        if (colClone) {
+                            colClone.remove();
+                        }
+                    } else {
+                        timeScrollBefore = $(this).scrollLeft();
+                        var mgLeft = $(window).width() / 2 - $('.navi-place').children().outerWidth() - width;
+                        $("#popExportRoadmap .navi-place").css({ "margin-left": mgLeft + timeScrollBefore });
+
+                        popExportRM.freezedPathOnScroll($(this));
+                        popExportRM.freezedDepthAndLabeling(timeScrollBefore - 383);
+
+                    }
+                });
+                $('.kgv-review-roadmap #ms-view-month-quarter').css({ 'margin-left': left + 'px' });
+                this.setHeightViewNextTick();       // use for checkbox labaling
+            },
+            computed: {                
+                kLg() { return kLg; },
+                TimerangeStart() {
+                    if (this.DateRange.Start) return this.DateRange.Start;
+                    return msRoadmapApp.TimeRangeFrom;
+                },
+                TimerangeEnd() {
+                    if (this.DateRange.End) return this.DateRange.End;
+                    return msRoadmapApp.TimeRangeTo;
+                },
+                TimeRangeFrom() { return msRoadmapApp.TimeRangeFrom; },
+                TimeRangeTo() { return msRoadmapApp.TimeRangeTo; },
+                StyleHeightViewQuarter() {
+                    var heightData = this.ViewHeight;
+                    
+                    return (heightData) + 'px';
+                },
+                StyleHeightViewMonth() {
+                    var height = this.ViewHeight;
+                    
+                    return (height + 1) + 'px';
+                },
+                StyleWithTimeRangeTo() {                    
+                    return {
+                        overflow: 'hidden'
+                    }
+                },
+                StyleWithTimeRangeFromTo() {
+                    //if (!this.TimeRangeFrom && !this.TimeRangeTo) return {};
+                    return {
+                        overflow: 'hidden'
+                    }
+                },
+                Elements() {
+                    var elemtns = msRoadmapApp.getElements(msRoadmapApp.MasterBlocks, undefined, true);
+                    this.setHeightForView(elemtns.RowsElement, elemtns.RowsRegion, elemtns.RowsBlock);
+
+                    return {
+                        MaxIndex: elemtns.MaxIndex,
+                        MasterBlocks: elemtns.MasterBlocks,
+                        IsAllItemEndNull: elemtns.IsAllItemEndNull,
+
+                        HasBlock: elemtns.HasBlock, MinStart: elemtns.MinStart,
+                        MaxEnd: elemtns.MaxEnd, MaxStartEndDateNull: elemtns.MaxStartEndDateNull
+                    }
+                },
+                MinMaxDate() {
+                    var minmaxDate = msRoadmapApp.MinMaxDate;
+                    
+                    return minmaxDate;
+                },
+                ViewMonth() {
+                    var seVM = msRoadmapApp.getViewMonth(this.Elements, this.MinMaxDate, msRoadmapApp.CurrentDate, this.TimeRangeFrom, this.TimeRangeTo);
+
+                    var startDate = seVM.Start; // StringMMDDYYYY
+                    var endDate = seVM.End;     // StringMMDDYYYY
+                    if (this.Elements.MasterBlocks.length > 0) {
+                        if (!(!this.DateRange.Start && !this.DateRange.End)) {
+                            var maxStartMinEnd = this.getMaxStartMinEnd(startDate, this.DateRange.Start, endDate, this.DateRange.End);
+
+                            startDate = maxStartMinEnd.Start;   // StringMMDDYYYY
+                            endDate = maxStartMinEnd.End;       // StringMMDDYYYY
+                        }
+
+                        if (!this.TimeRangeFrom && !this.TimeRangeTo && this.MinMaxDate.MaxStartEndDateNull && !this.DateRange.End && this.DateRange.Start) {
+                            endDate = this.getEndOnlyHasDateRangeStart(new Date(startDate), new Date(endDate), 175 * 24 * 3600 * 1000);
+                        }
+                        if (!this.TimeRangeFrom && !this.TimeRangeTo && this.DateRange.End && !this.DateRange.Start) {
+                            startDate = this.MinMaxDate.Start;
+                            endDate = this.DateRange.End;
+                        }
+                        if (this.Elements.IsAllItemEndNull && !this.TimeRangeTo) {
+                            endDate = this.getEndHasNotTimerangeEnd(new Date(startDate), endDate, this.DateRange, 175 * 24 * 3600 * 1000);
+                        }
+                    }
+
+                    // has no data
+                    if (this.Elements.MasterBlocks.length < 1 && (!this.DateRange.Start || !this.DateRange.End)) {
+                        if (!(!this.DateRange.Start && !this.DateRange.End)) {      // co it nhat Start hoac End
+                            var startEndNoData = this.getStartEndNoData(this.DateRange.Start, this.DateRange.End, 1);
+                            startDate = startEndNoData.Start;   // StringMMDDYYYY
+                            endDate = startEndNoData.End;
+                        }
+                        if (this.MinMaxDate.IsAllItemEndNull && !this.TimeRangeTo) {
+                            endDate = this.getEndHasNotTimerangeEnd(new Date(startDate), endDate, this.DateRange);
+                        }
+                    }
+                    return msRoadmapApp.moveFirstLastDayInWeek(startDate, endDate);
+                },
+                ViewQuarter() {
+                    var seVQ = msRoadmapApp.getViewQuarter(this.Elements, this.MinMaxDate, msRoadmapApp.CurrentDate, this.TimeRangeFrom, this.TimeRangeTo);
+
+                    var startDate = seVQ.Start;     // StringMMDDYYYY
+                    var endDate = seVQ.End;
+                    if (this.Elements.MasterBlocks.length > 0) {
+                        if (!(!this.DateRange.Start && !this.DateRange.End)) {
+                            var maxStartMinEnd = this.getMaxStartMinEnd(startDate, this.DateRange.Start, endDate, this.DateRange.End);
+
+                            startDate = maxStartMinEnd.Start;   // StringMMDDYYYY
+                            endDate = maxStartMinEnd.End;       // StringMMDDYYYY
+                        }
+                        if (!this.TimeRangeFrom && !this.TimeRangeTo && this.MinMaxDate.MaxStartEndDateNull && !this.DateRange.End && this.DateRange.Start) {
+                            endDate = this.getEndOnlyHasDateRangeStart(new Date(startDate), new Date(endDate), 335 * 24 * 3600 * 1000);
+                        }
+                        if (!this.TimeRangeFrom && !this.TimeRangeTo && this.DateRange.End && !this.DateRange.Start) {
+                            startDate = this.MinMaxDate.Start;
+                            endDate = this.DateRange.End;
+                        }
+                        if (this.Elements.IsAllItemEndNull && !this.TimeRangeTo) {
+                            endDate = this.getEndHasNotTimerangeEnd(new Date(startDate), endDate, this.DateRange, 335 * 24 * 3600 * 1000);
+                        }
+                    }
+                    // has no data
+                    if (this.Elements.MasterBlocks.length < 1 && (!this.DateRange.Start || !this.DateRange.End)) {
+                        if (!(!this.DateRange.Start && !this.DateRange.End)) {
+                            var startEndNoData = this.getStartEndNoData(this.DateRange.Start, this.DateRange.End, 0);
+                            startDate = startEndNoData.Start;   // StringMMDDYYYY
+                            endDate = startEndNoData.End;
+                        }
+                    }
+                    return msRoadmapApp.moveFirstLastDayInMonth(startDate, endDate);
+                },
+                ViewFrom() {      // use for key (rebind) in elements
+                    var from = this.ViewQuarter.Start;
+                    if (this.ViewTypeId == 1) {     // view Month
+                        from = this.ViewMonth.Start;
+                    }
+                    from = new Date(from);
+                    var m = from.getMonth() + 1;
+                    if (m < 10) m = `0${m}`;
+                    var d = from.getDate();
+                    if (d < 10) d = `0${d}`;
+                    return `${from.getFullYear()}-${m}-${d}`;
+                },
+                ViewTo() {      // use for key (rebind) in elements
+                    var to = this.ViewQuarter.End;
+                    if (this.ViewTypeId == 1) {     // view Month
+                        to = this.ViewMonth.End;
+                    }
+                    to = new Date(to);
+                    var m = to.getMonth() + 1;
+                    if (m < 10) m = `0${m}`;
+                    var d = to.getDate();
+                    if (d < 10) d = `0${d}`;
+                    return `${to.getFullYear()}-${m}-${d}`;
+
+                },
+                IsEnableBtnExport() {
+                    if ((this.IsOwner && this.isPreviewCheck) || this.isExportPdf || this.isExportExcel) {
+                        return true;
+                    }
+                    return false;
+                },
+                LinkSharepointItems() {
+                    return vmCommon.getLinkSharepoint().getItems(this.LinkSharepoints, true);
+                },
+                WidthDataBoundShadow() {
+                    var start, end;
+                    if (this.ViewTypeId == 0) {
+                        start = this.ViewQuarter.Start;
+                        start = new Date(start);
+                        end = this.ViewQuarter.End;
+                        end = new Date(end);
+                        var dateR = getDateDiff(start, end);
+                        return dateR * msRoadmap.qUnit;
+                    }
+
+                    if (this.ViewTypeId == 1) {
+                        start = this.ViewMonth.Start;
+                        start = new Date(start);
+                        end = this.ViewMonth.End;
+                        end = new Date(end);
+                        var dateR = getDateDiff(start, end);
+                        return dateR * msRoadmap.mUnit;
+                    }
+                },
+                IsOpenPopPreview() { return true; },
+                IsLabelingChanged() {
+                    if (this.LinkSharepoints.length < 1) return false;
+                    const s = this.LinkSharepoints[0].SubFilter;
+                    if(popExportRM.MenuLabeling.IsMain != s.IsMainPath) return true;
+                    if (popExportRM.MenuLabeling.IsSub != s.IsSubPath) return true;
+                    if (popExportRM.MenuLabeling.IsAction != s.IsActionPath) return true;
+                    return false;
+                },
+                IsLabeling() { return this.MenuLabeling.IsMain || this.MenuLabeling.IsSub || this.MenuLabeling.IsAction; },
+                KeyLabeling() {
+                    const mL = this.MenuLabeling;
+                    const t = this.ViewTypeId == 0 ? 'quarter' : 'month';
+                    return `view_${t}-isMainLabel_${mL.IsMain ? 1 : 0}-isSubLabel_${mL.IsSub ? 1 : 0}-isActionLabel_${mL.IsAction ? 1 : 0}`;
+                },
+            }, //watch: {},
+            provide() {
+                return {
+                    mountedOnView: this.mountedOnView,
+                    HoverTooltip: msRoadmapApp.onHoverTooltip,
+                    onHoverBlockPath: this.onHoverTitle,
+                    getDateLine: () => { return this.DateLine; }
+                }
+            },
+            methods: {
+                resetExpandPathBlocks() {
+                    this.LstVisibleInView.filter(block => {
+                        block.IsBlockExpand = true;
+                        return true;
+                    });
+                    this.ListExpands.filter(ex => {
+                        ex.IsExpand = true;
+                        return true;
+                    });
+                },
+                getIconToggle(element) {
+                    var icontoggle = 'none';
+                    const typeId = element.TypeId;
+                    if (!this.IsSharepoint) {
+                        var eEx;
+                        if (this.MenuLabeling.IsMain && typeId == vmCommon.RMGoalActionType.MainGoal) {
+                            eEx = this.ListExpands.find(e => e.Id == element.Id && e.TypeId == typeId);
+                        }
+                        if (this.MenuLabeling.IsSub && typeId == vmCommon.RMGoalActionType.SubGoal) {
+                            eEx = this.ListExpands.find(e => e.Id == element.Id && e.TypeId == typeId);
+                        }
+                        if (this.MenuLabeling.IsAction && typeId == vmCommon.RMGoalActionType.Action) {
+                            eEx = this.ListExpands.find(e => e.Id == element.Id && e.TypeId == typeId);
+                        }
+                        if (eEx && eEx.Descendants.length > 0) {
+                            if (eEx.IsExpand) icontoggle = 'font-arrow-down';
+                            else icontoggle = 'font-arrow-right';
+                        }
+                    }
+                    return icontoggle;
+                },
+                isNotOverRangeDateAndTime() {
+                    if (!this.TimeRangeFrom) return false;
+                    if (!this.TimeRangeTo) return false;
+                    if (!this.DateRange.Start) return false;
+                    if (!this.DateRange.End) return false;
+                    let sT = new Date(this.TimeRangeFrom);
+                    let eT = new Date(this.TimeRangeTo);
+                    let sD = new Date(this.DateRange.Start);
+                    let eD = new Date(this.DateRange.End);
+                    if (eT.getDate() < sD.getDate()) return true;
+                    if (sT.getDate() > eD.getDate()) return true;
+                    return false;
+                },
+                onHoverTitle(text, e) { /* do nothing because of preview */ },
+                getEndHasNotTimerangeEnd(start, end, DateRange, milSecondForwad) {   // DateTime
+                    if (DateRange.Start && !DateRange.End) {
+                        var e = start.getTime() + milSecondForwad;
+                        e = new Date(e);
+                        return e.toStringMMDDYYYY();
+                    }
+                    
+                    return end;
+                },
+                dataservice() {
+                    var rootUrl = '/Handlers/RoadMapHandler.ashx?funcName={funcName}&projid=' + projectId + '&strid=' + strategyId + '&lang=' + kLg.language;
+
+                    const urlBuilder = function (funcName) {
+                        return rootUrl.replace('{funcName}', funcName);
+                    };
+
+                    const base = (funcName, entryData) => {
+                        this.loading = true;
+                        return callAjaxPromise(urlBuilder(funcName), entryData).then(data => Promise.resolve(data)).catch(error => {
+                            this.errored = true;
+                        }).finally(() => this.loading = false);
+                    };
+
+                    var loadSettingRoadmap = function (entryData) {
+                        return base("getpreviewmmsettings", entryData);
+                    };
+                    var saveSettings = function (entryData) {
+                        return base("savepreviewmmsettings", entryData);
+                    };
+
+                    var getSharePointLinks = function (entryData) {
+                        return base("getsharepointlinks", entryData);
+                    };
+
+                    return {
+                        base: base,
+                        loadSettingRoadmap: loadSettingRoadmap,
+                        saveSettings: saveSettings,
+                        getSharePointLinks: getSharePointLinks
+                    };
+                },
+                getEndOnlyHasDateRangeStart(start, end, milSecondForwad) {
+                    if (end.getTime() - start.getTime() < milSecondForwad) {
+                        var e = start.getTime() + milSecondForwad;
+                        e = new Date(e);
+                        return e.toStringMMDDYYYY();
+                    }
+                    return end.toStringMMDDYYYY();
+                },
+                setStyleBody() {
+                    if (window.devicePixelRatio >= 1.25 || $(window).width() < 1600) {
+                        var $nav = $('.ms-header[role="navigation"]');
+                        var width = $nav.width();
+
+                        $('.body-content').css({
+                            'display': 'inline-block', 'max-width': width + 'px'
+                        });
+                    } else {
+                        $('.body-content').css({ 'display': '', 'max-width': '' });
+                    }
+                    this.MaxRowElements = Math.ceil($(window).height() / 34);
+                },
+                setHeightForView(rowsElement, rowsRegion, rowsBlock) {
+                    var viewHeight = rowsElement * 34;       // 34px height each row
+                    viewHeight += rowsRegion * 12;
+                    if (rowsBlock > 0) viewHeight += (rowsBlock * 38 - 9); // first block not padding top
+                    viewHeight += 105;       // padding top 105px
+                    viewHeight += 162;       // padding bottom
+
+                    if (viewHeight < 708 || rowsElement < 1) {
+                        viewHeight = 708;
+                    }
+                    this.ViewHeight = viewHeight;
+
+                    this.setHeightViewNextTick();       // use for checkbox labaling
+                },
+                setHeightView() {
+                    if (this.IsLabeling) {
+                        $(this.$el).find('.rm-rms-h').each(function () {
+                            $(this).css('max-height', '100%');
+                        });
+
+                        msRoadmapApp.setHLineDOM($(this.$el), this.MenuLabeling, '#dnb_export_pdf');
+
+                    } else {
+                        $('#dnb_export_pdf .dnb--rm-mga-empty').remove();
+                        $('#dnb_export_pdf .rm-path-labeling-showall').remove();
+                        $(this.$el).find('.dnb-elm-name-maxh').css({ 'max-height': '' });
+                        $('.dnb-elm-name-maxh').removeClass('dnb-elm-name-maxh');
+                    }
+                    var _h = $(this.$el).find('.dnb-msa-view').height();
+                    if (!_h) return;
+                    this.$root.ViewHeight = _h + 60 + 80;
+                },
+                setWidthView() {
+                    if (msRoadmapApp.TimeRangeTo || msRoadmapApp.TimeRangeTo) {
+                        $('#dnb_export_pdf .dnb-maxwidth-calc').css({ 'max-width': 'initial' });
+                    } else {
+                        const $calHead = $('.divExportSetting .dnb-years');
+                        const w = $calHead.width();
+                        $('#dnb_export_pdf .dnb-maxwidth-calc').css({ 'max-width': w + 'px' });
+                    }
+                    this.updateViewWidth();
+                },
+                setHeightViewNextTick() {
+                    this.$nextTick(function () {
+                        this.setHeightView();
+                        this.setWidthView();
+                    });
+                },
+                getWidthFromStartEnd(start, end, dayUnit) { // DateTime, DateTime, int                    
+                    var delTime = end.getTime() - start.getTime();
+                    delTime = delTime / 24 / 3600 / 1000; // days
+
+                    return delTime * dayUnit;
+                },
+                updateViewWidth() {
+                    var width = 0;
+                    const calendarView = this.$el.querySelector('.dnb_width_ref');
+                    if (calendarView) {
+                        width = calendarView.scrollWidth + 24;
+                        if (this.ViewTypeId == 1) {     // view month
+                            width += 110;
+                        }
+                    }
+                    const pathView = this.$el.querySelector('.dnb_view_path');
+                    if (pathView) {
+                        width += pathView.offsetWidth;
+                        if (this.ViewTypeId == 0) {     // view quarter
+                            width -= 8;
+                        }
+                    }
+                    if (this.IsAllItemNull) {
+                        width += this.ViewTypeId == 1 ? 308 : 300;
+                    }
+                    if (width != this.ViewWidth) {
+                        this.ViewWidth = width;
+                    }
+                },
+                saveViewStatus: function (typeId) {
+                    var that = this;
+                    that.ViewTypeId = typeId;
+                    this.resetExpandPathBlocks();
+                },
+                closeopenPopExportRoadmap: function () {
+                    msRoadmap.popExportRoadmap.close();
+                },
+                mountedOnView() {
+                    $('.body-content').animate({
+                        scrollLeft: 0
+                    }, 50);
+
+                    var ua = navigator.userAgent.toLowerCase();
+                    if (ua.indexOf('safari') != -1) {
+                        if (ua.indexOf('chrome') > -1) {
+                            // Chrome
+                        } else {
+                            // Safari
+                            $('.rm-text1line').addClass('rm-text1line-safari');
+                        }
+                    }
+                },
+                getWeekObject(date) {     // Date time
+                    return msRoadmapApp.getWeekObject(date);
+                },
+                getStartEndNoData(dateRangeStart, dateRangeEnd, viewTypeId) {
+                    var start = new Date(dateRangeStart);
+                    var end;
+                    if (viewTypeId == 0) {      // quarter
+                        if (dateRangeStart && !dateRangeEnd) {
+                            end = getDateForwad12Month(start.getFullYear(), start.getMonth() + 1);
+                        } else if (!dateRangeStart && dateRangeEnd) {
+                            end = new Date(dateRangeEnd);
+                            start = getDateBack12Month(end.getFullYear(), end.getMonth() + 1);
+                        }
+
+                        function getDateForwad12Month(year, month) {
+                            var m2 = month - 1;
+                            var y = year;
+                            if (month == 1) {
+                                m2 = 12;
+                            } else {
+                                y = year + 1;
+                            }
+                            return new Date(y, m2, 0);// ngay cuoi dung thang m2 nam y
+                        }
+                        function getDateBack12Month(year, month) {
+                            var m2 = month + 1;
+                            var y = year;
+                            if (month == 12) {
+                                m2 = 1;
+                            } else {
+                                y = year - 1;
+                            }
+                            return new Date(y, m2 - 1, 1);// ngay 1 thang m2 nam y
+                        }
+
+                    }
+
+                    if (viewTypeId == 1) {      // month
+                        if (dateRangeStart && !dateRangeEnd) {
+                            end = getDateForward6Month(start.getFullYear(), start.getMonth() + 1);
+                        } else if (!dateRangeStart && dateRangeEnd) {
+                            end = new Date(dateRangeEnd);
+                            start = getDateBack6Month(end.getFullYear(), end.getMonth() + 1);
+                        }
+
+                        function getDateForward6Month(year, month) {
+                            var m2 = month + 5;
+                            if (month > 8) {
+                                m2 -= 12;
+                                year += 1;
+                            }
+
+                            return new Date(year, m2, 0);
+                        }
+                        function getDateBack6Month(year, month) {
+                            var m2 = month - 5;
+                            if (month < 6) {
+                                m2 += 12;
+                                year -= 1;
+                            }
+
+                            return new Date(year, m2 - 1, 1);
+                        }
+                    }
+                    
+                    return {
+                        Start: start.toStringMMDDYYYY(), End: end.toStringMMDDYYYY()
+                    }
+                },
+                setDateRange(start, end) {      // start/end - DateTime or null
+                    var startStr = !start ? start : start.toStringMMDDYYYY();
+                    var endStr = !end ? end : end.toStringMMDDYYYY();
+
+                    this.DateRange.Start = startStr;
+                    this.DateRange.End = endStr;
+                },
+                getMaxStartMinEnd(viewStart, dateRangeStart, viewEnd, dateRangeEnd) {   // string/null param
+                    var timeRangeStart = this.TimeRangeFrom;
+                    var timeRangeEnd = this.TimeRangeTo;
+                                        
+                    var maxStart = getMaxStart(); // dateRangeStart ? getMaxStart() : getDateStart();
+                    var minEnd = getMinEnd(); //dateRangeEnd ? getMinEnd() : getDateEnd();
+                    return {
+                        Start: maxStart.toStringMMDDYYYY(),
+                        End: minEnd.toStringMMDDYYYY()
+                    }
+
+                    function getMinEnd() {
+                        var e = new Date(viewEnd);
+                        var e2;
+                        if (timeRangeEnd && dateRangeEnd) {
+                            e2 = new Date(dateRangeEnd);
+
+                            return e2.getTime() < e.getTime() ? e2 : e;
+
+                        }
+
+                        if (!dateRangeEnd)
+                            return e;
+
+                        e2 = new Date(dateRangeEnd);
+                        return e2;
+                        
+                    }
+
+                    function getMaxStart() {
+                        var s = new Date(viewStart);
+                        var s2;
+                        if (timeRangeStart && dateRangeStart) {
+                            s2 = new Date(dateRangeStart);
+
+                            return s2.getTime() > s.getTime() ? s2 : s;
+
+                        }
+
+                        if (!dateRangeStart)
+                            return s;
+
+                        s2 = new Date(dateRangeStart);
+                        return s2;
+                        
+                    }
+                },
+                bindDateRange(start, end) {     // start/end = DateTime or null
+                    this.setDateRange(start, end);
+                    $("#txtStartDateEx").preventPressAlphabetChar(kLg.language === "de" | "pm" ? [46] : [47]);
+                    $("#txtEndDateEx").preventPressAlphabetChar(kLg.language === "de" | "pm" ? [46] : [47]);
+                    $("#txtStartDateEx, #txtEndDateEx").kendoDatePicker({
+                        change: function (e) {
+                            onStartEndDateChange(e);
+                        },
+                        weekNumber: true
+                    });
+
+                    if (start)
+                        $("#txtStartDateEx").data("kendoDatePicker").value(start);
+                    
+                    if (end)
+                        $("#txtEndDateEx").data("kendoDatePicker").value(end);
+
+
+                    $("#txtStartDateEx, #txtEndDateEx").on("change", function (e) {
+                        correctDate(e.currentTarget);
+                    });
+
+                    function onStartEndDateChange(e) {
+                        var $elm = e.sender.element;
+                        var startDate = $('#txtStartDateEx').val() !== "" ? startDateValue() : null;
+                        var endDate = $('#txtEndDateEx').val() !== "" ? endDateValue() : null;
+                        // startDate/endDate is DateTime or null
+                        if (startDate != null && endDate != null && vmCommon.compareDate2(startDate, endDate) > 0) {
+                         
+                            ShowToolTip2($elm, kLg.msgValidateStartEndDate, "top");
+                            popExportRM.DateRange.IsValid = false;
+
+                        } else {
+                            if (vmCommon.compareDate2(startDate, endDate) < 0) {
+                                $("#txtStartDateEx").tooltip('destroy')
+                                $("#txtEndDateEx").tooltip('destroy')
+                            }
+                           
+                            popExportRM.DateRange.IsValid = true;
+                            popExportRM.setDateRange(startDate, endDate);
+                        }
+                    }
+
+                    function startDateValue() {
+                        return $('#txtStartDateEx').data("kendoDatePicker").value();
+                    }
+
+                    function endDateValue() {
+                        return $('#txtEndDateEx').data("kendoDatePicker").value();
+                    }
+
+                    function correctDate(elem) {
+                        popExportRM.DateRange.IsChange = true;
+                        var str = $(elem).val().trim();
+                        var newDate = vmCommon.formatStringToDate(str, kLg.language);
+
+                        if (str.length > 0 && newDate == null) {
+                            ShowToolTip2($(elem), kLg.msgDateInValid, "top");
+                            popExportRM.DateRange.IsValid = false;
+                            return;
+                        }
+                        popExportRM.DateRange.IsValid = true;
+                        DestroyToolTip($(elem));
+
+                        if (newDate != null) $(elem).val(kendo.toString(newDate, "d"));
+                    }
+                },
+                setOptionColumnString(linkSharepointEntry) {
+                    let IsHidePath = this.IsHidePath;
+
+                    linkSharepointEntry.OptionColumn = JSON.stringify({
+                        IsHidePath: IsHidePath
+                    });
+                },
+                openPopupLinkSharepoint() {
+                    var that = this;
+                    var interval = interval || null;
+                    if (interval) {
+                        clearInterval(interval);
+                        interval = null;
+                    }
+                    return new Promise((resolve) => {
+                        $('.kgv-review-roadmap').css({ 'cursor': 'context-menu' });
+
+                    var interval = setInterval(function () {
+                        if (!that.isHasSharePointLinks) return;
+
+                        var linkSharepoint = msFilter.getLinkSharepoint();
+
+                        var entry = linkSharepoint.fromRoadmap(that.ViewTypeId);
+                        var checkDuplicate = checkDuplicateF();
+
+                        if (checkDuplicate.IsDuplicate && !popExportRM.IsLabelingChanged) {
+                            var item = checkDuplicate.Item;
+                            if (!item)
+                                return;
+
+                            vmCommon.getLinkSharepoint().editService().updateExportTime(item);
+
+                            window.open(item.Link, '_blank');
+                        } else {
+                            resolve('open popup Link Name');
+
+                            that.setOptionColumnString(entry);
+                            
+                            popName(kLg.linksName).then(
+                                function () {
+                                    var nameLink = popName.Data;
+
+                                    entry.Name = nameLink;
+                                    entry.IsActive = true;
+                                    entry.CreatedDate = new Date();
+                                    entry.FilterQuery = msFilter.controlService.getQueryFilter();
+
+                                    vmCommon.getLinkSharepoint().editService().add(entry, function (data) {
+                                        var resData = data.value;
+                                        popExportRM.LinkSharepoints = resData.TheObject;
+
+                                        popExportRM.DateRange.IsChange = false;
+                                        msFilter.controlService.getCurrentModel().resetCheckChange();
+
+                                        var previewLink = resData.Message;
+
+                                        window.open(previewLink, '_blank');
+                                    });
+                                    return;
+                                });
+                        }
+
+                        clearInterval(interval);
+                        interval = null;
+                    }, 50);
+
+                    });
+                    function checkDuplicateF() {
+                        var filterHaschange = msFilter.controlService.getCurrentModel().hasChange();
+                        if (filterHaschange || popExportRM.DateRange.IsChange) {
+                            return { IsDuplicate: false };
+                        }
+
+                        if (popExportRM.LinkSharepointItems.length > 0) {
+                            let item = popExportRM.LinkSharepointItems[0];
+                            if (item.OptionColumn && item.OptionColumn.IsHidePath != that.IsHidePath) {
+                                return { IsDuplicate: false };
+                            }
+                        }
+                        
+                        return vmCommon.getLinkSharepoint().checkDuplicate(
+                            popExportRM.LinkSharepointItems,
+                            popExportRM.DateRange,
+                            popExportRM.ViewTypeId
+                        );
+                        
+                    }
+
+                },
+                onExportRoadmap: function () {
+                    if (!this.DateRange.IsValid) return;
+
+                    var arrPromise = [];
+                    
+                    if (this.IsOwner && this.isPreviewCheck) {
+                        arrPromise.push(this.openPopupLinkSharepoint());
+                        //this.openPopupLinkSharepoint();
+                    }
+
+                    if (this.isExportExcel) {
+                        arrPromise.push(this.exportExcel());
+                        //this.exportExcel();
+                    }
+
+                    if (this.isExportPdf) {
+                        arrPromise.push(this.exportToPDF());
+                        //this.exportToPDF();
+                    }
+
+                    if (arrPromise.length > 0) {
+                        // run task parallel
+                        Promise.all(arrPromise).then((values) => {
+                            $('.kgv-review-roadmap').css({ 'cursor': '' });
+                        });
+                    }
+
+
+                    if (this.IsEnableBtnExport) {
+                        this.saveSettingsRoadmap();
+                    }
+                },
+                saveSettingsRoadmap: function () {
+
+                    var isPreviewCheck = this.isPreviewCheck,
+                        isExportPdf = this.isExportPdf,
+                        isExportExcel = this.isExportExcel,
+                        IsHidePath = this.IsHidePath;
+                    var timeRangeFrom = new Date(this.TimeRangeFrom),
+                        timeRangeTo = new Date(this.TimeRangeTo);
+                    var entryData = {
+                        projectId: projectId,
+                        LastActionValue: JSON.stringify({
+                            IsLinkPreview: isPreviewCheck,
+                            PdfExport: isExportPdf,
+                            Excel: isExportExcel,
+                            HidePath: IsHidePath,
+                            PaperSize: parseInt($("#sltPaperSize").data("kendoDropDownList").value()),
+                            Orientation: parseInt($("#sltOrientation").data("kendoDropDownList").value()),
+                            DateRangeStart: changeHourOfDate($('#txtStartDateEx').data("kendoDatePicker").value()),
+                            DateRangeEnd: changeHourOfDate($('#txtEndDateEx').data("kendoDatePicker").value()),
+                            startDate: changeHourOfDate(timeRangeFrom),
+                            endDate: changeHourOfDate(timeRangeTo)
+
+                        })
+                    };
+                    this.dataservice().saveSettings(entryData);
+                },
+                getPdfSettingFrom: function (paperSize, orientation) {
+                    var that = this;
+                    var rmViewWidth = that.ViewTypeId == 0 ? $('#dnb_export_pdf .rm-view-quarter').width() : $('#dnb_export_pdf .rm-view-month').width();
+                    if (rmViewWidth < 1476) rmViewWidth = 1476;
+                    var scale = 1, pageWidth = 1, pageHeight;
+                    var contentH;
+                    
+                    switch (true) {
+                        case (paperSize === "A1" && orientation === kLg.landscape):
+                            pageWidth = 2327.2272;
+                            pageHeight = 1627.3872;
+                            contentH = (pageHeight * rmViewWidth / pageWidth) - 480;        // padding paper
+                            (contentH > pageHeight * 3.9) && (contentH = pageHeight * 3.9);
+                            break;
+                        case (paperSize === "A1" && orientation === kLg.portrait):
+                            pageWidth = 1627.3872;
+                            pageHeight = 2327.2272;
+                            contentH = (pageHeight * rmViewWidth / pageWidth) - 600;        // padding paper
+                            (contentH > pageHeight * 5.7) && (contentH = pageHeight * 5.7);
+                            break;
+                        case (paperSize === "A2" && orientation === kLg.landscape):
+                            pageWidth = 1627.3872;
+                            pageHeight = 1134.1872;
+                            contentH = (pageHeight * rmViewWidth / pageWidth) - 460;
+                            (contentH > pageHeight * 5.7) && (contentH = pageHeight * 5.7);
+                            break;
+                        case (paperSize === "A2" && orientation === kLg.portrait):
+                            pageWidth = 1134.1872;
+                            pageHeight = 1627.3872;
+                            contentH = (pageHeight * rmViewWidth / pageWidth) - 580;
+                            (contentH > pageHeight * 6) && (contentH = pageHeight * 6);
+                            break;
+                        case (paperSize === "A3" && orientation === kLg.landscape):
+                            pageWidth = 1134.1872;
+                            pageHeight = 784.9872;
+                            contentH = (pageHeight * rmViewWidth / pageWidth) - 540;
+                            (contentH > pageHeight * 6) && (contentH = pageHeight * 6);
+                            break;
+                        case (paperSize === "A3" && orientation === kLg.portrait):
+                            pageWidth = 784.9872;
+                            pageHeight = 1134.1872;
+                            contentH = (pageHeight * rmViewWidth / pageWidth) - 680;
+                            (contentH > pageHeight * 6.6) && (contentH = pageHeight * 6.6);
+                            break;
+                        case (paperSize === "A4" && orientation === kLg.landscape):
+                            pageWidth = 784.9872;
+                            pageHeight = 538.7472;
+                            contentH = (pageHeight * rmViewWidth / pageWidth) - 660;
+                            (contentH > pageHeight * 6) && (contentH = pageHeight * 5.7);
+                            break;
+                        case (paperSize === "A4" && orientation === kLg.portrait):
+                            pageWidth = 538.7472;
+                            pageHeight = 784.9872;
+                            contentH = (pageHeight * rmViewWidth / pageWidth) - 800;        // padding paper
+                            (contentH > pageHeight * 6.6) && (contentH = pageHeight * 6.6);
+                            break;
+                        default:
+                            pageWidth = rmViewWidth;
+                            break;
+                    }
+
+                    scale = pageWidth / rmViewWidth;
+                    
+                    return {
+                        Scale: scale,       // scale = 1 => set auto
+                        ContentH: contentH,
+                        pageH: pageHeight
+                    }
+                },
+                exportToPDF() {
+                    var time = new Date();
+                    var date = time.getDate();
+                    var month = time.getMonth() + 1;
+                    var year = time.getFullYear();
+                    var hour = time.getHours();
+                    var minute = time.getMinutes();
+                    var second = time.getSeconds();
+                    if (date < 10) {
+                        date = "0" + date;
+                    }
+                    if (month < 10) {
+                        month = "0" + month;
+                    }
+                    if (hour < 10) {
+                        hour = "0" + hour;
+                    }
+                    if (minute < 10) {
+                        minute = "0" + minute;
+                    }
+                    if (second < 10) {
+                        second = "0" + second;
+                    }
+                    var that = this;
+
+                    return new Promise((resolve) => {
+
+                    if (that.IsEnableBtnExport) {
+                        var pdfSetting = that.getPdfSettingFrom($("#sltPaperSize option:selected").text(), $("#sltOrientation option:selected").text());
+                        var _scale = pdfSetting.Scale;
+
+                        var optionPdf = {
+                            avoidLinks: true,
+                            paperSize: $("#sltPaperSize option:selected").text(),
+                            margin: { top: "2cm", left: "1cm", right: "1cm", bottom: "2cm" },
+                            landscape: true,
+                            scale: _scale
+                        };
+
+                        var selector = that.ViewTypeId == 0 ? '.kgv-review-roadmap .rm-view-quarter' : '.kgv-review-roadmap .rm-view-month';
+                        var $element = $(selector);
+                        
+                        if (pdfSetting.Scale != 1)
+                            $element = modifyDOM();
+                        if ($element.length > 0) {  // first element has class dnbViewonHideWhenExport
+                            $element = $element.last();
+                            $element.find('.dnb-ename-activity').each(function () {
+                                const limW = $(this).parent().width() - 18;
+                                $(this).css({ display: '' });
+                                $(this).find('.dnb-elm-name').css({ 'max-width': `${limW}px` });
+                            });
+                        }
+                        kendo.ui.progress($('#popExportRoadmap'), true);       // show icon processing
+                        $('.dnb-export_pdf-wrapper').css({'margin-top': '999px'});
+                        
+                        if ($("#sltPaperSize option:selected").text() === kLg.AutoSize) {
+                            optionPdf.allPages = true;
+                            optionPdf.paperSize = undefined;
+
+                            drawDOMThenExport($element, optionPdf);
+                        } else if ($("#sltOrientation option:selected").text() === kLg.landscape) {
+                            optionPdf.allPages = true;
+
+                            drawDOMThenExport($element, optionPdf);
+                        } else if ($("#sltOrientation option:selected").text() === kLg.portrait) {
+                            optionPdf.landscape = false;
+
+                            drawDOMThenExport($element, optionPdf);
+                        }
+                        
+                        function modifyDOM() {
+                            $('#dnb_rm_export_pdf_cache').html('');
+
+                            var height = pdfSetting.ContentH; // _scale - 440; // 440px: padding from optionPdf.margin
+                            height = Math.round(height);        // height 1 page
+                            
+                            var pageNum = $('#dnb_export_pdf .kgv-calenda-review').height() / height;
+                            pageNum = Math.ceil(pageNum);
+
+                            var $rvRm = $('#dnb_export_pdf > .kgv-review-roadmap:first-child');
+
+                            var idxFrom = 0;
+                            for (let i = 0; i < pageNum; i++) {
+                                var $aa = getPruneElm($rvRm.clone());
+                                $('#dnb_rm_export_pdf_cache').append($aa.clone());
+                                $('#dnb_rm_export_pdf_cache').find('.rmlabeling_toggle_view').remove();
+                                fitPage(i);
+                            }
+                            
+                            function getPruneElm($aa) {
+                                $aa.find('.dnbViewonHideWhenExport').remove();
+                                $aa.find('.div-info-measuresplan').remove();
+                                $aa.find('.settings-export-rm').remove();
+                                $aa.find('.dnb-pdf-1-page').css('height', 'auto');                                
+                                return $aa;
+                            }
+                            function fitPage(i) {
+                                var $aa = $('#dnb_rm_export_pdf_cache');
+                                $aa.find('.dnb-pdf-1-page').each(function (index) {
+                                    if (i == index) {
+                                        let _h = 0;
+                                        $(this).find('.rm-main-goal-action').each(function (index) {
+                                            if (index >= idxFrom) {
+                                                _h += $(this).height() + 2; // 2 margin bottom
+                                                if (_h > height) { // break to new page
+                                                    $(this).addClass('dnb_export_need_remove');
+                                                }
+                                            } else {
+                                                $(this).addClass('dnb_export_need_remove');
+                                            }
+                                        });
+                                        $(this).find('.dnb_export_need_remove').remove();
+                                        idxFrom += $(this).find('.rm-main-goal-action').length;
+                                    }
+                                });                                
+                            }
+                            $('#dnb_rm_export_pdf_cache').find('.dnb-group-of-elements').each(function () {
+                                if ($(this).find('.rm-main-goal-action').length < 1) {
+                                    $(this).closest('.dnbScrollItem').addClass('dnb_export_need_remove');
+                                }
+                            });
+                            
+                            $('#dnb_rm_export_pdf_cache').find('.rm-main-goal-action').each(function () {
+                                if ($(this).children('.rm-element-wrap').length > 1) {
+                                    var c0, i = 0;
+                                    $(this).children('.rm-element-wrap').each(function () {
+                                        if (i < 1) {
+                                            c0 = $(this).offset().top;
+                                        } else {
+                                            if (c0 != $(this).offset().top) {
+                                                $(this).addClass('dnb_export_need_remove');
+                                            }
+                                        }
+                                        i++;
+                                    });
+                                }
+                            });
+                            
+                            $('#dnb_rm_export_pdf_cache').find('.dnb_export_need_remove').remove();
+                            $('#dnb_rm_export_pdf_cache').find('.dnb_25880_freezed_col_clone').remove();
+
+                            $('#dnb_rm_export_pdf_cache').find('.dnb-pdf-1-page').each(function () {
+                                var $view = $(this).find('.dnb-msa-view');
+                                $(this).css('height', $view.height() + 143);
+                            });
+                            
+                            $('#dnb_rm_export_pdf_cache tr > td > div.dnb-pdf-1-page').css({       // .dnb-pdf-1-page
+                                'overflow-y': 'hidden'
+                            });
+                            $('#dnb_rm_export_pdf_cache .kgv-review-roadmap').each(function () {
+                                if ($(this).find('.dnbScrollItem').length < 1)
+                                    $(this).remove();
+                            });
+                            
+                            var $reviewRmLast = $('#dnb_rm_export_pdf_cache > tr:last-child td > div').last();
+                            var lastH = $reviewRmLast.find('.rm-main-goal-action').length * 34;
+                            $reviewRmLast.height(lastH + 390);
+
+                            $('#dnb_rm_export_pdf_cache .rm-master-block').css({
+                                'font-family': 'sans-serif', 'font-weight': '600'
+                            });
+
+                            return $('#dnb_rm_export_pdf_cache');
+                        }
+
+                        function drawDOMThenExport($element, optionPdf) {
+                            
+                            kendo.drawing.drawDOM($element, optionPdf).done(function (group) {
+                                kendo.ui.progress($('#popExportRoadmap'), false);  // hide icon processing
+
+                                var fileName = "Mapexport " + year + "-" + month + "-" + date + " " + hour + "-" + minute + "-" + second + ".pdf";
+                                var strApiController = "../api/imagebrowser/savefile";
+                                kendo.drawing.pdf.saveAs(group, fileName, strApiController);
+                                
+                                $('#dnb_rm_export_pdf_cache').html('');
+                                $('.dnb-export_pdf-wrapper').css({ 'margin-top': '' });
+                                resolve('pdf downloaded');
+                            });
+                        }
+                    }
+
+                    });
+                },
+                exportExcel: function () {
+                    var that = this;
+                    return new Promise((resolve) => {
+                        var elements = msRoadmapApp.getElements(msRoadmapApp.MasterBlocks, undefined, true);                        
+                        rmExcel.exportService.exportFile({
+                            Start: new Date(that.ViewFrom),
+                            End: new Date(that.ViewTo),
+                            ViewTypeId: that.ViewTypeId,
+                            Data: elements.MasterBlocks,
+                            IsHidePath: that.IsHidePath,
+                            MenuLabeling: that.MenuLabeling
+                        });
+
+                        resolve('rmExcel.exportService.exportFile executed');
+                    });
+                },
+                getClassName(element) {
+                    return msRoadmapApp.getClassName(element);
+                },
+                getFontLabeling(element) {
+                    return msRoadmapApp.getFontLabeling(element);
+                },
+                freezedPathOnScroll($this) {
+                    const viewPath = this.$el.querySelector('.dnb_view_path');
+                    if (!viewPath) return;
+                    const scrollLeft = $this.scrollLeft();
+                    
+                    if (scrollLeft == this.ScrollLeft) return;
+                    if (scrollLeft > 383) {
+                        var colClone = this.$el.querySelector('.dnb_25880_freezed_col_clone');
+                        if (!colClone) {        // Dam bao code chi chay 1 lan
+                            colClone = msRoadmapApp.clonePath(this);
+                        }
+                        colClone.style.left = `${scrollLeft - 386}px`;
+                    } else {
+                        const colClone = this.$el.querySelector('.dnb_25880_freezed_col_clone');
+                        if (colClone) {
+                            colClone.remove();
+                            delete vmCommon.RmRootExptLstVsbInView;
+                            delete vmCommon.RmRootExpt_onToggleLabelingOnFreezedPath;
+                        }
+                    }
+
+                    this.ScrollLeft = scrollLeft;
+                },
+                reClonePath() {
+                    const viewPath = this.$el.querySelector('.dnb_view_path');
+                    if (!viewPath) return;
+                    var colClone = this.$el.querySelector('.dnb_25880_freezed_col_clone');
+                    if (colClone) {
+                        colClone.remove();
+                    }
+                    msRoadmapApp.clonePath(this);
+                    colClone = this.$el.querySelector('.dnb_25880_freezed_col_clone');
+                    const scrollLeft = $('#popExportRoadmap').scrollLeft();
+                    if (this.ScrollLeft > 385 && scrollLeft > 386) {
+                        const colClone = this.$el.querySelector('.dnb_25880_freezed_col_clone');
+                        colClone.style.left = `${scrollLeft - 386}px`;
+                        this.freezedDepthAndLabeling(scrollLeft - 383);
+                    }
+                },
+                onToggleLabelingOnFreezedPath($this) {
+                    const elmid = $this.attr('elmid');
+                    const $lblingParent = $(this.$el).find(`div[freezedid="${elmid}"]`).first();
+
+                    const eEx = msRoadmapApp.ListExpands.find(e => e.Id == elmid);
+                    if (eEx) {
+                        const isEx = !eEx.IsExpand
+                        eEx.IsExpand = isEx;
+                    }
+
+                    const typeid = $lblingParent.hasClass('rm_labeling_maingoal') ? vmCommon.RMGoalActionType.MainGoal :
+                        ($lblingParent.hasClass('rm-labeling-subgoal') ? vmCommon.RMGoalActionType.SubGoal :
+                            ($lblingParent.hasClass('rm-labeling-action') ? vmCommon.RMGoalActionType.Action : -1));
+
+                    toggleLabelingOnPath($lblingParent.find('.dnb-elm-name'), typeid, this);
+
+                    this.reClonePath();
+                },
+                freezedDepthAndLabeling(scrollLeft) {
+                    if (scrollLeft > 0) {
+                        const cFdLbling = this.$el.querySelector('.dnb-ex_preview-f_depth_lbling');
+                        if (cFdLbling) {
+                            cFdLbling.classList.add('dnb-f_depth_lbling-freezed');
+                            cFdLbling.style.left = `${scrollLeft - 9}px`;
+                        }
+                    } else {
+                        const cFdLbling = popExportRM.$el.querySelector('.dnb-ex_preview-f_depth_lbling');
+                        if (cFdLbling) {
+                            cFdLbling.classList.remove('dnb-f_depth_lbling-freezed');
+                            cFdLbling.style.left = '0px';
+                        }
+                    }
+                },
+            },
+            destroyed() {
+                msRoadmapApp.IsOpenPopPreview = false;
+            }
+        });
+    });
+
+    msRoadmap.popExportRoadmap.bind('close', function (e) {
+        e.sender.element.focus();
+        popExportRM.$destroy();
+        var $body = $('.body-content');
+        msRoadmap.popExportRoadmap.destroy();
+        msRoadmap.popExportRoadmap = null;
+        $body.append(`<div id="popExportRoadmap"></div>`);
+    });
+</script>

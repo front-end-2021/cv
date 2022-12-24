@@ -1,0 +1,175 @@
+﻿<div id="popUpRegionMainContent"></div>
+<style>
+    .w-100per {
+    width: 98% !important;
+    }
+</style>
+<script id="popRegionTemplate" type="text/html">
+    <div class="modal-body ms-modal-body">
+        <form id="formEditMarket">
+
+            <div class="form-group">
+                <label id="lblPopName">Name</label><span style="font-weight: bold">*</span>
+                <div class="clear"></div>
+                <input id="regionName" name="regionName" tabindex="0" class="modal-input txtInput w-100per" value="#=htmlEscape(data.Name)#" maxlength="50" #if(!data.RoleMaster){# disabled="disabled" #}# />
+            </div>
+            <hr class="modal-market-hr" />
+            <div class="form-group">
+                <label id="lblPopDescription">Description</label>
+                <div class="clear"></div>
+                <textarea id="regionDescription" tabindex="0" class="modal-textarea w-100per" #if(!data.RoleMaster){# disabled="disabled" #}# >#if (data.Description != null){##:data.Description##}#</textarea>
+            </div>
+            <div class="form-group">
+                <label id="lblCurrency">Currency</label><span style="font-weight: bold">*</span>
+                <div class="clear"></div>
+                <input id="drpCurrency" tabindex="0" value="#:data.CurrencyId#" #if(!data.RoleMaster){# disabled="disabled" #}# />
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input id="regionType" tabindex="0" type="checkbox" #if(data.Type==1){#checked="checked"#}# #if(!data.RoleMaster){# disabled="disabled" #}# />
+                    <span>Neu</span>
+                </label>
+            </div>
+        </form>
+    </div>
+    <div class="modal-market-footer">
+        <button type="button" class="ms-button" tabindex="0" onclick="closeEditRegion()"><span class="icon-16 icon-close margin-right6"></span><span>Schliessen</span></button>
+    </div>
+</script>
+<script type="text/javascript">
+    var vmPopMEdit = {};
+    vmPopMEdit.isChange = false;
+    $(document).ready(function () {
+        //manh: begin
+        vmFile.assginedIcon("popEditRegion");
+
+        //manh: end
+        vmCommon.currentMarket.RoleMaster = vmSMarket.MarketData.Role > 0 ? true : false;
+        bindTemplate("popUpRegionMainContent", "popRegionTemplate", vmCommon.currentMarket);
+        onCheckChange();
+        vmCommon.popEditRegion.bind("close", function (e) {
+            vmFile.enableAssignedIcon = false;
+            if (vmPopMEdit.isChange) {
+                if (!window.confirm(kLg.saveConfirmQuestion)) {
+                    vmCommon.popEditRegion.destroy();
+                    vmCommon.popEditRegion = null;
+                    $('.body-content').after('<div id="popEditRegion"></div>');
+                } else {
+                    if (validEditRegion()) {
+                        updateNewRegion(vmCommon.currentControl);
+                        vmCommon.popEditRegion.destroy();
+                        vmCommon.popEditRegion = null;
+                        $('.body-content').after('<div id="popEditRegion"></div>');
+                    } else {
+                        e.preventDefault();
+                    }
+                }
+
+            } else {
+                vmCommon.popEditRegion.destroy();
+                vmCommon.popEditRegion = null;
+                $('.body-content').after('<div id="popEditRegion"></div>');
+            }
+
+        });
+        setPopEditRegionLanguage();
+
+        $('#regionName').keydown(function (e) {
+            $('#regionName').tooltip('hide');
+            if (e.keyCode == 13) {
+                e.preventDefault();
+            }
+        });
+
+        loadCurrencyPopDes();
+        limitedTabKey();
+        $('#regionName').focus();
+    });
+
+    function updateNewRegion(typeUpdate) {
+        var id = vmCommon.currentMarket.Id;
+        var name = $("input#regionName").val();
+        var description = $("textarea#regionDescription").val();
+        var currencies = $("#drpCurrency").val();
+        if ($('input#regionType').is(':checked') == true)
+            var type = 1;
+        else
+            type = 2;
+        var jsonObject = { Id: id, Name: name, Type: type, Description: description, Mdf: vmCommon.currentMarket.Mdf, CurrencyId: currencies };
+         jsonObject.LandId = vmCommon.currentMarket.LandId;
+
+        if (id == 0) {
+            editMarket(jsonObject, "insert" + typeUpdate);
+        } else {
+            editMarket(jsonObject, "update" + typeUpdate);
+        }        
+    }
+    
+    function closeEditRegion() {
+        if (!vmCommon.currentMarket.RoleMaster) {
+            vmCommon.popEditRegion.close();
+        }
+
+        if (validEditRegion()) {
+            vmPopMEdit.isChange = false;
+            updateNewRegion(vmCommon.currentControl);
+            vmCommon.popEditRegion.close();
+        }
+    }
+
+    function onCheckChange() {
+        $("#regionName").on("change keyup paste", function () {
+            vmPopMEdit.isChange = true;
+        });
+
+        $("#regionDescription").on("change keyup paste", function () {
+            vmPopMEdit.isChange = true;
+        });
+
+        $("#regionType").on("change", function () {
+            vmPopMEdit.isChange = true;
+        });
+    }
+
+    function setPopEditRegionLanguage() {
+        $("#lblCurrency").text(kLg.Currency);
+        $("#lblPopName").text(kLg.PopName);
+        $("#lblPopDescription").text(kLg.labelDes);
+        $("span.icon-close").next().text(kLg.lblClose);
+        $("#regionType").next().text(kLg.newLandRegion);
+    }
+
+    function validEditRegion() {
+        $('#regionName').tooltip('destroy');
+        var regionName = $('#regionName').val().trim();
+        if (regionName == null || regionName == '') {
+            $('#regionName').attr('title', kLg.requiredName);
+            $('#regionName').tooltip({ placement: 'top', trigger: 'manual' }).tooltip('show');
+            $('#regionName').focus();
+            return false;
+        } else {
+            if (regionName.length > 100) {
+                $('#regionName').attr('title', kLg.msgMaxlenghName);
+                $('#regionName').tooltip({ placement: 'top', trigger: 'manual' }).tooltip('show');
+                $('#regionName').focus();
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
+
+    function loadCurrencyPopDes() {
+        $("#drpCurrency").kendoDropDownList({
+            dataTextField: "Name",
+            dataValueField: "Id",
+            change: changeCurrencyRegion,
+            dataSource: vmSMarket.MarketData.Currency
+        });
+    }
+
+    function changeCurrencyRegion() {
+        vmPopMEdit.isChange = true;
+    }
+
+</script>

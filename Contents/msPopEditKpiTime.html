@@ -1,0 +1,131 @@
+﻿<div id="pop-edit-kpitime" class="pop-wrapper">
+    <form id="fCategoryForm" role="form" class="form-horizontal">
+        <div class="modal-body ms-modal-body" style="height: 280px;overflow: auto;">
+
+            <div>
+                <label id="lblCategoryName">Name</label>
+                <div class="clear"></div>
+                <input id="textCategoryName" name="textCategoryName" tabindex="1" class="modal-input txtInput w-100per-fix" maxlength="250" data-bind="value: category.Name, enabled: hasRole" />
+            </div>
+
+            <hr class="modal-market-hr">
+
+            <div style="margin-bottom: 12px;min-height: 20px;">
+                <input type="checkbox" class="pull-left" data-bind="checked: category.NonArchive, enabled: hasRole" /> <span class="pull-left" style="margin-left: 3px;margin-top: 1px;" id="lblAccumulate">Accumulate</span>
+            </div>
+
+            <div class="clear"></div>
+
+            <div>
+                <label id="lblCategoryDescription">Description</label>
+                <div class="clear"></div>
+                <textarea id="textTopicDescription" tabindex="2" class="modal-textarea w-100per-fix" data-bind="value: category.Description, enabled: hasRole"></textarea>
+            </div>
+
+        </div>
+        <div class="modal-market-footer">
+            <button id="btnUpdateViewData" type="button" class="ms-button" data-bind="events:{click: update}">
+                <span class="icon-20 icon-close"></span>
+                <span id="lblClose">Speichern und schliessen</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    var vmCategory = {};
+    vmCategory.modelChanged = false;
+
+    vmCategory.destroyPop = function () {
+        vmPopSetting.popupCategory.destroy();
+        vmPopSetting.popupCategory = null;
+        $("#pop-setting").after("<div id='pop-add-categories-place'></div>");
+    };
+
+    vmPopSetting.popupCategory.bind("close", function (e) {
+        if (vmCategory.modelChanged) {
+            if (confirm(kLg.saveConfirmQuestion)) {
+                if (!catModel.update()) e.preventDefault();
+            } else {
+                vmCategory.destroyPop();
+            }
+
+        } else {
+            vmCategory.destroyPop();
+        }
+    });
+
+    vmCategory.setupLanguage = function () {
+        $("#pop-edit-kpitime #lblCategoryName").text(kLg.lblName);
+        $("#pop-edit-kpitime #lblCategoryDescription").text(kLg.Description);
+        $("#pop-edit-kpitime #lblAccumulate").text(kLg.titleAccumulate);
+
+        $("#pop-edit-kpitime #lblClose").text(kLg.lblClose);
+    };
+    var catModel = undefined;
+    $(function () {
+        catModel = kendo.observable({
+            hasRole: vmPopSetting.Role > vmCommon.MemberRole.View || vmPopSetting.IsEditSetting,
+            category: vmPopSetting.categoriesOptions.category,
+            oldCategory: vmCommon.deepCopy(vmPopSetting.categoriesOptions.category),
+            valid: function () {
+                if (this.category.Name.trim().length == 0 || this.category.Name.trim().length > 250) {
+                    ShowToolTip($("#pop-edit-kpitime #textCategoryName"), kLg.InvalidData, "top");
+                    return false;
+                }
+
+                return true;
+            },
+            update: function () {
+                if (!this.hasRole) {
+                    vmCategory.modelChanged = false;
+                    vmPopSetting.popupCategory.close();
+                    return true;
+                }
+
+                //if (!vmCategory.modelChanged) {
+                //    vmPopSetting.popupCategory.close();
+                //    return true;
+                //}
+
+                if (vmPopSetting.categoriesOptions.isEdit && (this.oldCategory.Name == this.category.Name && this.oldCategory.NonArchive == this.category.NonArchive && this.oldCategory.Description == this.category.Description)) {
+                        vmCategory.modelChanged = false;
+                        vmPopSetting.popupCategory.close();
+                        return true;
+                }
+
+                if (!this.valid()) return false;
+
+                var cate = this.category;
+                vmPopSetting.dataservice.saveKpiTime(this.category, function (res) {
+                    switch (res.value) {
+                        case -3: //duplicate
+                            ShowToolTip($("#pop-edit-kpitime #textCategoryName"), kLg.msgDuplicateName, "top");
+                            break
+                        case -1: //conflict
+                            //TODO: show alert, close form
+                            vmPopSetting.UpdateCallBack(res.value, cate.Type);
+                            vmCategory.modelChanged = false;
+                            vmPopSetting.popupCategory.close();
+                            break
+                        case 1: //success
+                            vmPopSetting.UpdateCallBack(res.value, cate.Type);
+                            vmCategory.modelChanged = false;
+                            vmPopSetting.popupCategory.close();
+                            //TODO: reload list categories, close form
+                            break
+                    }
+                });
+
+                return false;
+            }
+        });
+
+        catModel.bind("change", function () {
+            vmCategory.modelChanged = true;
+        });
+
+        kendo.bind($("#pop-edit-kpitime"), catModel);
+        vmCategory.setupLanguage();
+    });
+</script>

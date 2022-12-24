@@ -1,0 +1,768 @@
+﻿<div id="loadingsubmarket" class="loading"></div>
+<div id="popSelectSubmarketProductSeHolder"></div>
+<div id="popSelectSubmarketProductSe"></div>
+
+<style type="text/css">
+    .sub-table {
+        width: 100%;
+        margin-top: 8px;
+    }
+
+    .sub-td {
+        padding-left: 20px;
+        height: 25px;
+        border: 1px solid #dddddd;
+        padding-right: 2px;
+    }
+
+    .sub-table .ms-dropdow ul.popup-menu {
+        right: 3px !important;
+        bottom: 18px !important;
+    }
+
+    .sub-table .open .icon-dropdow {
+        background-position: -81px -299px;
+        text-indent: -999px;
+        float: right;
+        display: block;
+        width: 20px;
+    }
+
+    .sub-table tr.ui-sortable-helper {
+        background-color: white;
+        width: 96% !important;
+        -webkit-box-shadow: 0 0 10px 0 rgba(0,0,0,0.75);
+        -moz-box-shadow: 0 0 10px 0 rgba(0,0,0,0.75);
+        box-shadow: 0 0 10px 0 rgba(0,0,0,0.75);
+    }
+
+        .sub-table tr.ui-sortable-helper td {
+            border: none;
+        }
+
+        .sub-table tr.ui-sortable-helper .open {
+            display: none;
+        }
+
+    .sub-table tr.ui-sortable-placeholder {
+        height: 39px !important;
+    }
+
+    .clientname {
+        float: left; 
+        white-space: pre; 
+        
+        width: initial;
+    }
+
+    .clientlink {
+        color: #428bca; text-decoration: underline;cursor: pointer;
+    }
+
+    .w-100per {
+        width: 98% !important;
+    }
+
+    #tbSubData .dropdow-menu-li-a {
+        padding: 0 10px 0 10px !important;
+        width: 88% !important;
+    }
+
+    #tbSubData .td-v-align-top {
+        padding-bottom: 5px !important;
+    }
+
+    .divxy {
+        float: right;
+        margin-top: -30px !important;
+        margin-right: 250px;
+    }
+
+    .btnApplySubProSe {
+        margin-top: -23px;
+        background-position: -81px -299px;
+        text-indent: -999px;
+        float: right;
+        display: block;
+        width: 20px;
+        position: absolute;
+        right: 15px;
+    }
+
+    .btnChildApplySubProSe {
+        margin-top: 5px;
+        background-position: -81px -299px;
+        text-indent: -999px;
+        float: right;
+        display: block;
+        width: 20px;
+        position: absolute;
+        left: 239px;
+    }
+</style>
+
+<div id="popsubmarket">
+    <form id="fsubmarket">
+        <div class="modal-body ms-modal-body" id="divsubcontent" style="height: 325px; overflow-x: hidden;">
+            <div class="clear"></div>
+            <div class="form-group">
+                <label id="lblName">Name</label><span style="font-weight: bold">*</span>
+                <div class="clear"></div>
+
+                <input data-role="autocomplete"
+                       data-value-primitive="false"
+                       data-text-field="Name"
+                       data-value-field="Id"
+                       data-filter="contains"
+                       data-bind="source: Orgs, value: SubMarket.Name, events:{select: selectSubMarket, change: changeSubMarket}"
+                       type="text" id="txtSubMarketName" tabindex="0" maxlength="40" style="width: 100%; padding-right: 78px!important; ">
+                                
+                <span class="icon-16 icon-dropdow btnApplySubProSe" data-bind="events:{click: selectSubProSe}"></span>                
+            </div>
+
+            <hr class="modal-market-hr" />
+
+            <div class="form-group">
+                <label id="lblDescription">Description</label>
+                <div class="clear"></div>
+                <textarea class="modal-textarea w-100per" tabindex="0" data-bind="value: SubMarket.Description"></textarea>
+            </div>
+            <div class="clear"></div>
+            <div class="form-group">
+                <label id="lblDocument">Dokument</label>
+                <div class="clear"></div>
+                <div data-template="smpdocument-template" data-bind="source: SubmarketProductDocuments"></div>
+                <div class="clear"></div>
+                <button type="button" class="ms-button smp-button-upload" id="smpUploadFile" name="smpUploadFile" data-bind="events: {click: uploadDocumentItem}" tabindex="0">
+                    <span class="icon-16 icon-upload"></span><span id="lblBrowseDocument">Durchsuchen...</span>
+                </button>
+            </div>
+            <div class="clear"></div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" tabindex="0" data-bind="checked: SubMarket.TypeValue"/>
+                    <span id="lblNew">Neu</span>
+                </label>
+                
+            </div>
+            <div class="checkbox divxy">
+                <label>
+                    <input type="checkbox" tabindex="0" data-bind="checked: SubMarket.Isxy, enabled: enableIsXy" />
+                    <span id="lblIsxy">x <> y</span>
+                </label>
+            </div>
+
+            <div class="checkbox" style="margin-top: 0;">
+                <label>
+                    <input type="checkbox" data-bind="checked: SubMarket.IsSubClient, events:{change: changeIsSubClient}, enabled: enableIsSubClient, attr: {tabindex: tabindexOrder}"/>
+                    <span id="lblCheckSubClient">Subkunden</span>
+                </label>
+            </div>
+            <div class="clear"></div>
+
+            <div data-bind="visible: SubMarket.IsSubClient" style="height: 34px" id="divSubControl">
+                <input data-role="autocomplete"
+                       data-value-primitive="false"
+                       data-text-field="Name"
+                       data-value-field="Id"
+                       data-filter="contains"
+                       data-bind="source: Orgs, value: subValue, events:{select: selectSubClient, change: changeSubClient}"
+                       type="text" id="subProductName" tabindex="1" maxlength="100" style="float: left; width: 250px;">
+                
+                <span class="icon-16 icon-dropdow btnChildApplySubProSe" data-bind="events:{click: selectQuickSubProSe}"></span>                
+
+                <span class="icon-32 icon-add margin-left10 cursor-pointer" style="float: left; margin-top: -2px;" data-bind="events:{click: quickAddSubClient}"></span>
+
+            </div>
+            <div class="clear" id="divSubData" data-bind="visible: isShowSubData">
+                <table class="sub-table" id="tableSubData">
+                    <thead>
+                        <tr>
+                            <th style="background-color: #38baf8; padding-left: 5px; height: 24px; color: #FFFFFF; font-weight: lighter; text-align: left;">
+                                <span id="lblHeadSubClient">SubClient</span>
+                                <span class="icon-16 icon-right-block icon-plus cursor-pointer" data-bind="events: {click: addSubClient}" style="margin-top: -2px;margin-right: 4px;"></span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbSubData" data-template="subDataTemp" data-bind="source: SubClients"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="modal-market-footer">
+            <button type="button" tabindex="1" class="ms-button" data-bind="events:{click: saveandclose}">
+                <span class="icon-20 icon-close"></span>
+                <span id="lblClose">Close</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script type="text/html" id="subDataTemp">
+    <tr class="sub-tr" data-bind="visible: IsShow">
+        <td class="sub-td td-v-align-top td-hover">
+            <div style="position: relative; height: 21px;">
+                <span class="icon-16  icon-arow-towway-vertical"></span>
+
+                <div style="width: 400px; overflow: hidden; float: left;">
+                    #if(OrganisationId){#
+                    <span class="clientname clientlink" data-bind="text: Name, events={click: changeToInput}"></span>
+                    #}else{#
+                    <span class="clientname" data-bind="text: Name, events={click: changeToInput}"></span>
+                    #}#
+                    
+                    <input class="ms-editable" type="text" data-bind="value: Name" style="display: none; float: left;width: inherit;" />
+                </div>
+
+                <div class="ms-dropdow">
+                    <span class="icon-16 icon-dropdow" data-toggle="dropdown"></span>
+                    <ul aria-labelledby="btnGroupVerticalDrop1" role="menu" class="popup-menu dropdown-menu ms-popup-menu posAbsolute" style="top: inherit; left: inherit; right: inherit; bottom: inherit;">
+                        <li><a class="dropdow-menu-li-a" data-toggle="modal" data-target=".bs-example-modal-lg" data-bind="events: {click: editSubClient}"><span class="icon-24  icon-left-block icon-edit" ></span><span>#:kLg.edit#</span></a></li>
+                        <li role="presentation" class="divider"></li>
+                        <li><a class="dropdow-menu-li-a" data-bind="events: {click: removeSubClient}"><span class="icon-24  icon-left-block icon-delete" ></span><span>#:kLg.Delele#</span></a></li>
+                    </ul>
+                </div>
+
+            </div>
+        </td>
+    </tr>
+</script>
+
+<script id="smpdocument-template" type="text/x-kendo-template">
+    <div class="document-item pull-left">
+        <div class="pull-left">
+            <a class="item-document-truncate ms-link" data-bind="text: FolderFileName,events: {click: downloadDocument}"></a>
+        </div>
+        <span class="icon-20 ms-icon-delete-gray" data-bind="events: {click: deleteDocumentItem}"></span>
+    </div>
+</script>
+
+<script type="text/javascript">
+    var subMarketModel = undefined, isModified = false;
+    
+    vmSubMarket.popSubClient = undefined;
+    vmSubMarket.showPopSubClient = function (title) {
+        var options = { height: 350, width: 500 };
+        vmSubMarket.popSubClient = showPopup(vmSubMarket.popSubClient, $("#popeditsubclient"),
+            "/Contents/MsPopEditSubClientName.html",
+            {
+                title: htmlDecode(title),
+                height: options.height,
+                width: options.width,
+                resizable: false
+            });
+
+    };
+
+    vmSubMarket.popEditSubMarket.bind("close", function (e) {
+        var destroyForm = function () {
+            vmSubMarket.popEditSubMarket.destroy();
+            vmSubMarket.popEditSubMarket = null;
+            $(".body-content").append("<div id='popeditsubmarket'></div>");
+        };
+
+        vmFile.enableAssignedIcon = false;
+        if (isModified) {
+            if (confirm(kLg.saveConfirmQuestion)) {
+                subMarketModel.valid();
+                e.preventDefault();
+            } else {
+                destroyForm();
+            }
+        } else {
+            destroyForm();
+        }
+    });
+
+    vmSubMarket.setUpLanguage = function () {
+        $("#popsubmarket #lblName").text(kLg.PopName);
+        $("#popsubmarket #lblDescription").text(kLg.labelDes);
+        $("#popsubmarket #lblNew").text(kLg.newLandRegion);
+        $("#popsubmarket #lblCheckSubClient").text(kLg.subClient);
+        $("#popsubmarket #lblHeadSubClient").text(kLg.subClient);
+        $("#popsubmarket #lblClose").text(kLg.lblClose);
+        $("#popsubmarket #editSC").text(kLg.edit);
+        $("#popsubmarket #deleteSC").text(kLg.Delele);
+        $("#popsubmarket #lblBrowseDocument").text(kLg.lblBrowse);
+        $("#popsubmarket #lblDocument").text(kLg.lblDocument);
+    };
+    vmSubMarket.AdjustPopupHeight = function () {
+        var footerHeight = $('#fsubmarket .modal-market-footer').height() + 2;  // boder 1px  
+        var _height = 280 + $('#fsubmarket #lblDocument').parent().height() + footerHeight;
+        _height += $('#divSubData').is(':hidden') ? 0 : $('#divSubData').height();
+        _height += $('#divSubControl').is(':hidden') ? 0 : $('#divSubControl').height();
+        var popupHeight = vmCommon.getPopupHeight(_height, footerHeight);
+        $('#fsubmarket .modal-body').height(popupHeight - footerHeight - 20);
+        resizePopUp(vmSubMarket.popEditSubMarket, { width: 500, height: popupHeight });
+    };
+    vmSubMarket.AdjustPopSubClientHeight = function () {
+        var footerHeight = $('form#fsubclient .modal-market-footer').height() + 2;  // boder 1px  
+        var _height = 200 + $('#fsubclient #lblDocument').parent().height() + footerHeight;
+        var popupHeight = vmCommon.getPopupHeight(_height, footerHeight);
+        $('form#fsubclient .modal-body').height(popupHeight - footerHeight - 20);
+        resizePopUp(vmSubMarket.popSubClient, { width: 500, height: popupHeight });
+    };
+    //vmSubMarket.AdjustPopupHeight = function () {                
+    //    if (vmSubMarket.popEditSubMarket) {
+    //        var extra = 0, max = 300, fix = 404;
+    //        if ($("#divSubControl").is(":visible")) {
+    //            extra += $("#divSubControl").height();
+    //        }
+    //        if ($("#divSubData").is(":visible")) {
+    //            extra += ($("#divSubData").height() + 8);                 
+    //        }            
+    //        setHeightPopUpFix(vmSubMarket.popEditSubMarket, fix + Math.min(extra, max));
+    //        var _heightCSS = 325 + Math.min(extra, max);
+    //        $("#divsubcontent").css({ height: _heightCSS.toString() + "px" });
+    //    }
+    //};
+
+    var srcIndex = 0, desIndex = 0, isChangePosition = false, maxIndex = 0;
+    vmSubMarket.bindSortTable = function (el) {
+        $(el).sortable({
+            axis: "y",
+            items: "tbody tr.sub-tr",
+            cancel: "ul.popup-menu,input",
+            helper: "clone",
+            cursor: "n-resize",
+            revert: false,
+            opacity: 1,
+            tolerance: "pointer",
+            containment: $(el),
+            start: function (event, ui) {
+                srcIndex = ui.item.index();
+            },
+            stop: function (event, ui) {
+                desIndex = ui.item.index();
+
+                var subs = vmCommon.deepCopy(subMarketModel.SubClients);
+
+                var temp = subs.splice(srcIndex, 1);
+                subs.splice(desIndex, 0, temp[0]);
+
+                isChangePosition = true;
+                subMarketModel.set("SubClients", subs);
+            }
+        });
+    };
+
+    var initSubMarket = { Name: vmSubMarket.popOptions.SubMarket.Name, LinkId: vmSubMarket.popOptions.SubMarket.LinkId };    
+    //ready
+    $(function () {
+        if (vmSubMarket.popOptions.IsEdit) {
+            $("#divsubcontent").css("height", "325px");
+        }
+        //vmFile.assginedIcon("popeditsubmarket");
+        var subClients = vmSubMarket.popOptions.SubMarket.SubClients;
+        vmSubMarket.popOptions.SubMarket.TypeValue = (vmSubMarket.popOptions.SubMarket.Type === 1);
+
+        maxIndex = subClients.length ? subClients.last().MIndex : 0;
+        subMarketModel = kendo.observable({
+            SubMarket: vmSubMarket.popOptions.SubMarket,
+            SubClients: subClients,
+            enableIsXy: vmUser.currentAccount.IsOwner,
+            enableIsSubClient: subClients.length === 0,
+            tabindexOrder: subClients.length === 0 ? '0' : '-1',
+            Orgs: vmSubMarket.popOptions.Organisations,
+            isShowSubData: subClients.length > 0,            
+            tempSubMarketItem: null,
+            subValue: null,
+            tempSubValue: null,
+            originText: "",
+            SubmarketProductDocuments: vmSubMarket.popOptions.SubMarket.SubmarketProductDocuments ? vmSubMarket.popOptions.SubMarket.SubmarketProductDocuments : [],
+            changeToInput: function (e) {
+                //codes for redirect
+                var item = e.data;
+                if (!item.OrganisationId) return;
+
+                var url = "/Pages/CrmOrganisation.aspx?lang=" + kLg.language + "&projid=" + projectId + "&strid=" + strategies[2] + "&oid=" + item.OrganisationId;
+                window.open(url, "_blank");
+
+                return;                
+            },
+            isValidName: function () {
+                var name = this.SubMarket.Name.trim();
+                return name.length > 0 && name.length <= 100;
+            },
+            selectSubMarket: function(e) {
+                var item = e.sender.dataItem(e.item.index());
+                this.tempSubMarketItem = item; 
+            },
+            changeSubMarket: function () {
+                if (this.tempSubMarketItem != null) {
+                    this.SubMarket.set("OrganisationId", this.tempSubMarketItem.Id);
+                    this.set("tempSubMarketItem", null);
+
+                    return;
+                }
+
+                this.SubMarket.set("OrganisationId", null);
+                var text = this.SubMarket.Name.trim();
+                if (!text) {
+                    return;
+                }
+
+                var os = this.Orgs, org;
+                for (var i = 0, len = os.length; i < len; i++) {
+                    if (os[i].Name === text) {
+                        org = os[i];
+                        break;
+                    }
+                }
+                this.SubMarket.set("LinkId", 0);
+                this.SubMarket.set("OrganisationId", org ? org.Id : null);
+            },
+            selectSubClient: function (e) {
+                var item = e.sender.dataItem(e.item.index());
+
+                this.tempSubValue = item;
+                this.add({ Name: item.Name, OrganisationId: item.Id });
+            },
+            changeSubClient: function () {
+                if (this.tempSubValue != null) {
+                    this.set("tempSubValue", null);
+                    this.set("subValue", null);
+                    return;
+                }
+            },
+            quickAddSubClient: function () {
+                var text = $("#subProductName").val().trim();
+                if (!text) {
+                    $("#subProductName").focus();
+                    vmCommon.showTooltip($("#subProductName"), kLg.requiredName, 3000);
+                    return;
+                }
+
+                // SOLUTION 1: get first org is same name
+                var os = this.Orgs, org;
+                for (var i = 0, len = os.length; i < len; i++) {
+                    if (os[i].Name === text) {
+                        org = os[i];
+                        break;
+                    }
+                }
+                this.add({ Name: text, OrganisationId: org ? org.Id : null, SubmarketProductDocuments: [] });
+
+                //SOLUTION 2:
+                //this.add({ Name: text, OrganisationId: null });
+
+                //clear text
+                $("#subProductName").val("");
+                $("#subProductName").focus();
+
+                vmSubMarket.effectNewRow();
+                vmSubMarket.setUpLanguage();
+            },
+            add: function (item) {
+                this.set("isShowSubData", true);
+                var subs = this.SubClients;
+                subs.push($.extend({ Id: 0, IsShow: true, DataState: dataState.Added }, item));
+                if (this.enableIsSubClient) {
+                    this.set("enableIsSubClient", false);
+                }
+                if (vmSubMarket.AdjustPopupHeight) vmSubMarket.AdjustPopupHeight();
+            },
+
+            editSubClient: function (e) {
+                var item = e.data;
+                var index = this.SubClients.indexOf(item);
+
+                vmSubMarket.ClientOptions = {
+                    Element: $(e.target).closest("tr.sub-tr").find("span.clientname"),
+                    SubClient: item,
+                    Orgs: vmSubMarket.popOptions.Organisations,
+                    IsEdit: true,
+                    CallBack: function () {
+                        vmSubMarket.effectNewRow(index);
+                    }
+                };
+
+                vmSubMarket.showPopSubClient(kLg.strEditFormat.format(kLg.subClient));
+            },
+            addSubClient: function () {
+
+                vmSubMarket.ClientOptions = {
+                    Element: undefined,
+                    SubClient: {
+                        Id: 0, IsShow: true, DataState: dataState.Added, Name: "", OrganisationId: null,
+                        SubmarketProductDocuments: []
+                    },
+                    Orgs: vmSubMarket.popOptions.Organisations,
+                    IsEdit: false,
+                    SubClients: subMarketModel.SubClients,
+                    CallBack: function () {
+                        if (vmSubMarket.AdjustPopupHeight) vmSubMarket.AdjustPopupHeight();
+                        vmSubMarket.effectNewRow();
+                    }
+                };
+
+                vmSubMarket.showPopSubClient(kLg.strAddFormat.format(kLg.subClient));
+            },
+
+            removeSubClient: function (e) {
+                var subs = this.SubClients;
+                var index = subs.indexOf(e.data);
+
+                pConfirmWithDesc({
+                    Name: kLg.msgAskForDeleteSubClient,
+                    Description: '( ' + kLg.msgAskForDeleteSubClientHint + ' )'
+                }).then(function () {
+                    if (e.data.Id === 0) {
+                        subs.splice(index, 1);
+                    } else {
+                        subs[index].set("IsShow", false);
+                        subs[index].set("DataState", dataState.Deleted);
+                    }
+
+                    if (subMarketModel.SubClients.length === 0 || subMarketModel.SubClients.every(function (it) { return it.IsShow === false; })) {
+                        subMarketModel.set("isShowSubData", false);
+                        subMarketModel.set("enableIsSubClient", true);
+                    }
+                    if (vmSubMarket.AdjustPopupHeight) vmSubMarket.AdjustPopupHeight();
+                });
+            },
+            valid: function () {
+                if (!isModified) {
+                    vmSubMarket.popEditSubMarket.close();
+                    return;
+                }
+
+                if (!this.isValidName()) {
+                    vmCommon.showTooltip($("#txtSubMarketName"), kLg.requiredName, 3000);
+                    $('#lblClose').parent().removeAttr("disabled");
+                    return;
+                }
+                
+                var _subMarName = this.SubMarket.Name.trim();
+                if (_subMarName === initSubMarket.Name && vmSubMarket.popOptions.IsEdit) {
+                    subMarketModel.update();
+                } else {
+                    vmSubMarket.dataService.isDuplicateName(
+                        {
+                            name: _subMarName,
+                            marketSegmentRegionId: vmSubMarket.popOptions.MarketSegmentRegionId,
+                            type: vmCommon.enumType.Submarket,
+                            CurrentControl: vmCommon.currentControl
+                        },
+                        function (res) {
+                            if (!res.value.IsDuplicateName) {
+                                isModified = false;
+                                subMarketModel.update();
+                            } else {
+                                vmCommon.showTooltip($("#txtSubMarketName"), kLg.msgDuplicateName, 3000);
+                                $('#lblClose').parent().removeAttr("disabled");
+                            }
+                        }
+                    );
+                }
+            },
+            saveandclose: function () {
+                $('#lblClose').parent().attr("disabled", true);
+                isModified = true;
+                subMarketModel.valid(); 
+            },
+            update: function () {
+                var funcName = vmSubMarket.popOptions.IsEdit ? "updatesubmarket" : "insertsubmarket";
+
+                var subDatas = this.SubClients;
+
+                for (var i = 0, len = subDatas.length; i < len; i++) {
+                    var item = subDatas[i];
+                    if (item.DataState === dataState.Deleted)
+                        continue;
+
+                    if (item.Id) {
+                        maxIndex = item.MIndex;
+                    }
+
+                    if (isChangePosition) {
+                        item.MIndex = i;
+
+                        if (item.Id) {
+                            item.DataState = dataState.Modified;
+                        }
+                    } else {
+                        if (item.Id === 0) {
+                            item.MIndex = ++maxIndex;
+                        }
+                    }
+                }
+
+                this.SubMarket.Type = this.SubMarket.TypeValue ? 1 : 2;
+
+                this.SubMarket.SubClients = subDatas;
+                this.SubMarket.SubmarketProductDocuments = subMarketModel.get("SubmarketProductDocuments");
+                if (this.SubMarket.LinkId == initSubMarket.LinkId && this.SubMarket.Name != initSubMarket.Name) {
+                    this.SubMarket.set("LinkId", 0);
+                };
+                editProduct(this.SubMarket, funcName);
+
+                var $prd = $(`#${this.SubMarket.Id}`);
+                if ($prd.length) {
+                    $prd.attr('data-xy', this.SubMarket.Isxy);
+                }
+
+                //close form
+                isModified = false;
+                vmSubMarket.popEditSubMarket.close();
+            },
+            changeIsSubClient: function () {
+                if (vmSubMarket.AdjustPopupHeight) vmSubMarket.AdjustPopupHeight();
+            },
+            uploadDocumentItem: function (e) {
+                var item = e.data;
+                var role = vmSProduct.SMProductData.Role;
+                vmCommon.showUploadDocument(function (savedFiles) {
+
+                    var dataDocs = subMarketModel.get("SubmarketProductDocuments");
+                    for (var i = 0; i < savedFiles.length; i++) {
+                        var baseDoc = vmCommon.deepCopy(vmCommon.defaultDocument);
+                        baseDoc.Type = item.Type;
+                        baseDoc.FolderFileId = savedFiles[i].Id;
+                        baseDoc.LinkId = item.Id;
+                        baseDoc.LinkType = item.Level;
+                        baseDoc.FolderFileName = savedFiles[i].Name;
+                        baseDoc.PhysicalName = savedFiles[i].PhysicalName;
+                        baseDoc.FileTypeId = savedFiles[i].Type;
+                        dataDocs.push(baseDoc);
+                    }
+                    subMarketModel.set("SubmarketProductDocuments", dataDocs);
+                }, role);
+            },
+            deleteDocumentItem: function (e) {
+                var docItem = e.data;
+                var dataDocs = subMarketModel.get("SubmarketProductDocuments");
+                var newDocs = [];
+                vmCommon.findAllByFunc(newDocs, dataDocs, function (item) { return item.FolderFileId !== docItem.FolderFileId; });
+                subMarketModel.set("SubmarketProductDocuments", newDocs);
+            },
+            selectSubProSe: function (e) {
+                vmSubMarket.showSelectSubProSe(vmCommon.currentControl, e.data.SubMarket.LinkId, e.data.SubMarket.LinkType,false);
+                
+            },
+            selectQuickSubProSe: function () {
+                vmSubMarket.showSelectSubProSe(vmCommon.enumType.SubClient, 0, 0,true);
+            },
+            downloadDocument: function (e) {
+                var docItem = e.data;
+                // use regex to check http || https (link)
+                if (/^http(s)?:\/\//ig.test(docItem.PhysicalName)) {
+                    vmCommon.CopyTitleToClipboard(docItem.PhysicalName, e.target);
+                } else {
+                    vmCommon.ClickToDownAndCopy("../FileUpload/" + docItem.PhysicalName,
+                        docItem.FolderFileName,
+                        docItem.FileTypeId,
+                        e.target);
+                }               
+            }
+        });
+
+        subMarketModel.bind("change", function () {
+            isModified = true;
+        });
+
+        kendo.bind($("#popsubmarket"), subMarketModel);
+
+        vmSubMarket.bindSortTable($("#tableSubData"));
+        if (vmSubMarket.AdjustPopupHeight) vmSubMarket.AdjustPopupHeight();
+        isModified = false;
+
+        vmSubMarket.setUpLanguage();
+        limitedTabKey();
+        $('#txtSubMarketName').focus();
+    });
+
+    $("#tableSubData").on("mouseout", "input.ms-editable", function () {
+        vmSubMarket.changeToSpan($(this));
+    });
+
+    $("#tableSubData").on("keyup", "input.ms-editable", function (e) {
+        var changeKeys = [13, 27];
+        if (changeKeys.indexOf(e.keyCode) !== -1) {
+            vmSubMarket.changeToSpan($(this));
+        }
+    });
+
+    vmSubMarket.changeToSpan = function (inp) {
+        $(inp).blur();
+
+        var text = $(inp).val().trim();
+        var item = subMarketModel.SubClients[$(inp).closest("tr.sub-tr").index()];
+        var span = $(inp).prev();
+
+        if (subMarketModel.originText !== text) {
+            var os = subMarketModel.Orgs, org;
+            for (var i = 0, len = os.length; i < len; i++) {
+                if (os[i].Name === text) {
+                    org = os[i];
+                    break;
+                }
+            }
+
+            if (!text) {
+                item.set("Name", subMarketModel.originText);
+            } else {
+                item.set("OrganisationId", org ? org.Id : null);
+                if (org) {
+                    $(span).css({ "color": "blue", "text-decoration": "underline" });
+                } else {
+                    $(span).css({ "color": "inherit", "text-decoration": "none" });
+                }
+
+                if (item.Id) {
+                    item.set("DataState", dataState.Modified);
+                }
+            }
+        }
+
+        
+        
+        $(inp).css({ "display": "none" });
+        $(span).css({ "display": "block" });
+    };
+
+    $("#subProductName").on("keydown", function (e) {
+        if (e.keyCode === 13) {
+            subMarketModel.quickAddSubClient();
+        }
+    });
+
+    $("#txtSubMarketName").on("keydown", function () {
+        $(this).tooltip("destroy");
+    });
+
+    vmSubMarket.effectNewRow = function () {
+        return;
+        //var lastRow = (index == undefined) ? $("#tableSubData tbody tr:last:visible").children("td.sub-td") : $("#tableSubData tbody tr:eq(" + index + ")").children("td.sub-td");
+        //if (lastRow.length === 0)
+        //    return;
+
+        //setTimeout(function () {
+        //    $(lastRow).css({ "background-color": "beige" });
+        //    setTimeout(function() {
+        //        $(lastRow).css({ "background-color": "white" });
+        //    },300);
+        //}, 50);
+    };
+
+    vmSubMarket.showSelectSubProSe = function (control,linkId,linkType,isQuick) {
+
+        vmCommon.popSelectSubProOptions.Type = control || vmCommon.currentControl;
+
+        vmCommon.popSelectSubProOptions.OldLinkId = linkId; 
+        vmCommon.popSelectSubProOptions.OldLinkType = linkType;
+        vmCommon.popSelectSubProOptions.AddQuick = isQuick; 
+
+        vmCommon.popSelectSubProOptions.CallbackFunc = function (checkSubSource) {
+            //alert(checkSubSource.length);
+        };
+        vmCommon.popSelectSubmarketProductSe = showPopup(vmCommon.popSelectSubmarketProductSe, $('#popSelectSubmarketProductSe'),
+            '/Contents/MsPopSelectSubmarketProductSe.html',
+            {
+                title: kLg.strSelectionFormat.format(kLg.lblSubmarket),
+                height: 525,
+                width: 650,
+                resizable: false
+            });
+    };
+
+</script>

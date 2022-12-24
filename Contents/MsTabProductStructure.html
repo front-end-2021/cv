@@ -1,0 +1,174 @@
+﻿<div id="lblProductError" style="color: red"></div>
+<p class="clearx2"></p>
+<div id="tabProductStruct" class="ms-layout-wrap tab-swotanalyse">
+    <a class="k-button btnAddTemp" onclick="showProdDesignTempPop(templateAction.Add, this)" tabindex="0">Add</a>
+    <a class="k-button btnUpdateTemp" onclick="showProdDesignTempPop(templateAction.Update, this)" tabindex="0">Update</a>
+    <a class="k-button btnDelTemp" onclick="vmSME.btnOpenTemplate_Onclick(templateType.ProductDesign)" tabindex="0">Delete</a>
+    <select id="ddlProdDesignTemp" class="ms-dropdown">
+        <option>Choose layout</option>
+    </select>
+    <a class="k-button btnImportTemp" onclick="vmSME.btnImportTemp_Onclick(templateType.ProductDesign);" tabindex="0">Import templates</a>
+</div>
+<p class="clearx2"></p> 
+     
+<div id="targetgroup-content" class="tab-swotanalyse" style="position:relative;"></div> 
+
+<div id="windowDescription"></div>
+<div id="popUpproductDesign"></div>
+
+<!-- mahn: resize tooltip -->
+<style type="text/css">
+    .tooltip-inner {
+        max-width: 400px;
+    }
+</style>
+
+<script id="popUpproductDesign-temp" type="text/x-kendo-template">
+    <div class="modal-body ms-modal-body">
+        <form>
+            <div class="form-group">
+                <label id="lblNamepopUpproductDesign">Name</label>
+                <div class="clear"></div>
+                <input id="txtProdDesignTempName" name="txtProdDesignTempName" class="modal-input txtInput w-100per" value="#:data#"/>
+            </div>
+        </form>
+    </div>
+    <div class="modal-market-footer">
+        <button type="button" class="ms-button" onclick="closeProdDesignTempPopup(this)" tabindex="1"><span class="icon-20 icon-close margin-right6"></span><span id="lblProStructCancel">Cancel</span></button>
+        <button type="button" class="ms-button" id="btnSaveProdDesignTemp"><span class="icon-20 icon-update margin-right6"></span><span id="lblProStructOK">OK</span></button>
+    </div>
+</script>    
+
+<script type="text/html" id="targetTemplate">
+    <div style="float: right;width:300px;position: absolute;right: 0px;bottom: 0px;" class="boxSizing">
+        <div id="divChartDemand" ></div>  
+    </div>
+    <div style="overflow-x: scroll; margin-right: 301px" class="boxSizing">
+        <table id="tbTargetDemand" class="table-target">
+            <thead>
+                <tr >
+                    <td style="width: 230px"></td>
+                    <td id="tdNeeds"><span>Bedurfinisse</span></td>
+                    <td style="width: 25px"></td>
+                    <td id ="lblImportantC" style="width: 68px"><div id ="lblImportant"><span id ="lblImportantS"></span></div></td>
+                    <td id="tdErwartungen"><span></span></td>                   
+                    <td id ="lblExpectC" style="width: 42px"><div id ="lblExpect"><span id ="lblExpectS"></span></div></td>                    
+                    #for(var i = 0; i < data.DemandCharts.length; i++) {
+                    var demandCharts = data.DemandCharts[i];#
+                    <td style="width: 212px"> 
+                        <div id="chart#:demandCharts.Id#" > </div>                      
+                        <div class="showButton" style="position: relative">
+                            <div class="ms-table" style="width: 100%">
+                                <div class="ms-table-row">
+                                    <table>
+                                        <tr id="#:demandCharts.Id#"><td><input class="colorChartPickers" value="#=demandCharts.Color#" /> </td>
+                                            <td id="#:demandCharts.Id#_"><span # if(i > 0) { #  class="ChartNameEditable" #}# >#:demandCharts.Name#</span></td>
+                                            <td> 
+                                                #if ((data.DemandCharts.length > 1)&&(i > 0)){#
+                                                <a class="icon-28 icon-bin-hidden"  onclick="deleteDemandChart(this)"  />
+                                                #}# 
+
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div></td>                   
+                    #}#  
+                    <td class="edCell"> <a class="icon-28 icon-add-small floatleft" onclick="addDemandChart()"></a></td>   
+                </tr>
+            </thead>
+            <tbody>
+                #for(var i = 0; i < data.TargetDemands.length; i++) {
+                var colSpanTarget = 7 + data.DemandCharts.length;
+                var target = data.TargetDemands[i];#
+                <tr style="height: 35px">
+                    <td colspan="#:colSpanTarget#" class="target-description">                       
+                        <table style="border-spacing: 0px !important">
+                            <tr class="targetName">
+                                <td>
+                                    <a href="javascript:;" onclick="loadDemandsByOrder(this,'#:i#')"><i #if(target.IsShow) {# class="icon-pd-open icon-28 pull-left" #}else{# class="icon-pd-hidden icon-28 pull-left" #}#></i></a>
+                                </td>
+                                <td class="tdDescription">                
+                                    <span id="tdes#:target.Id#" class="icon-24 icon-description1 pull-left"onclick="showTargetDescription('#:target.Id#')"></span>  
+                                </td>
+                                <td id="#:target.Id#"><div class="removeTarget" ><span class="TargetNameEditable" style="vertical-align: text-bottom">#:target.Name#</span> 
+                                                      </div>
+                                </td>   
+                                <td>
+                                    #if (data.TargetDemands.length > 1){#
+                                    <a style="margin-top: 3px;" class="icon-bin-hidden icon-28" href="javascript:;" onclick="deleteTarget('#:target.Id#')"></a>
+                                    #}# 
+                                </td>                             
+                                #for(var h = 0; h < data.DemandCharts.length; h++) {
+                                var demandChart = data.DemandCharts[h];#
+                                <td class="cssChart#:demandChart.Id#" ><input isShow ="0" class="demandChartSlider" style="display: none" /></td> 
+                                #}# 
+                            </tr>        
+                        </table>                     
+                    </td>                    
+
+                </tr>
+                #if (target.IsShow)  {#
+                #for(var k = 0; k < target.DemandTypes.length; k++) {
+                var demandTypes = target.DemandTypes[k];#
+                #for (var j= 0; j < demandTypes.Demands.length; j++) {
+                var demand = demandTypes.Demands[j];#           
+                <tr class="filterItem" targetId="#:target.Id#" id ="#:demand.Id#">
+                    #if (j == 0)  {#<td rowspan="#=demandTypes.Demands.length#" class="td-hover">
+                                        <span class="cssNameDemand#=demandTypes.Type#" ></span>
+                                        <div class="ms-dropdow">
+                                            <span class="icon-16 icon-dropdow" data-toggle="dropdown"></span>
+                                            <ul role="menu" class="popup-menu dropdown-menu ms-popup-menu">
+                                                <li onclick="addDemand(this,'#=demandTypes.Type#')"><a class="dropdow-menu-li-a" data-toggle="modal" data-target=".bs-example-modal-lg"> 
+                                                                                                        <span class="icon-24  icon-left-block icon-add-region"></span><span class="cssAddDemand">Bedürfnisse hinzufügen</span></a></li>                                                                       
+                                            </ul>
+                                        </div>   
+                                    </td>#}#
+                    <td class="editCell">
+                        <div style=" position:relative">
+                            <input class="textDemandEditable" readonly="readonly" type="text" value="#=htmlEscape(demand.DemandText)#" name="demandText">                                                                                          
+                            <div class="divDemandTextAreaEdit" style=" position: relative; z-index: 50000;"></div>
+                        </div>
+                    </td>
+                    <td> <span id="tdes#:demand.Id#" class="icon-24 icon-description2 pull-left" onclick="showDemandDescription('#:demand.Id#')"></span>                   
+                    </td>
+                    <td><input class="cssImportance" value="#:demand.Importance#" /> 
+                    </td>
+                    <td class="editCell" style="padding-right: 12px !important">
+                        <input class="textDemandEditable" readonly="readonly" type="text" value="#=htmlEscape(demand.ExpectationText)#" name="expectationText">   
+                                                                                                               
+                        <div class="divDemandTextAreaEdit" style=" position: relative; z-index: 50000;"></div>
+                    </td>
+
+                    <td class="textcenter"><input type="checkbox" name="vehicle"  #if(demand.IsExpectation == true){# checked="checked" #}# onchange="changeIsExpectation(this)"></td>
+                             
+                    #for(var l = 0; l < data.DemandCharts.length; l++) {
+                    var demandChart = data.DemandCharts[l];#
+                    <td class="cssChart#:demandChart.Id#"><input id="_#:demandChart.Id#_#:demand.Id#" class="demandChartSlider" /></td>                 
+                    #}#    
+                    <td>
+                         #if (demandTypes.Demands.length > 1){#
+                            <a class="icon-28 icon-bin-small pull-left" onclick="deleteDemand(this)" />
+                            #}#           
+                    </td>
+                </tr>
+                #}# 
+                #}# 
+                #}#              
+                #}#               
+           
+            </tbody>
+        </table>  
+        
+        <div id="divAutoHeight" class="clear4px"></div>         
+              
+    </div> 
+     <div class="floatleft"> 
+            <a class="icon-add-small icon-28 floatleft"  onclick="addTargetDemand()"></a>
+        </div>
+      
+</script>
+<script src="/Scripts/msProductStructure.js"></script>
+

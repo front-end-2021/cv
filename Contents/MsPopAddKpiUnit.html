@@ -1,0 +1,249 @@
+﻿<div id="pop-add-kpiunit">
+    <form id="add-kpiunit-form" data-bind="events:{change: formChange}">
+        <div class="ms-modal-body" id="pop-add-kpi-unit">
+
+            <div class="form-group">
+                <label id="lblNameCategories">Name</label>
+                <p class="clear"></p>
+                <input class="modal-input txtInput w-98per" name="CategoryName" id="txtNameCategories" data-bind="value: kpiUnit.Name" tabindex="1" maxlength="250" />
+            </div>
+            <hr class="modal-market-hr" />
+
+            <div class="form-group">
+                <label id="lblType">Typ</label>
+                <div class="clear"></div>
+                <input id="drpCurrency" tabindex="2" data-role="dropdownlist" data-auto-bind="false"
+                       data-value-primitive="true"
+                       data-text-field="Name"
+                       data-value-field="Id"
+                       data-bind="value: kpiUnit.TypeId,
+                              source: kpiTypes, events: {change: changeTypeUnit}" />
+            </div>
+
+            <div class="form-group">
+                <label id="lblSymbol">Symbol</label>
+                <p class="clear"></p>
+                <input class="modal-input txtInput w-30per" name="SymbolName" data-bind="value: kpiUnit.Symbol" id="txtSymbol" tabindex="3" maxlength="50" />
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-5" style="padding-left: 0">
+                    <label id="lblPosition">Postion</label>
+                    <div class="radio" style="margin-top: 0;">
+                    <input type="radio" name="rdPostion" id="rdLeft" value="1" tabindex="4" data-bind="checked: kpiUnit.PositionId"><label class="type-select" id="lblLeft">Links</label><br />
+                    <input type="radio" name="rdPostion" id="rdRight" value="2" tabindex="5" data-bind="checked: kpiUnit.PositionId"><label class="type-select" id="lblRight">Rechts</label><br />
+                        <input type="radio" name="rdPostion" id="rdCenter" value="3" tabindex="6" data-bind="checked: kpiUnit.PositionId"><label class="type-select" id="lblCenter">Mitte</label><br />
+                        </div>
+                </div>
+
+                <div class="col-md-5">
+                    <label id="lblOrder">Order</label>
+                    <div class="radio" style="margin-top: 0;">
+                    <input type="radio" name="rdOrder" id="rdFront" value="1" tabindex="7" data-bind="checked: kpiUnit.OrderId" checked><label class="type-select" id="lblFront">Vorn</label><br />
+                        <input type="radio" name="rdOrder" id="rdBehind" value="2" tabindex="8" data-bind="checked: kpiUnit.OrderId"><label class="type-select" id="lblBehind">Hinter</label><br />
+                        </div>
+                </div>
+            </div>
+            
+            <div class="clear"></div>
+            <!--<div class="form-group">
+                
+            </div>-->
+            <div class="form-group">
+                <label id="lblDirectOutcome">Direct Outcome</label>
+                <p class="clear"></p>
+                <div class="checkbox">
+                    <input type="checkbox" id="ckIsContact" tabindex="9" data-bind="checked: kpiUnit.IsContact"><label class="type-select" id="lblKpiIsContact">Als Kontakt festlegen</label><br />
+                </div>
+                </div>
+                <div class="form-group">
+                    <label id="lblKpiOutflow">Outflow</label>
+                    <p class="clear"></p>
+                    <div class="checkbox">
+                        <input type="checkbox" id="ckIsRevenue" tabindex="10" data-bind="checked: kpiUnit.IsRevenue, events:{change: onChangeRevenue}, visible: isRevenueVisible"><label class="type-select" id="lblKpiIsRevenue" data-bind="visible: isRevenueVisible">Sales revenue</label>
+                        <input type="checkbox" id="ckIsTurnover" tabindex="11" data-bind="checked: kpiUnit.IsTurnover , events:{change: onChangeTurnover}, visible: isTurnoverVisible"><label class="type-select" id="lblKpiIsTurnover" data-bind="visible: isTurnoverVisible"> Sales figure (Piece, Unit)</label>
+                        <br />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div>
+                        <label id="lblDescriptionCategories" style="float: left">Description</label>
+                    </div>
+                    <p class="clear"></p>
+                    <textarea class="modal-textarea w-98per" id="txtDescriptionCategories" tabindex="12" data-bind="value: kpiUnit.Description"></textarea>
+
+                </div>
+
+            </div>
+
+    <div class="modal-market-footer">
+        <button type="button" class="ms-button" id="btnCloseCategories" data-bind="events:{click: updateUnit}" tabindex="3">
+            <span class="icon-16 icon-close margin-right6" ></span>
+            <span id="lblCloseKpiCategories"></span>
+        </button>
+    </div>
+        </form>
+</div>
+
+<div class="loading" id="add-categori-loading"></div>
+<script type="text/javascript">
+
+    var popKpiViewModel;
+
+    var vmPopKpiCategory = vmPopKpiCategory || {};
+    vmPopKpiCategory.IsModified = false;
+
+    vmPopKpiCategory.arrayTypeKpi = [
+        { Id: vmPopSetting.enumTypeKPI.Number, Name: kLg.lblKpiNumber},
+        { Id: vmPopSetting.enumTypeKPI.Currency, Name: kLg.lblKpiCurrency},
+        { Id: vmPopSetting.enumTypeKPI.Percent, Name: kLg.lblKpiPercent},
+        { Id: vmPopSetting.enumTypeKPI.Index, Name: kLg.menuKpiIndex},
+        { Id: vmPopSetting.enumTypeKPI.M2, Name: kLg.lblKpiM2 },
+        { Id: vmPopSetting.enumTypeKPI.Hour, Name: kLg.lblKpiHour }
+    ];
+
+    vmPopKpiCategory.SetLang = function () {
+        $("#pop-add-kpiunit #lblNameCategories").text(kLg.PopName);
+        $("#pop-add-kpiunit #lblDescriptionCategories").text(kLg.Description);
+        $("#pop-add-kpiunit #lblCloseKpiCategories").text(kLg.lblClose);
+        $("#pop-add-kpiunit #lblType").text(kLg.lblType);
+        $("#pop-add-kpiunit #lblPosition").text(kLg.lblKpiPosition);
+        $("#pop-add-kpiunit #lblLeft").text(kLg.lblKpiLeft);
+        $("#pop-add-kpiunit #lblRight").text(kLg.lblKpiRight);
+        $("#pop-add-kpiunit #lblCenter").text(kLg.lblKpiMiddle);
+        $("#pop-add-kpiunit #lblFront").text(kLg.lblKpiBefore);
+        $("#pop-add-kpiunit #lblBehind").text(kLg.lblKpiBehind);
+        $("#pop-add-kpiunit #lblDirectOutcome").text(kLg.lblDirectOutcome);
+        $("#pop-add-kpiunit #lblKpiIsContact").text(kLg.lblKpiIsContact);
+        $("#pop-add-kpiunit #lblKpiOutflow").text(kLg.lblKpiOutflow);
+        $("#pop-add-kpiunit #lblKpiIsRevenue").text(kLg.lblKpiRevenue);
+        $("#pop-add-kpiunit #lblKpiIsTurnover").text(kLg.lblKpiAbsatz);
+        $("#pop-add-kpiunit #lblOrder").text(kLg.lblKpiUnitOrder);
+        $("#pop-add-kpiunit #lblPosition").text(kLg.lblKpiUnitPosition);
+
+        
+        
+        
+    };
+
+    vmPopKpiCategory.dataService = function() {
+        var callAjaxCrm = function (divId, funcName, entryData, requestType, successCallBack) {
+            var url = "../Handlers/SettingHandler.ashx?funcName=" + funcName + "&projid=" + projectId + "&strid=" + strategyId + "&lang=" + language;
+            return callAjax(divId, url, entryData, successCallBack, requestType);
+        };
+
+        var callAjaxByPost = function (funcName, entryData, successFunc, loadingdiv) {
+            return callAjaxCrm(loadingdiv || "categories-loading", funcName, JSON.stringify(entryData), AjaxConst.PostRequest, successFunc);
+        };
+
+        var updateKpiUnit = function(entryData, successFunc) {
+            return callAjaxByPost("updatekpiunit", entryData, successFunc);
+        }
+
+        return {
+            updateKpiUnit: updateKpiUnit
+        }
+    }();
+
+    vmPopKpiCategory.SetupValidate = function() {
+        $('#add-kpiunit-form').validate({
+            rules: {
+                CategoryName: {
+                    required: true
+                }
+            },
+            messages: {
+                CategoryName: {
+                    required: kLg.requiredName
+                }
+            }
+        });
+    };
+
+    popUpKpiUnit.bind("close", function (e) {
+        $("#pop-add-kpiunit #txtNameCategories").tooltip('destroy');
+        $("#pop-add-kpiunit #txtNameCategories").removeAttr('title');
+        if (vmPopKpiCategory.IsModified === true) {
+            if (!confirm(kLg.saveConfirmQuestion)) {
+                popUpKpiUnit.destroy();
+                popUpKpiUnit = null;
+                $('#pop-setting').after('<div id="pop-add-categories-place"></div>');
+
+            } else {
+                if (!$('#add-kpiunit-form').valid()) { 
+                    e.preventDefault();
+                    return;
+                };
+                popKpiViewModel.updateUnit();
+                $('#pop-setting').after('<div id="pop-add-categories-place"></div>');
+            }
+        } else {
+            popUpKpiUnit.destroy();
+            popUpKpiUnit = null;
+            $('#pop-setting').after('<div id="pop-add-categories-place"></div>');
+
+        }
+    });
+
+
+
+    $(document).ready(function () {
+
+        popKpiViewModel = kendo.observable({
+            kpiUnit: vmPopSetting.KpiUnit,
+            kpiTypes: vmPopKpiCategory.arrayTypeKpi,
+            isTurnoverVisible: vmPopSetting.KpiUnit.TypeId !== vmPopSetting.enumTypeKPI.Currency,
+            isRevenueVisible: vmPopSetting.KpiUnit.TypeId === vmPopSetting.enumTypeKPI.Currency,
+            updateUnit: function () {
+                if (!$('#add-kpiunit-form').valid()) return;
+               var entryData = this.kpiUnit;
+                vmPopKpiCategory.dataService.updateKpiUnit(entryData, function (res) {
+
+                    vmPopKpiCategory.IsModified = false;
+                    vmPopSetting.returnSettingHome(res.value, vmPopSetting.enumsType.categoryKpiUnit);
+                    if (res.value !== vmPopSetting.enumsRoleConflict.nameExist ) {
+                        popUpKpiUnit.destroy();
+                        popUpKpiUnit = null;
+                        $('#pop-setting').after('<div id="pop-add-categories-place"></div>');
+                    }
+                  
+               });
+            },
+            formChange : function(){
+                vmPopKpiCategory.IsModified = true;
+            },
+            onChangeRevenue: function () {
+                if (this.kpiUnit.IsTurnover && this.kpiUnit.IsRevenue) {
+                    this.kpiUnit.set("IsTurnover", false);
+                }
+            }, 
+            onChangeTurnover: function () {
+                if (this.kpiUnit.IsTurnover && this.kpiUnit.IsRevenue) {
+                    this.kpiUnit.set("IsRevenue", false);
+                }
+            },
+            changeTypeUnit: function () {
+                var isCurrency = this.kpiUnit.TypeId === vmPopSetting.enumTypeKPI.Currency;
+                this.set("isTurnoverVisible", !isCurrency);
+                this.set("isRevenueVisible", isCurrency);
+
+                if (this.kpiUnit.TypeId === vmPopSetting.enumTypeKPI.Currency) {
+                    this.kpiUnit.set("IsTurnover", false);
+                } else {
+                    this.kpiUnit.set("IsRevenue", false);
+                }
+            }
+
+
+        });
+
+        vmPopKpiCategory.SetupValidate();
+        vmPopKpiCategory.SetLang();
+        kendo.bind($('#pop-add-kpiunit'), popKpiViewModel);  
+    });
+
+
+
+</script>
+

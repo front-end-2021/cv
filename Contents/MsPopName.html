@@ -1,0 +1,165 @@
+﻿<style>
+    .clearx5 {
+        height: 26px;
+    }
+</style>
+<div id="loading-editname" class="loading"></div>
+<div id="areaPop-edit-name" class="pop-wrapper">
+    <form id="fEditName" role="form" class="form-horizontal">
+        <div class="modal-body ms-modal-body">
+
+            <div class="clearx4"></div>
+            <div class="form-group noMargin">
+                <label class="col-sm-2 no-padding-right" for="txtName">Name</label>
+                <div class="col-sm-8">
+                    <input type="text" name="txtName" id="txtName" tabindex="1" required class="col-xs-12 col-sm-12 modal-input txtInput" maxlength="150">
+                </div>
+            </div>
+            <div class="clearx5"></div>
+
+        </div>
+        <div class="modal-market-footer">
+            <button id="btnUpdate" type="button" tabindex="2" class="ms-button" onclick="vmPopName.update()">
+                <span class="icon-20 icon-close"></span>
+                <span id="lblClose">Close</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    var vmPopName = vmPopName || {};
+    //var isEdit = vmPopName.options.isEdit;
+
+    vmPopName.dataservice = (function () {
+        var updateIndependency = function (entryDate, successFunc) {
+            vmGoalAction.dataservice.callAjaxByPost("updateIndependency", entryDate, successFunc, 'loading-editname');
+        };
+
+        return {
+            updateIndependency: updateIndependency
+        };
+    }());
+
+    vmPopName.setupValidate = function() {
+        $('#fEditName').validate({
+            rules: {
+                txtName: {
+                    required: true,
+                    maxlength: 150
+                }
+            },
+            messages: {
+                txtName: {
+                    required: kLg.msgRequired,
+                    maxlength: kLg.msgMaxlenghName
+                }
+            },
+            tooltip_options: {
+                txtName: { placement: 'bottom' }
+            }
+        });
+    };
+
+    vmPopName.update = function () {
+        if (!vmPopName.options.isEdit) {
+            vmGoalAction.popEditName.close();
+            return;
+        }
+
+        if (!$('#fEditName').valid())
+            return;
+
+        var name = $('#areaPop-edit-name #txtName').val().trim(),
+        entryData = { id: vmPopName.options.id, mdf: vmPopName.options.mdf, name: name };
+
+                
+                vmPopName.dataservice.updateIndependency(entryData, function (serData) {
+                    if (!vmGoalAction.checkRole(serData)) return;
+
+                    if (vmCommon.checkConflict(serData.value.Mdf)) {
+                        var independency = serData.value;
+                        vmPopName.modelChanged = false;
+                        
+                        if (typeof MsaApp.updateIndependency == 'function') {
+                            const _entry = {
+                                Id: entryData.id, Name: entryData.name, Mdf: serData.value.Mdf
+                            }
+                            MsaApp.updateIndependency(_entry);
+                        }
+
+                        //var independecy = {
+                        //    Id: independency.Id,
+                        //    Name: independency.Name
+                        //};
+                        //vmPopName.options.elem.find('span[mstype=parentName]').text(independency.Name);
+                        //vmPopName.options.elem.attr("mdf", independency.Mdf);
+                        //vmPopName.options.elem.attr("parentname", independency.Name);
+
+                        if (typeof (msFilter) != "undefined") {
+                            //vmFilter.EditParent(independecy, 15);
+                            msFilter.controlService.reLoadDataFilter();
+                        }
+
+                        //if (vmFilter.DFilter.length) {
+                        //        var dataEntry = {
+                        //            FilterContainer: vmFilter.CreatFilterQuerry(),
+                        //            StrQuerry: JSON.stringify(vmFilter.DFilter),
+                        //            Type: vmFilter.enumPage.ActionGoal
+                        //        };
+                        //        vmGoalAction.bindOverallView(dataEntry, false, true);
+                        //} else {
+                            //vmGoalAction.bindIndepdendencyView();
+                        //}
+
+                        if (vmGoalAction.popEditName)
+                            vmGoalAction.popEditName.close();
+
+                    } else {
+                        vmPopName.modelChanged = false;
+                    }
+                });
+       
+    };
+
+    //Pageload
+    $(function () {
+
+        //manh:
+        vmFile.assginedIcon("areaPop-edit-name");
+        limitedTabKey();
+        vmPopName.modelChanged = false;
+        $('#areaPop-edit-name #lblClose').text(kLg.lblClose);
+
+        $('#areaPop-edit-name #txtName').val(vmPopName.Name);
+        if (!vmPopName.options.isEdit) {
+            $('#areaPop-edit-name #txtName').attr('disabled', 'disabled');
+        }
+
+        $('#areaPop-edit-name #txtName').on("change keyup", function () {
+            vmPopName.modelChanged = true;
+        });
+
+
+        vmGoalAction.popEditName.bind("close", function (e) {
+            vmFile.enableAssignedIcon = false;
+            if (vmPopName.modelChanged) {
+                if (confirm(kLg.saveConfirmQuestion)) {
+                    if ($('#fEditName').valid()) {
+                        vmPopName.update();
+                        vmGoalAction.popEditName = null;
+                    } else {
+                        e.preventDefault();
+                    }
+                } else {
+                    vmGoalAction.popEditName = null;
+                }
+            } else {
+                vmGoalAction.popEditName = null;
+            }
+
+        });
+
+        vmPopName.setupValidate();
+    });
+</script>

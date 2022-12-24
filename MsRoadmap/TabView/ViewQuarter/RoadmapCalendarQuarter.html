@@ -1,0 +1,37 @@
+﻿<div class="dnb-calendar dnb-relative">
+    <div class="dnb-absolute dnb_calendar_view" style="top:0" 
+         v-bind:style="{left: StylePosition.Left }">
+        <div class="today-line" v-bind:style="[TodayLine]"></div>
+
+        <div class="dnb-years dnb-overhidden dnb-flex dnb_width_ref">
+            <div class="dnb-year dnb-year-2021"
+                 v-for="year in DisplayUI.Years">
+                <h6 class="text-center dnb-colorc1 dnb-font-18 kvg-style-years">{{year.Year}}</h6>
+                <div class="dnb-quaters dnb-flex" style="border-top: none!important">
+                    <div class="dnb-quater-0"
+                         v-bind:class="['rm-quarter-' + (quarter.Odd)]"
+                         v-for="quarter in year.Quaters"
+                         v-bind:style="{height:StyleHeightCalenda }">
+                        <h6 class="text-center dnb-color6d kgv-style-quarter">Q {{quarter.Quarter}}</h6>
+                        <div class="dnb-months dnb-flex">
+                            <div class="dnb-month"
+                                 v-for=" month in quarter.Months "
+                                 v-bind:style="{
+                                    height:StyleHeightCalenda ,
+                                  width: month.Days + 'px',
+                                  minWidth: month.Days + 'px',
+                                  maxWidth: month.Days + 'px'
+                                 }">
+                                <h6 class="dnb-color-b2 text-center kgv-tyle-month"
+                                    style="font-size: 12px;padding-top: 9px; ">
+                                    {{month.Name}}
+                                </h6>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

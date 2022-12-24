@@ -1,0 +1,529 @@
+﻿<style type="text/css">
+    /* Corner radius */
+    .ui-corner-all,
+    .ui-corner-bottom,
+    .ui-corner-right,
+    .ui-corner-br {
+        border-bottom-right-radius: 0 /*{cornerRadius}*/;
+    }
+
+    .ui-widget-header {
+        background: #3D6FC3;
+        color: white;
+    }
+
+    .ui-widget-content {
+        border-width: 0;
+    }
+    
+    .k-window-title{
+       right: 3.44em!important;
+    }
+
+
+    #productEvaluationArea .k-slider .k-label {
+        font-size: 10px !important;
+    }
+
+    .percentage {
+        width: 60px;
+    }
+
+    .compeUnsaved {
+        color: red;
+    }
+
+    .premove {
+        top: 9px;
+        right: 10px;
+    }
+
+    .ms-panel-left {
+        width: 490px;
+    }
+
+    #body-compe .compeName {
+        float: left;
+    }
+
+    #body-compe input.compeName {
+        float: left;
+    }
+
+    #body-compe .compeColor {
+        float: right;
+        width: 28px !important;
+        height: 28px;
+    }
+
+    #body-compe .premove {
+        right: 40px;
+    }
+
+    .k-picker-wrap {
+        height: 26px;
+    }
+
+    .k-selected-color {
+        height: 27px !important;
+    }
+
+    f
+    .k-colorpicker {
+        width: 28px;
+    }
+
+    .k-colorpicker .k-select {
+        display: none;
+    }
+
+    #evaluationArea a.k-button, #evaluationArea .ms-dropdown {
+        margin-top: 5px;
+    }
+
+    #competitionArea a.k-button, #competitionArea .ms-dropdown {
+        margin-top: 5px;
+    }
+
+    #competitionArea .k-numerictextbox .k-input {
+        padding-bottom: 5px !important;
+        padding-top: 5px !important;
+    }
+
+    .percentage .k-numeric-wrap .k-input {
+        height: auto;
+        line-height: inherit;
+    }
+
+
+    .popTempWrapper .k-button {
+        padding: 7px 10px;
+    }
+
+    #marketEvalChart .k-tooltip {
+        -ms-border-radius: 3px;
+        border-radius: 3px;
+        margin-left: -40px;
+        margin-top: -7px;
+    }
+
+    #headerPopSubmarketArea .k-input {
+        color: #FBFBFB !important;
+        border-color: #38baf8;
+    }
+
+    #headerPopSubmarketArea .k-dropdown-wrap.k-state-default {
+        background-image: none, linear-gradient(to bottom, #38baf8 0%, #38baf8 100%) !important;
+    }
+
+    .select-submarketproduct-temp {
+        width: 190px;
+        margin-top: -10px;
+    }
+
+    #ddlSubmarketTemp-list[data-role="popup"] {
+        background-color: #38baf8 !important;
+        color: #FBFBFB !important;
+    }
+
+    #headerPopSubmarketArea .k-dropdown.k-dropdown-wrap, .k-dropdown.k-state-border-down.k-dropdown-wrap.k-state-border-down {
+        border-color: #38baf8 !important;
+    }
+
+    table.ptable td { display: table-cell !important; }
+
+    .k-picker-wrap, .k-numeric-wrap { padding: 0 0.0em 0 0; }
+
+    .maxW232 {  max-width: 232px; }
+
+    .w-100per { width: 98% !important; }
+    .k-coloreditor-header.k-hstack { display: none; }
+    
+    .dnb-title-center { position: absolute;
+        left: 50%; bottom: -54px; transform: translateX(-50%);
+        padding: 6px; text-align: center;
+    }
+</style>
+<!--Main html-->
+<div class="pop-wrapper">
+    <form id="frmApEval" style="height:100%;" role="form" class="form-horizontal">
+        <div id="productEvaluationArea" style="overflow: auto; padding-top: 0 !important; padding-left: 13px !important;margin-bottom:57px;" class="ms-modal-body">
+            <p class="clearx1"></p>
+            <div id="tabs">
+                <ul class="nav nav-tabs margin-left12" id="msTab">
+                    <li class="active">
+                        <a id="idTabProductEvaluation" onclick="vmApEval.TabProductEvaluation_Onclick()" href="#pProductEvaluation" data-toggle="tab" class="tab-modal" tabindex="0">Bewertung  Strategie</a>
+                    </li>
+                    <li>
+                        <a id="idTabSwotAnalyse" href="#tabSwotAnalyse" onclick="vmApEval.TabSwotAnalyse_Onclick()" data-toggle="tab" class="tab-modal" tabindex="0">SWOT-Analyse</a>
+                    </li>
+                    <li>
+                        <a id="idTabProductStructure" href="#tabProductStructure" onclick="vmApEval.TabProductStructure_Onclick()" data-toggle="tab" class="tab-modal" tabindex="0">Produktgestaltung</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div id="pProductEvaluation" class="tab-pane active tab-padding">
+                        <div>
+                            <!--Product Evaluation-->
+                            <div class="boxSizing evaluationAreaWrapper" style="padding-left: 0;width:100%;">
+                                <!--<div class="ms-panel-new" id="evaluationArea">-->
+                                <div id="evaluationArea">
+                                    <div class="ms-layout-wrap evaluation-template-control">
+                                        <a class="k-button btnAddTemp" onclick="vmApEval.btnAddTemp_Onclick(templateAction.Add, this)" tabindex="0">Add</a>
+                                        <a class="k-button btnUpdateTemp" onclick="vmApEval.btnAddTemp_Onclick(templateAction.Update, this)" tabindex="0">Update</a>
+                                        <a class="k-button btnDelTemp" onclick="vmApEval.btnOpenTemplate_Onclick(templateType.ApEvaluationTemplate)" tabindex="0">Delete</a>
+                                        <select id="ddlEvalTemp" class="ms-dropdown">
+                                            <option>Choose layout</option>
+                                        </select>
+                                        <a class="k-button btnImportTemp" onclick="vmApEval.btnImportTemp_Onclick(templateType.ApEvaluationTemplate)" tabindex="0">Import templates</a>
+                                    </div>
+                                    <p class="clearx1"></p>
+                                    <!--<p class="ms-panel-title" id="submaketGroup">Priorisierung Teilmarkt</p>-->
+                                    <!--<h4 id="nameInEvaluation" class="w-100per-word-break"></h4>-->
+
+                                    <table id="tblProductEvaluation" class="ptable">
+                                        <thead>
+                                            <tr>
+                                                <td id="lblCriteria"></td>
+                                                <td class="textcenter w-60" id="lblPriority"></td>
+                                                <td id="lblEvaluationEval" class="w-200"></td>
+                                                <td class="w-48"></td>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="ap-body-eval"></tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td><a id="lnkAddProductEval" class="icon-28 icon-add-small pull-left" onclick="vmApEval.addEval_Onclick();"></a></td>
+
+                                                <td colspan="3">
+                                                    <span id="txtTotalEvaluation" class="span-bold pull-right"></span>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                    <p class="clearx2"></p>
+                                    <p class="label lblComment">Berkemtn</p>
+                                    <textarea id="txtEvaluationComment" class="eval-textarea w-100per" tabindex="0"></textarea>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clear2px"></div>
+                    </div>
+                    <div class="tab-pane" id="tabSwotAnalyse">...</div>
+                    <div class="tab-pane" id="tabProductStructure">...</div>
+                </div>
+            </div>
+            <div id="dnbChartEvaluationXYZ" style="margin-bottom: 150px; padding-left: 75px; padding-right: 69px; ">
+                <div style="position: relative; width: 621px; margin: 0 auto;">
+                    <div data-bind="text: TemplateTitle" style="text-align: center; font-size: 16px; color: #8d8d8d;"></div>
+                    <div data-bind="text: YEvaluationTitle" style="position: absolute; font-weight: bold; left: -123px; transform: rotate(270deg); top: 50%; "></div>
+                    <div data-bind="text: XYNegativeTitle" style="position: absolute; left: -37px; transform: rotate(270deg); top: 75px; "></div>
+                    <div data-bind="text: XYNeutralTitle" style="position: absolute; left: -37px; transform: rotate(270deg); top: 50%;"></div>
+                    <div data-bind="text: XYPositiveTitle" style="position: absolute; left: -37px; transform: rotate(270deg); bottom: 43px "></div>
+                    <div data-role="chart"
+                         data-legend="{ position: 'top' }"
+                         data-series="[ { type: 'bubble',
+                                xField: 'EvalX',
+                                yField: 'EvalY',
+                                sizeField: 'ShowEvalZ', maxSize: 98, minSize: 3,
+                                colorField: 'Color',
+                                categoryField: 'CatName',
+                                highlight: { inactiveOpacity: 0.69, opacity: 1,
+                                    toggle: function (e) {
+                                      e.preventDefault();
+                                      e.visual.opacity(e.show ? 1 : 0.69);
+                                    }                                    
+                                  },
+                                tooltip: {
+                                    visible: true, format: '{3}',
+                                    padding: { top: 6, bottom:6, left: 15, right: 15 }
+                                  }
+                                }]"
+                         data-x-axis="{majorUnit: 20, min: -120, max: 120, axisCrossingValue: [0]}"
+                         data-y-axis="{majorUnit: 20, min: -120, max: 120, axisCrossingValue: [0]}"
+                         data-chart-area="{height: 620, width: 620}"
+                         data-bind="visible: IsShowChartEvalXYZ,
+                              source: LstEvaluationXYZ,
+                              events: { 
+                                    seriesHover: onSeriesHover, 
+                                    seriesClick: onClickBubble }"
+                         style="height: 250px;"></div>
+                    <input maxlength="100" type="text" class="dnb-title-center"
+                           data-bind="value: XEvaluationTitle, visible: IsEditingXEvalTitle, 
+                           events: {mouseleave: onMouseleaveXEvalTitle, keyup: onKeyUpXEvalTitle}" />
+                    <div data-bind="text: XEvaluationTitle, invisible: IsEditingXEvalTitle,
+                         events: { dblclick: onDblClickXEvalTitle }"
+                         class="dnb-title-center"
+                         style="font-weight: bold; white-space: pre; "></div>
+                    <div data-bind="text: XYNegativeTitle" style="position: absolute; left: 30px; bottom: -21px; "></div>
+                    <div data-bind="text: XYNeutralTitle" style="position: absolute; left: calc(50% - 21px); bottom: -21px; "></div>
+                    <div data-bind="text: XYPositiveTitle" style="position: absolute; right: 29px; bottom: -21px; "></div>
+                </div>
+                <div style="text-align: right; padding-right: 114px; padding-top: 30px;">
+                    <input data-bind="checked: IsAssesment, events: {change: onChangeAssesment}, enabled: IsEnableAssesment" 
+                           type="checkbox" id="dnb-popeval-chbox-kassesment" style="margin: 0"/>
+                    <label data-bind="text: CheckboxAssesmentTitle" for="dnb-popeval-chbox-kassesment" 
+                           style="margin:0;padding-left:6px"></label>
+                </div>
+            </div>
+        </div>
+        <div class="modal-market-footer" style="border:0;border-top:1px solid #E7E7E7;position:absolute;width:100%;bottom:0px;">
+            <button type="button" class="ms-button" onclick="vmApEval.update()">
+                <span class="icon-20 icon-close"></span>
+                <span id="lblAPEvalClose">Speichern und schliessen</span>
+            </button>
+        </div>
+    </form>
+</div>
+<div id="loadingProdEvaluation" class="loading" />
+<div id="apImportTempWindow"></div>
+<div id="deleteTempWindow"></div>
+<div id="eval-compe-temp-pop"></div>
+
+<div id="popupSwotTemplate"></div>
+<div id="popupDeleteSwotTemplate"></div>
+
+<div id="popUpproductDesign"></div>
+<div id="deleteProTempWindow"></div>
+
+<!--End main-->
+<!--Product Evaluation template-->
+<script id="prodEval-temp" type="text/x-kendo-template">
+    #if(data.length == 0) {#
+
+    #} else {#
+
+    # for(var i = 0; i < data.length; i ++) { #
+    <tr index="#=i#" val="#=data[i].Id#" type="PE" id="#=data[i].Id#">
+        <td class="itemDraggable td-hover field_value dragProductEvaluationhandler" id="#:data[i].Id#" val="#=data[i].Id#">
+            <span class="icon-16  icon-arow-towway-vertical"></span>
+            <span title="#:data[i].Name#" class="editAble label-input nameField w-100per-word-break" id="#=data[i].Id#">#:data[i].Name#</span>
+        </td>
+        <td class="field_drop textcenter">
+            <select class="dd prodEvalDropdown" style="width: 60px">
+                <option value="10" # if(data[i].Priority==10) { # selected="selected" #}#> 10 </option>
+                <option value="9" # if(data[i].Priority==9) { # selected="selected" #}#> 9 </option>
+                <option value="8" # if(data[i].Priority==8) { # selected="selected" #}#> 8 </option>
+                <option value="7" # if(data[i].Priority==7) { # selected="selected" #}#> 7 </option>
+                <option value="6" # if(data[i].Priority==6) { # selected="selected" #}#> 6 </option>
+                <option value="5" # if(data[i].Priority==5) { # selected="selected" #}#> 5 </option>
+                <option value="4" # if(data[i].Priority==4) { # selected="selected" #}#> 4 </option>
+                <option value="3" # if(data[i].Priority==3) { # selected="selected" #}#> 3 </option>
+                <option value="2" # if(data[i].Priority==2) { # selected="selected" #}#> 2 </option>
+                <option value="1" # if(data[i].Priority==1) { # selected="selected" #}#> 1 </option>
+                <option value="0" # if(data[i].Priority==0) { # selected="selected" #}#> 0 </option>
+                <option value="-1" # if(data[i].Priority==-1) { # selected="selected" #}#> -1 </option>
+                <option value="-2" # if(data[i].Priority==-2) { # selected="selected" #}#> -2 </option>
+                <option value="-3" # if(data[i].Priority==-3) { # selected="selected" #}#> -3 </option>
+                <option value="-4" # if(data[i].Priority==-4) { # selected="selected" #}#> -4 </option>
+                <option value="-5" # if(data[i].Priority==-5) { # selected="selected" #}#> -5 </option>
+                <option value="-6" # if(data[i].Priority==-6) { # selected="selected" #}#> -6 </option>
+                <option value="-7" # if(data[i].Priority==-7) { # selected="selected" #}#> -7 </option>
+                <option value="-8" # if(data[i].Priority==-8) { # selected="selected" #}#> -8 </option>
+                <option value="-9" # if(data[i].Priority==-9) { # selected="selected" #}#> -9 </option>
+                <option value="-10" # if(data[i].Priority==-10) { # selected="selected" #}#> -10 </option>
+            </select>
+        </td>
+        <td class="field_slider noPaddingRight">
+            <input class="w-160 evalSlider" value="#=data[i].Evaluation#" />
+        </td>
+        <td class="td-bin td-v-align-middle"><span class="icon-28 icon-bin-small pull-left" onclick="vmApEval.delEval_Onclick(this)"></span></td>
+    </tr>
+    #}#
+
+    #}#
+</script>
+
+<!--Product Evaluation row template-->
+<script id="prodEval-row-temp" type="text/x-kendo-template">
+
+    <td class="field_value itemDraggable td-hover dragProductEvaluationhandler" val="#=data.Id#" id="#:data.Id#">
+        <span class="icon-16  icon-arow-towway-vertical"></span>
+        <span title="#:data.Name#" class=" w-100per-word-break label-input nameField editAble " id="#=data.Id#">#:data.Name#</span>
+        <a class="remove premove" href="javascript:;" onclick="vmApEval.delEval_Onclick(this)" style="display: none;"></a>
+    </td>
+    <td class="field_drop textcenter">
+        <select class="dd prodEvalDropdown" style="width: 60px">
+            <option value="10" # if(data.Priority == 10) { # selected="selected" #}#> 10 </option>
+            <option value="9" # if(data.Priority == 9) { # selected="selected" #}#> 9 </option>
+            <option value="8" # if(data.Priority == 8) { # selected="selected" #}#> 8 </option>
+            <option value="7" # if(data.Priority == 7) { # selected="selected" #}#> 7 </option>
+            <option value="6" # if(data.Priority == 6) { # selected="selected" #}#> 6 </option>
+            <option value="5" # if(data.Priority == 5) { # selected="selected" #}#> 5 </option>
+            <option value="4" # if(data.Priority == 4) { # selected="selected" #}#> 4 </option>
+            <option value="3" # if(data.Priority == 3) { # selected="selected" #}#> 3 </option>
+            <option value="2" # if(data.Priority == 2) { # selected="selected" #}#> 2 </option>
+            <option value="1" # if(data.Priority == 1) { # selected="selected" #}#> 1 </option>
+            <option value="0" # if(data.Priority == 0) { # selected="selected" #}#> 0 </option>
+            <option value="-1" # if(data.Priority == -1) { # selected="selected" #}#> -1 </option>
+            <option value="-2" # if(data.Priority == -2) { # selected="selected" #}#> -2 </option>
+            <option value="-3" # if(data.Priority == -3) { # selected="selected" #}#> -3 </option>
+            <option value="-4" # if(data.Priority == -4) { # selected="selected" #}#> -4 </option>
+            <option value="-5" # if(data.Priority == -5) { # selected="selected" #}#> -5 </option>
+            <option value="-6" # if(data.Priority == -6) { # selected="selected" #}#> -6 </option>
+            <option value="-7" # if(data.Priority == -7) { # selected="selected" #}#> -7 </option>
+            <option value="-8" # if(data.Priority == -8) { # selected="selected" #}#> -8 </option>
+            <option value="-9" # if(data.Priority == -9) { # selected="selected" #}#> -9 </option>
+            <option value="-10" # if(data.Priority == -10) { # selected="selected" #}#> -10 </option>
+        </select>
+    </td>
+    <td class="field_slider noPaddingRight">
+        <input class="w-160 evalSlider" value="#=data.Evaluation#" />
+    </td>
+    <td class="td-bin td-v-align-middle"><span class="icon-28 icon-bin-small pull-left" onclick="vmApEval.delEval_Onclick(this)"></span></td>
+</script>
+
+<!--Popup Add, edit ProductEvaluation, Competition template-->
+<script id="eval-compe-temp" type="text/x-kendo-template">
+    <div class="modal-body ms-modal-body">
+        <form>
+            <!--<div id="msgEditTemplate" />-->
+            <div class="form-group">
+                <label class="lblEvalTempName">Template name</label>
+                <div class="clear"></div>
+                <input id="txtTempName" class="modal-input txtInput w-100per" value="#:data#" />
+            </div>
+        </form>
+    </div>
+    <div class="modal-market-footer">
+        <button type="button" class="ms-button" onclick="vmApEval.closeLayout(this)" tabindex="1"><span class="icon-20 icon-close margin-right6"></span><span class="scancel" id="textCancelButton">Cancel</span></button>
+        <button type="button" class="ms-button" id="btnSaveTemplateSubMarket"><span class="icon-20 icon-update margin-right6"></span><span id="textUpdateButton">OK</span></button>
+    </div>
+</script>
+
+<!--Delete Template Popup-->
+<script id="delete-temp-pop-eval" type="text/x-kendo-template">
+    <div class="modal-body ms-modal-body" style="overflow:auto; height:420px">
+        <form>
+            <table id='myTable' class="tbgrid modal-table">
+                <thead>
+                    <tr>
+                        <th class="title bg-grey lblPrjName"></th>
+                        <th class="title bg-grey" id="lblPrjOwner"></th>
+                        <th class="title bg-grey" id="lblTemplateNameDeleteTemplate">Template name</th>
+                        <!--<th class="title bg-grey" id="lblProjectName">Project name</th>-->
+                    </tr>
+                </thead>
+                <tbody>
+                    # for(var i = 0; i < data.length; i ++) { #
+                    <tr id="#=data[i].Id#">
+                        <td>#=i + 1#</td>
+                        <td>
+                            <input class="cbTemp" type="checkbox" />
+                        </td>
+                        <td>#:data[i].Name#</td>
+                        <!--<td>#:data[i].ProjectName#</td>-->
+                    </tr>
+                    # } #
+                </tbody>
+            </table>
+        </form>
+    </div>
+    <div class="modal-market-footer" id="divImportFooter">
+        <button type="button" class="ms-button" onclick="vmApEval.btnDeleteTemplate_Onclick()" tabindex="1"><span class="icon-20 icon-bin-sub margin-right6"></span><span class="btnChoose">Delete</span></button>
+        <button type="button" class="ms-button" onclick="vmApEval.btnCloseDelTemplatePopup_Onclick()(this)"><span class="icon-20 icon-close margin-right6"></span><span class="btnCancel">Cancel</span></button>
+    </div>
+</script>
+<script src="../Scripts/ActionPlanEval/msGoalActionEval.js"></script>
+
+<style scoped>
+    .chart-wrapper {
+        position: relative;
+    }
+
+        .chart-wrapper ul {
+            font-size: 11px;
+            margin: 63px 30px 0 0;
+            padding: 30px;
+            position: absolute;
+            right: 0;
+            top: 0;
+            text-transform: uppercase;
+            width: 146px;
+            height: 94px;
+        }
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.k-tooltip').hide();
+
+        //vmApEval.isMain = vmGoalAction.goalActionEvalOptions.isMain;
+        vmApEval.goalActionTemplateId = vmGoalAction.goalActionEvalOptions.goalActionTemplateId;
+        vmApEval.goalActionTemplate = vmGoalAction.goalActionEvalOptions.goalActionTemplate;
+        vmApEval.isShowDirect = vmGoalAction.goalActionEvalOptions.isShowDirect; //open from overview
+
+        var ga_model = vmGoalAction.goalActionEvalOptions.goalActionModel;
+
+        vmApEval.ApProductTemplateId = ga_model.ApProductTemplateId;
+        vmApEval.ApEvaluationTemplateId = ga_model.ApEvaluationTemplateId;
+        vmApEval.ApSwotanalyseTemplateId = ga_model.ApSwotanalyseTemplateId;
+        vmApEval.ApEvaluationComment = ga_model.ApEvaluationComment;
+
+        vmApEval.objectType = vmGoalAction.goalActionEvalOptions.objectType;
+        vmApEval.goalActionModel = ga_model;
+        vmApEval.goalActionId = undefined;
+        if (ga_model.Id && ga_model.Id != vmCommon.emptyGuid)
+            vmApEval.goalActionId = ga_model.Id;
+
+        vmApEval.goalActionName = ga_model.Name;
+
+        vmApEval.curRole = vmGoalAction.goalActionEvalOptions.role;
+
+        // bind props tab 2
+        vmApSwotanalyse.role = vmApEval.curRole;
+        vmApSwotanalyse.goalActionTemplateId = vmApEval.goalActionTemplateId;
+        vmApSwotanalyse.isShowDirect = vmApEval.isShowDirect;
+
+        // bind props tab 3
+        vmApProduct.goalActionTemplateId = vmApEval.goalActionTemplateId;
+        vmApProduct.goalActionName = vmApEval.goalActionModel.Name;
+        vmApProduct.goalActionId = vmApEval.goalActionModel.Id;
+        vmApProduct.Role = vmApEval.curRole;
+        vmApProduct.goalActionModel = vmApEval.goalActionModel;
+        vmApProduct.isShowDirect = vmApEval.isShowDirect;
+
+        if (vmApEval.isShowDirect) {
+            vmApEval.loadData();
+        }
+        else if (!vmApEval.isClickOpenTab) {
+            if (vmApEval.goalActionModel.ActionPlanEvalData != undefined && vmApEval.goalActionModel.ActionPlanEvalData != null
+                && vmApEval.goalActionModel.ActionPlanEvalData.APEvaluations != null) {
+                var evals = vmCommon.deepCopy(vmApEval.goalActionModel.ActionPlanEvalData.APEvaluations);
+
+                vmApEval.ProductEvaluations = evals;
+
+                vmApEval.ProductEvaluations.map(item => {
+                    if (item.Id == 0) {
+                        item.Id = vmCommon.newGuid();
+                    }
+                });
+            }
+            else {
+                vmApEval.ProductEvaluations = [];
+            }
+
+            vmApEval.loadData();
+        }
+
+        //vmGAE.setupEditableLabel();
+        vmApEval.openingTab = 'idTabProductEvaluation';
+
+        vmApEval.setupLabelLanguage();
+        //popSaveTemplatePreventEnter();
+
+        vmApEval.bindEvent();
+        if (vmGoalAction.actionOptions && vmGoalAction.actionOptions.isDisordered)
+            $(".evaluation-template-control").hide();
+
+        vmGoalAction.popGoalActionEval.bind("close", popGoalActionEvalClosed_Onclick);
+
+        //#region Chart Evaluation XYZ
+        vmCommon.createChartEvaluationXYZ();
+        $("#dnbChartEvaluationXYZ").bind("kendo:skinChange", vmCommon.createChartEvaluationXYZ);
+        vmCommon.VmChartEvaluationXYZ.set('GoalActionId', '123' /*ga_model.Id*/);
+        vmCommon.VmChartEvaluationXYZ.setListEvalFromTemplate(getData());
+        //#endregion Chart Evaluation XYZ
+    });
+</script>

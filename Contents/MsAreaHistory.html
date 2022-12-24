@@ -1,0 +1,801 @@
+﻿<style>
+    #dash-history .tbgrid
+    {
+        margin-bottom: 0;
+        margin-right: 0;
+    }
+
+    #dash-history th.sort-mouse
+    {
+        cursor: pointer;
+    }
+
+    .dashboardvalue {
+        word-wrap: break-word;
+        width: 210px;
+    /*overflow-wrap: break-word;*/
+    }
+
+    
+</style> 
+<div id="dash-history" class="goal-action">
+    <div class="div-info-title"><span class="table-title" id="lblProjectOverView"></span></div>
+    <div id="placeHolder-projectList" class="div-table div-table-project">
+            <ul class="nav nav-tabs margin-left12" id="msTab">
+                <li class="active header-link"><a id="idTabMarket" onclick="vmHistory.callHistoryHandler()" href="#pProductEvaluation" data-toggle="tab" class="tab-modal">Markt Marktsegmentstrategie</a></li>
+                <li class="header-link"><a id="idTabSubmarket" onclick="vmHistory.callHistoryHandler(null,null,null,5)" data-toggle="tab" class="tab-modal">Teilmarkt / Produktstrategie</a></li>
+                <li class="header-link"><a id="idTabActionPlan" onclick="vmHistory.callHistoryHandler(null,null,null,6)" data-toggle="tab" class="tab-modal">Massnahmenplan</a></li>
+            </ul>
+
+            <div class="pull-left">
+                <table class="tbgrid">
+                    <thead>
+                        <tr>
+                            <th class="title bg-grey sort-mouse" width="250px" columnname="AccountName" scope="row"><span id="lblHeaderResponsible"></span></th>
+                            <th class="title bg-grey sort-mouse" width="332px" columnname="MPath"><span id="lblHeaderPath"></span></th>
+                            <th class="title bg-grey" width="50px"><span id="lblHeaderElement"></span></th>
+                            <th class="title bg-grey" width="40px"></th>
+                            <th class="title bg-grey" width="210px"><span id="lblHeaderOldValue"></span></th>
+                            <th class="title bg-grey" width="210px"><span id="lblHeaderNewValue"></span></th>
+                            <th class="title bg-grey sort-mouse" width="100px" columnname="ModifedDate"><span id="lblHeaderDate"></span></th>
+                            <th class="title bg-grey" width="50px"><span id="lblHeaderTime"></span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyHistory"></tbody>
+                </table>
+                <div id="pagingHistory" class="pull-right"></div>
+                <div class="clear"></div>
+            </div>
+            <div class="clear"></div>
+        </div>
+</div>
+
+<script type="text/html" id="tempHistory">
+    # for(var i = 0; i < data.length; i ++) { #
+    # var active = data[i]; #
+
+    <tr>
+        <td class="td-v-align-top td-hover">
+            #:active.AccountName#
+        </td>
+        <td id="path#=active.ObjectId##=i#" #if(active.DeletedBy >  0 || active.IsActive == false){# class="td-hover td-v-align-top" #}else{# class="td-hover table-td-link cursor-pointer td-v-align-top" #}# >
+            <span onclick=" vmHistory.redirectToHistoryPage('#=active.Id#') " class="cssActivePath" >${active.MPath}</span>                        
+        </td>
+        <td>
+            # if(active.Action == 2) { # <span class="cssActiveObject">#=active.TableName#::#=active.ColumnName#</span> 
+            #}else{# <span class="cssActiveObject">#=active.TableName#</span> #}#
+
+        </td>
+        <td class="padding-right10">
+            # if(active.Action == 1) { # <span class="icon-28 icon-add2 pull-left"></span> #}#
+            # if(active.Action == 2) { # <span class="icon-28 icon-edit-round pull-left"></span> #}#
+            # if(active.Action == 3 && active.IsNotRecover == false) { # <span class="icon-28 icon-bin-orange pull-left checkRole" id="recover#=i#" onclick="vmHistory.recover('#=active.Id#', '#:i#') "></span> #}#
+            # if(active.Action == 3 && active.IsNotRecover == true && active.RecoverBy == 0) { # <span class="icon-28 icon-bin-gray pull-left"></span> #}#
+            # if(active.Action == 3 && active.IsNotRecover == true && active.RecoverBy != 0) { # <span class="icon-28 icon-bin-gray pull-left ms-tooltip" title="#:kLg.recoverByName# #:active.RecoverName#"></span> #}#
+        </td>
+        <td>
+            #if(active.OldValue != null){#<div class="dashboardvalue"><span class="cssActiveValue">#:active.OldValue#</span></div> #}#
+        </td>
+        <td>
+            #if(active.NewValue != null){#<div class="dashboardvalue"><span class="cssActiveValue">#:active.NewValue#</span></div> #}#
+        </td>
+        <td><span style="padding-right: 9px;">#=kendo.toString(active.ModifedDate.jsonToDate(),"d")#</span>
+                       
+        </td>
+        <td><span style="margin-left: 4px;">#=kendo.toString(active.ModifedDate.jsonToDate(),"HH:mm")#</span>
+            
+        </td>
+    </tr>
+    #}#
+</script>
+
+<script type="text/html" id="tempPageHistory">
+    <ul class="pagination">
+          <li #if(CurrentPage == 1){# class="disabled" #}#><a href="\\#" #if(CurrentPage !=1){ # onclick="vmHistory.callHistoryHandler(#:null#,#:null#,#:null#,#:vmHistory.HistoryData.TypeId#)" # }#>&laquo;</a></li>
+        #for(var i = 0; i < data.pages.length; i ++) {#
+        <li #if(data.pages[i] == CurrentPage){ # #='class="active"'# #}# #if(data.pages[i] != CurrentPage){# onclick="vmHistory.callHistoryHandler(#=data.pages[i]#,#:null#,#:null#,#:vmHistory.HistoryData.TypeId#)" #}#><a href="\\#">#=data.pages[i]#</a></li>
+        #}#            
+        <li #if(CurrentPage == TotalPages){# class="disabled" #}#><a href="\\#" #if(data.TotalPages !=CurrentPage){ # onclick="vmHistory.callHistoryHandler(#=data.TotalPages#,#:null#,#:null#,#:vmHistory.HistoryData.TypeId#)" #}#>&raquo;</a></li>
+
+    </ul>
+</script>
+
+
+
+<script>
+    var vmHistory = vmHistory || {};
+    vmHistory.HistoryData = {};
+
+    vmHistory.EnumSubType = {
+        SubMarket: 1,
+        ProductGroup: 2,
+        Product: 3,
+        Label: 4,
+        SubMarketLabel: 5
+    };
+    vmHistory.EnumMarketType = {
+        Market: 1,
+        Land: 2,
+        Region: 3,
+        AssignRegion: 4
+    };
+
+    vmHistory.findHistoryItem = function (id) {
+        var history = vmHistory.HistoryData.ListHistory;
+        for (var i = 0; i < history.length; i++) {
+            if (history[i].Id == id) {
+                return history[i];
+            }
+        }
+        return null;
+    };
+
+    vmHistory.setHeaderLanguage = function () {
+        $('#lblProjectOverView').text(kLg.Activities);
+        $('#lblHeaderResponsible').text(kLg.Responsible);
+        $('#lblHeaderPath').text(kLg.Path);
+        $('#lblHeaderElement').text(kLg.Element);
+        $('#lblHeaderOldValue').text(kLg.OldValue);
+        $('#lblHeaderNewValue').text(kLg.NewValue);
+        $('#lblHeaderDate').text(kLg.labelDate);
+        $('#lblHeaderTime').text(kLg.Time);
+
+        $("#idTabMarket").text(kLg.tabMarketSegment);
+        $("#idTabSubmarket").text(kLg.tabSubMarketProduct);
+        $("#idTabActionPlan").text(kLg.tabActionPlan);
+    };
+
+
+    vmHistory.callHistoryHandler = function (pageIndex, mkey, value,typeIndex) {
+        var page = pageIndex || 1;
+
+        var getData = {
+            pageIndex: page
+        };
+        if (mkey && value) {
+            getData.mKey = mkey;
+            getData.value = value;
+        }
+
+        var typeId = typeIndex || 4;
+
+        vmHistory.filterQuery = msFilter.controlService.getQueryFilter(); //vmFilter.CreatFilterQuerry();
+        var url = "/Handlers/DashboardHandler.ashx?funcName=gethistory&projid=" + projectId + "&strid=" + strategyId + "&typeId=" + typeId
+            + "&isFirst=" + vmHistory.IsLoadFirst + "&firstcreat=" + vmDashboard.tab6FromFirstCreat;
+        callAjaxPostGet('loadingRegionMatrix', url, vmHistory.filterQuery, getData, vmHistory.loadHistoryView);
+    };
+
+    vmHistory.loadHistoryView = function (data) {
+        vmHistory.IsLoadFirst = 0;
+        if (data.value == null) return;
+        vmHistory.HistoryData = data.value;
+        bindTemplate("tbodyHistory", "tempHistory", vmHistory.HistoryData.ListHistory);
+        
+        if (vmHistory.HistoryData.Role >= vmCommon.MemberRole.Edit) {
+            $("span").css("pointer-events", "auto");
+        } else {
+            $('.checkRole').css("pointer-events", "none");
+        }
+
+        //$("#placeHolder-projectList").on("mouseenter", ".ms-tooltip", function (e) {
+        //    $(this).tooltip({ trigger: "manual" }).tooltip("show");
+        //});
+
+        //$("#placeHolder-projectList").on("mouseleave", ".ms-tooltip", function (e) {
+        //    $(this).tooltip("destroy");
+        //});
+        $("#placeHolder-projectList .ms-tooltip").mouseenter(function (e) {
+            ShowToolTip($(this), $(this).attr("title"), "top");
+
+        });
+        $("#placeHolder-projectList .ms-tooltip").mouseleave(function(e) {
+            DestroyToolTip($(this));
+        });
+
+        var pagingInfo = vmHistory.HistoryData.PagingInfo;
+        pagingInfo.pages = vmCommon.paging.getPages(pagingInfo.CurrentPage, pagingInfo.TotalPages);
+
+        bindTemplate('pagingHistory', "tempPageHistory", vmHistory.HistoryData.PagingInfo);
+        var sortInfo = vmHistory.HistoryData.SortInfos;
+        vmHistory.setSortType(sortInfo);
+        vmHistory.regisSort();
+        vmHistory.setHeaderLanguage();
+        vmHistory.setLanguageAllActives();
+
+    };
+
+    vmHistory.redirectToMarketSegmentRegion = function (obj, fassign) {
+        var par = "";
+        if (fassign) {
+            par = "&fa=1";
+        }
+        window.location = '/Pages/MsMarketSegment.aspx?lang=' + kLg.language + '&projid=' + projectId + "&strid=" + strategyId
+            + "&marketid=" + obj.MarketSegmentId + "&regid=" + obj.RegionId + par;
+    };
+
+    vmHistory.redirectToHistoryPage = function (id) {
+        var itemHistory = vmHistory.findHistoryItem(id);
+        if (itemHistory == null) return;
+        if (itemHistory.DeletedBy > 0 || itemHistory.IsActive == false) return;
+        switch (itemHistory.TableName) {
+            case 'MarketSegment':
+                vmHistory.redirectMarketSegmentFromHistory(itemHistory.ObjectId, vmHistory.EnumMarketType.Market);
+                break;
+            case 'Land':
+                vmHistory.redirectMarketSegmentFromHistory(itemHistory.ObjectId, vmHistory.EnumMarketType.Land);
+                break;
+            case 'Region':
+                vmHistory.redirectMarketSegmentFromHistory(itemHistory.ObjectId, vmHistory.EnumMarketType.Region);
+                break;
+            case 'SubMarket':
+                vmHistory.updateFilterByHistory(itemHistory, vmHistory.EnumSubType.SubMarket);
+                break;
+            case 'ProductGroup':
+                vmHistory.updateFilterByHistory(itemHistory, vmHistory.EnumSubType.ProductGroup);
+                break;
+            case 'Product':
+                vmHistory.updateFilterByHistory(itemHistory, vmHistory.EnumSubType.Product);
+                break;
+            case 'SubProduct':
+                vmHistory.updateFilterSubProductByHistory(itemHistory, vmHistory.EnumSubType.Product);
+                break;
+            case 'SubClient':
+                vmHistory.updateFilterSubClientByHistory(itemHistory, vmHistory.EnumSubType.SubMarket);
+                break;
+            case 'Label':
+                vmHistory.updateFilterByHistory(itemHistory, vmHistory.EnumSubType.Label);
+                break;
+            case 'SubMarketLabel':
+                vmHistory.updateFilterByHistory(itemHistory, vmHistory.EnumSubType.SubMarketLabel);
+                break;
+            case 'MainGoal':
+                vmDashboard.redirectToActionGoal(itemHistory.ObjectId.toLowerCase(), 1,false,itemHistory.LandId,itemHistory.RegionId);
+                break;
+            case 'SubGoal':
+                vmDashboard.redirectToActionGoal(itemHistory.ObjectId.toLowerCase(), 2,false,itemHistory.LandId,itemHistory.RegionId);
+                break;
+            case 'Action': 
+                vmDashboard.redirectToActionGoal(itemHistory.ObjectId.toLowerCase(), 3,false,itemHistory.LandId,itemHistory.RegionId);
+                break;
+              case 'ActionPlanColumn': 
+                vmDashboard.redirectToActionGoal(itemHistory.OtherId.toLowerCase(), 2,false,itemHistory.LandId,itemHistory.RegionId);
+                break;
+            case 'Independency':
+                vmDashboard.redirectToIndependency(itemHistory.ObjectId, 0, 4,itemHistory.LandId,itemHistory.RegionId);
+                break;
+            case 'SubIndependency':
+                vmDashboard.redirectToIndependency(itemHistory.ObjectId, itemHistory.ProductId, 5,itemHistory.LandId,itemHistory.RegionId);
+                break;
+            case 'MarketSegmentRegion': case 'RegionEvaluation':
+                vmHistory.redirectToMarketSegmentRegion(itemHistory);
+                break;
+            case 'SubMarketProduct': case 'ProductEvaluation': case 'ProductCompetition': case 'ProductPosition': case 'ProductPositionChart':
+                if (itemHistory.ColumnName == "StrategyId") {
+                    vmHistory.updateFilterAndCheckOpenTab(itemHistory, "idTabUmsatzStrategie");
+                } else {
+                    vmHistory.updateFilterAndCheck(itemHistory, false);
+                }
+                break;
+            case 'Swotanalyse': case 'SubSwotanalyse':
+                vmHistory.updateFilterAndCheckOpenTab(itemHistory, "idTabSwotAnalyse");
+                break;
+            case 'ProductFinance':case 'SubMarketProductAccount':
+                vmHistory.updateFilterAndCheckOpenTab(itemHistory, "idTabUmsatzStrategie");
+                break;
+            case 'TargetGroup': case 'Demand': case 'DemandChart': case 'DemandChartEvaluation':
+                vmHistory.updateFilterAndCheckOpenTab(itemHistory, "idTabProductStructure");
+                break;
+            case 'StatusProtocolM': case 'GoalPersonM': case 'ActionPlanConnectionM':  case 'GoalCategoryM':  case 'GoalFieldM':  case 'ActionPlanSubProductM': case 'ActionPlanSubClientM':
+                vmDashboard.redirectToActionGoal(itemHistory.OtherId, 1,false,itemHistory.LandId,itemHistory.RegionId);
+                break;
+            case 'StatusProtocolS': case 'GoalPersonS':case 'ActionPlanConnectionS':  case 'GoalCategoryS':  case 'GoalFieldS':  case 'ActionPlanSubProductS': case 'ActionPlanSubClientS':
+                vmDashboard.redirectToActionGoal(itemHistory.OtherId, 2,false,itemHistory.LandId,itemHistory.RegionId);
+                break;
+            case 'StatusProtocolA': case 'ActionPerson':case 'ActionPlanConnectionA': case 'ActionUpStreamConnection': case 'ActionCategory': 
+            case 'ActionField': case 'ActionFibu': case 'ActionPlanSubProductA': case 'ActionPlanSubClientA': case 'ActionCost':
+            case 'ActionPersonP': case 'MasterBudget': case 'ActionPlanCustomerJourney':
+                vmDashboard.redirectToActionGoal(itemHistory.OtherId, 3,false,itemHistory.LandId,itemHistory.RegionId);
+                break;
+            case 'IndependencyRegion':
+                vmDashboard.redirectToIndependency(itemHistory.IndependencyId,itemHistory.ProductId, 5,itemHistory.LandId,itemHistory.RegionId);
+                break;
+            case 'FolderFile':
+                var openItem = (itemHistory.ColumnName != null)?true:false;
+                vmFile.openPopUpFileManagementHistory(itemHistory.ObjectId, openItem);
+                break;
+            case 'FolderFieldAssign':
+                vmHistory.redirectFolderFieldAssign(itemHistory);
+                break;
+        }
+    };
+
+    vmHistory.redirectFolderFieldAssign = function (itemHistory) {
+        switch (itemHistory.ColumnName) {
+            case vmCommon.enumType.Region:
+                vmHistory.redirectMarketSegmentFromHistory(itemHistory.RegionId, vmHistory.EnumMarketType.Region, true);
+                break;
+            case vmCommon.enumType.Land:
+                vmHistory.redirectMarketSegmentFromHistory(itemHistory.LandId, vmHistory.EnumMarketType.Land, true);
+                break;
+            case vmCommon.enumType.Market:
+                vmHistory.redirectMarketSegmentFromHistory(itemHistory.MarketSegmentId, vmHistory.EnumMarketType.Market, true);
+                break;
+            case vmCommon.enumType.Submarket:
+                vmHistory.updateFilterFolderFileByHistory(itemHistory.SubMarketId, itemHistory, vmHistory.EnumSubType.SubMarket);
+                break;
+            case vmCommon.enumType.ProductGroup:
+                vmHistory.updateFilterFolderFileByHistory(itemHistory.ProductGroupId, itemHistory, vmHistory.EnumSubType.ProductGroup);
+                break;
+            case vmCommon.enumType.Product:
+                vmHistory.updateFilterFolderFileByHistory(itemHistory.ProductId, itemHistory, vmHistory.EnumSubType.Product);
+                break;
+            case vmCommon.enumType.Label:
+                vmHistory.updateFilterFolderFileByHistory(itemHistory.IndependencyId, itemHistory, vmHistory.EnumSubType.Label);
+                break;
+            case vmCommon.enumType.MarketSegmentRegion:
+                vmHistory.redirectToMarketSegmentRegion(itemHistory, true);
+                break;
+            case vmCommon.enumType.SubMarketProduct:
+                vmHistory.updateFilterAndCheck(itemHistory, true);
+                break;
+            case vmCommon.enumType.Goal:
+                vmDashboard.redirectToActionGoal(itemHistory.OtherId.toLowerCase(), 1, true,itemHistory.LandId,itemHistory.RegionId);
+                break;
+            case vmCommon.enumType.SubGoal:
+                vmDashboard.redirectToActionGoal(itemHistory.OtherId.toLowerCase(), 2, true,itemHistory.LandId,itemHistory.RegionId);
+                break;
+            case vmCommon.enumType.Action:
+                vmDashboard.redirectToActionGoal(itemHistory.OtherId.toLowerCase(), 3, true,itemHistory.LandId,itemHistory.RegionId);
+                break;
+
+        }
+    };
+
+    vmHistory.callUpdateSubmarketFilterFromHistory = function (jsonObject, funcName, id, type, fassign) {
+        var url = '/Handlers/MarketFilterHandler.ashx?funcName=' + funcName + "&projid=" + projectId + "&strid=" + strategyId;
+        callAjax('loadingRegionMatrix', url, JSON.stringify(jsonObject), function (data) {
+            var isExits = data.value;
+            if (isExits == -2) {
+                pAlert(kLg.ItemDelete);
+                return;
+            }
+            var par = "";
+            if (fassign) {
+                par = "&fa=1";
+            }
+            window.location = '/Pages/MsSubMarketProduct.aspx?lang=' + kLg.language + '&projid=' + projectId + "&strid=" + strategyId
+                + "&id=" + id + "&type=" + type + par;
+
+        }, AjaxConst.PostRequest);
+    };
+
+    vmHistory.updateFilterByHistory = function (obj, type) {
+        var filtersearch = [{ TypeId: vmCommon.EnumFilterType.Market, ParentId: obj.MarketSegmentId, ChildId: 0 }];
+        var jsonObject = { LandType: 2, LandId: obj.LandId, RegionId: obj.RegionId, FilterValue: JSON.stringify(filtersearch) };
+        vmHistory.callUpdateSubmarketFilterFromHistory(jsonObject, "updatefilter", obj.ObjectId, type);
+    };
+
+    vmHistory.updateFilterSubClientByHistory = function (obj, type) {
+        var filtersearch = [{ TypeId: vmCommon.EnumFilterType.Market, ParentId: obj.MarketSegmentId, ChildId: 0 }];
+        var jsonObject = { LandType: 2, LandId: obj.LandId, RegionId: obj.RegionId, FilterValue: JSON.stringify(filtersearch) };
+        vmHistory.callUpdateSubmarketFilterFromHistory(jsonObject, "updatefilter", obj.SubMarketId, type);
+    };
+
+    vmHistory.updateFilterSubProductByHistory = function (obj, type) {
+        var filtersearch = [{ TypeId: vmCommon.EnumFilterType.Market, ParentId: obj.MarketSegmentId, ChildId: 0 }];
+        var jsonObject = { LandType: 2, LandId: obj.LandId, RegionId: obj.RegionId, FilterValue: JSON.stringify(filtersearch) };
+        vmHistory.callUpdateSubmarketFilterFromHistory(jsonObject, "updatefilter", obj.ProductId, type);
+    };
+
+    vmHistory.updateFilterFolderFileByHistory = function (id, obj, type) {
+        var filtersearch = [{ TypeId: vmCommon.EnumFilterType.Market, ParentId: obj.MarketSegmentId, ChildId: 0 }];
+        var jsonObject = { LandType: 2, LandId: obj.LandId, RegionId: obj.RegionId, FilterValue: JSON.stringify(filtersearch) };
+        vmHistory.callUpdateSubmarketFilterFromHistory(jsonObject, "updatefilter", id, type, true);
+    };
+
+
+    vmHistory.redirectMarketSegmentFromHistory = function (id, type, fassign) {
+        var par = "";
+        if (fassign) {
+            par = "&fa=1";
+        }
+        window.location = '/Pages/MsMarketSegment.aspx?lang=' + kLg.language + '&projid=' + projectId + "&strid=" + strategyId
+        + "&id=" + id + "&type=" + type + par;
+    };
+
+    vmHistory.updateFilterAndCheck = function (obj, fassign) {
+        var filtersearch = [{ TypeId: vmCommon.EnumFilterType.Market, ParentId: obj.MarketSegmentId, ChildId: 0 }];
+        var jsonObject = { LandType: 2, LandId: obj.LandId, RegionId: obj.RegionId, SubMarketId: obj.SubMarketId, ProductId: obj.ProductId, FilterValue: JSON.stringify(filtersearch) };
+        callUpdateFilterAndCheck(jsonObject, "updatefiltercheck", fassign);
+    };
+
+    vmHistory.updateFilterAndCheckOpenTab = function (obj, tabId) {
+        var filtersearch = [{ TypeId: vmCommon.EnumFilterType.Market, ParentId: obj.MarketSegmentId, ChildId: 0 }];
+        var jsonObject = { LandType: 2, LandId: obj.LandId, RegionId: obj.RegionId, SubMarketId: obj.SubMarketId, ProductId: obj.ProductId, FilterValue: JSON.stringify(filtersearch) };
+        callUpdateFilterAndCheckOpenTab(jsonObject, "updatefiltercheck", tabId);
+    };
+
+    vmHistory.chooseLanguageActive = function (name) {
+        switch (name) {
+            case 'Action':
+                return kLg.labelActionName;
+            case 'Demand': case 'ApDemand':
+                return kLg.itemDemand;
+            case 'DemandChart': case 'ApDemandChart':
+                return kLg.competitorChart;
+            case 'DemandChartEvaluation': case 'ApDemandChartEvaluation':
+                return kLg.DemandChartEvaluation;
+            case 'GoalPersonM': case 'ActionPerson': case 'GoalPersonS': case 'SubMarketProductAccount': 
+                return kLg.labelRes;
+            case 'ActionPersonP':
+                return kLg.labelPeopleInvolved;
+            case 'Independency':
+                return kLg.gaLblOverallThread;
+            case 'SubIndependency':
+                return kLg.gaLblThread;
+            case 'Label':
+                return kLg.createNewLabel;
+            case 'Land':
+                return kLg.newLand;
+            case 'MainGoal':
+                return kLg.labelMainGoalName;
+            case 'SubGoal':
+                return kLg.labelSubGoalName;
+            case 'MarketSegment':
+                return kLg.newMarketSegment;
+            case 'MarketSegmentRegion':
+                return kLg.MarketSegmentRegion;
+            case 'Product':
+                return kLg.filterLblProduct;
+            case 'Subproduct':
+                return kLg.subproduct;
+            case 'SubClient':
+                return kLg.subClient;
+            case 'ProductCompetition':
+                return kLg.lblMarketCompe;
+            case 'ProductEvaluation': case 'ApEvaluation':
+                return kLg.criteria;
+            case 'ProductFinance':
+                return kLg.tabVolumeStrategy;
+            case 'ProductGroup':
+                return kLg.createNewProductGroup;
+            case 'ProductPosition':
+                return kLg.PrioritySubmarket;
+            case 'ProductPositionChart':
+                return kLg.lblPositionierung;
+            case 'Region':
+                return kLg.newRegion;
+            case 'RegionEvaluation':
+                return kLg.criteria;
+            case 'StatusProtocolM': case 'StatusProtocolS': case 'StatusProtocolA':
+                return kLg.gaLblStatusProtocol;
+            case 'SubMarket':
+                return kLg.createNewSubmarket;
+            case 'SubMarketLabel':
+                return kLg.SubMarketLabel;
+            case 'SubMarketProduct':
+                return kLg.SubMarketProduct;
+            case 'Swotanalyse': case 'ApSwotanalyse':
+                return kLg.tabSWOTAnalyse;
+            case 'SubSwotanalyse': case 'ApSubSwotanalyse':
+                return kLg.subCriteria;
+            case 'TargetGroup': case 'ApTargetGroup':
+                return kLg.Ansprechgruppen;
+            case 'ActionUpStreamConnection':
+                return kLg.upstreamAction;
+            case 'Name':
+                return kLg.PopName;
+            case 'Description':
+                return kLg.Description;
+            case 'Type':
+                return kLg.lblType;
+            case 'CurrencyId':
+                return kLg.Currency;
+            case 'ExpectedEffect':
+                return kLg.gaLblExpectedEffect;
+            case 'ActualEffect':
+                return kLg.gaLblActualEffect;
+            case 'Start':
+                return kLg.labelStart;
+            case 'End':
+                return kLg.labelEnd;
+            case 'ExpectedCost':
+                return kLg.gaLblExpectedCost;
+            case 'ActualCost':
+                return kLg.gaLblActualCost;
+            case 'Category': case 'ActionCategory':case 'GoalCategoryM' : case 'GoalCategoryS':
+                return kLg.labelCategories;
+            case 'Field':case 'ActionField': case 'GoalFieldM' : case 'GoalFieldS':
+                return kLg.gaLblField;
+            case 'Instrument':
+                return kLg.menuInstrument;
+            case 'IsCalendar':
+                return kLg.gaLblEP;
+            case 'Visibility':
+                return kLg.labelVisibility;
+            case 'DemandText':
+                return kLg.Needs;
+            case 'Finish':
+                return kLg.labelFinish;
+            case 'Importance':
+                return kLg.Evaluation;
+            case 'ExpectationText':
+                return kLg.Expectations;
+            case 'IsExpectation':
+                return kLg.ExpectFromClients;
+            case 'Color':
+                return kLg.Color;
+            case 'DemandChartValue':
+                return kLg.labelEvaluation;
+            case 'Evaluation':
+                return kLg.labelEvaluation;
+            case 'Effect':
+                return kLg.labelEstimate;
+            case 'Date':
+                return kLg.labelDate;
+            case 'Comment': case 'EvaluationComment': case 'CompetitionComment':
+                return kLg.labelComment;
+            case 'IsActive':
+                return kLg.lblActive;
+            case 'EvaluationResult':
+                return kLg.labelEvaluation;
+            case 'MarketShare':
+                return kLg.lblMarketShare;
+            case 'Priority':
+                return kLg.priority;
+            case 'Cost':
+                return kLg.Cost;
+            case 'Income':
+                return kLg.Ertrage;
+            case 'XName':
+                return kLg.XName;
+            case 'YName':
+                return kLg.YName;
+            case 'XUnit':
+                return kLg.XUnit;
+            case 'YUnit':
+                return kLg.YUnit;
+            case 'XValue':
+                return kLg.XValue;
+            case 'YValue':
+                return kLg.YValue;
+            case 'StatusId':
+                return kLg.gaLblStatus;
+            case 'Text':
+                return kLg.SubmarketLabelText;
+            case 'MarketGrowth':
+                return kLg.lblMarketGrowth;
+            case 'RelativeMarketShare':
+                return kLg.lblRelativeMarketShare;
+            case 'StrategyId':
+                return kLg.menuStrategy;
+            case 'IndependencyRegion':
+                return kLg.RegionSelection;
+            case 'FolderFieldAssign':
+                return kLg.titleFileAssigned;
+            case 'FolderFile':
+                return kLg.lblTitleFileManager;
+            case 'PhysicalName':
+                return kLg.lblUrl;
+            case 'SelectAllRegion':
+                return kLg.RegionSelection;
+            case 'IsNotRelative':
+                return kLg.lblnotRelative;
+            case 'StartDate':
+                return kLg.labelStart;
+            case 'AdvertisingMaterial':
+                return kLg.lblNameAdvertisingMaterials;
+            case 'Advertiser':
+                return kLg.lblNameAdvertiser;
+            case 'ActionPlanConnectionM': case 'ActionPlanConnectionS': case 'ActionPlanConnectionA':
+                return kLg.textConnection;
+            case 'NumberOfDay':
+                return kLg.NumberOfDay;
+            case 'FibuRegion':
+                return kLg.titleActionFibu;
+            case 'FibuKonten':
+                return kLg.lblFibuAccount;
+            case 'Kostenstellen':
+                return kLg.kostenstellen;
+            case 'FibuPercent': case 'MPercent':
+                return kLg.Percent;
+            case 'FibuDate':
+                return kLg.lblValueData;
+            case 'ActionFibu':
+                return kLg.titleActionFibu;
+            case 'MasterGoalId':case 'IsMasterGoal':
+                return kLg.lblMasterGoal;
+            case 'UpActionId':
+                return kLg.upstreamAction;
+            case 'ActionPlanSubProductM': case 'ActionPlanSubProductS': case 'ActionPlanSubProductA':
+                return kLg.lblSubProductGroup;
+            case 'ActionPlanSubClientM': case 'ActionPlanSubClientS': case 'ActionPlanSubClientA':
+                return kLg.createNewSubmarket;
+            case 'ActionCost':
+                return kLg.Timeline;
+            case 'IsXy':
+                return kLg.lblIsXy;
+            case 'AcDescription':
+                return kLg.Activity;
+            case 'MasterBudget': case 'MasterId': 
+                return kLg.lblMasterGoal;
+            case 'KpiActionFormatItem':
+                return kLg.lblKpiFormat;
+            case 'KpiActionMasterTopic': case 'KpiGoalTopic':
+                return kLg.lblKpiTopic;
+            case 'KpiActionMasterTime': case 'KpiActionMasterIndexTime': case 'KpiGoalTime': case 'KpiGoalIndexTime': case 'KpiOutcomeIndexTime': 
+                return kLg.titleIndextime;
+            case 'KpiActionMasterIndex': case 'KpiGoalIndex': case 'KpiActionIndex': case 'KpiOutcomeTime': 
+                return kLg.menuKpiIndex;
+            case 'MValue':
+                return kLg.FormatValue;
+            case 'ExpectedValue':
+                return kLg.lblSoll;
+            case 'LstValue':
+                return kLg.lblActual;
+            case 'KpiPercent': case 'ImplementPercent':
+                return kLg.lblKpiPercent;
+            case 'KpiValue':
+                return kLg.KpiValue;
+            case 'ActionPlanCustomerJourney':
+                return kLg.vtextCustomerJourney;
+            case 'ActionPlanColumn':
+                return kLg.nameColumn;    
+            case 'MCount':
+                return kLg.actionCount;  
+            default:
+                return name;
+        }
+    };
+
+    vmHistory.setLanguagePath = function (obj) {
+        var valueAct = obj.text();
+        if (valueAct) {
+            if (valueAct.charAt(valueAct.length - 1) == '/') {
+                valueAct = valueAct.substring(0, valueAct.length - 1);
+            }
+            obj.text(valueAct.replace("__keyDocumente2014", kLg.titleDocument));
+        }
+    };
+
+
+    vmHistory.chooseLanguageValue = function (name) {
+        switch (name) {
+            case '{@false}':
+                return kLg.untick;
+            case '{@true}':
+                return kLg.tick;
+            default:
+                return name;
+        }
+    };
+
+    vmHistory.setLanguageValue = function (obj) {
+        var valueAct = obj.text();
+        obj.text(vmHistory.chooseLanguageValue(valueAct));
+    };
+
+    vmHistory.setLanguageActive = function (obj) {
+        var nameAct = obj.text();
+        var parts = nameAct.split("::");
+        if (parts.length == 2) {
+            var arrayName = [vmHistory.chooseLanguageActive(parts[0]), vmHistory.chooseLanguageActive(parts[1])];
+            var nameTrans = arrayName.join("::");
+            obj.text(nameTrans);
+        } else {
+            obj.text(vmHistory.chooseLanguageActive(nameAct));
+        }
+    };
+
+    vmHistory.setLanguageAllActives = function () {
+        $('span.cssActiveObject').each(function () {
+            vmHistory.setLanguageActive($(this));
+        });
+
+        $('span.cssActiveValue').each(function () {
+            vmHistory.setLanguageValue($(this));
+        });
+
+        $('span.cssActivePath').each(function () {
+            vmHistory.setLanguagePath($(this));
+        });
+
+
+    };
+
+    vmHistory.setSortType = function (sortInfo) {
+        var sortIcon = 'icon-order-desc';
+        if (sortInfo.SortType == 'ASC')
+            sortIcon = 'icon-order-asc';
+        $('#dash-history th span.icon-16').remove();
+        $('#dash-history th[columnname=' + sortInfo.ColumnName + ']')
+            .attr('sortType', sortInfo.SortType)
+            .append('<span class="icon-16  icon-right-block  ' + sortIcon + '"></span>');
+    };
+
+    vmHistory.regisSort = function () {
+        $('#dash-history th[columnname]').unbind('click');
+        $('#dash-history th[columnname]').click(function () {
+            var columnName = $(this).attr('columnname'),
+                sortType = $(this).attr('sortType');
+            if (sortType) {
+                sortType = sortType == "ASC" ? "DESC" : "ASC";
+            } else {
+                sortType = "ASC";
+            }
+            vmHistory.callHistoryHandler(null, columnName, sortType,vmHistory.HistoryData.TypeId);
+        });
+    };
+
+    vmHistory.recover = function (id, index) {
+        pConfirm(kLg.confirmRecoverItem).then(function () {
+            var item = $.grep(vmHistory.HistoryData.ListHistory, function(e){ return e.Id === id; })[0];
+            var idTab = $('li.active').find("a").attr("id");
+            var type;
+
+            if (idTab === "idTabMarket") {
+                type = 4;
+            } else if (idTab === "idTabSubmarket") {
+                type = 5;
+            }else if (idTab === "idTabActionPlan") {
+                type = 6;
+            }
+            var jsonObject = { Id: id, ObjectId: item.ObjectId.toString(), Element: item.TableName, Type: type };
+
+            var url = "/Handlers/DashboardHandler.ashx?funcName=recover&projid=" + projectId + "&strid=" + strategyId;
+            callAjax('loadingRegionMatrix', url, JSON.stringify(jsonObject), function (data) {
+                var isExits = data.value.Result;
+                var recoverName = data.value.RecoverName;
+                switch (isExits) {
+                    case 1:
+                        var spanItemR = "recover" + index;
+                        $('#' + spanItemR).removeClass('icon-bin-orange');
+                        $('#' + spanItemR).addClass('icon-bin-gray ms-tooltip');
+                        $('#' + spanItemR).attr("title", kLg.recoverByName + recoverName);
+
+                        vmHistory.HistoryData.ListHistory[index].IsNotRecover = true;
+                        vmHistory.HistoryData.ListHistory[index].RecoverBy = data.value.RecoverBy;
+                        vmHistory.HistoryData.ListHistory[index].IsActive = true;
+                        vmHistory.HistoryData.ListHistory[index].DeletedBy = 0;
+                    
+                        var spanPath = "path" + item.ObjectId.toString() + index;
+                        if ($('#' + spanPath)) {
+                            $('#' + spanPath).addClass('table-td-link cursor-pointer');
+                        }
+                        break;
+                    case 0:
+                        pAlert(kLg.notRecoverAdded);
+                        break;
+                    case -1:
+                        pAlert(kLg.notRecoverSettingDel);
+                        break;
+                    case -2:
+                        pAlert(kLg.notRecoverDel);
+                        break;
+                    case -3:
+                        pAlert( kLg.msgDuplicateName);
+                        break;
+                    
+                default:
+                }
+
+                $("#placeHolder-projectList .ms-tooltip").removeAttr("onclick");
+
+                $("#placeHolder-projectList .ms-tooltip").mouseenter(function(e) {
+                    ShowToolTip($(this), $(this).attr("title"), "top");
+
+                });
+                $("#placeHolder-projectList .ms-tooltip").mouseleave(function(e) {
+                    DestroyToolTip($(this));
+                });
+
+            }, AjaxConst.PostRequest);
+        });        
+    };
+
+    $(document).ready(function () {
+        vmHistory.IsLoadFirst = 1;
+        vmHistory.callHistoryHandler();
+    });
+
+</script>

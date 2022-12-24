@@ -1,0 +1,329 @@
+﻿<style type="text/css">
+    .select-export {
+        margin-left: 10px;
+    }
+
+    .label-export {
+        margin-top: 5px;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+</style>
+
+<!--<script src="../Scripts/kendo/kendo.all.min.js"></script>-->
+<script src="../Scripts/jszip.min.js"></script>
+<div id="loadingportexcel" class="loading"></div>
+<div id="popexportexcel">
+    <form id="fExportExcel">
+        <div class="modal-body ms-modal-body">
+            <div class="clearx4"></div>
+            <div class="form-group">
+                <label class="modal-label pull-left label-export" id="lblProject">Crow Project</label>
+                <input data-option-label="{Name: kLg.filterLabelProject}"
+                       data-role="dropdownlist"
+                       data-auto-bind="false"
+                       data-value-primitive="false"
+                       data-text-field="Name"
+                       data-value-field="Id"
+                       data-bind="value: sitem, source: crows, events: {change: select}, enabled: isActive" id="dropCrow" class="select-export" />
+            </div>
+        </div>
+        <div class="modal-market-footer">
+            <button id="btnUpdate" type="button" tabindex="2" class="ms-button" data-bind="events:{click: exportExcel}, enabled: isExport">
+                <span class="icon-20 icon-close"></span>
+                <span id="lblExport">Close</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    var viewModel;
+    var strategyId = strategyId || 0;
+    vmSubmenu = vmSubmenu || {};
+
+    function getDataFilterByCrowId(id) {
+        var url = "../Handlers/CrmCrowdProjectViewHandler.ashx?funcName=getdatafilter&projid=" + projectId + "&strid=" + strategyId;
+        callAjax("loadingportexcel", url, JSON.stringify({ cid: id }), getDataFilterCallback, AjaxConst.PostRequest);
+    }
+
+
+    var exportData = [];
+    function bindData(res) {
+        
+        visibleBtnExport(res.length > 0);
+
+        viewModel = kendo.observable({
+            sitem: null,
+            crows: res,
+            isActive: res.length > 0,
+            select: function () {
+                if (this.sitem) {
+                    getDataFilterByCrowId(this.sitem.Id);
+                }
+            },
+            exportExcel: function () {
+                exportCallback();
+            },
+            isExport: res.length > 0
+        });
+
+        kendo.bind($("#popexportexcel"), viewModel);
+
+    }
+
+    function visibleBtnExport(flag) {
+        if (!flag) {
+            $("#popexportexcel #btnUpdate").addClass("bg-disable");
+        } else {
+            $("#popexportexcel #btnUpdate").removeClass("bg-disable");
+        }
+
+        return flag;
+    }
+
+    function setupLanguage() {
+        $("#popexportexcel #lblProject").text(kLg.lblCrowdProject);
+        $("#popexportexcel #lblExport").text(kLg.textExport);
+    }
+
+    //document ready
+    $(function () {
+        bindData(vmSubmenu.exportOption.crows);
+        setupLanguage();
+        //$("#popexportexcel").parent().append($("<script src='' id='kallscript'><\/script>").attr("src", "../Scripts/kendo/kendo.all.min.js"));
+    });
+
+    var columnCount = 0;
+    var columnFix = [];
+
+    var eRenCell = {
+        Header: "Name",
+        Value: "Value"
+    };
+
+    function getObjectCelByType(protype) {
+        switch (protype) {
+            case eRenCell.Header:
+                return {};
+            case eRenCell.Value:
+                return { wrap: true};
+            default:
+                return {};
+        }
+    }
+
+    function getIdentification(itype, index) {
+
+        var iden = "";
+        switch (itype) {
+            case vmCrmEnum.ExportChildType.Thema:
+                iden = kLg.itextThema + " " + (index + 1);
+                break;
+            case vmCrmEnum.ExportChildType.Group:
+                iden = kLg.itextGroup + " " + (currentThemaIndex + 1) + "." + (index + 1);
+                break;
+            case vmCrmEnum.ExportChildType.Title:
+                iden = kLg.itextTitle + " " + (currentThemaIndex + 1) + "." + (currentGroupIndex + 1) + "." + (index);
+                break;
+            case vmCrmEnum.ExportChildType.Question:
+                var parentIndex = currentGroupIndex === undefined ? "" : Number(currentGroupIndex);
+                iden = (currentThemaIndex + 1) + "." + (parentIndex + 1) + "." + index + " " + kLg.itextQuestion;
+                break;
+            case vmCrmEnum.ExportChildType.SubQuestion:
+                var groupIndex = currentGroupIndex === undefined ? "" : Number(currentGroupIndex);
+                var parrentIndex = currentQuestionIndex === undefined ? "" : Number(currentQuestionIndex);
+                iden = (currentThemaIndex + 1) + "." + (groupIndex + 1) + "." + (parrentIndex) + "." + (index + 1) + " " + kLg.itextQuestion;
+                break;
+            case vmCrmEnum.ExportChildType.Answer:
+                iden = kLg.itextAnswer + " " + (index + 1);
+                break;
+        }
+
+        if (iden !== "") {
+            iden += "; ";
+        }
+        return iden;
+    }
+
+    var currentThemaIndex;
+    var currentGroupIndex;
+    var currentQuestionIndex;
+    function renCell(cells, source, protype) {
+        for (var i = 0; i < source.length; i++) {
+
+            var src = source[i];
+            var cellItem = getObjectCelByType(protype);
+
+            if (!src.IsShow) {
+                continue;
+            }
+
+            if (src.TypeUnit === vmCrmEnum.QuestionType.Data || src.TypeUnit === vmCrmEnum.QuestionType.Image || src.TypeUnit === vmCrmEnum.QuestionType.ModuleText) {
+                continue;
+            }
+            
+            if (protype === eRenCell.Header) {  //create header cell
+                columnCount++;
+                if (src.TypeId === vmCrmEnum.ExportChildType.Thema) {
+                    currentThemaIndex = i;
+                } else if (src.TypeId === vmCrmEnum.ExportChildType.Group) {
+                    currentGroupIndex = i;
+                } else if (src.TypeId === vmCrmEnum.ExportChildType.Question) {
+                    currentQuestionIndex = i;
+                }
+
+                if (src.TypeUnit === vmCrmEnum.QuestionType.Ratingscale && src.TypeId === vmCrmEnum.ExportChildType.Answer) {
+                    cellItem.value = src[protype];
+                } else {
+                    cellItem.value = getIdentification(src.TypeId, i) + src[protype];
+                    if (src.TypeUnit === vmCrmEnum.QuestionType.SinglelineText || src.TypeUnit === vmCrmEnum.QuestionType.MultilineText) {
+                        columnFix.push(columnCount);
+                    }
+                }
+
+            } else if (protype === eRenCell.Value) {  //create value cell
+                //cellItem.value = src[protype];
+                if (src[protype] != null && src[protype].length > 0 && !isNaN(Number(src[protype])))
+                    cellItem.formula = "=VALUE(" + src[protype] + ")";
+                else
+                    cellItem.value = src[protype];
+
+                if ((src.TypeUnit === vmCrmEnum.QuestionType.MultilineText || src.TypeUnit === vmCrmEnum.QuestionType.NText) && cellItem.value != null) {
+                    var count = cellItem.value.split('\n').length;
+                    heightFix = count > heightFix ? count: heightFix;
+                }
+            }
+
+            cells.push(cellItem);
+            if (src.Childs.length > 0) {
+                renCell(cells, src.Childs, protype);
+            }
+
+            if (src.Subs.length > 0) {
+                renCell(cells, src.Subs, protype);
+            }
+
+            if (src.TypeId === vmCrmEnum.ExportChildType.Thema) {
+                currentThemaIndex = undefined;
+            }
+            else if (src.TypeId === vmCrmEnum.ExportChildType.Group) {
+                currentGroupIndex = undefined;
+            }
+            else if (src.TypeId === vmCrmEnum.ExportChildType.Question) {
+                currentQuestionIndex = undefined;
+            }
+        }
+        return cells;
+    }
+
+    var heightFix = 1;
+    function exportCallback() {
+        columnFix = [];
+
+        if (!exportData || exportData.length === 0) {
+            return;
+        }
+        var crowd = viewModel.get("sitem");
+
+        var rs = exportData;
+        if (rs.length === 0) {
+            return;
+        }
+
+        var headerRes = rs[0].QuestionAnswers;
+        var headerCells = [
+            { value: crowd.IsAnonymous ? "IP" : kLg.textOrganisation, background: "#BDB76B", textAlign: "center", bold: true },
+            { value: kLg.textPlace, background: "#BDB76B", textAlign: "center", bold: true },
+            { value: kLg.firstName, background: "#BDB76B", textAlign: "center", bold: true },
+            { value: kLg.lastName, background: "#BDB76B", textAlign: "center", bold: true }
+            //,{ value: kLg.titleSourcingEmail, background: "#BDB76B", textAlign: "center", bold: true }
+        ];
+
+        renCell(headerCells, headerRes, eRenCell.Header);
+
+        var header = {
+            cells: headerCells
+        };
+
+        var rows = [];
+        rows.push(header);
+        var i;
+
+        for (i = 0; i < rs.length; i++) {
+            var personFilter = rs[i];
+            var cells = [{ value: vmCommon.cleanInvalidXmlChars(personFilter.OrganisationName) },
+                         { value: vmCommon.cleanInvalidXmlChars(personFilter.OrgAddress) },
+                         { value: vmCommon.cleanInvalidXmlChars(personFilter.FirstName) },
+                         { value: vmCommon.cleanInvalidXmlChars(personFilter.LastName) }
+                         //,{ value: personFilter.SourcingEmail }
+            ];
+
+            heightFix = 1;
+            var valueRes = rs[i].QuestionAnswers;
+            renCell(cells, valueRes, eRenCell.Value);
+                        
+            var rowItem = { cells: cells };
+            if (heightFix > 0) {
+                rowItem.height = heightFix * 20;
+            }
+            rows.push(rowItem);
+        }
+
+        //columns of org-name, org-address, per-firstname, per-lastname
+        var columns = [{ autoWidth: true, width: 25 }, { autoWidth: true, width: 25 }, { autoWidth: true, width: 25 }, { autoWidth: true, width: 25 }
+            //,{ autoWidth: true, width: 25 }
+        ];
+
+        //columns of question/answer
+        for (i = 1; i < columnCount + 1; i++) {
+            if (columnFix.contains(i)) {
+                columns.push({ width: 500 });
+            } else {
+                columns.push({ autoWidth: true, width: 5 });
+            }
+
+        }
+
+        var workbook = new kendo.ooxml.Workbook({
+            creator: "Stratsigner",
+            sheets: [
+                {
+                    freezePane: {
+                        rowSplit: 1
+                    },
+                    title: "Customers",
+                    //creator: "Stratsigner",
+                    date: new Date(),
+                    filter: { from: 0, to: 3 },
+                    // Column settings
+                    columns: columns,
+                    // Rows of the sheet
+                    rows: rows
+                }
+            ]
+        });
+
+        // Create uri
+        var wUri = workbook.toDataURL();
+
+        // Save file from uri
+        kendo.saveAs({
+            dataURI: wUri,
+            fileName: crowd.Name + ".xlsx",
+            proxyURL: "../api/imagebrowser/savefile"
+        });
+
+        exportData = [];+
+        viewModel.set("sitem", null);
+        viewModel.set("isExport", visibleBtnExport(exportData.length > 0));
+    }
+
+    function getDataFilterCallback(res) {
+        exportData = res.value;
+        viewModel.set("isExport", visibleBtnExport(exportData.length > 0));
+    };
+
+</script>

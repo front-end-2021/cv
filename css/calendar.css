@@ -1,0 +1,250 @@
+﻿
+.ico {
+    width: 34px !important;
+    display: block;
+    height: 34px !important;
+}
+
+.nav-next {
+    background: url(../images/arrownext.png) no-repeat center center;
+    padding-left: 10px;
+}
+
+.nav-foward {
+    background: url(../images/arrowforward.png) no-repeat center center;
+    padding-right: 10px;
+}
+
+.ctable {
+    width: 100%;
+    text-align: center;
+    border-spacing: 0;
+    border-collapse: collapse;
+    margin-right: 10px;
+}
+
+table.ctable td.cell-header {
+    font-weight: 600;
+    color: #3f3f3f;
+    font-size: 16px;
+    text-transform: uppercase;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+}
+
+table.ctable td.cell {
+    /*background-color: #EEEEEE;*/
+    border: solid 1px white;
+    }
+
+
+thead {
+    margin-bottom: 10px;
+}
+
+    thead th {
+    }
+
+table.ctable td {
+    text-align: left;
+}
+
+    table.ctable td.evenCell, table.ctable td.oddCell {
+        text-align: center;
+    }
+
+thead th input {
+    margin: 0 !important;
+}
+
+tbody .cell-span {
+    /*background-color: #EEEEEE;*/
+    display: block;
+    padding: 5px;
+    color: white;
+}
+
+thead .year-span {
+}
+
+.reset-btn {
+    background: url(/images/reset-btn.png) no-repeat;
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    padding: 0 5px;
+}
+
+.yearCell {
+    background: #38BAF8;
+    height: 26px;
+    color: white;
+    border-radius: 17px;
+    -webkit-border-radius: 17px;
+    -moz-border-radius: 17px;
+    text-align: center;
+}
+
+.oddCell {
+    background-color: #FFFFFF;
+    width: 34px;
+    padding: 0;
+}
+
+.evenCell {
+    background-color: #F0F0F0;
+    width: 34px;
+    padding: 0;
+}
+
+.ctable .bottom-border {
+    border-bottom: 1px solid #E8E1D6;
+    padding-bottom: 10px;
+    padding-top: 5px;
+    padding-left: 10px;
+}
+
+
+.beginDiv {
+    float: right;
+}
+
+.endDiv {
+    float: left;
+}
+
+.processing {
+    background-color: #FFCC98;
+    height: 12px;
+}
+
+.min-w {
+    min-width: 1280px;
+}
+
+.table-calendar thead tr td {
+    background-color: #aaaaaa;
+    color: white;
+    border: white 1px solid;
+    text-align: center;
+}
+
+.master-row >td {
+    background-color: #aaaaaa;
+    color: white;
+    border: white 1px solid;
+    text-align: center;
+}
+
+.table-calendar {
+    min-width: 1200px !important;
+    
+}
+
+.table-calendar tbody tr td {
+    border: #aaaaaa 1px solid;
+    padding: 2px 0px 2px 10px;
+    height: 25px;
+}
+
+#calendar-time .table-calendar tbody tr td {
+    padding: 7px 0px 7px 0px;
+    /*height: 28px;*/
+}
+
+#calendar-field .table-calendar {
+    max-width: 1200px !important;
+}
+
+#calendar-field .table-calendar thead tr {
+    height: 50px;
+    font-size: 18px;
+}
+
+#calendar-time .table-calendar thead tr {
+    height: 25px;
+}
+
+#calendar-time .table-calendar thead tr .month-cell{
+    width: 30px;
+}
+
+
+#calendar-time .table-calendar {
+    min-width: 2400px !important;
+}
+
+.calendar-maingoal-row-field {
+    background-color: #ededed;
+    
+}
+
+.calendar-maingoal-row-field td:first-child {
+    padding-left: 10px !important; 
+}
+
+.calendar-subgoal-row-field {
+    border-top:  #aaaaaa 1px solid !important;
+}
+
+.calendar-subgoal-row-field td:first-child {
+    padding-left: 20px !important; 
+}
+
+.calendar-action-row-field td, .calendar-subgoal-row-field td{
+    /*border-width: 0px;*/
+    border-top: none !important;
+    border-bottom: none !important;
+}
+
+.calendar-action-row-field:last-of-type {
+    border-bottom:  #aaaaaa 1px solid !important;
+    
+}
+
+.calendar-action-row-field td:first-child{
+    padding-left: 30px !important;
+    
+}
+
+.calendar-path-row-field {
+    font-weight: bold;
+}
+
+.k-splitter .k-scrollable {
+    overflow-y: inherit;
+}
+
+.overEnd {
+    background-color: red;
+}
+
+.inProgress {
+    background-color: green;
+}
+
+.goal-type {
+    background-color: blue;
+}
+
+.maingoal {
+    height: 3px;
+}
+
+.subgoal {
+    height: 5px;
+}
+
+.action {
+    height: 10px;
+}
+
+.startProcess {
+    float: right;
+}
+
+.endProcess {
+    float: left;
+    
+}

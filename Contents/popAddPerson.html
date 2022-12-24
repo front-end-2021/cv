@@ -1,0 +1,438 @@
+﻿<div style="width: 730px; margin: 0 auto" class="pop-wrapper">
+    <!--<br/>-->
+    <form id="addUserForm">
+        <div class="modal-body ms-modal-body" style="margin-left: 10px;">
+            <div id="msgPopRegister"></div>
+            <div id="divRegisterInfo">
+                <div style="float: left">
+                    <label id="lblEmail">Email</label><span style="font-weight: bold">*</span>
+                    <div class="clear"></div>
+                    <input type="text" name="email" id="txtEmail" class="ms-input" maxlength="75" readonly tabindex="1" />
+                </div>
+                <div style="float: right">
+                    <label id="lblFirm">Firm</label>
+                    <div class="clear"></div>
+                    <input type="text" id="txtFirm" class="ms-input" maxlength="250" tabindex="6" />
+                </div>
+                <div style="float: left">
+                    <label id="lblFirstName">Firstname</label><span style="font-weight: bold">*</span>
+                    <div class="clear"></div>
+                    <input type="text" id="txtFirstName" name="firstName" class="ms-input" maxlength="50" tabindex="2" />
+                </div>
+                <div style="float: right">
+                    <label id="lblDepartment">Department</label>
+                    <div class="clear"></div>
+                    <input type="text" id="txtDepartment" class="ms-input" maxlength="250" tabindex="7" />
+                </div>
+                <div style="float: left">
+                    <label id="lblLastName">Lastname</label><span style="font-weight: bold">*</span>
+                    <div class="clear"></div>
+                    <input type="text" id="txtLastName" name="lastName" class="ms-input" maxlength="50" tabindex="3" />
+                </div>
+
+
+                <div style="float: right">
+                    <label id="lblMobilePhone">MobilePhone</label>
+                    <div class="clear"></div>
+                    <input type="text" id="txtMobilePhone" class="ms-input" maxlength="50" tabindex="8" />
+                </div>
+                <div style="float: left">
+                    <label id="lblHomePhone">HomePhone</label>
+                    <div class="clear"></div>
+                    <input type="text" id="txtHomePhone" class="ms-input" maxlength="50" tabindex="4"/>
+                </div>
+                <div style="float: right">
+                    <label id="lblGreeting">Greeting</label>
+                    <div class="clear"></div>
+                    <input type="text" id="txtGreeting" class="ms-input" tabindex="9" />
+                </div>
+                <div style="float: left">
+                    <label id="lblSigningOff">Signing Off</label>
+                    <div class="clear"></div>
+                    <input type="text" id="txtSigningOff" class="ms-input" tabindex="5" />
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+        <div class="modal-market-footer">
+            <button type="button" id="btnCancel" onclick="resetForm(this)" class="ms-button" tabindex="11"><span class="icon-20 icon-refresh margin-right6"></span><span id="textResetButton">Abbrechen</span></button>
+            <button type="button" id="btnAddMember" onclick="SaveMember()" class="ms-button" tabindex="10"><span id="icoAdd" class="icon-20 icon-add3 margin-right6"></span><span id="textUpdateButton">Aktualisieren</span></button>
+        </div>
+    </form>
+</div>
+<div class="loading" id="loadingEditInfo"></div>
+
+<!-- mahn: resize tooltip -->
+<style type="text/css">
+    .tooltip-inner {
+        max-width: 400px;
+    }
+
+    .ms-input {
+        margin-left: 0;
+    }
+</style>
+<script type="text/javascript">
+    var vmNewMember = vmNewMember || {};
+    var vmProject = vmProject || {};
+    var vmProjectGroup = vmProjectGroup || {};
+    vmProject.editMember = null;
+    var vmAddPerson = vmAddPerson || {};
+    vmAddPerson.service = (function () {
+        var sourceInfo = getSourceInfo();
+        var callAjaxAccount = function (funcName, entryData, requestType, successCallBack) {
+            var url = "../Handlers/AccountHandler.ashx?funcName=" + funcName + "&projectGroupId=" + sourceInfo.ProjectGroupId + "&projid=" + sourceInfo.ProjectId + "&lang=" + language;
+            return callAjax("pop-add-project-loading", url, entryData, successCallBack, requestType);
+        };
+
+        var addaccount = function (entry, successFunc) {
+            callAjaxAccount("addaccount", JSON.stringify(entry), AjaxConst.PostRequest, successFunc);
+        };
+        var getuserinfo = function (memberId, successFunc) {
+            callAjaxAccount("getuserinfo&accountId=" + memberId, null, AjaxConst.GetRequest, successFunc);
+        };
+        var updateotheraccount = function (entry, successFunc) {
+            callAjaxAccount("updateotheraccount", JSON.stringify(entry), AjaxConst.PostRequest, successFunc);
+        };
+        var deleteunactivemember = function (memberId, successFunc) {
+            callAjaxAccount("deleteunactivemember&accountId=" + memberId, null, AjaxConst.GetRequest, successFunc);
+        };
+
+        return {
+            addaccount: addaccount,
+            getuserinfo: getuserinfo,
+            updateotheraccount: updateotheraccount,
+            deleteunactivemember: deleteunactivemember
+        };
+    })();
+
+    //SONPT
+    function BindPersonInfo(member) {
+        if (member.IsUpdate) {
+            member.Email = vmNewMember.MemberEmail;
+            getMemberById(member.MemberId);
+        } else {
+            $('#txtEmail', "#addUserForm").prop('readonly', false);
+            $('#txtFirstName', "#addUserForm").focus();
+            $('#txtGreeting').val(kLg.defaultGreeting);
+            $('#txtSigningOff').val(kLg.defaultSigningOff);
+        }
+        $('#txtEmail', "#addUserForm").val(member.Email);
+    };
+    function assignDeleteIcon() {
+        $("#pop-add-new_wnd_title").next().prepend('<a role="button" href="javascript:deleteMember();" class="icon-open-file" style="padding:0px !important"><span id="iconDeleteCrm" role="presentation" class="icon-16 icon-file icon-delete-file" style="height:20px;width:20px;zoom:85%"></span></a>');
+    }
+    function getMemberById(memberId) {
+        vmAddPerson.service.getuserinfo(memberId, function(data) {
+            var member = vmProject.editMember = data.Info;
+            if (member == null) {
+                pAlert(kLg.msgConflickData).then(function() {
+                    window.location = "../Default.aspx?lang=" + kLg.language;
+                });
+                return;
+            }
+            $('#txtFirstName', "#addUserForm").val(member.FirstName);
+            $('#txtLastName', "#addUserForm").val(member.LastName);
+            $('#txtFirm', "#addUserForm").val(member.Firm);
+            $('#txtDepartment', "#addUserForm").val(member.Department);
+            $('#txtHomePhone', "#addUserForm").val(member.HomePhone);
+            $('#txtMobilePhone', "#addUserForm").val(member.MobilePhone);
+            $('#txtGreeting', "#addUserForm").val(member.Greeting);
+            $('#txtSigningOff', "#addUserForm").val(member.SigningOff);
+            if (!data.IsUsed) {
+                if (data.CanDeleted) {
+                    assignDeleteIcon();
+                }
+                $('#txtEmail', "#addUserForm").prop('readonly', false);
+                $('#txtEmail', "#addUserForm").focus();
+            } else {
+                $('#txtFirstName', "#addUserForm").focus();
+            }
+        });
+    }
+
+    function SaveMember() {
+        if (vmNewMember.IsUpdate) Updatememberexistingemails();
+        else AddMember();
+    }
+
+    function bindControlToEntity(member) {
+        member.Email = $('#txtEmail', "#addUserForm").val().trim();
+        member.FirstName = $('#txtFirstName').val().trim();
+        member.LastName = $('#txtLastName').val().trim();
+        member.Firm = $('#txtFirm').val().trim();
+        member.Department = $('#txtDepartment').val().trim();
+        member.MobilePhone = $('#txtMobilePhone').val().trim();
+        member.HomePhone = $('#txtHomePhone').val().trim();
+        member.Greeting = $('#txtGreeting').val().trim();
+        member.SigningOff = $('#txtSigningOff').val().trim();
+    }
+
+    function updateMember(currentMember, member) {
+        currentMember.MemberEmail = member.Email;
+        currentMember.MemberName = member.FirstName + " " + member.LastName;
+        currentMember.Department = member.Department;
+    }
+    //private
+    function getSourceInfo() {
+        switch (vmNewMember.Source) {
+            case "project":
+                return { ProjectGroupId: vmProject.ProjectDetail.ProjectGroupId, ProjectId: vmProject.ProjectDetail.Id };
+            case "group":
+                return { ProjectGroupId: vmProjectGroup.ProjectGroupId, ProjectId: 0 };
+            default:
+                return null;
+        }
+    }
+
+    function AddMember() {
+        if (!$('#addUserForm').valid()) return;
+        
+        dwp("addUserForm", false);
+        var addMember = { Email: vmNewMember.Email }
+        bindControlToEntity(addMember);
+        vmAddPerson.service.addaccount(addMember, function (data) {
+            if (!saveAccountOkay(data.value.Result)) {
+                dwp("addUserForm", true);
+                return;
+            }
+            vmAddPerson.IsModified = false;
+            vmNewMember.MemberId = data.value.Id;
+            vmNewMember.LastLoginedDate = null;
+            vmNewMember.RowState = dataState.Added;
+
+            updateMember(vmNewMember, addMember);
+
+            switch (vmNewMember.Source) {
+            case "project":
+                vmProject.ProjectDetail.ListMember.push(vmNewMember);
+                vmProject.ComboEmailDataSource.push(vmNewMember);
+
+                vmProject.BindTab();
+
+                popAddNewUser.close();
+                break;
+            case "group":
+                vmNewMember.Role = vmProjectGroup.TempMember.Role;
+                vmProjectGroup.ListMember.push(vmNewMember);
+                vmProjectGroup.BindMemberList();
+
+                popAddNewUser.close();
+                break;
+            default:
+            }
+        });
+    }
+
+    function Updatememberexistingemails() {
+        if (!$('#addUserForm').valid()) return;
+        if (vmAddPerson.IsModified != true) {
+            popAddNewUser.close();
+            return;
+        }
+        dwp("addUserForm", false);
+        var editMember = {
+            Id: vmNewMember.MemberId
+        }
+        bindControlToEntity(editMember);
+
+        vmAddPerson.service.updateotheraccount(editMember, function (data) {
+            if (!saveAccountOkay(data)) {
+                dwp("addUserForm", true);
+                return;
+            }
+            vmAddPerson.IsModified = false;
+            updateMember(vmNewMember, editMember);
+
+            switch (vmNewMember.Source) {
+            case "project":
+                if (vmNewMember.Role == vmProject.Role.ProjectOwner) {
+                    vmProject.IsModified = true;
+                }
+                for (var i = 0; i < vmProject.ProjectDetail.ListStrategy.length; i++) {
+                    var member = vmCommon.findByFunc(vmProject.ProjectDetail.ListStrategy[i].ListMember, function(item) { return item.MemberId == editMember.Id; });
+                    if (member != null) {
+                        updateMember(member, editMember);
+                    }
+                }
+                var comboMember = vmCommon.findByFunc(vmProject.ComboEmailDataSource, function(item) { return item.MemberId == editMember.Id; });
+                if (comboMember != null) {
+                    updateMember(comboMember, editMember);
+                }
+                vmProject.BindTab();
+                vmProject.BindComboEmail();
+                vmProject.BindDepartment();
+                vmProject.setActiveTab();
+                popAddNewUser.close();
+                break;
+            case "group":
+                if (vmNewMember.Role == vmProjectGroup.Role.GroupOwner) {
+                    vmProjectGroup.IsModified = true;
+                }
+                vmProjectGroup.BindMemberList();
+                popAddNewUser.close();
+                break;
+            default:
+            }
+        });
+    }
+    function saveAccountOkay(result) {
+        if (result == 0) {
+            pAlert(kLg.emailExistedInSystem).then(function () {
+                setTimeout(function () { $('#txtEmail', "#addUserForm").focus(); }, 10);
+            });
+            return false;
+        }
+        if (result == 1) {
+            pAlert(kLg.msgPermissionDenied).then(function() {
+                window.location = "../Default.aspx?lang=" + kLg.language;
+            });
+            return false;
+        }
+        return true;
+    }
+
+    function resetForm(e) {
+        if (e != undefined) {
+            var member = vmNewMember.IsUpdate ? vmProject.editMember : vmNewMember;
+            $('#txtEmail', "#addUserForm").val(member == null ? "" : member.Email);
+            $('#txtFirstName', "#addUserForm").val(member == null ? "" : member.FirstName);
+            $('#txtLastName', "#addUserForm").val(member == null ? "" : member.LastName);
+            $('#txtFirm', "#addUserForm").val(member == null ? "" : member.Firm);
+            $('#txtDepartment', "#addUserForm").val(member == null ? "" : member.Department);
+            $('#txtHomePhone', "#addUserForm").val(member == null ? "" : member.HomePhone);
+            $('#txtMobilePhone', "#addUserForm").val(member == null ? "" : member.MobilePhone);
+            $('#txtGreeting', "#addUserForm").val(member == null ? "" : member.Greeting);
+            $('#txtSigningOff', "#addUserForm").val(member == null ? "" : member.SigningOff);
+            $('#addUserForm').find('.tooltip').remove();
+            vmAddPerson.IsModified = false;
+        }
+        return;
+    }
+
+    function setLanguage() {
+        $('#addUserForm #textResetButton').text(kLg.resetButton);
+        $('#addUserForm #textUpdateButton').text(vmNewMember.IsUpdate ? kLg.btnUpdate : kLg.add);
+        $('#addUserForm #lblFirm').text(kLg.firm);
+        $('#addUserForm #lblEmail').text(kLg.emailAddressloginview);
+        $('#addUserForm #lblDepartment').text(kLg.lblFunction);
+        $('#addUserForm #lblHomePhone').text(kLg.homePhone);
+        $('#addUserForm #lblFirstName').text(kLg.firstName);
+        $('#addUserForm #lblMobilePhone').text(kLg.mobilePhone);
+        $('#addUserForm #lblLastName').text(kLg.lastName);
+        $("#addUserForm #lblGreeting").text(kLg.greeting);
+        $("#addUserForm #lblSigningOff").text(kLg.signingoff);
+    }
+
+    function dwp(elem, enabled) {
+        if (enabled)
+            $('button', "#" + elem).removeAttr("disabled", "disabled");
+        else
+            $('button', "#" + elem).attr("disabled", "disabled");
+    }
+
+    function deleteMember() {
+        pConfirm(kLg.deleteAccountConfirm).then(function () {
+            var memberId = vmNewMember.MemberId;
+            vmAddPerson.service.deleteunactivemember(memberId, function (data) {
+                if (data == 1) {
+                    pAlert(kLg.msgPermissionDenied).then(function () {
+                        window.location = "../Default.aspx?lang=" + kLg.language;
+                    });
+                    return;
+                }
+                switch (vmNewMember.Source) {
+                case "project":
+                    vmCommon.removeByFunc(vmProject.ProjectDetail.ListMember, function (item) {
+                        if (item.MemberId == memberId) {
+                            if (item.RowState != dataState.Added) { vmProject.IsModified = true; }
+                            return true;
+                        }
+                        return false;
+                    });
+                    vmProject.RemoveMemberOfListStrategy(vmNewMember);
+                    vmCommon.removeByFunc(vmProject.ComboEmailDataSource, function(item) { return item.MemberId == memberId; });
+                     vmProject.BindTab();
+                     vmProject.BindDepartment();
+                    vmProject.BindComboEmail();
+                    vmProject.setActiveTab();
+
+                    popAddNewUser.close();
+                    break;
+                case "group":
+                    vmCommon.removeByFunc(vmProjectGroup.ListMember, function (item) {
+                        if (item.MemberId == memberId) {
+                            if (item.RowState != dataState.Added) { vmProjectGroup.IsModified = true; }
+                            return true;
+                        }
+                        return false;
+                    });
+                    vmProjectGroup.BindMemberList();
+
+                    popAddNewUser.close();
+                    break;
+                default:
+                }
+            });
+        });
+    }
+    vmAddPerson.BindClosePopup = function () {
+        popAddNewUser.bind("close", function (e) {
+            if (vmAddPerson.IsModified == true) {
+                e.preventDefault();
+                pConfirm(kLg.saveConfirmQuestion).then(function () {
+                    if ($('#addUserForm').valid()) {
+                        SaveMember();
+                    }
+                }, function () {
+                    vmAddPerson.IsModified = false;
+                    popAddNewUser.close();
+                });
+            } else {
+                popAddNewUser.destroy();
+                popAddNewUser = null;
+                $('.body-content').after('<div id="pop-add-new"></div>');
+            }
+        });
+    };
+
+    //$.validator.addMethod('betterEmail', function (value, element) {
+    //    return this.optional(element) || /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(value);
+    //}, kLg.validEmail);
+
+    $(document).ready(function () {
+        $("#addUserForm input[type='text']").on("change keyup paste", function() {
+            vmAddPerson.IsModified = true;
+        });
+        setLanguage();
+        BindPersonInfo(vmNewMember);
+
+        $('#addUserForm').validate({
+            onfocusout: function(element) {
+                $(element).valid();
+            },
+            rules: {
+                email: {
+                    required: true,
+                    betterEmail: true,
+                    maxlength: 75
+                },
+                firstName: { required: true },
+                lastName: { required: true }
+            },
+            messages: {
+                email: {
+                    required: kLg.requiredEmail,
+                    betterEmail: kLg.validEmail,
+                    maxlength: kLg.msgMaxlenghEmail
+                },
+                firstName: { required: kLg.requiredFirstName },
+                lastName: { required: kLg.requiredLastName }
+            }
+        });
+        $('#icoAdd').attr('class', vmNewMember.IsUpdate ? "icon-20 icon-update margin-right6" : "icon-20 icon-add3 margin-right6");
+
+        vmAddPerson.BindClosePopup();
+        limitedTabKey();
+    });
+</script>

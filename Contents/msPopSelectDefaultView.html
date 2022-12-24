@@ -1,0 +1,331 @@
+﻿<style>
+    .menu-title, .item-title {
+        height: 30px;
+        background-color: #38baf8;
+        line-height: 28px;
+        padding-left: 5px;
+        color: white;
+        padding: 1px;
+    }
+
+        .menu-title a {
+            color: white;
+        }
+
+    .menu-content {
+        width: 96%;
+        float: right;
+        display: none;
+    }
+
+    .menu-place {
+        margin-top: 4px;
+        position: relative;
+    }
+
+    .menu-title:hover {
+        cursor: pointer;
+    }
+
+    input[type="checkbox"][disabled].ckbAdvtisingHasbeenUsed {
+        cursor: initial !important
+    }
+</style>
+
+<div id="pop-selectdefault" class="pop-wrapper">
+    <form id="selectdefaultform" role="form" class="form-horizontal">
+        <div class="modal-body ms-modal-body" style="height: 350px;overflow-x: hidden; overflow-y: scroll;" id="div-selectdefault">
+            <div class="root" id="root"></div>
+        </div>
+        <div class="modal-market-footer">
+            <button id="btnUpdateSelectDefault" type="button" class="ms-button" onclick="vmSelectDefault.update()">
+                <span class="icon-20 icon-close"></span>
+                <span id="lblSelectDefaultClose">Speichern und schliessen</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script type="text/html" id="viewitemtemplate">
+    #for(var i = 0; i < data.length; i++){#
+    #var item = data[i]; #
+    <div class="menu-place" level="#:item.Level#" typeid="#:item.TypeId#" mid="#:item.Id#">
+
+        #if(item.IsLatest){#
+        <div class="item-title pointer" onclick="vmSelectDefault.SelectSubTitle(this)">
+            <div style="width: 24px; height: 24px; float: left;margin-right: 10px;"></div>
+            <span>#:item.Name || ""#</span>
+        </div>
+        #}else{#
+        <div class="menu-title pointer" onclick="vmSelectDefault.openSubItem(this)" id="#:item.Level#m#:item.Id#">
+            <span class="arrow-panel-online icon-24 icon-left-block arrow-collapse" style="margin-top: 2px"></span>
+            <span>#:item.Name || ""#</span>
+        </div>
+        #}#
+
+        #if(item.HasSelect){#
+            #if(item.TypeId == vmCommon.ActionCustomViewType.ADVERTISING && item.IsUsed){#
+            <div class="pull-right cbx-view" 
+                 style="position: absolute; display:inline-block; top: 1px; right: 1px;width:30px;height:30px">
+                <span style="position:relative">
+                    <input type="checkbox" 
+                           class="ckbAdvtisingHasbeenUsed"
+                           style="position: absolute; right: -25px; top: 5px;width: 13px;height:13px"
+                           #if(item.IsSelect){#checked#}#
+                           #if(!item.IsSelectable){#disabled#}#
+                           #if(!item.IsSelectable){#islock#}#
+                           #if(item.IsUsed){#disabled#}#/>
+                    <span class="advtisingHasbeenUsed"
+                          style="position: absolute; right: -28px; top: 5px; display:inline-block; width: 20px; height:20px">
+                    </span>
+                </span>
+            </div>
+            #} else {#
+            <input type="checkbox"
+                   class="pull-right cbx-view"
+                   style="position: absolute; right: 5px; top: 5px;"
+                   onchange="vmSelectDefault.selectSubItem(this)"
+                   #if(item.IsSelect){#checked#}#
+                   #if(!item.IsSelectable){#disabled#}#
+                   #if(!item.IsSelectable){#islock#}#
+                   #if(item.IsUsed){#disabled#}# />
+            #}#
+        #}#
+
+        <div class="clear"></div>
+        <div class="menu-content" id="#:item.Level#x#:item.Id#">
+        </div>
+        <div class="clear"></div>
+    </div>
+    #}#
+
+</script>
+
+<script type="text/javascript">
+    var vmSelectDefault = {};
+    //vmSelectDefault.modelChanged = false;
+
+    vmSelectDefault.destroyPop = function () {
+        vmPopSetting.popSelectDefault.destroy();
+        vmPopSetting.popSelectDefault = null;
+        $("#pop-viewData").before("<div id='pop-select-default'></div>");
+    };
+
+    vmPopSetting.popSelectDefault.bind("close", function (e) {
+        if (vmSelectDefault.isChanged()) {
+            if (confirm(kLg.saveConfirmQuestion)) {
+                if (!vmSelectDefault.update()) e.preventDefault();
+            } else {
+                vmSelectDefault.destroyPop();
+            }
+
+        } else {
+            vmSelectDefault.destroyPop();
+        }
+    });
+
+    vmSelectDefault.setUpLanguage = function () {
+        $("#pop-selectdefault #lblSelectDefaultClose").text(kLg.lblClose);
+    };
+
+    vmSelectDefault.SelectSubTitle = function (e) { };
+    vmSelectDefault.openSubItem = function (e) { };
+
+    vmSelectDefault.selectSubItem = function (e) {
+        var flag = $(e).is(":checked");
+
+        var parent = $(e).closest("div.menu-place");
+        var pId = $(parent).attr("mid");    // string
+        var pLevel = $(parent).attr("level");
+        if (pId == undefined || pLevel == undefined || isNaN(Number(pLevel))) return;
+
+        var item = vmCommon.findByFunc(source, function (it) {
+            return it.Id == pId && it.Level == pLevel;
+        });
+        if (item == null) {
+            $(e).prop("checked", !flag);
+            return;
+        }
+
+        if (item.TypeId == 12)  // Advertiser - code cu giu nguyen
+        {
+            if (flag) {
+                for (var i = 0; i < source.length; i++) {
+                    var vitem = source[i];
+                    if (vitem.Id != pId && vitem.IsSelect) vitem.IsSelect = false;
+                }
+            }
+            $("#pop-selectdefault input.cbx-view:not([islock])").not(e).prop("checked", false);
+            viewItem.DefaultValue = flag ? pId : "";
+        }
+        else {   // Advertising - multichoice
+            var pIds = viewItem.DefaultValue ? viewItem.DefaultValue.split(',').filter(e => {
+                return e != '';
+            }) : []; // array[string]
+            let idx = pIds.indexOf(pId);        // pId (string)
+
+            if (flag) {
+                if (idx < 0)             // Check khong co trong array thi them
+                    pIds.push(pId);
+            } else {
+                if (idx > -1) {         // Check co trong array thi xoa
+                    pIds.splice(idx, 1);
+                }
+            }
+            viewItem.DefaultValue = pIds.join();
+        }
+    };
+
+    vmSelectDefault.checkX = function () {
+        if (viewItem.TypeId == 11) {
+            var selectedIds = viewItem.DefaultValue ? viewItem.DefaultValue.split(',').filter(e => {
+                return e != '';
+            }).map(f => { return Number(f); }) : [];
+
+            if (selectedIds.length >= 2 && vmPopSetting.defaultViewOptions.OtherUsedIds.length > 0) {
+                if (vmPopSetting.defaultViewOptions.OtherUsedIds.every(t => selectedIds.includes(t))) {
+                    return [];
+                } else {
+                    return vmPopSetting.defaultViewOptions.OtherUsedIds.filter(t => !selectedIds.contains(t));
+                }
+            }
+
+            return [];
+        }
+        else
+            return [];
+    }
+
+    vmSelectDefault.update = function () {
+        if (vmSelectDefault.isChanged()) {
+            var ids = vmSelectDefault.checkX();
+            if (ids.length == 0) {
+                var viewModel = vmPopSetting.defaultViewOptions.viewItemModel;
+                viewModel.set("DefaultValue", viewItem.DefaultValue);
+
+                if (viewModel.DataState == dataState.Unchanged) viewModel.DataState = dataState.Modified;
+                if (vmPopSetting.defaultViewOptions.func) vmPopSetting.defaultViewOptions.func(viewModel);
+            } else {
+                var ads = source.filter(t => ids.contains(t.Id)).map(t => t.Name).join(", ");
+                pAlert(kLg.msgAdvertisingUsed.replaceAll("{0}", ads).replaceAll("{1}", ids.length > 1 ? kLg.textAre : kLg.textIs), { width: 500, height: 200 });
+                return false;
+            }
+        }
+
+        vmPopSetting.popSelectDefault.close();
+    };
+
+    vmSelectDefault.binding = function (divId, data, tempId) {
+        var templateContent = $("#" + tempId).html();
+        data = data || [];
+
+        var template = kendo.template(templateContent);
+        $("#" + divId).html(template(data));
+    };
+
+    vmSelectDefault.mergeSelected = function () {
+
+        for (var i = 0; i < source.length; i++) {
+            source[i].IsSelect = false;
+            source[i].IsPath = false;
+        }
+
+        function markParent(parentId, parentLevel) {
+            if (parentId == undefined || parentLevel <= 0) return;
+
+            var parent = vmCommon.findByFunc(source, function (it) { return it.Id == parentId && it.Level == parentLevel; });
+            if (parent == undefined) return;
+
+            parent.IsPath = true;
+
+            markParent(parent.ParentId, parentLevel - 1);
+        };
+
+        var usedIds = viewItem.DefaultValueIsUsed ? viewItem.DefaultValueIsUsed.split(',').filter(e => {
+            return e != '';
+        }).map(f => { return Number(f); }) : [];
+
+        var parentIds = viewItem.DefaultValue ? viewItem.DefaultValue.split(',').filter(e => {
+            return e != '';
+        }).map(f => { return Number(f); }) : [];
+
+        for (i = 0; i < source.length; i++) {
+            var item = source[i];
+            if (item.TypeId == viewItem.TypeId) {
+                let parentId = parentIds.find(e => { return e == item.Id; });
+                if (parentId) {
+                    item.IsSelect = true;
+                    item.IsUsed = usedIds.contains(item.Id);
+
+                    markParent(item.ParentId, item.Level - 1);
+                }
+            }
+        }
+
+        //if (parentIds.length == 1) {    // Code cu: Option 1: co 1 check duoc tick
+        //    for (i = 0; i < source.length; i++) {
+        //        var item = source[i];
+        //        if (item.TypeId == viewItem.TypeId && (item.Id == parentIds[0])) {
+        //            item.IsSelect = true;
+        //            //mark parent
+        //            markParent(item.ParentId, item.Level - 1);
+        //            break;
+        //        }
+        //    }
+        //}
+        //else if (parentIds.length > 1) {    // Option2: co tu 2 check duoc tick
+        //    for (i = 0; i < source.length; i++) {
+        //        var item = source[i];
+        //        if (item.TypeId == viewItem.TypeId) {
+        //            let parentId = parentIds.find(e => { return e == item.Id; });
+        //            if (parentId) {
+        //                item.IsSelect = true;
+        //                markParent(item.ParentId, item.Level - 1);
+        //            }
+        //        }
+        //    }
+        //}
+    };
+
+    vmSelectDefault.isChanged = function(){
+        return viewItem.DefaultValue != vmPopSetting.defaultViewOptions.viewItemModel.DefaultValue;
+    };
+
+    vmSelectDefault.setUpTooltip = function () {
+        var $chkbxHasbeenUsed = $(`.advtisingHasbeenUsed`);
+        if ($chkbxHasbeenUsed.length > 0) {
+            $('#div-selectdefault > #root').kendoTooltip({
+                filter: "span.advtisingHasbeenUsed",
+                content: kLg.HasBeenUsed,
+                position: "top",
+                show: function (e) {
+                    if (e.sender.options.filter == 'span.advtisingHasbeenUsed') {
+                        e.sender.popup.element.css({ 'opacity': '' });
+                    }
+                }
+            });
+
+            $chkbxHasbeenUsed.on('mouseenter', function () {
+                $('#div-selectdefault > #root').data("kendoTooltip").show($(this));
+            });
+            $chkbxHasbeenUsed.on('mouseleave', function () {
+                $('#div-selectdefault > #root').data("kendoTooltip").hide();
+            });
+        }
+        
+    };
+
+    var source, viewItem;
+    $(function () {
+        source = vmCommon.deepCopy(vmPopSetting.defaultViewOptions.Source);
+        viewItem = vmCommon.deepCopy(vmPopSetting.defaultViewOptions.viewItemModel);
+
+        vmSelectDefault.mergeSelected();
+
+        var roots = $.grep(source, function (it) { return it.Level === 1; });
+        vmSelectDefault.binding("root", roots, "viewitemtemplate");
+
+        vmSelectDefault.setUpLanguage();
+        vmSelectDefault.setUpTooltip();
+    });
+</script>

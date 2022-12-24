@@ -1,0 +1,1729 @@
+﻿<style>
+    .k-header {
+        background-color: transparent !important;
+    }
+
+    .ms-select {
+        padding: 0px !important;
+    }
+
+    #pop-add-project .dropdown-menu {
+        left: -192px;
+        min-width: 208px;
+    }
+
+    #pop-add-project .icon-dropdow {
+        background-position: -81px -299px;
+        text-indent: -999px;
+        float: right;
+        display: block;
+        width: 20px;
+    }
+
+    .procate {
+        max-width: 308px;
+        overflow: hidden;
+        height: 19px;
+    }
+
+    #pop-add-project .dropdow-menu-li-a {
+        padding: 0 10px 0 10px !important;
+        width: 90% !important;
+    }
+
+    .department-nav {
+        padding: 0 2rem;
+    }
+
+    .department-nav .btn-nav {
+        cursor: pointer;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .department-nav :is(.nav-title,.direction-info) {
+        font-weight: bold;
+        font-size: 14px;
+        user-select: none;
+    }
+
+    .department-nav :is(.direction-info) {
+        color: #808080;
+    }
+
+
+    .slide-in {
+        z-index: 10; /* to position it in front of the other content */
+        overflow: hidden; /* to prevent scrollbar appearing */
+        position: absolute;
+        width: 100%
+    }
+
+    .slide-in.from-left {
+        left: 0;
+    }
+
+    .slide-in.from-right {
+        right: 0;
+    }
+
+    .slide-in-content {
+        padding: 5px 10px;
+        transition: transform .2s ease; /* our nice transition */
+    }
+
+    :is(#department-part,#user-part) .slide-in-content {
+        display: table;
+        margin-left: auto;
+        margin-right: auto;
+        table-layout: fixed;
+        width: calc(100% - 26px);
+    }
+
+    :is(#department-part,#user-part) .slide-in-content table:first-child {
+        table-layout: fixed;
+    }
+
+    :is(#department-part,#user-part) table:first-child tr :is(th,td) {
+        overflow: hidden;
+        padding-left: 5px!important;
+        padding-right: 5px!important;
+        text-overflow: ellipsis;
+    }
+
+    :is(#department-part,#user-part) table:first-child tr :is(th,td):first-child {
+        width: 32px !important;
+    }
+
+    #user-part table:first-child tr :is(th,td):nth-child(4){
+        width:82px!important;
+    }
+
+    
+    #user-part table:first-child tr :is(th,td):nth-child(5){
+        width:40px!important;
+    }
+
+    :is(#department-part,#user-part) table:first-child tr :is(th,td):last-child {
+        width: 6px !important;
+        overflow:visible;
+    }
+    .slide-in.from-left .slide-in-content {
+        transform: translateX(-100%);
+        -webkit-transform: translateX(-100%);
+    }
+
+    .slide-in.from-right .slide-in-content {
+        transform: translateX(100%);
+        -webkit-transform: translateX(100%);
+    }
+
+    .slide-in.show .slide-in-content {
+        transform: translateX(0);
+        -webkit-transform: translateX(0);
+    }
+    #user-part table:first-child tr th.marketingdepartment {
+        overflow: hidden;
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+        text-overflow: ellipsis;
+        max-width: 540px;
+        background-color: #76838a;
+         border: 1px solid #fff; 
+        font-size: 18px;
+        color: #FFFFFF;
+        font-weight: lighter;
+    }
+    #divStrategy0 #user-part table.tbgrid.modal-table td span.k-widget.k-dropdown.k-header.ms-select.w-select-project {
+        width: 100% !important; max-width:170px;
+    }
+    table.popup-table-email td {
+        padding: 0 7px 0 0 !important;
+    }
+</style>
+
+<div id="pop-add-project" class="pop-wrapper">
+    <form id="form-add-project">
+        <div class="modal-body ms-modal-body" style="overflow-x: overlay;">
+            <div class="form-group">
+                <label class="popup-lable" id="lblProjectName">Projectname</label>
+                <div class="clearx1"></div>
+                <input class="popup-input" id="txtProjectName" maxlength="100" name="ProjectName" value="Projektname" tabindex="1" style="margin-left:0;" />
+            </div>
+            
+            <div class="clear"></div>
+            <div id="pop-add-project-content-place">
+            </div>
+            <div id="pop-add-group-error"></div>
+        </div>
+
+        <div class="popup-footer">
+            <button type="button" class="ms-button" onclick="vmProject.closePopUp()" tabindex="1"><span class="icon-20  icon-close margin-right6"></span><span id="lblcloseProject">Close</span></button>
+        </div>
+    </form>
+</div>
+<div id="pop-add-project-loading" class="loading"></div>
+<div id="pop-setRole"></div>
+<div id="pop-transferResponsibility"></div>
+<div id="pop-transferResponsibilityCRM"></div>
+
+<script type="text/HTML" id="template-memberList-project">
+    <table class="tbgrid modal-table" style="min-width:688px;">
+        <tr>
+            <th class="title bg-grey" style="text-align: center !important;" width="43px">Id</th>
+            <th class="title bg-grey" width="100px">#:kLg.fullName#</th>
+            #if (data.isStrategy && data.Type == 1) {#
+            <th class="marketingdepartment"  width="250px">#:kLg.gaLblField#</th>
+            #}#
+            <th class="title bg-grey" width="86px">#:kLg.role#</th>
+            <th class="title bg-grey" width="170px">#:kLg.lastLoggedIn#</th>
+            <th class="title bg-grey" width="48px" colspan="#if(!data.isStrategy) {# 2 #}#"></th>
+        </tr>
+        #for(var i = 0; i < data.ListMember.length; i++) {#
+        # var member = data.ListMember[i];#
+        #if(member.RowState != dataState.Deleted) {#
+        <tr indexArr="#:i#">
+            <td style="text-align: center !important;">#:member.MemberId#</td>
+            <td>#:member.MemberName#</td>
+             #if (data.isStrategy && data.Type == 1) {#
+            <td style="width:500px;min-width:500px">
+                <style>
+                    .k-multiselect-wrap li[class~="k-button"] {
+                        background-color: \#fafafa;
+                        border-color: \#fafafa;
+                        border-radius: 30px;
+                    }
+
+                    .k-multiselect-wrap .k-input {
+                        background-color: transparent !important;
+                        border: none !important
+                    }
+                </style>
+                #if (data.RemoveProjectOwner || data.RemoveMember) {#
+                    <select id="ddldeparment#:i#"></select>
+                #} else {#
+                    #:vmProject.showDepartmentFromId(member.ListDepartment)#
+                #}#
+            </td>
+             #}#
+            <td>
+                #var isMe = member.MemberId == vmUser.currentAccount.Id && !data.isStrategy;#
+                #var canRemove = (data.RemoveProjectOwner || ((member.Role != vmProject.Role.ProjectOwner || isMe) && data.RemoveMember));#
+                #var canEdit = member.Role != vmProject.Role.GroupOwner && (canRemove || (member.RowState != dataState.Unchanged && !data.isStrategy));#
+                #if (canEdit) {#
+
+                    <select onchange="vmProject.changeRole(#=i#, this)" class="ms-select w-select-project" tabindex="1">
+                        #if(!data.isStrategy) {#
+                        <option value="#:vmProject.Role.ProjectView#" #if(member.Role==vmProject.Role.ProjectView) { #  selected="selected" #}#>#=vmProject.Lang.ProjectView#</option>
+                        <option value="#:vmProject.Role.ProjectEdit#" #if(member.Role==vmProject.Role.ProjectEdit) { #  selected="selected" #}#>#=vmProject.Lang.ProjectEdit#</option>
+                        <option value="#:vmProject.Role.ProjectNoAccess#" #if(member.Role==vmProject.Role.ProjectNoAccess) { #  selected="selected" #}#>#=vmProject.Lang.ProjectNoAccess#</option>
+                        #if(data.AddOwner == true){#
+                        <option value="#:vmProject.Role.ProjectOwner#" #if(member.Role==vmProject.Role.ProjectOwner) { # selected="selected" #}#>#=vmProject.Lang.ProjectOwner#</option>
+                        #}#
+                        #} else {#
+                        <option value="#:vmProject.Role.StrategyView#" #if(member.Role==vmProject.Role.StrategyView) { #  selected="selected" #}#>#=vmProject.Lang.ProjectView#</option>
+                        <option value="#:vmProject.Role.StrategyEdit#" #if(member.Role==vmProject.Role.StrategyEdit) { # selected="selected" #}#>#=vmProject.Lang.ProjectEdit#</option>
+                        #}#
+                    </select>
+
+                #} else {#
+                #:vmProject.showRole(member.Role)#
+                #}#
+            </td>
+            <td>#if(member.LastLoginedDate != null){#
+                #:kendo.toString(member.LastLoginedDate.jsonToDate(),"d")#
+                #}#
+            </td>
+            #if(!data.isStrategy && (data.RemoveProjectOwner || data.RemoveMember) && data.Id != 0){#
+            <td style="width: 34px; padding-left: 8px;">
+                #if(!member.IsActived){#
+                <a class="icon-32 icon-m" onclick="vmProject.reSendMail('#=member.MemberEmail#')" tabindex="1"></a>
+                #}#
+            </td>
+            #}#
+            
+            <td class="td-bin td-v-align-middle" style="width: 34px; padding-left: 8px;">
+                #if(data.isStrategy){#
+                #if(data.Type == 1) {#
+                <!--Tab Marketing Strategy-->
+                #if(vmProject.ProjectDetail.AddOwner == true){#
+                <div class="ms-dropdow" style="right: 0px;" tabindex="1">
+                    <span class="icon-16  icon-dropdow" data-toggle="dropdown"></span>
+                    <ul aria-labelledby="btnGroupVerticalDrop1" role="menu" class="popup-menu dropdown-menu ms-popup-menu">
+                        #if(canEdit) {#
+                        <li>
+                            <a class="dropdow-menu-li-a" data-toggle="modal" data-target=".bs-example-modal-lg" onclick="vmProject.OpenPopSetRole(this,#=i#,#=canEdit#)">
+                                <span class="icon-24  icon-left-block icon-edit"></span>#:kLg.setRole#
+                            </a>
+                        </li>
+                        <li role="presentation" class="divider"></li>
+                        <li><a class="dropdow-menu-li-a" onclick="vmProject.RemoveMember(this)"><span class="icon-24  icon-left-block icon-delete"></span>#=kLg.lblDelete#</a></li>
+                        <li role="presentation" class="divider"></li>
+                        #}#
+                        <li>
+                            <a class="dropdow-menu-li-a" onclick="vmProject.TransferResponsibility(this)" data-memberid="#:member.MemberId#">
+                                <span class="icon-24 icon-left-block icon-open"></span>#=kLg.TransferResponsibility#
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                #}#
+                #} else {#
+                <!--Tab CRM Open Inovation-->
+                #if(vmProject.ProjectDetail.AddOwner == true){#
+
+                <div class="ms-dropdow" style="right: 0px;" tabindex="1">
+                    <span class="icon-16  icon-dropdow" data-toggle="dropdown"></span>
+                    <ul aria-labelledby="btnGroupVerticalDrop1" role="menu" class="popup-menu dropdown-menu ms-popup-menu">
+                        #if(canEdit) {#
+
+                        <li><a class="dropdow-menu-li-a" onclick="vmProject.RemoveMember(this)" tabindex="1"><span class="icon-24  icon-left-block icon-delete"></span>#=kLg.lblDelete#</a></li>
+                        <li role="presentation" class="divider"></li>
+                        #}#
+
+                        <li>
+                            <a class="dropdow-menu-li-a" onclick="vmProject.TransferResponsibilityCRM(this)" data-memberid="#:member.MemberId#">
+                                <span class="icon-24 icon-left-block icon-open"></span>#=kLg.TransferResponsibility#
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                #}#
+                <!--#if(canEdit) {#
+    <span class="icon-32 icon-bin" onclick="vmProject.RemoveMember(this)" tabindex="1"></span>
+    #}#-->
+                #}#
+                #} else if (canEdit) {#
+                <!--Tab Project Admin-->
+                <div class="ms-dropdow">
+                    <span class="icon-16  icon-dropdow" data-toggle="dropdown" tabindex="1"></span>
+                    <ul aria-labelledby="btnGroupVerticalDrop1" role="menu" class="popup-menu dropdown-menu ms-popup-menu" tabindex="1">
+                        #if (member.IsActived != true) {#
+                        <li><a class="dropdow-menu-li-a" data-toggle="modal" data-target=".bs-example-modal-lg" onclick="vmProject.EditMember(this)"> <span class="icon-24 icon-left-block icon-edit"></span><span id="lblQGEdit">#:kLg.edit#</span></a></li>
+                        <li role="presentation" class="divider"></li>
+                        #}#
+                        <li><a class="dropdow-menu-li-a" onclick="vmProject.RemoveMember(this)"><span class="icon-24  icon-left-block icon-delete"></span><span id="lblQGDel">#:kLg.lblDelete#</span></a></li>
+                    </ul>
+                </div>
+                #}#
+            </td>
+        </tr>
+        #}#
+        #}#       
+    </table>
+
+    #if(data.isStrategy && data.Type == 1 && (data.RemoveProjectOwner || data.RemoveMember)) {#
+    <div class="clearx2"></div>
+    <table class="popup-table-email" style="margin-left:0;">
+            <tr>
+                <td>
+                <label></label>
+                <div class="clear"></div>
+                <td>
+                    <label>#:kLg.role#</label>
+                    <div class="clear"></div>
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><input style="width: 350px" value="" id="txtEmai-strategy#=data.Xindex#"/></td>
+                <td><select class="ms-select" id="Select-strategy#=data.Xindex#">
+                        <option value="#:vmProject.Role.StrategyEdit#" selected="selected">#:vmProject.Lang.ProjectEdit#</option>
+                        <option value="#:vmProject.Role.StrategyView#">#:vmProject.Lang.ProjectView#</option>
+                    </select></td>
+                <td><span class="icon-32  icon-add" id="Span-strategy#=data.Xindex#" onclick="vmProject.AddMember(#=data.Xindex#)"></span></td>
+            </tr>
+     </table>
+    #}#
+</script>
+
+<script type="text/HTML" id="template-marketing-tab">
+    <div class="department-nav">
+        <div id="btnShowUser" class="btn-nav nav-left" style="display:none;" onclick="vmProject.showListUser(this)">
+            <div class="nav-title">
+                <p>#=kLg.lblSetDpRole#</p>
+            </div>
+            <div class="direction-info">
+                <p>< #=kLg.lblSetUserRole#</p>
+            </div>
+
+        </div>
+        <div id="btnShowDepartment" class="btn-nav nav-right" onclick="vmProject.showListDepartment(this)">
+            <div class="nav-title">
+                <p>#=kLg.lblSetUserRole#</p>
+            </div>
+            <div class="direction-info">
+                <p>#=kLg.lblSetDpRole# ></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="user-part" style="z-index:10" class="slide-in from-left show">
+        <div class="slide-in-content">
+            #=vmProject.BindMemberListDynamic(data)#
+        </div>
+    </div>
+
+    <div id="department-part" style="z-index:1" class="slide-in from-right">
+        <div class="slide-in-content">
+            #=vmProject.BindDepartmentTab(data)#
+        </div>
+    </div>
+</script>
+
+<script type="text/HTML" id="template-department-tab">
+    <table class="tbgrid modal-table" style="min-width:688px;">
+        <tr>
+            <th class="title bg-grey" style="text-align: center !important;" width="10px">Id</th>
+            <th class="title bg-grey" style="width:clamp(200px,400px,500px);word-break:break-word;text-overflow:ellipsis;">#:kLg.gaLblField#</th>
+            <th class="title bg-grey" width="200px">#:kLg.fullName#</th>
+            <!--<th class="title bg-grey" width="200px">#:kLg.role#</th>-->
+            <th class="title bg-grey" width="48px" colspan="#if(!data.isStrategy) {# 2 #}#"></th>
+        </tr>
+
+        #for(var department of data.ListGroupDepartment) {#
+        #if(department.RowState != dataState.Deleted) {#
+        <tr indexArr="#:department.DepartmentId#">
+            <td style="text-align: center !important;">#:department.DepartmentId#</td>
+            <td>#:department.DepartmentName#</td>
+            <td style="width:500px;min-width:500px">
+                <style>
+                    .k-multiselect-wrap li[class~="k-button"] {
+                        background-color: \#fafafa;
+                        border-color: \#fafafa;
+                        border-radius: 30px;
+                    }
+
+                    .k-multiselect-wrap .k-input {
+                        background-color: transparent !important;
+                        border: none !important
+                    }
+                </style>
+
+                #:vmProject.showUserNameFromId(department.Users)#
+            </td>
+
+            <td class="td-bin td-v-align-middle" style="width: 34px; padding-left: 8px;">
+                #var canRemove = (data.RemoveProjectOwner || ((department.Role != vmProject.Role.ProjectOwner) && data.RemoveMember));#
+                #var canEdit = department.Role != vmProject.Role.GroupOwner && (canRemove || (department.RowState != dataState.Unchanged && !data.isStrategy));#
+                #if(data.isStrategy){#
+                #if(canEdit) {#
+                #if(data.Type == 1) {#
+                <div class="ms-dropdow" style="right: 0px;" tabindex="1">
+                    <span class="icon-16  icon-dropdow" data-toggle="dropdown"></span>
+                    <ul aria-labelledby="btnGroupVerticalDrop1" role="menu" class="popup-menu dropdown-menu ms-popup-menu">
+                        <li>
+                            <a class="dropdow-menu-li-a" data-toggle="modal" data-target=".bs-example-modal-lg" onclick="vmProject.OpenPopSetRole(this,#=department.DepartmentId#,#=canEdit#, true)">
+                                <span class="icon-24  icon-left-block icon-edit"></span>#:kLg.setRole#
+                            </a>
+                        </li>
+                        <li role="presentation" class="divider"></li>
+                        <li><a class="dropdow-menu-li-a" onclick="vmProject.RemoveDepartment_MarketingTab(#:department.DepartmentId#)"><span class="icon-24  icon-left-block icon-delete"></span>#=kLg.lblDelete#</a></li>
+                    </ul>
+                </div>
+                #} else {#
+                <span class="icon-32 icon-bin" onclick="vmProject.RemoveDepartment_MarketingTab(#:department.DepartmentId#)" tabindex="1"></span>
+                #}  }#
+                #} #
+
+            </td>
+        </tr>
+        #}#
+        #}#
+    </table>
+
+    #if(data.RemoveProjectOwner || data.RemoveMember){#
+
+    <table class="popup-table-email" style="margin-left:0;margin-top:5px;">
+            <tr>
+                <td>
+                    <input style="width: 350px" value="" id="ddlDepartmentTab"/>
+                </td>
+                <td>
+                    <span class="icon-32  icon-add" id="Span-strategy-department" onclick="vmProject.AddDepartmentTab()"></span>
+                </td>
+            </tr>
+     </table>
+
+    #}#
+
+</script>
+
+<script type="text/html" id="template-tab-content">
+    
+    <ul class="nav nav-tabs" id="Ul1" style="margin-left:1px;">
+        <li class="active"><a href="\\#tab1" data-toggle="tab" class="tab-modal" id="project-tab" onclick="vmProject.changeTab(this)" tabindex="1">#=kLg.lblProjectTitle#</a></li>     
+        #for(var i = 0; i < data.ListStrategy.length; i++){#
+        #   var strategy = data.ListStrategy[i];#
+        #if(strategy.Enabled){#
+        <li><a href="\\#strategy#=strategy.Id#" data-toggle="tab" class="tab-modal" id="strategy-tab#=i#" onclick="vmProject.changeTab(this)" tabindex="1"><div class="procate">#=htmlEscape(strategy.Name)#</div></a></li>
+        #}#
+        #}#
+    </ul>
+    <div class="tab-content">
+        #=vmProject.BindTabDynamic(data)#      
+    </div>
+       
+</script>
+
+<script type="text/html" id="template-table-email">
+    <div class="tab-pane active" id="tab1">
+        <p class="clear"></p>
+        <div id="pop-add-project-tab-content" type="-1">
+            #=vmProject.BindMemberListDynamic(data)#
+        </div>
+        <p class="clearx2"></p>
+        #if(data.RemoveProjectOwner || data.RemoveMember){#
+        <table class="popup-table-email" style="margin-left: 0;">
+            <tr>
+                <td>
+                    <label>#:kLg.emailAddressloginview#</label>
+                <div class="clear"></div>
+                <td>
+                    <label>#:kLg.role#</label>
+                    <div class="clear"></div>
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><input name="email" value="" class="popup-input" id="project-txtEmail" tabindex="1" /></td>
+                <td><select class="ms-select" id="combobox-role-project"tabindex="1">
+                        <option value="#:vmProject.Role.ProjectEdit#" selected="selected">#:vmProject.Lang.ProjectEdit#</option>
+                        <option value="#:vmProject.Role.ProjectView#">#:vmProject.Lang.ProjectView#</option>
+                        <option value="#:vmProject.Role.ProjectNoAccess#">#:vmProject.Lang.ProjectNoAccess#</option>
+                    </select></td>
+                <td>
+                    <span class="icon-32 icon-add" id="Span1" onclick="vmProject.AddMember()" tabindex="1"></span>
+                </td>
+            </tr>
+        </table>
+        #}#
+    </div>        
+    #for(var j = 0; j < data.ListStrategy.length; j ++){#
+    #var item = data.ListStrategy[j];#
+    #item.isStrategy = true;item.Xindex = j;#
+    <div class="tab-pane" id="strategy#=item.Id#">
+        <p class="clear"></p>
+        <div id="divStrategy#=j#" type="#=j#" item-type="#=item.Type#">
+            # if( item.Type == 1) { #
+                #=vmProject.BindMarketingTab(item)#
+            # } else {#
+                #=vmProject.BindMemberListDynamic(item)#
+            # }#
+
+        </div>
+        <p class="clearx2"></p>
+        #if((data.RemoveProjectOwner || data.RemoveMember) && item.Type != 1){#
+        <table class="popup-table-email">
+            <tr>
+                <td>
+                <label></label>
+                <div class="clear"></div>
+                <td>
+                    <label>#:kLg.role#</label>
+                    <div class="clear"></div>
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><input style="width: 350px" value="" id="txtEmai-strategy#=j#"/></td>
+                <td><select class="ms-select" id="Select-strategy#=j#">
+                        <option value="#:vmProject.Role.StrategyEdit#" selected="selected">#:vmProject.Lang.ProjectEdit#</option>
+                        <option value="#:vmProject.Role.StrategyView#">#:vmProject.Lang.ProjectView#</option>
+                    </select></td>
+                <td><span class="icon-32  icon-add" id="Span-strategy#=j#" onclick="vmProject.AddMember(#=j#)"></span></td>
+            </tr>
+        </table>
+        #}#
+        
+    </div>
+    #}#
+</script>
+
+<script>
+    var vmProject = vmProject || {};
+    vmProject.Role = {
+        GroupOwner: 1,
+        ProjectOwner: 4,
+        ProjectEdit: 5,
+        ProjectView: 6,
+        StrategyEdit: 7,
+        StrategyView: 8,
+        ProjectNoAccess: 18
+    };
+
+    vmProject.Lang = {
+        GroupOwner: kLg.groupOwner,
+        ProjectOwner: kLg.projectOwnerStrategy,
+        ProjectEdit: kLg.roleEdit,
+        ProjectView: kLg.roleView,
+        ProjectNoAccess: kLg.noAccess
+
+    };
+
+    vmProject.ErrorsState = {
+        NoRole: -1,
+        Conflict: -3,
+        SentMailError: -5
+    };
+    vmProject.Strategy = {};
+    vmProject.Strategy.Lang = [];
+    vmProject.Strategy.Lang[1] = kLg.strategyTab;
+    vmProject.Strategy.Lang[2] = kLg.crmTab;
+
+    vmProject.ProjectDetail = {};
+    vmProject.ProjectDetail.Id = 0;
+    vmProject.ProjectDetail.ListMember = [];
+    vmProject.ProjectDetail.ListStrategy = [];
+    vmProject.CurrentRole = 0;
+    vmProject.ProjectDetail.InvitationSubject = kLg.invitationSubject;
+    vmProject.ProjectDetail.InviteMail = kLg.inviteMail;
+    vmProject.ProjectDetail.RegisterLink = kLg.registerLink;
+    vmProject.ProjectDetail.ProjectLink = kLg.projectLink;
+    vmProject.CurrentTab = 'project-tab';
+    vmProject.ComboEmailDataSource = [];
+
+    vmProject.GetValidComboEmailSource = function(exceptedMembers) {
+        var res = vmCommon.pushApply([], vmProject.ComboEmailDataSource, null, function(item) {
+            var memberIndex = vmProject.FindIndexByMemberId(item.MemberId, exceptedMembers);
+            return (memberIndex == -1 || exceptedMembers[memberIndex].RowState == dataState.Deleted);
+        });
+        return res;
+    }
+    vmProject.enumPage = {
+        OverView: 1,
+        Project: 2
+    };
+    vmProject.IsModified = false;
+
+    vmProject.BindMemberList = function () {
+        bindTemplate("div-project-memberlist-place", "template-memberList-project", vmProject.ProjectDetail);
+
+    };
+
+    vmProject.BindTab = function () {
+        bindTemplate("pop-add-project-content-place", "template-tab-content", vmProject.ProjectDetail);
+        if (popUpAddProject) {
+            var maxPopupHeight = (typeof projectApp != "undefined" ? $("#app").height() : $(window).height()) - 50;;// $(window).height() - 50;
+            var puContent = $("#form-add-project .modal-body #pop-add-project-content-place").height();
+
+            var modalBody = puContent + 243;
+            var popupHeight = modalBody < maxPopupHeight ? modalBody : maxPopupHeight;
+
+            $("#form-add-project .modal-body").height(popupHeight - 137);
+            var popupWidth = $("#form-add-project .modal-body").width() + 20;
+            resizePopUp(popUpAddProject, { height: popupHeight, width: popupWidth });
+
+            $("#form-add-project .modal-body").on('scroll', function (e) {
+                var $multiSelect = $(this).find('[data-role=multiselect]');
+                var $dopdownLst = $(this).find('[data-role=dropdownlist]');
+                
+                if ($dopdownLst.length > 0) {
+                    $dopdownLst.each(function () {
+                        var slct = $(this).data('kendoDropDownList');
+                        if (slct) {
+                            slct.close();
+                        }
+                    });
+                }
+                if ($multiSelect.length > 0) {
+                    $multiSelect.each(function () {
+                        var slct = $(this).data('kendoMultiSelect');
+                        if (slct) {
+                            slct.close();
+                        }
+                    });
+                }
+            });
+        }
+        vmProject.SetupValidate();
+        $(".ms-select").kendoDropDownList({
+            change: function () {
+                vmProject.IsModified = true;
+            }
+        });
+
+        if (vmProject.isShowDepartment) {
+            vmProject.showListDepartment();
+        }
+
+        let bindEmail = new Promise(r => { vmProject.BindComboEmail(); r(true); });
+        let bindDp = new Promise(r => { vmProject.BindDepartment(); r(true); })
+        let setActive = new Promise(r => { vmProject.setActiveTab(); r(true); })
+
+        Promise.all([bindEmail, bindDp, setActive]).then(t => { });
+    };
+
+    vmProject.BindComboEmail = function () {
+        
+        for (var i = 0; i < vmProject.ProjectDetail.ListStrategy.length; i++) {
+            $("#txtEmai-strategy" + i).kendoDropDownList({
+                optionLabel: kLg.selectMember,
+                dataTextField: "MemberName",
+                dataValueField: "MemberEmail",
+                //dataSource: vmProject.ProjectDetail.ListMember,
+                dataSource: vmProject.GetValidComboEmailSource(vmProject.ProjectDetail.ListStrategy[i].ListMember)
+        });
+        }
+    };
+
+    vmProject.BindDepartment = function () {
+        let strategy = vmProject.ProjectDetail.ListStrategy.find(t => t.Type == 1);
+
+        if (strategy) {
+            for (var i = 0, l = strategy.ListMember.length; i < l; i++) {
+
+                if (strategy.ListMember[i].RowState !== dataState.Deleted && $("#ddldeparment" + i).length) {
+                    $("#ddldeparment" + i).kendoMultiSelect({
+                        dataTextField: "Name",
+                        dataValueField: "Id",
+                        dataSource: vmProject.ProjectDetail.Departments,
+                        change: vmProject.changeDepartments,
+                        value: strategy.ListMember[i].ListDepartment || []
+                    });
+                }
+            }
+
+            this.BindUserMultiselect();
+
+            this.BindDDLDepartmentTab();
+        }
+    };
+
+    vmProject.changeDepartments = function (e) {
+        vmProject.IsModified = true;
+
+        let strategy = vmProject.ProjectDetail.ListStrategy.find(t => t.Type == 1);
+
+        var members = strategy.ListMember;
+
+        var indexer = $(e)[0].sender.element.attr("id").substring(12);
+
+        var member = members[indexer];
+        if (member.RowState == dataState.Unchanged) {
+            member.RowState = dataState.Modified;
+        }
+        var multipleselect = this.element.data('kendoMultiSelect');
+        if (multipleselect != null) {
+            member.ListDepartment = multipleselect.value();
+            member.IsDepartmentChange = true;
+        }
+
+        vmProject.syncDataTabMarketing(isFromDepartment = false);
+
+        vmProject.BindTab();
+    };
+
+    vmProject.syncDataTabMarketing = function (isFromDepartment = true) {
+        var strategy = vmProject.ProjectDetail.ListStrategy.find(t => t.Type == 1);
+        var listUser = [];
+        var listDepartment = [];
+
+        if (strategy) {
+            listUser = strategy.ListMember;
+            listDepartment = strategy.ListGroupDepartment;
+
+            if (isFromDepartment) {
+                //_syncFromDepartment();
+            }
+            else {
+                _syncFromUser();
+            }
+        }
+
+        function _syncFromDepartment() {
+            for (let user of listUser) {
+
+                let lstDpAssigned = listDepartment.filter(t => t.RowState != dataState.Deleted && t.Users && t.Users.some(x => x == user.MemberId));
+                
+                if (lstDpAssigned.length > 0) {
+                    user.ListDepartment = lstDpAssigned.map(t => t.DepartmentId);
+                    user.RowState != dataState.Added && user.RowState != dataState.Deleted && ( user.RowState = dataState.Modified);
+                }
+                else {
+                    let ids = listDepartment.map(t => t.DepartmentId);
+
+                    user.ListDepartment = user.ListDepartment.filter(t => !ids.some(x => x == t));
+                    user.RowState != dataState.Added && user.RowState != dataState.Deleted && (user.RowState = dataState.Modified);
+                }
+            }
+        };
+
+        function _syncFromUser() {
+            for (let dp of listDepartment) {
+
+                let listU = listUser.filter(t => t.RowState != dataState.Deleted && t.ListDepartment && t.ListDepartment.some(x => x == dp.DepartmentId));
+
+                if (listU.length > 0) {
+                    dp.Users = listU.map(t => t.MemberId);
+                    dp.RowState != dataState.Added && dp.RowState != dataState.Deleted && (dp.RowState = dataState.Modified);
+                }
+                else {
+                    let ids = listUser.map(t => t.MemberId);
+
+                    dp.Users = dp.Users.filter(t => !ids.some(x => x == t));
+                    dp.RowState != dataState.Added && dp.RowState != dataState.Deleted && (dp.RowState = dataState.Modified);
+                }
+            }
+        }
+    };
+
+    vmProject.BindDDLDepartmentTab = function () {
+        let strategy = vmProject.ProjectDetail.ListStrategy.find(t => t.Type == 1);
+        
+        $("#ddlDepartmentTab").kendoDropDownList({
+            optionLabel: kLg.SelectDepartment,
+            dataTextField: "Name",
+            dataValueField: "Id",
+            dataSource: vmProject.ProjectDetail.Departments.filter(t => !strategy.ListGroupDepartment.some(x => x.DepartmentId == t.Id && x.RowState != dataState.Deleted))
+        });
+    };
+
+    vmProject.BindUserMultiselect = function () {
+        let strategy = vmProject.ProjectDetail.ListStrategy.find(t => t.Type == 1);
+        for (var department of strategy.ListGroupDepartment) {
+            if (department.RowState !== dataState.Deleted && $("#ddlUser" + department.DepartmentId).length > 0 ) {
+                $("#ddlUser" + department.DepartmentId).kendoMultiSelect({    
+                    dataTextField: "MemberName",
+                    dataValueField: "MemberId",
+                    dataSource: vmProject.ProjectDetail.ListMember,
+                    change: vmProject.changeUser_DepartmentTab
+                });
+
+                if (department.Users != undefined)
+                    $("#ddlUser" + department.DepartmentId).data("kendoMultiSelect").value(department.Users);
+            }
+        }
+
+    };
+
+    vmProject.changeUser_DepartmentTab = function (e) {
+        vmProject.IsModified = true;
+
+        var dpId = $(e)[0].sender.element.attr("id").substring(7);
+        dpId = parseFloat(dpId);
+
+        let strategy = vmProject.ProjectDetail.ListStrategy.find(t => t.Type == 1);
+
+        var dpEdit = strategy.ListGroupDepartment.find(t => t.DepartmentId == dpId);
+        if (dpEdit.RowState == dataState.Unchanged) {
+            dpEdit.RowState = dataState.Modified;
+        }
+        var multipleselect = this.element.data('kendoMultiSelect');
+        if (multipleselect != null) {
+            dpEdit.Users = multipleselect.value();
+        }
+
+        vmProject.syncDataTabMarketing(isFromDepartment = true);
+
+        vmProject.BindTab();
+    };
+
+    vmProject.RemoveMemberOfListStrategy = function(member) {
+        for (var i = 0; i < vmProject.ProjectDetail.ListStrategy.length; i++) {
+            var members = vmProject.ProjectDetail.ListStrategy[i].ListMember;
+            var memberIndex = vmProject.FindIndexByMemberId(member.MemberId, members);
+            if (memberIndex == -1) {
+                continue;
+            }
+            var findMember = members[memberIndex];
+            if (findMember.RowState == dataState.Added) {
+                members.splice(memberIndex, 1);
+            } else {
+                findMember.RowState = dataState.Deleted;
+            }
+        }
+
+        
+    }
+
+    vmProject.FindIndexByMemberId = function(memberId, list) {
+        return vmCommon.findIndexByFunc(list, function(obj) { return obj.MemberId == memberId; });
+    }
+
+    vmProject.CloneMember = function(member) {
+        var cloneMember = {
+            ActiveValue: member.ActiveValue,
+            Department: member.Department,
+            IsActived: member.IsActived,
+            LastLoginedDate: member.LastLoginedDate,
+            MemberEmail: member.MemberEmail,
+            MemberId: member.MemberId,
+            MemberName: member.MemberName,
+            Role: member.Role,
+            RowState: member.RowState,
+            ListDepartment: member.ListDepartment
+        };
+        return cloneMember;
+    }
+    vmProject.UpdateProjectOwnerForStrategyMembers = function(member) {
+        for (var i = 0; i < vmProject.ProjectDetail.ListStrategy.length; i++) {
+            var members = vmProject.ProjectDetail.ListStrategy[i].ListMember;
+            var memberIndex = vmProject.FindIndexByMemberId(member.MemberId, members);
+            var hasMember = memberIndex != -1;
+            if (hasMember) {
+                var findMember = members[memberIndex];
+                findMember.Role = vmProject.Role.ProjectOwner;
+                if (findMember.RowState != dataState.Added) {
+                    findMember.RowState = dataState.Modified;
+                }
+            }
+            else {
+                var strategyMember = vmProject.CloneMember(member);
+                strategyMember.Role = vmProject.Role.ProjectOwner;
+                strategyMember.RowState = dataState.Added;
+                members.push(strategyMember);
+            }
+        }
+    }
+
+
+    vmProject.UpdateDepartmensForStrategyMembers = function(member) {
+        for (var i = 0; i < vmProject.ProjectDetail.ListStrategy.length; i++) {
+            var members = vmProject.ProjectDetail.ListStrategy[i].ListMember;
+            var memberIndex = vmProject.FindIndexByMemberId(member.MemberId, members);
+            var hasMember = memberIndex != -1;
+            if (hasMember) {
+                var findMember = members[memberIndex];
+                findMember.ListDepartment = member.ListDepartment;
+            }
+        }
+    }
+
+    vmProject.UpdateProjectMembers = function(members, memberRole) {
+        for (var i = 0; i < members.length; i++) {
+            if (members[i].Role != vmProject.Role.ProjectOwner) {
+                continue;
+            }
+            vmProject.UpdateProjectMember(members[i], memberRole);
+        }
+    }
+
+    vmProject.UpdateProjectMember = function(member, memberRole) {
+        member.Role = memberRole;
+        if (member.RowState != dataState.Added && member.RowState != dataState.Deleted) {
+            member.RowState = dataState.Modified;
+        }
+    };
+
+    vmProject.UpdateProjectEditForOtherMembers = function() {
+        var members = vmProject.ProjectDetail.ListMember;
+        vmProject.UpdateProjectMembers(members, vmProject.Role.ProjectEdit);
+
+        for (var i = 0; i < vmProject.ProjectDetail.ListStrategy.length; i++) {
+            members = vmProject.ProjectDetail.ListStrategy[i].ListMember;
+            vmProject.UpdateProjectMembers(members, vmProject.Role.StrategyEdit);
+        }
+    }
+
+    vmProject.UpdateProjectEditForSelectMember = function(member, role) {
+        for (var i = 0; i < vmProject.ProjectDetail.ListStrategy.length; i++) {
+            var members = vmProject.ProjectDetail.ListStrategy[i].ListMember;
+            var strategyMember = vmCommon.findByFunc(members, function(obj) { return obj.MemberId == member.MemberId; });
+            if (strategyMember != null) {
+                vmProject.UpdateProjectMember(strategyMember, role);
+            }
+        }
+    }
+
+    vmProject.BindMemberListDynamic = function (data) {
+        return kendo.template($("#template-memberList-project").html())(data);
+    };
+
+    vmProject.BindMarketingTab = function (data) {
+        return kendo.template($("#template-marketing-tab").html())(data);
+    };
+
+    vmProject.BindDepartmentTab = function (data) {
+        return kendo.template($("#template-department-tab").html())(data);
+    };
+
+    vmProject.BindTabDynamic = function (data) {
+        return kendo.template($("#template-table-email").html())(data);
+    };
+
+    vmProject.GetGroupOwner = function () {
+        var url = "../Handlers/ProjectGroupHandler.ashx?funcName=getgroupowner";
+        var entryData = { Id: vmProject.ProjectDetail.ProjectGroupId };
+        callAjax("pop-add-project-loading", url, JSON.stringify(entryData), function (data) {
+            var groupOwner = data.value;
+            groupOwner.RowState = dataState.Added;
+            vmProject.ProjectDetail.ListMember.push(groupOwner);
+            if (groupOwner.MemberId != parseInt(vmUser.currentAccount.Id)) {
+                var current = {
+                    MemberId: vmUser.currentAccount.Id,
+                    MemberName: vmUser.currentAccount.Name,
+                    MemberEmail: vmUser.currentAccount.Email,
+                    LastLoginedDate: vmUser.currentAccount.LastLoginedDate,
+                    Role: vmProject.Role.ProjectOwner,
+                    RowState: dataState.Added,
+                    IsCombobox: false,
+                    ListDepartment: []
+                };
+                vmProject.ProjectDetail.ListMember.push(current);
+            }
+            vmProject.ProjectDetail.AddOwner = true;
+            vmProject.ProjectDetail.RemoveProjectOwner = true;
+            vmProject.BindTab();
+            
+        }, AjaxConst.PostRequest);
+
+    };
+
+    vmProject.GetMemberByEmail = function (email, role, e) {
+        if (e == undefined) {
+            $('#Span1').css({ 'pointer-events': 'none' });
+        };
+
+        var url = '../Handlers/AccountHandler.ashx?funcName=getbyemail&email=' + email;
+        callAjax('pop-add-project-loading', url, null, function (data) {
+            if (e == undefined) {
+                $('#Span1').css({ 'pointer-events': '' });
+            };
+
+            var member = data.value;
+            if (member == null) {
+                member = {};
+                member.MemberEmail = email;
+                member.MemberName = '';
+                member.LastLoginedDate = null;
+                
+                vmProject.ProjectDetail.Name = $("#pop-add-project #txtProjectName").val();
+                vmProject.ProjectDetail.CreatedBy = vmUser.Id;
+                vmProject.ProjectDetail.InvitationSubject = kLg.invitationSubject;
+                vmProject.ProjectDetail.InviteMail = kLg.inviteMail;
+                vmProject.ProjectDetail.RegisterLink = kLg.registerLink;
+                vmProject.ProjectDetail.ProjectLink = kLg.projectLink;
+                vmProject.ProjectDetail.ContentEmail = kLg.textContentInviteEmail;
+                vmProject.ProjectDetail.InvitationSubject = kLg.textSubjectInviteEmail;
+
+                vmProject.OpenPopAddUser(email, role);
+                return;
+            }
+            member.RowState = dataState.Added;
+            member.Role = parseInt(role);
+            vmProject.ProjectDetail.ListMember.push(member);
+            if(e == null) {
+                vmProject.ComboEmailDataSource.push(member);
+            }
+            vmProject.BindTab();
+        }, AjaxConst.GetRequest);
+    };
+
+    vmProject.AddStrategyMember = function(e) {
+        let that = this;
+
+        var index = $("#pop-add-project #txtEmai-strategy" + e).data('kendoDropDownList').select();
+        if (index == 0) return;
+        vmProject.IsModified = true;
+        var email = $("#pop-add-project #txtEmai-strategy" + e).val().trim();
+        var role = $("#pop-add-project #Select-strategy" + e).val();
+        var members = vmProject.ProjectDetail.ListStrategy[e].ListMember;
+
+        var member = vmProject.FindByEmail(email, members);
+        if (member != null) {
+            member.RowState = dataState.Modified;
+            member.Role = role;
+            member.ListDepartment = [];
+        } 
+        else {
+            member = vmProject.FindByEmail(email, vmProject.ProjectDetail.ListMember);
+            var cloneMember = vmProject.CloneMember(member);
+            cloneMember.RowState = dataState.Added;
+            cloneMember.Role = role;
+            member.ListDepartment = [];
+
+            members.push(cloneMember);
+        }
+
+        that.syncDataTabMarketing(isFromDepartment = false);
+
+        vmProject.BindTab();
+    }
+    vmProject.EditMember = function (e) {
+        vmProject.OpenPopAddUser(null,null,e);
+    }
+    
+    vmProject.AddMember = function (e) {
+        if (e != null) {
+            vmProject.AddStrategyMember(e);
+            return;
+        }
+
+        var email = $("#pop-add-project #project-txtEmail").val().trim();
+        var role = $("#pop-add-project #combobox-role-project").val();
+        
+        vmProject.IsModified = true;
+        if (email == null || email == '') {
+            return;
+        }
+        if (!$('#form-add-project').valid()) return;
+        
+        var check = vmProject.FindByEmail(email, vmProject.ProjectDetail.ListMember);
+        if (check != null) {
+            if (check.RowState != dataState.Deleted) {
+                var $input = $("#pop-add-project #project-txtEmail");
+                $input.attr('title', kLg.emailExisted);
+                $input.tooltip('show');
+                return;
+            }
+            check.RowState = dataState.Modified;
+            check.Role = role;
+            vmProject.ComboEmailDataSource.push(check);
+            vmProject.BindTab();
+            return;
+        }
+        vmProject.GetMemberByEmail(email, role, e);
+
+    };
+
+    vmProject.RemoveMember = function (e) {
+        vmProject.IsModified = true;
+        var tab = $(e).closest('div[type]');
+        var type = parseInt(tab.attr('type'));
+        
+        var indexer = $(e).closest('tr').attr('indexArr');
+        var detailType = type == -1;
+        var list = detailType ? vmProject.ProjectDetail.ListMember : vmProject.ProjectDetail.ListStrategy[type].ListMember;
+        indexer = parseInt(indexer);
+        var member = list[indexer];
+
+        // clear department when delete member
+        member.ListDepartment && (member.ListDepartment = []);
+
+        if (detailType) {
+            vmProject.RemoveMemberOfListStrategy(member);
+            var memberIndex = vmProject.FindIndexByMemberId(member.MemberId, vmProject.ComboEmailDataSource);
+            if (memberIndex != -1) {
+                vmProject.ComboEmailDataSource.splice(memberIndex, 1);
+            }
+        }
+        if (member.RowState != dataState.Added) {
+            member.RowState = dataState.Deleted;
+        } else {
+            list.splice(indexer, 1);
+        }
+        var itemType = parseInt(tab.attr('item-type'));
+        // Tab Marketing
+        if (itemType == 1 && member.RowState == dataState.Deleted) {
+            member.TransferResponsibility = null;
+        }
+        vmProject.syncDataTabMarketing(isFromDepartment = false);
+
+        vmProject.BindTab();
+    };
+
+    vmProject.TransferResponsibilityData = function (data) {
+        var dataTMemberId = +data.TMemberId; // convert string to number
+        // add to array to check TransferResponsibility was added to set vmProject.IsModified before close popup
+        if (!vmProject.ListTMemberIdStrategy) vmProject.ListTMemberIdStrategy = [];
+        if (dataTMemberId > 0) {
+            var dtMId = '_' + data.MemberId + ',' + data.TMemberId;
+            if (!vmProject.ListTMemberIdStrategy.includes(dtMId)) {
+                vmProject.ListTMemberIdStrategy.push(dtMId);
+            }
+        } else {
+            var findIdx = vmProject.ListTMemberIdStrategy.findIndex(str => {
+                var dmId = '_' + data.MemberId;
+                return str.indexOf(dmId) > -1;
+            });
+            if (findIdx > -1) {
+                vmProject.ListTMemberIdStrategy.splice(findIdx, 1);
+            }
+        }
+
+        vmProject.ProjectDetail.ListStrategy.forEach(s => {
+            if (s.Type == 1) {
+                s.ListMember.forEach(m => {
+                    if (m.MemberId == data.MemberId) {
+                        m.TransferResponsibility = {
+                            IsDone: data.IsDone,
+                            IsUndone: data.IsUnDone,
+                            TMemberId: dataTMemberId
+                        };
+                    }
+                });
+            }
+        });
+    }
+    vmProject.TransferResponsibilityDataCRM = function (data) {
+        var dataTMemberId = +data.TMemberId; // convert string to number
+        // add to array to check TransferResponsibility was added to set vmProject.IsModified before close popup
+        if (!vmProject.ListTMemberIdStrategy) vmProject.ListTMemberIdStrategy = [];
+        if (dataTMemberId > 0) {
+            var dtMId = '_' + data.MemberId + ',' + data.TMemberId;
+            if (!vmProject.ListTMemberIdStrategy.includes(dtMId)) {
+                vmProject.ListTMemberIdStrategy.push(dtMId);
+            }
+        } else {
+            var findIdx = vmProject.ListTMemberIdStrategy.findIndex(str => {
+                var dmId = '_' + data.MemberId;
+                return str.indexOf(dmId) > -1;
+            });
+            if (findIdx > -1) {
+                vmProject.ListTMemberIdStrategy.splice(findIdx, 1);
+            }
+        }
+
+        vmProject.ProjectDetail.ListStrategy.forEach(s => {
+            if (s.Type == 2) {
+                s.ListMember.forEach(m => {
+                    if (m.MemberId == data.MemberId) {
+                        m.TransferResponsibility = {
+                            IsDone: data.IsDone,
+                            IsUndone: data.IsUnDone,
+                            TMemberId: dataTMemberId
+                        };
+                    }
+                });
+            }
+        });
+    }
+    vmProject.TransferResponsibility = function (e) {
+        var strategy = vmProject.ProjectDetail.ListStrategy.find(t => t.Type == 1);
+        var listMember = strategy.ListMember;
+        var memberId = $(e).attr('data-memberid');
+
+        vmProject.StrategyMemberCurrent = Object.assign({}, listMember.find(m => m.MemberId == memberId)); // avoid add new var in data source
+        vmProject.StrategyMemberCurrent.Accounts = vmProject.ComboEmailDataSource.slice(); // vmProject.ProjectDetail.ListMember.slice(); // avoid add new var in data source
+
+        //vmProject.curProjectId = vmProject.ProjectDetail.Id;
+
+        vmProject.PopupTransferResponsibility = showPopup(vmProject.PopupTransferResponsibility,
+            $('#pop-transferResponsibility'),
+            'Contents/MsPopTransferResponsibility.html',
+            {
+                title: kLg.TransferResponsibility,
+                height: 280,
+                width: 400,
+                resizable: false
+            });
+    };
+    vmProject.TransferResponsibilityCRM = function (e) {
+        var CRM = vmProject.ProjectDetail.ListStrategy.find(t => t.Type == 2);
+        var listMember = CRM.ListMember;
+        var memberId = $(e).attr('data-memberid');
+
+        vmProject.StrategyMemberCurrent = Object.assign({}, listMember.find(m => m.MemberId == memberId)); // avoid add new var in data source
+        vmProject.StrategyMemberCurrent.Accounts = vmProject.ComboEmailDataSource.slice(); // vmProject.ProjectDetail.ListMember.slice(); // avoid add new var in data source
+
+        //vmProject.curProjectId = vmProject.ProjectDetail.Id;
+
+        vmProject.PopupTransferResponsibilityCRM = showPopup(vmProject.PopupTransferResponsibilityCRM,
+            $('#pop-transferResponsibilityCRM'),
+            'Contents/MsPopTransferResponsibilityCRM.html',
+            {
+                title: kLg.TransferResponsibility,
+                height: 280,
+                width: 400,
+                resizable: false
+            });
+    };
+
+    vmProject.AddDepartmentTab = function (e) {
+        let that = this;
+
+        let ddDepartmentTab = $("#pop-add-project #ddlDepartmentTab").data('kendoDropDownList');
+        let index = ddDepartmentTab.select();
+
+        if (index == 0) return;
+
+        vmProject.IsModified = true;
+
+        let strategy = vmProject.ProjectDetail.ListStrategy.find(t => t.Type == 1);
+
+        let departments = vmProject.ProjectDetail.Departments;
+
+        let dpAddedId = parseFloat(ddDepartmentTab.value());
+
+        //let role = $("#pop-add-project #Select-strategy-department").val();
+
+        let dpAdded = departments.find(t => t.Id == dpAddedId);
+
+        let dpNew = {
+            DepartmentId: dpAdded.Id,
+            DepartmentName: dpAdded.Name,
+            RowState: dataState.Added,
+            Role: vmProject.Role.StrategyEdit,
+            Users: []
+        }
+
+        let dpOld = strategy.ListGroupDepartment.find(t => t.DepartmentId == dpAddedId);
+
+        if (dpOld) {
+            dpOld.RowState = dataState.Modified;
+            dpOld.Users = [];
+        }
+        else {
+            strategy.ListGroupDepartment.push(dpNew);
+        }
+
+        that.syncDataTabMarketing(isFromDepartment = false);
+        
+        vmProject.BindTab();
+    };
+
+    vmProject.RemoveDepartment_MarketingTab = function (dpId) {
+        var that = this;
+
+        let strategy = vmProject.ProjectDetail.ListStrategy.find(t => t.Type == 1);
+
+        let dpIndex = strategy.ListGroupDepartment.findIndex(d => d.DepartmentId == dpId);
+
+        if (dpIndex > -1) {
+
+            let dp = strategy.ListGroupDepartment[dpIndex];
+
+            dp.RowState = dataState.Deleted; 
+            vmProject.IsModified = true;
+
+            that.syncDataTabMarketing();
+
+            vmProject.BindTab();
+        }
+    }
+
+    vmProject.GetMemberById = function (projectId) {        
+        $("#lblcloseProject").closest("button").css({ "pointer-events": "none" });
+
+        var url = '../Handlers/ProjectHandler.ashx?funcName=getprojectinfo&lang='+language;
+        var obj = { Id: projectId };
+        callAjax('pop-add-project-loading', url, JSON.stringify(obj), function (data) {
+            $("#lblcloseProject").closest("button").css({ "pointer-events": "" });
+
+            vmProject.ProjectDetail = data.value;
+            vmProject.ProjectDetail.ProjectGroupId = vmProjectList.GroupId;
+
+            for (var i = 0; i < vmProject.ProjectDetail.ListStrategy.length; i++) {
+                vmProject.ProjectDetail.ListStrategy[i].Name = rebindStrategyName(vmProject.ProjectDetail.ListStrategy[i].Name, vmProject.ProjectDetail.ListStrategy[i].Type);
+            }
+
+            let strategy = vmProject.ProjectDetail.ListStrategy.find(t => t.Type == 1);
+
+            strategy.ListGroupDepartment.map(t => t.Role = vmProject.Role.StrategyEdit);
+
+            vmCommon.loadcustomizeMarketCatLanguage(vmProject.ProjectDetail.CatLang);
+            vmCommon.loadcustomizeMarketLanguage(vmProject.ProjectDetail.TabLang);
+            vmProject.ComboEmailDataSource = JSON.parse(JSON.stringify(vmProject.ProjectDetail.ListMember));
+            vmProject.BindTab();
+        }, AjaxConst.PostRequest);
+    };
+
+    function rebindStrategyName(name, type) {
+        if (name) return name;
+
+        switch (type) {
+            case 1:
+            case "1":
+            return kLg.strategyTab;
+        default:
+            return kLg.crmTab;
+        }
+    };
+
+    vmProject.changeRole = function (indexer, e) {
+        vmProject.IsModified = true;
+        var tab = $(e).closest('div[type]');
+        var type = parseInt(tab.attr('type'));
+
+        //change rowstate
+        var detailType = type == -1;
+        var members = detailType ? vmProject.ProjectDetail.ListMember : vmProject.ProjectDetail.ListStrategy[type].ListMember;
+        var member = members[indexer];
+        if (member.RowState == dataState.Unchanged) {
+            member.RowState = dataState.Modified;
+        }
+        var memberRole = parseInt($(e).val());
+        if (detailType) {
+            if (memberRole == vmProject.Role.ProjectOwner) {
+                //vmProject.UpdateProjectEditForOtherMembers(); //removed 6053
+                vmProject.UpdateProjectOwnerForStrategyMembers(member);
+            }
+                //added 6053
+            else if (member.Role == vmProject.Role.ProjectOwner) {
+                var strategyRole = memberRole == vmProject.Role.ProjectEdit ? vmProject.Role.StrategyEdit : vmProject.Role.StrategyView;
+                vmProject.UpdateProjectEditForSelectMember(member, strategyRole);
+            }
+            //added data.isStrategy in template
+            //end 6053
+            member.Role = memberRole;
+            vmProject.BindTab();
+        } else {
+            member.Role = memberRole;
+        }
+    };
+
+    vmProject.changeRoleDepartmentTab = function (id, e) {
+        vmProject.IsModified = true;
+
+        var tab = $(e).closest('table').parent();
+        var type = parseInt(tab.attr('type'));
+        let strategy = vmProject.ProjectDetail.ListStrategy.find(t => t.Type == 1);
+
+        //change rowstate
+        var dp = strategy.ListGroupDepartment.find(d => d.DepartmentId == id);
+
+        if (dp.RowState == dataState.Unchanged) {
+            dp.RowState = dataState.Modified;
+        }
+
+        var role = parseInt($(e).val());
+   
+        dp.Role = role;
+    };
+
+    vmProject.FindByEmail = function (email, list) {
+        email = email.toLowerCase();
+        return vmCommon.findByFunc(list, function(obj) { return obj.MemberEmail.toLowerCase() == email; });
+    };
+
+    vmProject.UpdateProject = function () {
+        if (!$('#form-add-project').valid()) return;
+        var funcName = 'update';
+        if (vmProject.ProjectDetail.Id == 0) {
+            funcName = 'insert';
+        } else {
+            vmProject.ProjectDetail.Mdf = vmProjectList.ProjectMdf;
+        }
+        var url = "../Handlers/ProjectHandler.ashx?funcName=" + funcName+"&lang="+language;
+        vmProject.ProjectDetail.Name = $("#pop-add-project #txtProjectName").val();
+        vmProject.ProjectDetail.CreatedBy = vmUser.Id;
+        vmProject.ProjectDetail.InvitationSubject = kLg.textSubjectInviteEmail;
+        vmProject.ProjectDetail.InviteMail = kLg.textContentInviteEmail;
+        vmProject.ProjectDetail.RegisterLink = kLg.registerLink;
+        vmProject.ProjectDetail.ProjectLink = kLg.projectLink;
+        callAjax("pop-add-project-loading", url, JSON.stringify(vmProject.ProjectDetail), function (data) {
+            var state = parseInt(data.value.Result);
+            switch (state) {
+                case vmProject.ErrorsState.NoRole:
+                    pAlert(kLg.msgNoEditPermission).then(function () {
+                        if (typeof getListByMember == "undefined") {
+                            location.reload();
+                        } else {
+                            getListByMember();
+                            if (popUpAddProject != null) {
+                                popUpAddProject.close();
+                            }
+                        }
+                    });
+                    break;
+                case vmProject.ErrorsState.Conflict:
+                    pAlert(kLg.msgConflickData).then(function () {
+                        getListByMember();
+                        if (popUpAddProject != null) {
+                            popUpAddProject.close();
+                        }
+                    });
+                    break;
+                default:
+                    if (typeof projectApp !== 'undefined') {
+                        projectApp.getData();
+                    }
+
+                    if (typeof getListByMember !== 'undefined') {
+                        getListByMember();
+                    }
+
+                    popUpAddProject.close();
+                    break;
+            };
+        }, AjaxConst.PostRequest);
+    };
+    vmProject.flag = false;
+    vmProject.page = vmProject.enumPage.OverView;
+    vmProject.closePopUp = function () {
+        if (!$('#form-add-project').valid()) return;
+        var isTransferRes = Array.isArray(vmProject.ListTMemberIdStrategy) && vmProject.ListTMemberIdStrategy.length > 0;
+        vmProject.ListTMemberIdStrategy = undefined;
+
+        if (vmProject.IsModified || isTransferRes) {
+            vmProject.IsModified = false;
+            vmProject.UpdateProject();
+        } else if (!vmProject.IsModified) {
+            popUpAddProject.close();
+        }
+    };
+
+    vmProject.changeTab = function (e) {
+        vmProject.CurrentTab = $(e).attr('id');
+    };
+
+    vmProject.setActiveTab = function () {
+        $('#pop-add-project li').removeClass('active');
+        $('#' + vmProject.CurrentTab).closest('li').addClass('active');
+        var tabId = $('#' + vmProject.CurrentTab).attr('href');
+        $('#pop-add-project div.tab-pane').removeClass('active');
+        $(tabId).addClass('active');
+    };
+
+    vmProject.SetLang = function () {
+        $('#pop-add-project #lblProjectName').text(kLg.projectName);
+        $('#pop-add-project #lblcloseProject').text(kLg.lblClose);
+    };
+
+    vmProject.BindClosePopup = function () {
+        popUpAddProject.bind("close", function (e) {
+            // check TransferResponsibility list was added
+            if (Array.isArray(vmProject.ListTMemberIdStrategy)) {
+                if (vmProject.ListTMemberIdStrategy.length > 0 && !vmProject.IsModified) {
+                    vmProject.IsModified = true;
+                    vmProject.ListTMemberIdStrategy = undefined;
+                }
+            }
+
+            if (vmProject.IsModified && !popUpAddProject.needClose) {
+                e.preventDefault();
+                pConfirm(kLg.saveConfirmQuestion).then(function() {
+                    if ($('#form-add-project').valid()) {
+                        popUpAddProject.needClose = true;
+                        vmProject.UpdateProject();
+                    };
+                    vmProject.IsModified = false;
+                }, function () {
+                    vmProject.IsModified = false;
+                    popUpAddProject.needClose = true;
+                    popUpAddProject.close();
+                });
+            } else {
+                vmProject.IsModified = false;
+                popUpAddProject.destroy();
+                popUpAddProject = null;
+                $('.body-content').after('<div id="pop-add-project-place"></div>');
+            }
+        });
+    };
+
+    $.validator.addMethod('betterEmail', function (value, element) {
+        return this.optional(element) || /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(value);
+    }, kLg.validEmail);
+
+    vmProject.SetupValidate = function () {
+        $('#form-add-project').validate({
+            rules: {
+                email: {
+                    betterEmail: true,
+                    maxlength: 75
+                },
+                ProjectName: {
+                    required: true
+                }
+            },
+            messages: {
+                email: {
+                    betterEmail: kLg.validEmail,
+                    maxlength: kLg.msgMaxlenghEmail
+                },
+                ProjectName: {
+                    required: kLg.requiredName
+                }
+            }
+        });
+    };
+
+    var popUpRole = undefined;
+    vmProject.OpenPopSetRole = function (e, indexer, isEdit, isDepartment) {
+        /*vmProject.IsModified = true;*/
+        var tab = $(e).closest('div[id^=divStrategy]');
+        var type = parseInt(tab.attr('type'));
+
+        var strategy = vmProject.ProjectDetail.ListStrategy.find(t => t.Type == 1);
+        var listDepartment = strategy.ListGroupDepartment;
+
+        if (isDepartment) {
+            var departmentId = indexer;
+
+            
+            var listMember = strategy.ListMember;
+
+            var departmentObj = listDepartment.find(x => x.DepartmentId == departmentId);
+            departmentObj.ListMember = listMember;
+
+            vmProject.curMem = departmentObj;
+        }
+        else {
+            var members = vmProject.ProjectDetail.ListStrategy[type].ListMember;
+            vmProject.curMem = members[indexer];
+
+            let listDepartmentNotDelete = listDepartment.filter(t => t.RowState != dataState.Deleted);
+
+            vmProject.curMem.ListDepartmentId = listDepartmentNotDelete ? listDepartmentNotDelete.map(t => t.DepartmentId):[];
+        }
+
+        vmProject.isDepartment = isDepartment;
+
+        vmProject.curProjectId = vmProject.ProjectDetail.Id;
+        vmProject.isEdit = isEdit;
+        popUpRole = showPopup(popUpRole,
+                $('#pop-setRole'),
+                'Contents/MsPopSetRoleLandRegion.html',
+                {
+                    title: kLg.setRole,
+                    height: 380,
+                    width: 930,
+                    resizable: false
+                });
+    };
+
+    var popAddNewUser = undefined;
+    vmProject.OpenPopAddUser = function (email, role, e) {
+        var isAdd = e == null;
+        if (isAdd) {
+            vmNewMember = { Email: email, Role: role };
+        }
+        else {
+            var indexer = $(e).closest('tr').attr('indexArr');
+            var list = vmProject.ProjectDetail.ListMember;
+            vmNewMember = list[indexer];
+            vmNewMember.IsUpdate = true;
+        }        
+        vmNewMember.Source = "project";
+
+        var popTitle = isAdd ? kLg.titleAccountRegisterForm: kLg.changeInforTitle;
+        popAddNewUser = showPopup(popAddNewUser,
+                $('#pop-add-new'),
+                '../Contents/popAddPerson.html',
+                {
+                    title: popTitle,
+                    height: 410,
+                    width: 730,
+                    resizable: false
+                }).center();
+    };
+
+    vmProject.showRole = function(value) {
+        switch (value) {
+            case vmProject.Role.GroupOwner:
+                return vmProject.Lang.GroupOwner;
+            case vmProject.Role.ProjectEdit:
+            case vmProject.Role.StrategyEdit:
+                return vmProject.Lang.ProjectEdit;
+            case vmProject.Role.ProjectOwner:
+                return vmProject.Lang.ProjectOwner;
+            case vmProject.Role.ProjectView:
+            case vmProject.Role.StrategyView:
+                return vmProject.Lang.ProjectView;
+            default:
+                return '';
+        }
+    };
+
+    vmProject.showDepartmentFromId = function (listDepartment) {
+        var listReturn = "";
+        if (listDepartment) {
+            for (var i = 0; i < listDepartment.length; i++) {
+                for (var j = 0; j < vmProject.ProjectDetail.Departments.length; j++) {
+
+                    if (listDepartment[i] == vmProject.ProjectDetail.Departments[j].Id) {
+                        listReturn = listReturn + vmProject.ProjectDetail.Departments[j].Name + ', ';
+                        break;
+                    }
+
+                }
+            }
+
+        }
+        if (listReturn !== "") {
+            listReturn = listReturn.substring(0, listReturn.length - 2);
+        }
+        return listReturn;
+    }
+
+    vmProject.showUserNameFromId = function (arrId) {
+        var rs = "";
+        if (arrId && arrId.length > 0) {
+            var strategy = vmProject.ProjectDetail.ListStrategy.find(t => t.Type == 1);
+            var listUser = strategy.ListMember;
+
+            for (let id of arrId) {
+
+                let member = listUser.find(t => t.MemberId == id);
+
+                member && (rs+= ', ' + member.MemberName);
+            }
+        }
+
+        return rs.slice(2);
+    }
+
+    vmProject.showListDepartment = function (e) {
+        $('#department-part.slide-in').addClass('show');
+        $("#btnShowDepartment").hide();
+        $("#user-part").css('z-index', '1')
+        $("#department-part").css('z-index', '10')
+        $("#btnShowUser").show();
+        $('#user-part.slide-in').removeClass('show');
+        vmProject.isShowDepartment = true;
+    }
+
+    vmProject.showListUser = function (e) {
+        $('#user-part.slide-in').addClass('show');
+        $("#btnShowUser").hide();
+        $("#user-part").css('z-index', '10')
+        $("#department-part").css('z-index', '1')
+        $("#btnShowDepartment").show();
+        $('#department-part.slide-in').removeClass('show');
+        vmProject.isShowDepartment = false;
+    }
+
+    vmProject.StringDefault = function (e) {
+        if (!e || e == null) {
+            e = '';
+        }
+        return e;
+    };
+
+    $(document).ready(function () {
+        vmProject.isShowDepartment = false;
+
+        kLg.gaLblField = kLg.lblDepartment;
+        $("#pop-add-project #txtProjectName").on("change keyup paste", function () {
+            vmProject.IsModified = true;
+        });
+
+        $("#pop-add-project #txtProjectName").focus();
+        if (typeof vmProjectList != "undefined") {
+            vmProject.ProjectDetail.Id = vmProjectList.ProjectId;
+            vmProject.ProjectDetail.ProjectGroupId = vmProjectList.GroupId;
+            if (vmProject.ProjectDetail.Id == 0) {
+                if (popUpAddProject) popUpAddProject.title(kLg.addProject);
+                vmProject.GetGroupOwner(vmProject.ProjectDetail.ProjectGroupId);
+                vmProject.IsModified = true;
+            } else {
+                if (popUpAddProject) popUpAddProject.title(kLg.EditProjectTitle);
+                vmProject.ProjectDetail.Name = vmProjectList.ProjectName;
+                $("#pop-add-project #txtProjectName").val(vmProject.ProjectDetail.Name);
+                vmProject.GetMemberById(vmProject.ProjectDetail.Id);
+
+            }
+        } else if (typeof vmProjectStrategy != "undefined") {
+            vmProject.ProjectDetail.ProjectGroupId = vmProjectStrategy.ProjectGroupId;
+            vmProject.GetGroupOwner(vmProject.ProjectDetail.ProjectGroupId);
+        }
+        vmProject.SetLang();
+        vmProject.BindClosePopup();
+        vmCommon.resetTabIndex("pop-add-project");
+
+       
+    });
+
+    vmProject.reSendMail = function(email) {
+        var url = "../Handlers/ProjectHandler.ashx?funcName=resendemail&lang=" + language + "&projid=" + vmProject.ProjectDetail.Id;
+        var data = { email: email, inviteSubject: kLg.textSubjectInviteEmail, inviteContent: kLg.textContentInviteEmail };
+        callAjax('pop-add-project-loading', url, JSON.stringify(data), function(result) {
+            switch (result.value) {
+            case vmProject.ErrorsState.NoRole:
+                pAlert(kLg.msgNoEditPermission);
+                break;
+            case vmProject.ErrorsState.Conflict:
+                pAlert(kLg.msgConflickData);
+                break;
+            case vmProject.ErrorsState.SentMailError:
+                pAlert(kLg.errorEmail);
+                break;
+            default:
+                pAlert(kLg.msgSentInviteEmailSuccess);
+            }
+    }, AjaxConst.PostRequest);
+    }
+</script>

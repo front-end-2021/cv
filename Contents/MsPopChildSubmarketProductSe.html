@@ -1,0 +1,168 @@
+﻿<link href="../Css/msSubmarketProductSe.css" rel="stylesheet" />
+<div id="vmchildsubmarketproduct">
+    <div class="modal-body ms-modal-body">
+        <form>
+            <div class="form-group">
+                <label id="lblSmpChildName">Name</label>
+                <span class="required hidden">*</span>
+                <div class="clear"></div>
+                <input type="text" id="smpChildName" name="smpChildName" tabindex="1" class="modal-input txtInput w-100per" maxlength="100"
+                       data-value-update="keyup" data-bind="value: Name" />
+            </div>
+            <hr class="modal-market-hr" />
+            <div class="form-group">
+                <label id="lblSmpChildDescription">Description</label>
+                <div class="clear"></div>
+                <textarea id="smpChildDescription" name="smpChildDescription" class="modal-textarea w-100per" data-bind="value: Description"></textarea>
+            </div>            
+            <div class="w-100per child-document-region">
+                <label>Dokument</label>
+                <div class="clear"></div>
+                <div data-template="child-smpdocument-template" data-bind="source: SubmarketProductDocuments"></div>
+                <div class="clear"></div>
+                <button type="button" class="ms-button smp-button-upload" id="smpChildUploadFile" name="smpChildUploadFile" data-bind="events: {click: uploadDocumentItem}">
+                    <span class="icon-16 icon-upload"></span><span>Durchsuchen...</span>
+                </button>
+            </div>           
+            <div class="clear"></div>
+        </form>
+    </div>
+
+    <div class="modal-market-footer">
+        <button type="button" class="ms-button" data-bind="events: {click: saveAndClose}"><span class="icon-16 icon-close margin-right6"></span><span>Save and close</span></button>
+    </div>
+</div>
+
+<script id="child-smpdocument-template" type="text/x-kendo-template">
+    <div class="document-item pull-left">
+        <div class="pull-left">
+            <a class="goal-truncate ms-link" data-bind="text: FolderFileName"></a>
+        </div>
+        <span class="icon-20 ms-icon-delete-gray" data-bind="events: {click: deleteDocumentItem}"></span>
+    </div>
+</script>
+
+<script type="text/javascript">
+    var vmChildSubmarketProductSe = {};
+    vmChildSubmarketProductSe.viewModel = undefined;
+    vmChildSubmarketProductSe.Role = false;
+    vmChildSubmarketProductSe.IsChanged = false;
+    
+    vmChildSubmarketProductSe.bindViewModel = function (data) {
+        var name = htmlEscape(data.Name);
+        vmChildSubmarketProductSe.viewModel = kendo.observable({
+            Id: data.Id,
+            Type: data.Type,
+            Level: data.Level,
+            Name: name,
+            Description: data.Description,
+            DataState: data.DataState,
+            SubmarketProductDocuments: data.SubmarketProductDocuments,
+            uploadDocumentItem: function (e) {
+                var item = e.data;
+                var role = vmCommon.popSubmarketProductSeDatas.Role;
+                vmCommon.showUploadDocument(function (savedFiles) {
+                    var dataDocs = vmChildSubmarketProductSe.viewModel.get("SubmarketProductDocuments");
+                    for (var i = 0; i < savedFiles.length; i++) {
+                        var baseDoc = vmCommon.deepCopy(vmCommon.defaultDocument);
+                        baseDoc.Type = item.Type;
+                        baseDoc.FolderFileId = savedFiles[i].Id;
+                        baseDoc.LinkId = item.Id;
+                        baseDoc.LinkType = item.Level;
+                        baseDoc.FolderFileName = savedFiles[i].Name;
+
+                        dataDocs.push(baseDoc);
+                    }
+                    vmChildSubmarketProductSe.viewModel.set("SubmarketProductDocuments", dataDocs);
+
+                    vmChildSubmarketProductSe.reSize();
+                    vmChildSubmarketProductSe.IsChanged = true;
+                }, role);
+            },
+            deleteDocumentItem: function (e) {
+                
+                var docItem = e.data;
+                var dataDocs = vmChildSubmarketProductSe.viewModel.get("SubmarketProductDocuments");
+                var newDocs = [];
+                vmCommon.findAllByFunc(newDocs, dataDocs, function (item) { return item.FolderFileId !== docItem.FolderFileId; });
+                vmChildSubmarketProductSe.viewModel.set("SubmarketProductDocuments", newDocs);
+
+                vmChildSubmarketProductSe.reSize();
+                vmChildSubmarketProductSe.IsChanged = true;
+            },
+            saveAndClose: function () {
+                vmChildSubmarketProductSe.updateToParent();
+            }
+
+        });
+
+        kendo.bind($("#vmchildsubmarketproduct"), vmChildSubmarketProductSe.viewModel);
+
+        vmChildSubmarketProductSe.reSize();
+    };
+
+    vmChildSubmarketProductSe.destroyPop = function () {
+        vmCommon.popChildSubmarketProductSe.destroy();
+        vmCommon.popChildSubmarketProductSe = null;
+        if (!$('#popMenuChildSubmarketProductSe').length)
+            $('#smpPopupHolder').after('<div id="popMenuChildSubmarketProductSe"></div>');
+    };
+
+    vmChildSubmarketProductSe.reSize = function () {
+        var baseH = 336;
+        var docH = $('.child-document-region').height() - 22;
+        if (docH < 0) docH = 0;
+        baseH += docH;
+        setHeightPopUp(vmCommon.popChildSubmarketProductSe, baseH);
+    };
+
+    vmChildSubmarketProductSe.validate = function () {
+        var vm = vmChildSubmarketProductSe.viewModel;
+        var id = vm.get("Id");
+        var name = vm.get("Name").trim();
+        if (name.length == 0) {
+            vmCommon.showToolTipById("smpChildName", kLg.requiredName);
+            return false;
+        }
+        if (vmSubmarketProductSe.isSubNameExisted(id, name)) {
+            vmCommon.showToolTipById("smpChildName", kLg.msgDuplicateName);
+            return false;
+        }
+        return true;
+    };
+
+    vmChildSubmarketProductSe.updateToParent = function () {  
+        if (vmChildSubmarketProductSe.validate()) {
+            var vm = vmChildSubmarketProductSe.viewModel;
+            var child = {
+                Id: vm.get("Id"),
+                Type: vm.get("Type"),
+                Level: vm.get("Level"),
+                Name: vm.get("Name"),
+                Description: vm.get("Description"),
+                SubmarketProductDocuments: vm.get("SubmarketProductDocuments")
+            };
+            vmSubmarketProductSe.updateChild(child);
+            vmChildSubmarketProductSe.destroyPop();
+        }
+        
+    };
+
+    //Pageload
+    $(document).ready(function () {
+        
+        vmChildSubmarketProductSe.bindViewModel(vmCommon.popChildSubmarketProductSeData);
+        vmCommon.popChildSubmarketProductSe.bind("close", function (e) {
+            if (vmChildSubmarketProductSe.IsChanged) {
+                if (!window.confirm(kLg.saveConfirmQuestion)) {
+                    vmChildSubmarketProductSe.destroyPop();
+                } else {
+                    e.preventDefault();                    
+                    vmChildSubmarketProductSe.updateToParent();
+                }
+            } else {
+                vmChildSubmarketProductSe.destroyPop();
+            }
+        });
+    });
+</script>

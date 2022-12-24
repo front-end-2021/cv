@@ -1,0 +1,94 @@
+﻿<div id="popUpDescription"></div>
+<script id="popDescriptionTemplate" type="text/html">
+    <div class="modal-body ms-modal-body">
+        <form>
+            <div class="form-group">
+                <div class="clear"></div>
+                <textarea id="popTextDescription" class="modal-textarea w-100per" tabindex="1" #if (data.IsMasterSetting && !data.IsMaster){# disabled="disabled" #}#>#if (data.Description != null){##=data.Description##}#</textarea>
+            </div>
+        </form>
+    </div>
+    <div class="modal-market-footer">
+        <button type="button" class="ms-button" onclick="closePopDescription()" tabindex="2"><span class="icon-16 icon-close margin-right6"></span><span>Schliessen</span></button>
+    </div>
+</script>
+
+<script type="text/javascript">
+    var vmPopDes = {};
+    vmCommon.currentMarket.IsMasterSetting = false;
+    vmPopDes.isChange = false;
+    
+    $(document).ready(function () {
+        //if (vmCommon.currentControl == "productgroup" || vmCommon.currentControl == "submarket" || vmCommon.currentControl == "product") {
+        //    vmCommon.currentMarket.IsMasterSetting = true;
+        //}
+
+        bindTemplate("popUpDescription", "popDescriptionTemplate", vmCommon.currentMarket);
+
+        onCheckDescriptionChange();
+        vmCommon.popEditDescription.bind("close", function (e) {
+            if (vmPopDes.isChange) {
+                if (!confirm(kLg.saveConfirmQuestion)) {
+                    vmCommon.popEditDescription = null;
+                } else {
+                    updateDataRegion(vmCommon.currentControl);
+                    vmCommon.popEditDescription = null;
+                }
+
+            } else {
+                vmCommon.popEditDescription = null;
+            }
+
+        });
+        
+        setDescriptionLanguage();
+        limitedTabKey();
+    });
+
+    function closePopDescription() {
+        vmPopDes.isChange = false;
+        updateDataRegion(vmCommon.currentControl);
+        vmCommon.popEditDescription.close();
+    }
+
+    function updateDataRegion(typeUpdate) {
+        vmCommon.currentMarket.Description = $("textarea#popTextDescription").val();
+        var jsonObject = vmCommon.currentMarket;
+        
+
+
+        switch (typeUpdate) {
+            case vmCommon.enumType.Region: case vmCommon.enumType.Land: case vmCommon.enumType.Market:
+                editMarket(jsonObject, "update" + typeUpdate);
+                break;
+            case vmCommon.enumType.Submarket: case vmCommon.enumType.ProductGroup: case vmCommon.enumType.Product:
+                editProduct(jsonObject, "update" + typeUpdate);
+                break;
+            case vmCommon.enumType.Target: case vmCommon.enumType.Demand:
+                updateTargetDescription(jsonObject, "update" + typeUpdate);
+                break;
+        }
+    }
+    
+    function onCheckDescriptionChange() {
+        $("#popTextDescription").on("change keyup paste", function () {
+            vmPopDes.isChange = true;
+        });
+    }
+
+    function setDescriptionLanguage() {
+        $("span.icon-close").next().text(kLg.lblClose);
+    }
+
+    //manh
+    //$('div[data-role=window]:focus').keydown(function (e) {
+    //    if (e.keyCode == 9) {
+    //        if ($('*[tabindex]:last').is(':focus')) {
+    //            $('*[tabindex=1]').focus();
+    //            e.preventDefault();
+    //        }
+    //        return;
+    //    }
+    //});
+    
+</script>

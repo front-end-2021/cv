@@ -1,0 +1,211 @@
+﻿<link href="../Css/multiple-select.css" rel="stylesheet" />
+<style type="text/css">
+    .w-full {
+        width: 100% !important;
+    }
+
+    .menu-title {
+        overflow: hidden;
+        height: 30px;
+        background-color: #38baf8;
+        line-height: 28px;
+        padding-left: 5px;
+        color: white;
+    }
+
+        .menu-title a {
+            color: white;
+        }
+
+    .menu-content {
+        width: 96%;
+        float: right;
+        display: none;
+    }
+
+    .menu-place {
+        margin-top: 4px;
+    }
+
+    .menu-title:hover {
+        cursor: pointer;
+    }
+</style>
+<div>
+    <div id="pop-select-Index">
+        <div style="margin: 15px 0px -10px 13px">
+            <span id="msgKpiIndexInvalid" style="color: red; font-weight: bold; display: none"></span>
+        </div>
+        <div class="modal-body ms-modal-body">
+            <div data-bind="source: listIndex" data-template="listMenu"></div>
+        </div>
+    </div>
+
+    <script type="text/html" id="listMenu">
+        <div class="menu-place" rtype="root">
+            <div class="menu-title" data-bind="attr:{id: Id}" onclick="vmPopSelectSettingIndex.openMenu(this)">
+                <span class="arrow-panel-online icon-24 icon-left-block arrow-collapse" style="margin-top: 2px"></span>
+                <span data-bind="text:Name"></span>
+                <span class="icon-20 icon-right-block icon-check-w cursor-pointer" mstype="noGoal" data-toggle="dropdown" style="margin-top: 6px; display: none"></span>
+            </div>
+            <div class="clear"></div>
+            <div class="menu-content">
+                <span></span>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </script>
+
+    <script type="text/html" id="listMenu2">
+        #for(var i = 0; i< data.length; i++){#
+        #var item = data[i];#
+        <div class="menu-place">
+            <div data-toggle="collapse" data-target="#:item.Id#" class="menu-title" id="#:item.Id#" mtype="#:item.TypeId#" onclick="vmPopSelectSettingIndex.chooseIndex(#:i#)">
+
+                <span date="#:item.End#">#:item.Name#</span>
+ 
+                <span class="icon-20 icon-right-block icon-check-w cursor-pointer" mstype="noGoal" data-toggle="dropdown" style="margin-top: 6px; display: none"></span>
+            </div>
+            <div class="clear"></div>
+            <div class="menu-content collapse ">
+                <span></span>
+            </div>
+            <div class="clear"></div>
+        </div>
+
+
+        #}#
+    </script>
+
+
+</div>
+
+<script type="text/javascript">
+    var vmPopSelectSettingIndex = vmPopSelectSettingIndex || {};
+
+    //var choiceObj = {};
+    //choiceObj.PathIds = vmEditAction.paths;
+    //choiceObj.ActCache = {};
+    
+
+    popUpSelectIndex.bind("close", function (e) {
+        popUpSelectIndex.destroy();
+        popUpSelectIndex = null;
+        $("#pop-kpisettingindex").after("<div id='divSelectKpiIndex'></div>");
+    });
+
+    vmPopSelectSettingIndex.setLanguage = function () {
+        $('#msgKpiIndexInvalid').text(kLg.msgUsingKpiIndex.format(kLg.menuKpiIndex));
+    };
+
+    vmPopSelectSettingIndex.findIndexs = function (id) {
+        if (!vmPopSetting.TopicIndex) return [];
+        var indexs = vmPopSetting.TopicIndex;
+        for (var i = 0; i < indexs.length; i++) {
+            if (indexs[i].Id === parseInt(id))
+                return indexs[i].KpiIndexs;
+        }
+        return [];
+    }
+
+
+    function bindTemplateSelect(elem, data) {
+        var template = kendo.template($("#listMenu2").html());
+        $(elem).html(template(data));
+        //$(elem).show();
+        //findChoice(choiceObj.PathIds);
+    }
+
+    function toggleArrowIcon(elem, divcontent) {
+        var tgIcon = $(elem).children(":first");
+        var isCollapse = tgIcon.hasClass("arrow-collapse");
+        if (isCollapse) {
+            tgIcon.removeClass("arrow-collapse").addClass("arrow-right-big");
+            $(divcontent).show();
+        } else {
+            tgIcon.removeClass("arrow-right-big").addClass("arrow-collapse");
+            $(divcontent).hide();
+        }
+        return isCollapse;
+    }
+
+    function bindChangeIcon() {
+        var theSelector = '.parent-body';
+        $(theSelector).on('show.bs.collapse', function (e) {
+            var $span = $($(e.target).prev().find('span')[0]);
+            $span.removeClass('arrow-collapse');
+            $span.addClass('arrow-right-big');
+        }).on('hide.bs.collapse', function (e) {
+            var $span = $($(e.target).prev().find('span')[0]);
+            $span.removeClass('arrow-right-big');
+            $span.addClass('arrow-collapse');
+        });
+    };
+
+
+
+    vmPopSelectSettingIndex.findChoice = function () {
+        var paths = vmPopSetting.Paths;
+        if (paths == null)
+            return;
+        $('#pop-select-Index .icon-20').each(function (i, obj) { $(obj).hide(); });
+        var arrs = paths.split('/');
+        for (var i = 0; i < arrs.length; i++) {
+            var elm = $('#pop-select-Index #' + arrs[i]);
+            if (!elm.length) continue;
+            var children = elm.children();
+            if (!children.first().hasClass("arrow-right-big")) {
+                elm.children().last().show();
+                break;
+            }
+        }
+    }
+
+    $(function () {
+        vmPopSelectSettingIndex.viewModel = kendo.observable({
+            listIndex: vmPopSetting.TopicIndex
+        });
+        
+        kendo.bind($("#pop-select-Index"), vmPopSelectSettingIndex.viewModel);
+        vmPopSelectSettingIndex.findChoice();
+
+        vmPopSelectSettingIndex.openMenu = function (event) {
+            var divContent = $(event).closest("div[class=menu-place]").children(".menu-content");
+            var id = $(event).attr("id");
+
+            toggleArrowIcon(event, divContent);
+            vmPopSelectSettingIndex.dataIndexs = vmPopSelectSettingIndex.findIndexs(id);
+            bindTemplateSelect(divContent, vmPopSelectSettingIndex.dataIndexs);
+            vmPopSelectSettingIndex.findChoice();
+
+        };
+
+        vmPopSelectSettingIndex.chooseIndex = function (i) {
+            var indexObj = vmPopSelectSettingIndex.dataIndexs[i];
+            var eData = vmPopSetting.IndexObj;
+            var entryData = {
+                Id: eData.Id,
+                CategoryId: eData.CategoryId,
+                ExpectedValue: eData.ExpectedValue,
+                KpiIndexId: indexObj.Id
+            };
+
+            vmPopSetting.dataservice.updateKpiSettingIndex(entryData, function (res) {
+                if (res.value === vmPopSetting.enumsRoleConflict.nameExist) {
+                    $('#msgKpiIndexInvalid').show();
+                } else {
+
+                    vmPopSetting.getAndBindIndexFormat(eData.CategoryId);
+                    popUpSelectIndex.destroy();
+                    popUpSelectIndex = null;
+                    $("#pop-kpisettingindex").after("<div id='divSelectKpiIndex'></div>");
+                }
+              
+            });
+        };
+        vmPopSelectSettingIndex.setLanguage();
+
+    });
+
+</script>
+

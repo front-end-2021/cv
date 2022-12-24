@@ -1,0 +1,124 @@
+﻿<div class="pop-wrapper" id="pop-add-cprojectgroup">
+    <div class="ms-modal-body">
+        <form id="add-cprojectgroup-form" data-bind="events:{change: formChange}">
+            <div class="form-group">
+                <label id="lblNameCProjectGroup">Name :</label>
+                <p class="clear"></p>
+                <input class="modal-input txtInput w-98per" maxlength="100" name="CProjectGroupName" id="txtNameCProjectGroup" tabindex="1" data-bind="value: group.Name" data-value-update="keyup" onkeyup=" vmEditCProjectGroup.activeModelChange() " />
+            </div>
+            <hr class="modal-market-hr" />
+            <div class="form-group">
+                <label id="lblDescriptionCProjectGroup">Description :</label>
+                <p class="clear"></p>
+                <textarea class="modal-textarea w-98per" name="CProjectGroupDescription" id="txtDescriptionCProjectGroup" tabindex="2" data-bind="value: group.Description" data-value-update="keyup" onkeyup=" vmEditCProjectGroup.activeModelChange() "></textarea>
+            </div>
+        </form>
+    </div>
+    <div class="modal-market-footer">
+        <button type="button" class="ms-button" id="btnCloseCProjectGroup" tabindex="3" data-bind="events:{click: update}">
+            <span class="icon-20 icon-close margin-right6"></span><span id="lblClose">Speichern und schliessen</span>
+        </button>
+    </div>
+</div>
+<div class="loading" id="pop-loading"></div>
+<script type="text/javascript">
+    var groupViewModel;
+    var vmEditCProjectGroup = {};
+    //var groupDetail = {};
+
+    vmEditCProjectGroup.setupLanguage = function () {
+        $('#lblClose').text(kLg.lblClose);
+        $('#lblNameCProjectGroup').text(kLg.titleCPGName);
+        $('#lblDescriptionCProjectGroup').text(kLg.titleCPGDescription);
+    };
+
+    vmEditCProjectGroup.SetupValidate = function () {
+        $('#add-cprojectgroup-form').validate({
+            rules: {
+                CProjectGroupName: {
+                    required: true
+                    //maxlength: 100
+                }
+            },
+            messages: {
+                CProjectGroupName: {
+                    required: kLg.msgRequired
+                    //maxlength: kLg.msgMaxlenghName
+                }
+            }
+        });
+    };
+    $("#txtNameCProjectGroup").on('keydown', function (e) {
+        if (e.keyCode == 9 || e.keyCode == 13) {
+            e.preventDefault();
+            return;
+        }
+    });
+
+    popUpAddProjectGroup.bind("close", function (e) {       
+            if (vmEditCProjectGroup.IsModified == true) {
+                if (!confirm(kLg.saveConfirmQuestion)) {
+                    popUpAddProjectGroup.destroy();
+                    popUpAddProjectGroup = null;
+                    $('.body-content').after('<div id="pop-add-projectGroup-place"></div>');
+                } else {
+                    e.preventDefault();
+                    if (!$('#add-cprojectgroup-form').valid()) {
+                       return;
+                    };
+                    groupViewModel.update();
+                   
+                   // popUpAddProjectGroup = null;
+                    $('.body-content').after('<div id="pop-add-projectGroup-place"></div>');
+                }
+            } else {
+                popUpAddProjectGroup.destroy();
+                popUpAddProjectGroup = null;
+                $('.body-content').after('<div id="pop-add-projectGroup-place"></div>');
+            }
+        });
+
+    $(function () {
+        vmEditCProjectGroup.IsModified = false;
+        groupViewModel = kendo.observable({
+            group: vmCProjectList.editOptionGroup.Group,
+            update: function (e) {
+                if ($('#add-cprojectgroup-form').valid()) {
+                    var funcName = vmCProjectList.editOptionGroup.IsEdit ? "updategroup" : "addgroup";
+                    var theGroup = this.group;
+                    vmEditCProjectGroup.saveChange(theGroup, funcName);
+                }
+            },
+            formChange: function () {
+                vmEditCProjectGroup.IsModified = true;
+            }
+        });
+        vmEditCProjectGroup.activeModelChange = function () {
+            vmEditCProjectGroup.IsModified = true;
+        };
+
+        kendo.bind($('#pop-add-cprojectgroup'), groupViewModel);
+        vmEditCProjectGroup.SetupValidate();
+        vmEditCProjectGroup.setupLanguage();
+        limitedTabKey();
+    });
+
+    vmEditCProjectGroup.saveChange = function (data, funcName) {
+        if (vmEditCProjectGroup.IsModified == true) {
+            var url = '../Handlers/CrmCrowdProjectHandler.ashx?funcName=' + funcName + '&projid=' + projectId + "&strid=" + strategyId;
+            callAjax('pop-loading', url, JSON.stringify(data), vmEditCProjectGroup.callBackData, AjaxConst.PostRequest);
+            vmEditCProjectGroup.IsModified = false;
+        } else {
+            popUpAddProjectGroup.close();
+        }
+    };
+    vmEditCProjectGroup.callBackData = function (res) {
+        if (res == vmCrmEnum.ResultStatus.CONFLICT) {
+            pAlert(kLg.msgConflickData);
+        }
+        if (popUpAddProjectGroup != null) {
+            popUpAddProjectGroup.close();
+        }
+        vmCProjectList.dataservice.getprojectbyproject(null, vmCProjectList.loadProjectListTemplate);
+    };
+</script>

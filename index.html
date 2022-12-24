@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>Road Map</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link href="/css/bootstrap.css" rel="stylesheet" />
+    <meta http-equiv='cache-control' content='no-cache' />
+    <meta http-equiv='expires' content='0' />
+    <meta http-equiv='pragma' content='no-cache' />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="/css/default-master.css" rel="stylesheet" />
+    <link href="/css/master.css" rel="stylesheet" />
+    <link href="/css/kendo.css" rel="stylesheet" />
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+    <link href="/css/calendar.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/popupeditboard.css">
+    <link href="/css/msRoadmap.css" rel="stylesheet" />
+
+    <script src="/Language/en.js"></script>
+    <script src="/Scripts/mService.js"></script>
+    <script src="/Scripts/jquery.js"></script>
+    <script src="/Scripts/bootstrap.js"></script>
+    <script src="/Scripts/kendo.js"></script>
+    <script src="/Scripts/master.js"></script>
+    <script src="/Scripts/validatetooltip.js"></script>
+    <script src="/Scripts/momentjs.js"></script>
+    <script src="/Scripts/MsFileManagement.js"></script>
+    <script src="/Scripts/msFilter.js"></script>
+    <script src="/Scripts/clampjs.js"></script>
+    <script src="/Scripts/rmexceljs.js"></script>
+    <script src="/Scripts/vuejs/vue.min.js"></script>
+    <script src="/Scripts/vuejs/vuesortable.js"></script>
+    <script src="/Scripts/vuejs/vue-observe-visibility.min.js"></script>
+    <script src="/Scripts/vuejs/lodash.min.js"></script>
+    <script src="/Scripts/vuejs/Sortable.min.js"></script>
+    <script src="/Scripts/vuejs/vue-draggable.js"></script>
+    <script src="/Scripts/vuejs/vuedraggable.umd.min.js"></script>
+    <script src="/Scripts/jquery.ui.touch-punch.min.js"></script>
+    <script src="/Scripts/jquery-mousewheel.js"></script>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="ms-header" role="navigation">
+            <span onclick="redirectHomePage()" class="logo">
+                <img class="cursor-pointer" src="../images/stratsigner_logo.png" />
+            </span>
+            <div class="navbar-collapse collapse block-nav">
+                <!-- Start dropdown 1 -->
+                <!--Title 1-->
+                <div id="combobox-project-place"></div>
+                <!-- End dropdown 1 -->
+                <!-- Start dropdown 2 -->
+                <div id="combobox-strategy-place"></div>
+                <!-- End dropdown 2 -->
+                <div id="popActionIndex"></div>
+                <div id="pop-add-project-place"></div>
+                <div id="pop-file-management-place"></div>
+                <div id="pop-file-assigned"></div>
+                <div id="popEditFile"></div>
+                <div id="popUploadFile"></div>
+                <div id="pop-exportexcel"></div>
+                <div id="pop-selectkpiindex"></div>
+                <div id="pop-selectcrmlink"></div>
+                <div id="pop-uploadformatfile"></div>
+                <div id="popkpigoal"></div>
+                <div id="popEditMainGoal"></div>
+                <div id="popEditAction"></div>
+                <div id="popGoalActionEval"></div>
+                <div id="filter-loading" class="loading"></div>
+                <div id="mix-loading" class="loading"></div>
+                <div id="actionplan-loading" class="loading"></div>
+                <div id="popEditLink"></div>
+                <div id="popEditTemplate"></div>
+
+                <div id="activity-loading" class="loading"></div>
+                <script type="text/html" id="template-project">
+        <div class="navbar-header"><span class="navbar-brand nv-br">#:kLg.FilterProject#</span></div>
+        <ul class="nav navbar-nav navb1">
+            <li class="dropdown">
+                <a class="cursor-pointer truncate-project-combo dropdown-toggle" style="width: 250px" data-toggle="dropdown" id="combobox-project"></a>
+                <ul class="dropdown-menu drop-menu"style="overflow: auto;max-height: 915px;">
+                    #for (var i = 0; i < data.ListProject.length; i ++){#    
+                    #   var project = data.ListProject[i];#
+                          <li><a class="cursor-pointer truncate" onclick="autoRedirectToLastAction(#=project.Id#)">#:vmProjectStrategy.ProjectNameCut(project.Name)#</a></li>
+                    #}#
+                    <li class="divider"></li>
+                    <li><a class="cursor-pointer" onclick="vmProjectStrategy.ReturnHome()">#=kLg.returnHome#</a></li>
+                    #if(data.Role == true){#
+                    <li><a class="cursor-pointer" id="A1" onclick="vmProjectStrategy.openPopUpAddProject()">#=kLg.newProject#</a><span class="icon-plus1"></span></li>
+                    #}#
+
+                </ul>
+            </li>
+        </ul>
+
+    </script>
+
+                <script type="text/html" id="template-strategy">
+        <div class="navbar-header"><span class="navbar-brand nv-br">#:kLg.menuStrategy#</span></div>
+        <!--Title 2 -->
+        <ul class="nav navbar-nav navb2">
+            <li class="dropdown" style="width: 240px; height: 30px">
+                <a class="cursor-pointer dropdown-toggle" data-toggle="dropdown" id="combobox-strategy"></a>
+                <ul class="dropdown-menu drop-menu">
+                    #for(var i = 0; i < data.length; i ++){#
+                    #var strategy = data[i];#
+                    <li><a class="cursor-pointer" onclick="vmProjectStrategy.ChangeStrategy(#=strategy.Id#)">
+                        <div class="stratcate-w86per">#=vmProjectStrategy.StrategyName(strategy.Type)# </div>
+                    </a></li>
+                    #}#
+                </ul>
+            </li>
+        </ul>
+    </script>
+
+                <script id="save-filter" type="text/html">
+        <div class="margin-bottom-4px pointer" data-bind="visible: IsShow, events: { click: onSelectFilter }" 
+            style="overflow: hidden; margin-right: 0px; height: 28px;">
+            <span class="icon-16 icon-left-block icon-filter-tick title-tick-icon" data-bind="visible: IsUsing"></span>
+            <span data-bind="text: Name, css:{ redirectfilter: IsHasRedirect }" style="width: initial;"></span>
+            <br />
+        </div>
+    </script>
+
+                <script type="text/html" id="msfiltertemp">
+        <div class="msfilterpanel">
+            <div style="position: absolute;top: 5px;left: 8px;z-index: 2;height: 31px;"
+                data-bind="visible: IsNotShowOnDashboard">
+                <button type="button" style="display: flex;height:31px;"
+                    data-bind="events: {click: onToggleFilterBar}, style: {marginLeft: cssBtnToggleFilter}"
+                    class="ms-button btn-search no-margin button-filter2 pointer">
+                    <span class="txtToggleFilterbar" 
+                        data-bind="text: ShowFilterbarText, style: {width: stlWidthByLang}">Show Filter</span>
+                    <span class="icon-16 icon-order-desc"
+                        data-bind="css:{ic-filterbar-hidding: iconHideFilterBar}"></span>
+                </button>
+            </div>
+            <div class="msfilterlist"
+                data-bind="style: {borderWidth: cssBorderToggleFilter, paddingTop: cssPaddingTopNotInDashboard}">
+                <table class="table-filter" data-bind="visible: IsShowFilterBar"
+                    style="margin-top:16px;">
+                    <thead>
+                        <tr><th colspan="8" class="ms-move-tr" 
+                            style="padding: 0 0 10px 10px; font-weight: 400;">
+                        </th></tr>
+                    </thead>
+                    <tbody data-bind="source: filter.Items" data-template="itemfiltertemp"></tbody>
+                </table>
+            </div>
+            <div data-bind="visible: IsShowFilterBar"
+                style="position: absolute; top: 0; right: 0; padding: 5px;">
+                <button type="button" class="ms-button btn-search floatright no-margin button-filter2 pointer" 
+                    data-toggle="dropdown" data-bind="enabled: hasFilter">
+                    <span class="icon-16 icon-right-block icon-order-desc"></span><span btitle="filters">Filter</span>
+                </button>
+                <div class="filter-dropdown" data-bind="visible: hasFilter">
+                    <div aria-labelledby="btnGroupVerticalDrop1" role="menu" style="padding-bottom: 1px;" 
+                        class="popup-menu dropdown-menu ms-popup-menu dropdow-menu-filter cursor-pointer">
+                        <div class="stand-filter none-border" data-bind="source: filters" data-template="save-filter">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="clear"></div>
+            <div data-bind="visible: IsShowFilterBar">
+                <div class="msfiltercontrol pull-left" style="width: 550px;">
+                    <button class="ms-button button-search" value="Search" data-bind="events: { click: onFilter }">
+                        <span class="icon-20 icon-search margin-right6"></span><span btitle="filter">Filter</span>
+                    </button>
+                    <button class="ms-button button-search" value="Reset" data-bind="events: { click: onReset }">
+                        <span class="icon-20 icon-refresh margin-right6"></span><span btitle="reset">Reset</span>
+                    </button>
+
+                    <button class="ms-button button-search" value="AddFilter" data-bind="events: { click: onAddItem }">
+                        <span class="icon-16 icon-plus margin-right6"></span>
+                        <span btitle="add">Add filter</span>
+                    </button>
+                    <button class="ms-button button-search" value="SaveFilter" data-bind="events: { click: onSaveFilter }">
+                        <span class="icon-16 icon-update margin-right6"></span>
+                        <span btitle="save">Save filter</span>
+                    </button>
+                </div>
+
+                <div class="pull-left" data-bind="visible: hasSearch" style="margin-left: 176px;">
+                    <input class="modal-input input-search-text" style="width: 250px; height: 32px; padding-left: 5px; float: left;" 
+                        data-bind="value: filter.SearchFilter.Text, events: { change: onChangeTextSearch }" />
+                    <button type="button" class="ms-button button-search" style="margin-left: 10px; width: 90px; margin-top: 1px;" 
+                        data-bind="events: { click: onSearch }">
+                        <span class="icon-20 icon-search margin-right6"></span>
+                        <span btitle="search">Search</span>
+                    </button>
+                </div>
+                <div class="pull-left" style="padding-top: 7px;"
+                    data-bind="visible: isShowOnActionPlan">
+                    <div class="checkbox-inline">
+                      <label>
+                          <span data-bind="text: ShowDoneUndoneElementName">Beendete Elemente anzeigen</span>
+                          <input type="checkbox" 
+                              data-bind="checked: filter.IsShowDoneUndoneElement,
+                                         visible: isShowOnActionPlan,
+                                         events: {change: onChangeShowDoneUndoneElement}, 
+                                         disabled: isDisableFinishCbx" />
+                          <span class="checkmarkd"></span>
+                      </label>
+                      
+                    </div>
+                </div>
+                  <div data-bind="visible: isHasNavigationMenu" class="checkbox-inline" style="padding-top: 7px;">
+                         <label>
+                          <span data-bind="text: ShowNavigationMenu">Beendete Elemente anzeigen</span>
+                          <input type="checkbox"  data-bind="checked: isShowNavigationMenu,
+                               events: {change: onChangeShowNavigationMenu} " />
+                           <span class="checkmarkd"></span>
+                      </label>
+                            </div>
+                <div class="pull-right" style="padding-right: 2px;">
+                    <div class="pull-left" style="max-width: 250px; overflow: hidden; height: 23px; margin-right: 5px; padding-top: 4px;">
+                        <span data-bind="text: filter.Name, css:{ redirectfilter: filter.IsHasRedirect }"></span>
+                    </div>
+                    <span class="icon-24 icon-left-block icon-delete pointer" 
+                        data-bind="events: { click: onDeleteFilter }, visible: filter.IsShow, attr:{ fid: filter.Id }"></span>
+                    <span class="icon-24 icon-left-block icon-close-grey pointer" 
+                        data-bind="events: { click: onReset }, visible: filter.IsShow"></span>
+                </div>
+            </div>
+        </div>
+    </script>
+
+                <script id="typeSrcTemp" type="text/html">
+        <span class="#: data.IsDisable ? 'k-state-disabled' : ''#">#: data.Name#</span>
+    </script>
+
+                <script type="text/html" id="itemfiltertemp">
+        <tr>
+            <td>
+                <input data-role="dropdownlist" style="width: 100px"
+                    data-auto-bind="false"
+                    data-value-primitive="false"
+                    data-text-field="Name"
+                    data-value-field="Id"
+                    class="pull-left" data-bind="value: Operator, source: OperatorSrc, enabled: OperatorSelectable, events: { change: onChangeOperator }" />
+            </td>
+            <td>
+                <input data-role="dropdownlist"
+                    data-auto-bind="false"
+                    data-value-primitive="false"
+                    data-text-field="Name"
+                    data-value-field="Id"
+                    class="pull-left w-filter" data-bind="value: TypeValue, source: TypeSrc, enabled: TypeSelectable, events: { change: onChangeType, select: onSelectType }" 
+                    data-template="typeSrcTemp"
+                    />
+            </td>
+            <td>
+                <input data-role="dropdownlist"
+                    data-auto-bind="false"
+                    data-value-primitive="false"
+                    data-text-field="Name"
+                    data-value-field="Id"
+                    class="pull-left w-filter" data-bind="value: ParentValue, source: ParentSrc, events: { change: onChangeParent }, visible: HasParent" />
+            </td>
+            <td>
+                <input data-role="dropdownlist"
+                    data-auto-bind="false"
+                    data-value-primitive="false"
+                    data-text-field="Name"
+                    data-value-field="Id"
+                    class="pull-left w-filter" data-bind="value: ChildValue, source: ChildSrc, events: { change: onChangeChild }, visible: HasChild" />
+            </td>
+            <td>
+                <input data-role="dropdownlist"
+                    data-auto-bind="false"
+                    data-value-primitive="false"
+                    data-text-field="Name"
+                    data-value-field="Id"
+                    class="pull-left w-filter" data-bind="value: ChildValue1, source: Child1Src, visible: HasChild1" />
+            </td>
+            <td><span class="icon-32 icon-bin icon-bin-filter pointer" data-bind="events: { click: onRemoveItem }, visible: removeVisible"></span></td>
+        </tr>
+    </script>
+
+                <script type="text/html" id="timerangetemp">
+        <div>
+            <div class="pull-left">
+                <input data-role="dropdownlist" style="width: 100px;"
+                    id="timerange-type-drp"
+                    data-auto-bind="false"
+                    data-value-primitive="false"
+                    data-text-field="Name"
+                    data-value-field="Id"
+                    class="pull-left" data-bind="value: filter.SearchFilter.Type, source: filter.SearchFilter.TypeSrc, events: { change: onChangeTimeRangeType, select: onSelectTimeRangeType }" />
+            </div>
+
+            <div class="pull-left" style="margin-left: 36px !important;">
+                <span class="pull-left startend" titlename="start" style="margin-top: 5px;">Start</span>
+                <input data-role="datepicker" class="pull-left dateitem fstart" 
+                    data-bind="value: filter.SearchFilter.Start, events:{change: onChangeStart }" style="width: 110px;" />
+            </div>
+
+            <div class="pull-left" style="margin-left: 122px !important;">
+                <span class="pull-left startend" titlename="end" style="margin-top: 5px;width:32px;">End</span>
+                <input data-role="datepicker" class="pull-left dateitem fend" 
+                    data-bind="value: filter.SearchFilter.End, events:{change: onChangeEnd }" style="width: 110px;" />
+            </div>
+        </div>
+    </script>
+
+                <script type="text/javascript">
+                    var vmProjectStrategy = vmProjectStrategy || {}, strategies = [];
+                    vmProjectStrategy.ListProject = [];
+                    vmProjectStrategy.Strategy = {};
+                    vmProjectStrategy.Strategy.Lang = [];
+
+                    vmProjectStrategy.Strategy.LinkPage = ['MsMarketSegment', 'CrmOrganisation'];
+                    vmProjectStrategy.ProjectGroupId = 0;
+
+                    vmProjectStrategy.GetProjectStrategy = function () {
+                        var url = "../Handlers/ProjectHandler.ashx?funcName=getprojectstrategy&projid=" + sHandler.ProjectId + "&strid=" + sHandler.StrategyId;
+                        callAjax(null, url, null, function (data) {
+                            vmProjectStrategy.ListProject = data.value.ListProject;
+                            if (vmProjectStrategy.ListProject.length > 0) {
+                                vmProjectStrategy.ProjectGroupId = vmProjectStrategy.ListProject[0].ProjectGroupId;
+                                vmProjectStrategy.BindTemplateProjectStrategy(data.value);
+                                vmProjectStrategy.SetComboBoxProject(parseFloat(sHandler.ProjectId));
+                            }
+                            if (typeof updatePaletteFrom == 'function') {
+                                updatePaletteFrom(data.value.PaletteColors);
+                            }
+                        }, AjaxConst.GetRequest);
+                    };
+
+                    vmProjectStrategy.ProjectNameCut = function (name) {
+                        if (name.length >= 27) {
+                            name = name.substring(0, 25) + '... ';
+                        }
+                        return name;
+                    };
+
+                    vmProjectStrategy.BindTemplateProjectStrategy = function (data) {
+                        bindTemplate('combobox-project-place', 'template-project', data);
+                    };
+
+                    function findStrategiesByType(type, listSt) {
+                        var str = null;
+                        for (var i = 0; i < listSt.length; i++) {
+                            if (listSt[i].Type == type) {
+                                str = listSt[i];
+                            }
+                        }
+                        return str;
+                    }
+
+                    vmProjectStrategy.FindProject = function (id, list) {
+                        for (var i = 0; i < list.length; i++) {
+                            if (list[i].Id == id) {
+                                return list[i];
+                            }
+                        }
+                        return null;
+                    };
+                    vmProjectStrategy.SetComboBoxProject = function (id) {
+                        var project = vmProjectStrategy.FindProject(parseFloat(id), vmProjectStrategy.ListProject);
+                        var strHtmlArrow = '<b class="caret caret1 header-caret cursor-pointer"></b>';
+                        var strHtmlSpan = '<span class="truncate-w200">';
+                        if (project == null) {
+                            pAlert(kLg.msgInvalidProject).then(redirectDefault);
+                            return;
+                        }
+                        else {
+                            $('#combobox-project-place #combobox-project').html(strHtmlSpan + vmProjectStrategy.ProjectNameCut(htmlEncode(project.Name)) + "</span>" + strHtmlArrow);
+                        }
+
+                        bindTemplate('combobox-strategy-place', 'template-strategy', project.Strategies);
+                        vmProjectStrategy.SetComboBoxStrategy(sHandler.StrategyId, project.Strategies);
+
+                        for (var i = 0; i < project.Strategies.length; i++) {
+                            var item = project.Strategies[i];
+                            strategies[item.Type] = item.Id;
+                        }
+                    };
+
+
+                    vmProjectStrategy.SetComboBoxStrategy = function (id, list) {
+                        var strategy = vmProjectStrategy.FindProject(id, list);
+                        vmProjectStrategy.currentStrategy = strategy;
+                        var strHtmlArrow = '<b class="caret caret1 header-caret cursor-pointer"></b>';
+                        var strHtmlSpan = '<span class="stratcate-w200">';
+                        if (strategy == null) {
+                            // pAlert(kLg.msgInvalidProject).then(redirectDefault);
+                            // return;
+                        }
+                        else {
+                            $('#combobox-strategy-place #combobox-strategy').html(strHtmlSpan + vmProjectStrategy.StrategyName(strategy.Type) + "</span>" + strHtmlArrow);
+                        }
+                    };
+
+                    vmProjectStrategy.StrategyName = function (type) {
+                        switch (type) {
+                            case 1:
+                            case "1":
+                                return htmlEscape(kLg.strategyTab);
+                            default:
+                                return htmlEscape(kLg.crmTab);
+                        }
+                    };
+
+                    vmProjectStrategy.ChangeStrategy = function (strategyId) {
+                        //don't reload page when still select current strategy
+                        if (strategyId == vmProjectStrategy.currentStrategy.Id) return;
+
+                        vmProjectStrategy.GetChangeUrlStrategy(strategyId);
+                    };
+                    vmProjectStrategy.GetChangeUrlStrategy = function (strategyId) {
+                        return;
+                    };
+
+                    var popUpAddProject = undefined;
+                    vmProjectStrategy.openPopUpAddProject = function () {
+                        popUpAddProject = showPopup(popUpAddProject,
+                            $('#pop-add-project-place'), '../Contents/popAddProject.html',
+                            {
+                                title: kLg.addProject,
+                                height: 410,
+                                width: 800,
+                                resizable: false
+                            });
+                    };
+
+                    vmProjectStrategy.ReturnHome = function () {
+                        //window.location = '../Default.aspx?lang=' + language;
+                    };
+
+                    //show icon file manager
+                    function showFileIcon() {
+                        if (sHandler.ProjectId != null || sHandler.ProjectId != "undefined") {
+                            var iconFile = $('#iconFileManagement');
+                            if (iconFile.hasClass('hidden')) {
+                                iconFile.removeClass('hidden');
+                            }
+                        } else {
+                            return;
+                        }
+                    };
+
+                    $(document).ready(function () {
+                        var obj = new queryString(true);
+                        vmProjectStrategy.Strategy.Lang[1] = htmlEscape(kLg.strategyTab);
+                        vmProjectStrategy.Strategy.Lang[2] = htmlEscape(kLg.crmTab);
+
+                        vmProjectStrategy.GetProjectStrategy();
+
+                        showFileIcon();
+                    });
+                </script>
+
+                <!-- Start dropdown 3 -->
+                <div class="navbar-right navb-right">
+                    <script type="text/html" id="tmpErrors">
+                        <ul class="alert alert-danger">
+                            #for(var i = 0; i < data.length; i ++) {#
+                            <li class="minus">#:data[i]#</li>
+                            #}#
+                        </ul>
+                    </script>
+                    <script type="text/html" id="tmpSuccesses">
+                        <ul class="alert alert-success">
+                            #for(var i = 0; i < data.length; i ++) {#
+                            <li class="circle">#:data[i]#</li>
+                            #}#
+                        </ul>
+                    </script>
+                    <div class="navbar-header"><span class="navbar-brand nv-br" id="lblLang">Sprache</span></div>
+                    <!--Title 3-->
+                    <ul class="nav navbar-nav navb3">
+                        <li class="dropdown dropdown-language">
+                            <a href="#" id="a-language" class="dropdown-toggle" data-toggle="dropdown">English<b
+                                    class="caret caret1 header-caret" id="language-icon"></b></a>
+                            <ul class="dropdown-menu drop-menu">
+                                <li class="li-language"><a href="javascript:vmLanguage.changeLanguage('de');"
+                                        id="lnkde">Deutsch</a></li>
+                                <li class="li-language"><a href="javascript:vmLanguage.changeLanguage('pm');"
+                                        id="lnkpm">PM</a></li>
+                                <li class="li-language"><a href="javascript:vmLanguage.changeLanguage('en');"
+                                        id="lnken">English</a></li>
+                                <li class="li-language"><a href="javascript:vmLanguage.changeLanguage('it');"
+                                        id="lnkit">Italino</a></li>
+                                <li class="li-language"><a href="javascript:vmLanguage.changeLanguage('fr');"
+                                        id="lnkfr">Vietnam</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <script>
+                        var vmLanguage = vmLanguage || {};
+                        var hashUrl;
+                        vmLanguage.langeNum = {
+                            de: kLg.german,
+                            pm: kLg.pm,
+                            it: kLg.italy,
+                            fr: kLg.french,
+                            en: kLg.english
+                        };
+
+                        vmLanguage.changeLanguage = function (lang) {
+                            if (lang == kLg.language)
+                                return;
+                            //var obj = new queryString(true);
+                            //obj.set("lang", lang);
+                            //window.location = window.location.pathname + "?" + obj.urlParams + window.location.hash;
+                        };
+
+                        vmLanguage.setComboLanguage = function () {
+                            var language = sHandler.Lang;
+                            var stringHtmlArrow = "<b class=\"caret caret1 header-caret\"></b>";
+                            switch (language) {
+                                case "en":
+                                    $("#a-language").html(vmLanguage.langeNum.en + stringHtmlArrow);
+                                    break;
+                                case "fr":
+                                    $("#a-language").html(vmLanguage.langeNum.fr + stringHtmlArrow);
+                                    break;
+                                case "it":
+                                    $("#a-language").html(vmLanguage.langeNum.it + stringHtmlArrow);
+                                    break;
+                                case "pm":
+                                    $("#a-language").html(vmLanguage.langeNum.pm + stringHtmlArrow);
+                                    break;
+                                default:
+                                    $("#a-language").html(vmLanguage.langeNum.de + stringHtmlArrow);
+                                    break;
+                            }
+                        };
+
+                        $(document).ready(function () {
+                            var ua = window.navigator.userAgent;
+                            if (ua.indexOf('MSIE ') > 0 || ua.indexOf('Trident/') > 0) {
+                                alert(kLg.lblCheckBrowser);
+                            }
+
+                            $("#lnkde").text(kLg.german);
+                            $("#lnkpm").text(kLg.pm);
+                            $("#lnkit").text(kLg.italy);
+                            $("#lnken").text(kLg.english);
+                            $("#lnkfr").text(kLg.french);
+                            $("#lblLang").text(kLg.lblLang);
+
+                            setupHostName("mf.", "test.", "localhost", "demo.").set(function () {
+                                $("#lnkpm").hide();
+                            });
+
+                            $("#lnk" + kLg.language).attr("class", "flag " + kLg.language + " curlang");
+
+                            kendo.culture(vmCommon.getCultureLang());
+                            hashUrl = window.location.hash;
+                            vmLanguage.setComboLanguage();
+
+                            function setupHostName() {
+                                var isPrefix = false;
+
+                                for (let i = 0; i < arguments.length; i++) {
+                                    let prefix = arguments[i];
+
+                                    if (prefix && window.location.hostname.includes(prefix)) {
+                                        isPrefix = true;
+                                        break;
+                                    }
+                                };
+
+                                return {
+                                    set: function (fnc) {
+                                        if (!isPrefix)
+                                            fnc();
+                                    }
+                                }
+                            }
+                        });
+                    </script>
+
+                    <!-- icon -->
+                    <div class="block-menu-icon" id="icon">
+                        <div id="div-loading-ucaccount" class="loading"></div>
+                            <div id="pop-changePassword"></div>
+                            <div id="pop-changeInfo"></div>
+                            <div id="pop-showQrCode"></div>
+                            <span class="ms-icon ms-usercon cursor-pointer" href="#msModal" id="iconUser"></span>
+                            <div id="msModal" class="msModal1">
+                                <div class="md-title">
+                                    <span class="text-title title-info-sub" id="titleUcAccount">Address Schulz </span>
+                                    <span class="arrow-top1"></span>
+                                    <figure id="ms-icon-close"></figure>
+                                    <figure id="ms-icon-edit" onclick="vmUser.showPopUpChangeInfomation()"></figure>
+                                </div>
+                                <div class="md-content">
+                                    <table class="table">
+                                        <tr>
+                                            <td class="left no-border"><span id="lblEmainUcAccount">E-Mail</span></td>
+                                            <td class="right no-border">
+                                                <div style="width: 188px; margin-left: 2px"><span id="emailUcAccount" class="file-sub" style="height: 20px">abc@gmail.com</span></div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="left"><span id="lblFirmUcAccount">Firma</span></td>
+                                            <td class="right">
+                                                <div style="width: 188px; margin-left: 2px"><span id="firmUcAccount" class="file-sub" style="height: 20px">analog.eins|Grafikdesign</span></div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="left"><span id="lblDepartmentUcAccount">Abteilung</span> </td>
+                                            <td class="right">
+                                                <div style="width: 188px; margin-left: 2px"><span id="departmentUcAccount" class="file-sub" style="height: 20px">Kreation</span></div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="md-footer">
+                                    <input type="button" class="btn-user" style="float: left; margin-left: 10px;" value="QR Code" id="genQrCode" onclick="vmUser.genQrCode()" />
+                                    <input type="button" class="btn-user" value="Abmelden" id="signOutButtonUcAccount" onclick="vmUser.logOut()" />
+                                    <input type="button" class="btn-user" id="passButtonUcAccount" onclick="vmUser.showPopUpChangePassword()" value="Passwort andern" />
+                                </div>
+                            </div>
+                            <script>
+                                var vmUser = vmUser || {};
+                                vmUser.displayUserInfo = function () {
+                                    $('#msModal #titleUcAccount').text(vmUser.currentAccount.Name);
+                                    $('#msModal #emailUcAccount').text(vmUser.currentAccount.Email);
+                                    $('#msModal #firmUcAccount').text(vmUser.currentAccount.Firm == null ? '' : vmUser.currentAccount.Firm);
+                                    $('#msModal #departmentUcAccount').text(vmUser.currentAccount.Department == null ? '' : vmUser.currentAccount.Department);
+                         
+                                    $('#msModal #passButtonUcAccount').val(kLg.changePassTitle);
+                                    $('#msModal #lblEmainUcAccount').text(kLg.emailAddressloginview + ": ");
+                                    $('#msModal #lblFirmUcAccount').text(kLg.firm + ": ");
+                                    $('#msModal #lblDepartmentUcAccount').text(kLg.lblFunction + ": ");
+                                    $('#msModal #signOutButtonUcAccount').val(kLg.signOut);
+                         
+                                    $('#msModal #emailUcAccount').attr("title", vmUser.currentAccount.Email);
+                                    $('#msModal #firmUcAccount').attr("title", vmUser.currentAccount.Firm);
+                                    $('#msModal #departmentUcAccount').attr("title", vmUser.currentAccount.Department);
+                                };
+                         
+                                vmUser.logOut = function () {
+                                    var url = "../Handlers/AccountHandler.ashx?funcName=signOut";
+                                    callAjax("div-loading-ucaccount", url, null, vmUser.signOutCallBack, AjaxConst.GetRequest);
+                                };
+                         
+                                vmUser.genQrCode = function () {
+                                    vmUser.showPopUpQrCode();
+                                };
+                         
+                                vmUser.signOutCallBack = function (data) {
+                                    window.location.href = '../Login.aspx?lang=' + kLg.language;
+                                };
+                         
+                                vmUser.getCurrentAccount = function () {
+                                    var objQuery = new queryString(true);
+                                    var strid = objQuery.get("strid") || 0;
+                         
+                                    if (!vmUser.currentAccount) {
+                                        var url = "../Handlers/AccountHandler.ashx?funcName=getcurrentaccount&strid=" + strid;
+                                        return callAjaxPromise(url).then(function (data) {
+                                            vmUser.currentAccount = data.value;
+                                            vmUser.currentAccount.Name = data.value.FirstName + " " + data.value.LastName;
+                                            vmUser.displayUserInfo();
+                         
+                                            return Promise.resolve(vmUser.currentAccount);
+                                        });
+                                    }
+                                };
+                         
+                                vmUser.popUpChangePassword = undefined;
+                                vmUser.showPopUpChangePassword = function () {
+                                    vmUser.popUpChangePassword = showPopup(vmUser.popUpChangePassword,
+                                        $('.ms-header #pop-changePassword'),
+                                        '../Contents/popChangePassword.html',
+                                        {
+                                            title: kLg.changePassTitle,
+                                            height: 295,
+                                            width: 500,
+                                            resizable: false
+                                        });
+                                };
+                         
+                                vmUser.popUpChangeInfomation = undefined;
+                                vmUser.showPopUpChangeInfomation = function () {
+                                    vmUser.popUpChangeInfomation = showPopup(vmUser.popUpChangeInfomation,
+                                        $('.ms-header #pop-changeInfo'), '../Contents/popEditUserInfomation.html',
+                                        {
+                                            title: kLg.changeInforTitle,
+                                            height: 410,
+                                            width: 710,
+                                            resizable: false
+                                        });
+                                };
+                         
+                                vmUser.popUpQrCode = undefined;
+                                vmUser.showPopUpQrCode = function () {
+                                    vmUser.popUpQrCode = showPopup(vmUser.popUpQrCode,
+                                        $('.ms-header #pop-showQrCode'), '../Contents/popQrCode.html',
+                                        {
+                                            title: kLg.titleQrCode,
+                                            height: 350,
+                                            width: 400,
+                                            resizable: false
+                                        });
+                                };
+                         
+                                $(document).ready(function () {
+                                    vmUser.getCurrentAccount();
+                                });
+                         </script>
+                        
+                    </div>
+                    <!-- end icon -->
+                </div>
+                <!-- End dropdown 3 -->
+            </div>
+            <!--/.nav-collapse -->
+
+        </div>
+
+    </div>
+    <div class="clear"></div>
+    <div id="divloading" class="loading"></div>
+    <div class="submenu">
+        <ul class="horizontal-menu sub-menu" id="submenu">
+            <li><a class="cursor-pointer menu_max_width" id="linkMarketSegment">Markt Marktsegmentstrategite</a><div class="arrow-top"></div>
+            </li>
+            <li><a class="cursor-pointer menu_max_width" id="linkSubMarketSegment">Teilmarkt Produktstrategie</a><div class="arrow-top"></div>
+            </li>
+            <li><a class="cursor-pointer menu_max_width" id="linkActionGoal">MaBnameplan</a><div class="arrow-top"></div>
+            </li>
+            <li><a class="cursor-pointer menu_max_width" id="linkMarketingCalendar">Marketingmix/Einasatzplanung</a><div class="arrow-top"></div>
+            </li>
+            <li class="active-li-top"><a class="cursor-pointer menu_max_width" id="linkRoadmap">Roadmap</a><div class="arrow-top"></div>
+            </li>
+            <li><a class="cursor-pointer menu_max_width" id="linkTeamboard">Team board</a><div class="arrow-top"></div>
+            </li>
+            <li><a class="cursor-pointer menu_max_width" id="linkDashboard">Dashboard</a><div class="arrow-top"></div>
+            </li>
+        </ul>
+    
+        <div id="timerange" class="pull-left"></div>
+        <div id="auswertung" style="position:relative"></div>
+    </div>
+    <div class="clear"></div>
+    <script>
+        var vmDefaultMaster = vmDefaultMaster || {};
+
+        vmDefaultMaster.updateScreen = function () {
+            var docHeight = $(window).height();
+            $('.body-content').css('height', docHeight - 135 + 'px');
+            vmCommon.onMobile().do(function () {
+                if (vmCommon.checkCurrentPage(vmCommon.enumPage.Dashboard)
+                    || vmCommon.checkCurrentPage(vmCommon.enumPage.SubMarket)
+                    || vmCommon.checkCurrentPage(vmCommon.enumPage.ActionPlan)
+                    || vmCommon.checkCurrentPage(vmCommon.enumPage.TeamBoard)
+                    || vmCommon.checkCurrentPage(vmCommon.enumPage.RoadMap)
+                    || vmCommon.checkCurrentPage(vmCommon.enumPage.Market)) {
+
+                    $('body div.body-content').css('height', '100%');
+                }
+
+            });
+        };
+
+        vmDefaultMaster.setupResize = function () {
+            $(window).resize(function () {
+                vmDefaultMaster.updateScreen();
+            });
+        };
+
+        $(function () {
+            vmDefaultMaster.updateScreen();
+
+            vmDefaultMaster.setupResize();
+        });
+
+
+    </script>
+
+    <script id="kpigoalviewtemplate" type="text/html">
+        <div class="kpidivview" style="width: 100%;">
+            #var times = data.KpiGoalTimes;#
+            #var topics = data.KpiGoalTopics;#
+
+            <table style="width: 100%;" id="kpitableview">
+                <thead>
+                    <tr style="color: white;">
+                        <th style="border-right: none; min-width: 8px;"></th>
+                        <th style="border-left: none; min-width: 250px; text-align: left;">#:kLg.menuKpiIndex#
+                        </th>
+                        <th style="min-width: 90px; width: 200px;">#:kLg.lblKpiUnit#
+                        </th>
+
+                        <th style="min-width: 62px;">
+                            <span class="icon-26 icon-cost-gray-kpi" style="margin-left: 12px; margin-bottom: 8px; float: left;"></span>
+                            <span style="float: right; margin-top: 10px; margin-right: 12px;">%</span>
+                        </th>
+
+                        <th style="min-width: 80px;">#:kLg.lblSoll#
+                        </th>
+                        <th style="min-width: 65px;">
+                            <span>+/-</span>
+                        </th>
+                        <th style="min-width: 80px;">#:kLg.lblActual#
+                        </th>
+
+                        #for(var i = 0; i < times.length; i++){#
+                            #var time = times[i];#
+                            <th style="width: 120px; max-width: 120px; min-width: 92px; position: relative;" class="sortable">
+                                <span class="timename">#:kendo.toString(time.Name, "d")#</span>
+                            </th>
+                        #}#
+
+                    </tr>
+
+                </thead>
+                <tbody>
+                    #var timeNo = times.length; #
+                    #for(var i = 0; i < topics.length; i++){#
+                    #var topic = topics[i];#
+
+                    #var iconCls = vmGoalAction.getTopicIconView(topic.TypeId); #
+                    <tr>
+                        <td class="add-kpi-goal-td topicicon noPadding">
+                            <span class="icon-28 #:iconCls#"></span>
+                        </td>
+                        <td class="add-kpi-goal-td topicname noborder posRelative" colspan="#:(timeNo + 7)#">
+                            <span class="topicnamespan">#:topic.Name || ''#</span>
+                        </td>
+                    </tr>
+
+                    #var indexes = topic.KpiGoalIndexes;#
+                    #for(var j = 0; j < indexes.length; j++){#
+                    #var index = indexes[j]; #
+                    <tr>
+                        <td style="padding-left: 8px;">#if(index.IsCalculate){#<span class="icon-16 icon-select-gray"></span>#}#</td>
+                        <td>
+                            <div style="height: 20px; overflow: hidden; padding-top: 2px; width: 270px;">
+                                <span>#:index.Name || ''#</span>
+                            </div>
+                        </td>
+                        <td class="view-unit">#:index.KpiUnitText#</td>
+                        <td class="view-percent" style="text-align: right;">#:index.KpiPercent != null ? (index.KpiPercent + " %"): "" # </td>
+                        <td class="view-expected #:index.posClass#">#:index.ExpectedValueText#</td>
+                        <td class="view-implement" style="text-align: right;">#:index.ImplementPercent != null ? (index.ImplementPercent + " %"): "" # </td>
+                        <td class="view-ist #:index.posClass#">#:index.LstValueText#</td>
+
+                        #for(var k = 0; k < index.KpiGoalIndexTimes.length; k++){#
+                        #var indextime = index.KpiGoalIndexTimes[k]; #
+                        <td class="view-indextime #:index.posClass#">#:indextime.KpiValueText#
+                        </td>
+                        #}#
+                    </tr>
+                    #}#
+                
+                    <tr>
+                        <td class="noPadding" style="text-align: center;"></td>
+                        <td colspan="#:(timeNo + 7)#"></td>
+                    </tr>
+                    #}#
+                </tbody>
+
+            </table>
+
+        </div>
+    </script>
+
+    <script id="kpiActionviewTemplate" type="text/html">
+     #for(var d = 0; d < data.length; d++){#
+        #var times = data[d].KpiOutcomeTimes;#
+        #var indexes = data[d].KpiIndexes;#
+        
+        <%--<div class="dnb-kpi-av-tmp-head">
+            <span class="icon-28 icon-network-gray"></span>
+            <span style="margin-left:6px;">#: data[d].AdvertiserName #</span>
+        </div>--%>
+        
+        <div class="kpidivview" style="width: 100%;">
+            <table style="margin-bottom: 20px;">
+                <thead>
+                    <tr>
+                        <th style="min-width: 8px; width:28px; border-right: none;">
+                            <span class="icon-28 icon-network-gray"></span>
+                        </th>
+                        <th colspan="#:times.length + 6#" style="text-align: left;">
+                            <span style="margin-left:6px;">#: data[d].AdvertiserName #</span>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th style="min-width: 8px; width:28px; border-right: none;"></th>
+                        <th style="min-width: 228px; text-align: left;width: 228px;">#:kLg.menuKpiIndex#</th>
+                        <th style="min-width: 80px;width:91px;">#:kLg.lblKpiUnit#</th>
+                        <th style="min-width: 80px;width:122px;">#:kLg.lblKpiTimePeriod#</th>
+                        <th style="min-width: 80px;width:121px;" id="sollCol">#:kLg.lblSoll#</th>
+                        <th style="min-width: 80px;width:120px;">+/-</th>
+                        <th style="min-width: 80px;width:87px;" id="istCol">#:kLg.lblActual#</th>
+
+                        #for(var i = 0; i < times.length; i++){ var time = times[i];#
+                        <th style="width: 120px; max-width: 120px; min-width: 75px;">
+                            <span class="timename">#:kendo.toString(time.Name, "d" )#</span>
+                        </th>
+                        #}#
+
+                    </tr>
+                </thead>
+                <tbody>
+                    #for(var i = 0; i < indexes.length; i++){#
+                      #var index = indexes[i]; var subindexes = index.SubIndexes || [];# 
+                      #for(var j = 0; j < subindexes.length; j++){ var subindex = subindexes[j]; #
+                        <tr class="indexrow">
+                            <td></td><td></td><td></td><td></td>
+                            <td></td><td></td><td></td>
+                            #var subindextimes = subindex.KpiIndexTimes || [];#
+                            #for(var k = 0; k < subindextimes.length; k++){#
+                                #var subindextime = subindextimes[k];#
+                                <td class="view-indextime #:index.posClass#"><span>#:subindextime.KpiValueText#</span></td>
+                            #}#
+                        </tr>
+                      #}#
+                        <tr class="indexrow">
+                            <td>#if(index.IsCalculate){#<span class="icon-16 icon-select-gray"></span>#}#</td>
+                            <td class="posRelative dnb-ac-kpidata-tlp" style="width:228px;max-width: 228px;">
+                                <span style="max-width: 100%;">#:index.KpiIndexName || ''#</span></td>
+                            <td class="view-unit dnb-ac-kpidata-tlp">
+                                <span style="max-width:90px;">#:index.KpiUnitName#</span></td>
+                            <td class="view-time dnb-ac-kpidata-tlp" style="width:122px;">
+                                <span style="max-width:122px;">#:index.KpiTimeName#</span></td>
+                            <td class="view-expected dnb-ac-kpidata-tlp #:index.posClass#"><span>#:index.ExpectedValueText#</span></td>
+                            <td class="view-percent" style="text-align: right;">#:index.KpiPercent ? (index.KpiPercent + " %"): "" #</td>
+                            <td class="view-ist dnb-ac-kpidata-tlp #:index.posClass#" style="width:87px"><span>#:index.LstValueText#</span></td>
+
+                            #var indextimes = index.KpiIndexTimes;#
+                            #for(var j = 0; j < indextimes.length; j++){#
+                             #var indextime = indextimes[j];#
+                             <td class="view-indextime #:index.posClass#"><span>#:indextime.KpiValueText#</span></td>
+                            #}#
+                        </tr>
+                    #}#
+                </tbody>
+            </table>
+        </div>
+    #}#
+    </script>
+
+    <script type="text/javascript">
+        $("#timerange").on("change", "input.fstart", function (e) {
+            msFilter.validStart(e.currentTarget);
+        });
+
+        $("#timerange").on("change", "input.fend", function (e) {
+            msFilter.validStart(e.currentTarget);
+        });
+
+        $("#timerange").on("keyup", "input.fstart,input.fend", function (e) {
+            if ((e.key == "Delete" || e.key == "Backspace") && $(e.currentTarget).val() == '') {
+                msFilter.validStart(e.currentTarget);
+                msFilter.controlService.changeEnd();
+            }
+        });
+    </script>
+    <div class="clear"></div>
+    <div class="body-content">
+        <div id="nprogressActionPlanDisableAll"></div>
+        <div id="loadingRoadmap" class="loading"></div>
+        <div id="popkpigoal"></div>
+        <div id="popkpigoaltopic"></div>
+        <div id="popkpigoalindex"></div>
+        <div id="popkpigoalaction"></div>
+        <div id="popConnectionOverview"></div>
+        <div id="popGoalActionEval"></div>
+        <div id="popExportRoadmap"></div>
+        <div class="div-info-measuresplan">
+            <div id="msfilterpanel14"></div>
+        </div>
+        <div class="clear"></div>
+
+
+        <script src="/Scripts/msGoalAction.js"></script>
+
+        <div id="RoadmapApp"></div>
+        <script src="/Scripts/msRoadmap.js"></script>
+        <script src="/MsRoadmap/RoadmapApp.js"></script>
+        <script src="/MsRoadmap//Navigator/RoadMapNavigator.js"></script>
+
+    </div>
+
+
+
+    <script type="text/javascript">
+        $(function () {
+            document.title = kLg.captiontabRoadmap;
+            msFilter.controlService.init(vmCommon.FilterType.RoadMap, function (data) {
+                msRoadmapApp.setLabeling();
+            });
+        });
+    </script>
+</body>

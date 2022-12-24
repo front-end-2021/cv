@@ -1,0 +1,2392 @@
+﻿<style type="text/css">
+    /* Corner radius */
+    .ui-corner-all,
+    .ui-corner-bottom,
+    .ui-corner-right,
+    .ui-corner-br {
+        border-bottom-right-radius: 0 /*{cornerRadius}*/;
+    }
+
+    .ui-widget-header {
+        background: #3D6FC3;
+        color: white;
+    }
+
+    .ui-widget-content {
+        border-width: 0;
+    }
+
+    .k-window-title {
+        right: 3.44em !important;
+    }
+
+
+    #productEvaluationArea .k-slider .k-label {
+        font-size: 10px !important;
+    }
+
+    .percentage {
+        width: 60px;
+    }
+
+    .compeUnsaved {
+        color: red;
+    }
+
+    .premove {
+        top: 9px;
+        right: 10px;
+    }
+
+    .ms-panel-left {
+        width: 490px;
+    }
+
+    #body-compe .compeName {
+        float: left;
+    }
+
+    #body-compe input.compeName {
+        float: left;
+    }
+
+    #body-compe .compeColor {
+        float: right;
+        width: 28px !important;
+        height: 28px;
+    }
+
+    #body-compe .premove {
+        right: 40px;
+    }
+
+    .k-picker-wrap {
+        height: 26px;
+    }
+
+    .k-selected-color {
+        height: 27px !important;
+    }
+
+    f
+    .k-colorpicker {
+        width: 28px;
+    }
+
+    .k-colorpicker .k-select {
+        display: none;
+    }
+
+/*    #evaluationArea a.k-button, #evaluationArea .ms-dropdown {
+        margin-top: 5px;
+    }*/
+
+    #competitionArea a.k-button, #competitionArea .ms-dropdown {
+        margin-top: 5px;
+    }
+
+    #competitionArea .k-numerictextbox .k-input {
+        padding-bottom: 5px !important;
+        padding-top: 5px !important;
+    }
+
+    .percentage .k-numeric-wrap .k-input {
+        height: auto;
+        line-height: inherit;
+    }
+
+
+    .popTempWrapper .k-button {
+        padding: 7px 10px;
+    }
+
+    #marketEvalChart .k-tooltip {
+        -ms-border-radius: 3px;
+        border-radius: 3px;
+        margin-left: -40px;
+        margin-top: -7px;
+    }
+
+    #headerPopSubmarketArea .k-input {
+        color: #FBFBFB !important;
+        border-color: #38baf8;
+    }
+
+    #headerPopSubmarketArea .k-dropdown-wrap.k-state-default {
+        background-image: none, linear-gradient(to bottom, #38baf8 0%, #38baf8 100%) !important;
+    }
+
+    .select-submarketproduct-temp {
+        width: 190px;
+        margin-top: -10px;
+    }
+
+    #ddlSubmarketTemp-list[data-role="popup"] {
+        background-color: #38baf8 !important;
+        color: #FBFBFB !important;
+    }
+
+    #headerPopSubmarketArea .k-dropdown.k-dropdown-wrap, .k-dropdown.k-state-border-down.k-dropdown-wrap.k-state-border-down {
+        border-color: #38baf8 !important;
+    }
+
+    table.ptable td {
+        display: table-cell !important;
+    }
+
+    .k-picker-wrap, .k-numeric-wrap {
+        padding: 0 0.0em 0 0;
+    }
+
+    .maxW232 {
+        max-width: 232px;
+    }
+
+    .w-100per {
+        width: 98% !important;
+    }
+
+    .k-coloreditor-header.k-hstack {
+        display: none;
+    }
+    .axis-title {
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    .axis-area {
+        margin-bottom: 16px;
+        margin-top: 6px;
+    }
+    .dnb-title-center {
+        position: absolute; left: 50%; bottom: -54px;
+        transform: translateX(-50%); padding: 6px; text-align: center;
+    }
+    .dnbinput-edittlteval {font-size: 16px; width: 510px;padding:9px 8px;margin-top:-10px;}
+    .dnbinput-edittlteval+.clearx2{height:0 !important;}
+    .valuation-title {margin-top: 7px; padding-left: 0; padding-right: 0;text-align:center;
+                      max-width: 82px; min-width:82px;}
+    .valuation-title-c {max-width: 74px; min-width:74px; display:inline-block; padding-left: 4px; padding-right: 4px;
+                      white-space: pre; overflow: hidden; text-overflow: ellipsis;}
+    .valuationTitle { min-width:82px; max-width: 82px; margin-left: 9px; margin-top: 0; margin-left: 0 !important; padding-left: 3px !important;min-height: 28px;
+    padding-top: 8px; }
+
+    .dnb-tooltip {position: relative; display: inline-block;}
+    .dnb-tooltip .tooltiptext {
+      display:none; width: auto; background-color: white;box-shadow: 0 0 3px rgb(0 0 0 / 12%), 0 0 2px rgb(0 0 0 / 20%);
+      color: black; text-align: center; border-radius: 2px; padding: 5px 9px; position: absolute; z-index: 1;
+      top: 118%; left: 36px; transform: translateX(-50%);
+    }
+    .dnb-tooltip .tooltiptext::after {
+        content: "";
+        position: absolute; bottom: 100%; left: 50%;
+        margin-left: -5px; border-width: 5px; border-style: solid;
+        border-color: transparent transparent rgb(0 0 0 / 20%) transparent;
+    }
+    .dnb-tooltip:hover .tooltiptext { display: block; }
+    .dnbeval-tlt-neg-y {position: absolute; transform: rotate(270deg);white-space:nowrap;
+        bottom: 74px; width: 136px;min-width:136px;max-width:136px; left: -80px;}
+    .dnbeval-tlt-neu-y {position: absolute;transform: rotate(270deg);white-space:nowrap;
+        left: -81px; top: 50%; width: 137px;min-width:137px; max-width: 137px;text-align:center;}
+    .dnbeval-tlt-pos-y {position: absolute; transform: rotate(270deg); white-space:nowrap;
+        left: -84px; top: 76px; text-align:right;width: 141px;min-width:141px;max-width:141px;
+    }
+    .dnbeval-tlt-neg-x {position: absolute; left: 30px; bottom: -21px; width: 147px;min-width:147px;max-width:147px;}
+    .dnbeval-tlt-neu-x {position: absolute; left: 50%; bottom: -21px;white-space:nowrap;
+        width: 145px; min-width:145px;max-width:145px; transform: translateX(-50%); text-align: center;}
+    .dnbeval-tlt-pos-x {position: absolute; right: 15px; bottom: -21px;white-space:nowrap;
+        width: 135px;min-width:135px;max-width:135px; text-align: right;}
+    .dnbeval-template-n {text-align: center; font-size: 16px; color: #303030; padding-bottom: 9px; white-space: nowrap; position: absolute; 
+                top: -30px; left: 50%; transform: translateX(-50%); max-width: 1230px; overflow: hidden; text-overflow: ellipsis;}
+    .dnbeval-chart-area {position:relative;margin-top:37px;}
+</style>
+<script src="../Scripts/ActionPlanEval/msGoalActionEval.js"></script>
+
+<div class="pop-wrapper" id="pop-ap-eval" style="overflow-y: scroll;">
+    <form id="frmApEval" style="height:100%;" role="form" class="form-horizontal">
+        <div id="productEvaluationArea" style="overflow: auto; padding-top: 0 !important; padding-left: 13px !important;margin-bottom:57px;" class="ms-modal-body">
+            <p class="clearx1"></p>
+            <div id="tabs">
+                <ul class="nav nav-tabs margin-left12" id="msTab">
+                    <li class="active">
+                        <a href="#pProductEvaluation" @click="onSelectTab(1)" data-toggle="tab" class="tab-modal" v-bind:class="{'pointer':focusingTab != 1}">{{kLg.tabEvaluationStrategy}}</a>
+                    </li>
+                    <li>
+                        <a href="#tabSwotAnalyse" @click="onSelectTab(2)" data-toggle="tab" class="tab-modal" v-bind:class="{'pointer':focusingTab != 2}">{{kLg.tabSWOTAnalyse}}</a>
+                    </li>
+                    <li>
+                        <a href="#tabProductStructure" @click="onSelectTab(3)" data-toggle="tab" class="tab-modal" tabindex="0" v-bind:class="{'pointer':focusingTab != 3}">{{kLg.tabProductStructuring}}</a>
+                    </li>
+                </ul>
+                <div class="tab-content" style="margin-bottom: 60px;">
+                    <Ap-Eval v-if="focusingTab == 1" :item="ap.APEvaluations.APEvaluationData" :apcomment="ap.ApEvaluationComment" :templates="ap.ApEvaluationTemplates" :apTemplateId="ap.ApEvaluationTemplateId" ref="apeval"></Ap-Eval>
+                    <div class="tab-pane" v-show="focusingTab == 2" id="tabSwotAnalyse"></div>
+                    <div class="tab-pane" v-show="focusingTab == 3" id="tabProductStructure"></div>
+
+
+                </div>
+            </div>
+        </div>
+        <div class="modal-market-footer" style="border:0;border-top:1px solid #E7E7E7;position:absolute;width:100%;bottom:0px;">
+            <button type="button" class="ms-button" @click="update()">
+                <span class="icon-20 icon-close"></span>
+                <span>{{kLg.lblClose}}</span>
+            </button>
+        </div>
+        <div id="deleteTempWindow"></div>
+        <div id="apImportTempWindow"></div>
+        <div id="popupSwotTemplate"></div>
+        <div id="popupDeleteSwotTemplate"> </div>
+        <div id="popUpproductDesign"></div>
+        <div id="deleteProTempWindow"> </div>
+    </form>
+</div>
+
+<script id="apevaltemp" type="text/html">
+    <div class="tab-pane active">
+        <p class="clearx2"></p>
+        <div class="tab-swotanalyse">
+            <div class="boxSizing evaluationAreaWrapper" style="padding-left: 0;width:100%;">
+                <div id="evaluationArea">
+                    <div class="ms-layout-wrap evaluation-template-control" v-if="isHasControl">
+                        <a class="k-button btnAddTemp" v-bind:class="{'k-state-disabled': role < 1}" @click ="onAddEvalTemplate()">{{kLg.btnAddTemp}}</a>
+                        <a class="k-button btnUpdateTemp" v-bind:class="{'k-state-disabled': role < 1}" @click ="onEditEvalTemplate()">{{kLg.btnUpdateTemp}}</a>
+                        <a class="k-button btnDelTemp" v-bind:class="{'k-state-disabled': role < 1}" @click ="onDeleteEvalTemplate()">{{kLg.btnDelTemp}}</a>
+                        <select class="ms-dropdown" ref="ddlTemplate">
+                            <option>Choose layout</option>
+                        </select>
+                        <a class="k-button btnImportTemp" v-bind:class="{'k-state-disabled': role < 1}" @click ="onImportEvalTemplate()" >{{kLg.btnImportTemp}}</a>
+                    </div>
+                    <div class="clearx3"></div>
+
+                    <div class="axis-area">
+                        <input v-if="IsEditTitleX" type="text" maxlength="50" 
+                               class="dnbinput-edittlteval"
+                               v-model="item.TitleX" @change="e => onChangeTitle(e, 1)" 
+                               @mouseleave="e => onCompleteChangeTitle(1, e)"
+                               v-on:keyup.enter="e => onCompleteChangeTitle(1, e)" />
+                        <span v-else class="axis-title" @dblclick="e => switchToInputEditTitle(e, 1, item.TitleX)">{{item.TitleX}}</span>
+                        <div class="clearx2"></div>
+                        <ApEvalBlock :items="item.APEvaluations" :axisType="1" 
+                                     :negative="item.TitleNegativeX" :neutral="item.TitleNeutralX" :positive="item.TitlePositiveX"></ApEvalBlock>
+                    </div>
+
+                    <div class="axis-area">
+                        <input v-if="IsEditTitleY" type="text" maxlength="50" 
+                               class="dnbinput-edittlteval"
+                               v-model="item.TitleY" @change="e => onChangeTitle(e, 2)"
+                               @mouseleave="e => onCompleteChangeTitle(2, e)"
+                               v-on:keyup.enter="e => onCompleteChangeTitle(2, e)" />
+                        <span v-else class="axis-title" @dblclick="e => switchToInputEditTitle(e, 2, item.TitleY)">{{item.TitleY}}</span>
+                        <div class="clearx2"></div>
+                        <ApEvalBlock :items="item.APEvaluationsY" :axisType="2"
+                                     :negative="item.TitleNegativeY" :neutral="item.TitleNeutralY" :positive="item.TitlePositiveY"></ApEvalBlock>
+                    </div>
+
+                    <div class="axis-area">
+                        <input v-if="IsEditTitleZ" type="text" maxlength="50" 
+                               class="dnbinput-edittlteval"
+                               v-model="item.TitleZ" @change="e => onChangeTitle(e, 3)"
+                               @mouseleave="e => onCompleteChangeTitle(3, e)"
+                               v-on:keyup.enter="e => onCompleteChangeTitle(3, e)" />
+                        <span v-else class="axis-title" @dblclick="e => switchToInputEditTitle(e, 3, item.TitleZ)">{{item.TitleZ}}</span>
+                        <div class="clearx2"></div>
+                        <ApEvalBlock :items="item.APEvaluationsZ" :axisType="3"
+                                      :negative="kLg.lblNegative" :neutral="kLg.lblNeutral" :positive="kLg.lblPositive"></ApEvalBlock>
+                    </div>
+
+                    <div class="clearx2"></div>
+
+                    <p class="label lblComment">{{kLg.labelComment}}</p>
+                    <textarea class="eval-textarea" tabindex="0" style="width: 99%;" v-model="comment" v-bind:disabled="role < 1" @keyup="onChangeComment()"></textarea>
+
+                    <div class="clearx4"></div>
+                    <div class="chart">
+                        <ApChartEvalXYZ :item="item" :templates="templates" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="clear2px"></div>
+    </div>
+</script>
+<script id="apchartevalxyztemp" type="text/html">
+    <div id="dnbChartEvaluationXYZ" v-show="IsShowChart"
+         style="margin: 0 auto 150px auto; padding-left: 75px; padding-right: 69px; width: 1086px; ">
+        <div style="position: relative; width: 621px; margin: 0 auto;">
+            <div v-if="CurrentTemplateName" class="dnbeval-template-n">{{CurrentTemplateName}}</div>
+            <div style="position: absolute; font-weight: bold; left: -339px; transform: rotate(270deg); top: 50%; width: 573px; text-align: center;">{{item.TitleY}}</div>
+            <div class="dnbeval-tlt-neg-y">{{item.TitleNegativeY}}</div>
+            <div class="dnbeval-tlt-neu-y">{{item.TitleNeutralY}}</div>
+            <div class="dnbeval-tlt-pos-y">{{item.TitlePositiveY}}</div>
+            <div class="dnbeval-chart-area"
+                 data-role="chart"
+                 data-legend="{ position: 'top' }"
+                 data-series="[ { type: 'bubble',
+                                xField: 'EvalX',
+                                yField: 'EvalY',
+                                sizeField: 'ShowEvalZ', zIndex: 2, maxSize: 98,
+                                colorField: 'Color',
+                                categoryField: 'CatName',
+                                highlight: { inactiveOpacity: 0.9, opacity: 1,
+                                    toggle: function (e) { e.preventDefault(); e.visual.opacity(e.show ? 1 : 0.9); }
+                                  },
+                                tooltip: {
+                                    visible: true, format: '{3}', padding: { top: 6, bottom:6, left: 15, right: 15 }
+                                  }
+                                }]"
+                 data-x-axis="{majorUnit: 20, min: -120, max: 120, axisCrossingValue: [0]}"
+                 data-y-axis="{majorUnit: 20, min: -120, max: 120, axisCrossingValue: [0]}"
+                 data-chart-area="{height: 620, width: 620}"
+                 data-bind="source: LstEvaluation,
+                            events: { dataBound: onDataBound,
+                                seriesHover: onSeriesHover, seriesLeave: onSeriesLeave,
+                                seriesClick: onClickBubble }"
+                 style="height: 250px;"></div>
+            <div class="dnb-title-center" 
+                 style="font-weight: bold; white-space: pre; width: 663px; max-width: 663px; overflow: hidden; text-overflow: ellipsis;">{{item.TitleX}}</div>
+            <div class="dnbeval-tlt-neg-x">{{item.TitleNegativeX}}</div>
+            <div class="dnbeval-tlt-neu-x">{{item.TitleNeutralX}}</div>
+            <div class="dnbeval-tlt-pos-x">{{item.TitlePositiveX}}</div>
+        </div>
+        <div v-if="IsShowCheckboxAssesment"
+             style="text-align: right; padding-right: 96px; padding-top: 33px;">
+            <input v-model="IsAssesment" v-bind:disabled="IsEnableAssesment == false"
+                   type="checkbox" id="dnb-popeval-chbox-kassesment" style="margin: 0" />
+            <label style="margin: -1px 0 0 0; padding-left: 6px; vertical-align: top;"
+                   for="dnb-popeval-chbox-kassesment" >{{CheckboxAssesmentTitle}}</label>
+        </div>
+    </div>
+</script>
+<script id="apevalblocktemp" type="text/html">
+    <div>
+        <table class="ptable">
+            <thead>
+                <tr>
+                    <th>{{kLg.criteria}}</th>
+                    <th class="textcenter w-60">{{kLg.priority}}</th>
+                    <th class="w-200">{{kLg.evaluation}}</th>
+                    <th style="width: 50px;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <ApEvalItem v-for="evalItem in items" :item="evalItem" v-show="evalItem.DeletedBy == null" :key="getHashKey()"></ApEvalItem>
+            </tbody>
+            <tfoot>
+                <tr style="height: 38px;min-height:38px;max-height:38px;">
+                    <td><a class="icon-28 icon-add-small pull-left pointer" v-if="role > 0" @click="onAddEval()"></a></td>
+                    <td></td>
+                    <td>
+                        <div class="row" style="width: 109%;display: inline-flex;" v-if="total != null && isHasAxisTitle">
+                            <input v-if="axisType < 3 && IsEditValTitleNg"
+                                   type="text" class="valuationTitle" maxlength="20"
+                                   v-model="TxtNegative"
+                                   @change="e => onChangeValTitle(-1, e)"
+                                   @mouseleave="e => onCompleteChangeValTitle(-1, e)"
+                                   v-on:keyup.enter="e => onCompleteChangeValTitle(-1, e)" />
+                            <div v-else
+                                 class="col-md-4 valuation-title"
+                                 @dblclick="e => switchToInputEditValTitle(-1, e)"
+                                 v-bind:class="[getClssTltipValTitleNeg(TxtNegative, -1)]">
+                                <span class="valuation-title-c">{{TxtNegative}}</span>
+                                <span v-if="getClssTltipValTitleNeg(TxtNegative, -1) != ''" class="tooltiptext">{{TxtNegative}}</span>
+                            </div>
+
+                            <input v-if="axisType < 3 && IsEditValTitleNt"
+                                   type="text" class="valuationTitle" maxlength="20"
+                                   v-model="TxtNeutral"
+                                   @change="e => onChangeValTitle(0, e)"
+                                   @mouseleave="e => onCompleteChangeValTitle(0, e)"
+                                   v-on:keyup.enter="e => onCompleteChangeValTitle(0, e)" />
+                            <div v-else
+                                 class="col-md-4 valuation-title"
+                                 @dblclick="e => switchToInputEditValTitle(0, e)"
+                                 v-bind:class="[getClssTltipValTitleNeg(TxtNeutral, 0)]">
+                                <span class="valuation-title-c" style="min-width:72px;max-width:72px;">{{TxtNeutral}}</span>
+                                <span v-if="getClssTltipValTitleNeg(TxtNeutral, 0) != ''" class="tooltiptext">{{TxtNeutral}}</span>
+                            </div>
+
+                            <input v-if="axisType < 3 && IsEditValTitlePv"
+                                   type="text" class="valuationTitle" maxlength="20"
+                                   v-model="TxtPositive"
+                                   @change="e => onChangeValTitle(1, e)"
+                                   @mouseleave="e => onCompleteChangeValTitle(1, e)"
+                                   v-on:keyup.enter="e => onCompleteChangeValTitle(1, e)" />
+                            <div v-else
+                                 class="col-md-4 valuation-title"
+                                 @dblclick="e => switchToInputEditValTitle(1, e)"
+                                 v-bind:class="[getClssTltipValTitleNeg(TxtPositive, 1)]">
+                                <span class="valuation-title-c">{{TxtPositive}}</span>
+                                <span v-if="getClssTltipValTitleNeg(TxtPositive, 1) != ''" class="tooltiptext">{{TxtPositive}}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="padding-right: 0;">
+                        <span class="span-bold pull-left" v-if="total != null" style="margin-top: -3px; margin-left: 9px;">{{kLg.lblTotalEvaluation}}{{total}}</span>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</script>
+
+<script id="apevalitemtemp" type="text/html">
+    <tr class="sortable">
+        <td class="td-hover">
+            <span class="icon-16 icon-arow-towway-vertical" style="margin-top: 5px;" v-if="role > 0"></span>
+            <div style="width: 100%; border: 1px solid #e7e7e7; background-color: #f7f7f7; height: 22px; padding-left: 7px; padding-top: 4px;" v-show="!isEditName" @click="onShowName()" >
+                <span>{{item.Name}}</span>
+            </div>
+            <input type="text" class="evalname" maxlength="50" style="width: 100%;" v-bind:disabled="role < 1" v-show="isEditName" @mouseleave="onHideName()" @keyup.enter="onHideName()" ref="evalname"/>
+        </td>
+        <td class="textcenter"><select ref="ddlPriority" class="rfEvalKendoPriority" style="width: 60px"></select></td>
+        <td class="textcenter"><input ref="sliderEvaluation" class="rfEvalKendoSlider" /></td>
+        <td class="textcenter">
+            <span class="icon-28 icon-bin-small pull-left pointer" v-if="role > 0" @click="onDeleteItem()" style="margin-left: 16px;"></span>
+        </td>
+    </tr>
+</script>
+
+<script id="apswottemp" type="text/html">
+    <div class="tab-pane active tab-padding">swot</div>
+</script>
+
+<script id="approevaltemp" type="text/html">
+    <div class="tab-pane active tab-padding">pro</div>
+</script>
+
+<script id="delete-temp-pop-eval" type="text/x-kendo-template">
+    <div class="modal-body ms-modal-body" style="overflow:auto; height:420px">
+        <form>
+            <table id='myTable' class="tbgrid modal-table">
+                <thead>
+                    <tr>
+                        <th class="title bg-grey lblPrjName"></th>
+                        <th class="title bg-grey" id="lblPrjOwner"></th>
+                        <th class="title bg-grey" id="lblTemplateNameDeleteTemplate">Template name</th>
+                        <!--<th class="title bg-grey" id="lblProjectName">Project name</th>-->
+                    </tr>
+                </thead>
+                <tbody>
+                    # for(var i = 0; i < data.length; i ++) { #
+                    <tr id="#=data[i].Id#">
+                        <td>#=i + 1#</td>
+                        <td>
+                            <input class="cbTemp" type="checkbox" />
+                        </td>
+                        <td>#:data[i].Name#</td> 
+                    </tr>
+                    # } #
+                </tbody>
+            </table>
+        </form>
+    </div>
+    <div class="modal-market-footer" id="divImportFooter">
+        <button type="button" class="ms-button" onclick="vmApEval.btnDeleteTemplate_Onclick()" tabindex="1"><span class="icon-20 icon-bin-sub margin-right6"></span><span class="btnChoose">Delete</span></button>
+        <button type="button" class="ms-button" onclick="vmApEval.btnCloseDelTemplatePopup_Onclick()"><span class="icon-20 icon-close margin-right6"></span><span class="btnCancel">Cancel</span></button>
+    </div>
+</script>
+
+
+<script type="text/javascript">
+    var vmApEvalx = { modelChanged: false };
+    var evalApp;
+    var priorityData = [];
+
+    getPriorityData = function () {
+        if (priorityData.length == 0) {
+            for (var i = 10; i >= -10; i--)
+                priorityData.push({ Id: i, Name: `${i}` });
+        }
+        return priorityData;
+    };
+
+    vmGoalAction.popGoalActionEval.bind("close", popGoalActionEvalClosed_Onclick);
+
+    vmApEvalx.dataService = function () {
+        var getUrl = function (fn, params) {
+            var url = `../Handlers/MsActionPlanEvalHandler.ashx?funcName=${fn}&lang=${kLg.language}&projid=${projectId}&strid=${strategyId}`;
+            if (params) {
+                for (key in params) {
+                    url += `&${key}=${params[key]}`;
+                }
+            }
+            return url;
+        };
+
+        var callAjaxApEval = function (url, entryData, requestType, successCallBack) {
+            return callAjax("loadingProdEvaluation", url, entryData ? JSON.stringify(entryData) : null, successCallBack, requestType);
+        };
+
+        var callAjaxByPost = function (fn, entryData) {
+            return callAjaxApEval(getUrl(fn), entryData, AjaxConst.PostRequest);
+        };
+
+        var callAjaxByGet = function (fn, params, successCallBack) {
+            return callAjaxApEval(getUrl(fn, params), null, AjaxConst.GetRequest, successCallBack);
+        };
+
+        var getEvalData = function (params) {
+            return callAjaxByGet("getListEval", params);
+        };
+
+        var getSwotData = function (params) {
+            return callAjaxByGet("getswotanalyse", params);
+        };
+
+        var getProductData = function (entryData) {
+            return callAjaxByPost("getmarketmatrix", entryData);
+        };
+        var getEvalXYZByTemplateId = function (id, successFunc) {
+            return callAjaxByGet("getDataTab1ByTemplateId", { templateId: id} , successFunc);
+        };
+        var getDataAssesment = function (id, successFunc) {
+            return callAjaxByGet("getdataassesment", { templateId: id} , successFunc);
+        };
+        var saveTitleLang = function (entryData) {
+            return callAjaxByPost("savetitlelang", entryData);
+        };
+        var getApEvaluationByTemplate = function (id) {
+            return callAjaxByGet("getapevaluationbytemplate", { templateId: id });
+        };
+
+        return {
+            getEvalData: getEvalData,
+            getSwotData: getSwotData,
+            getProductData: getProductData, saveTitleLang: saveTitleLang,
+            getEvalXYZByTemplateId: getEvalXYZByTemplateId,
+            getDataAssesment: getDataAssesment,
+            getApEvaluationByTemplate: getApEvaluationByTemplate
+        };
+    }();
+
+    vmApEval.reloadApEvalationByTemplate = function (templateId) {
+        vmApEvalx.dataService.getApEvaluationByTemplate(templateId).then(function (res) {
+            var evals = res.value;
+
+            if (vmCommon.checkCurrentPage(vmCommon.enumPage.ActionPlan)) {
+                evals.forEach(t => {
+                    var gaId = t.GoalActionId;
+
+                    if (MsaApp.componentService(false).get(gaId)) {
+                        var item = MsaApp.componentService(false).get(gaId).item || MsaApp.componentService(false).get(gaId).goal;
+                        if (item) item.ApEvaluation = t.ApEvaluation;
+                    }
+
+                    if (MsaApp.componentService(true).get(gaId)) {
+                        var item = MsaApp.componentService(true).get(gaId).item || MsaApp.componentService(true).get(gaId).goal;
+                        if (item) item.ApEvaluation = t.ApEvaluation;
+                    }
+                });
+            }
+
+            if (vmCommon.checkCurrentPage(vmCommon.enumPage.TeamBoard)) {
+                var items = vmCommon.getChildComponent(teamBoardVM, "column-item");
+                evals.forEach(t => {
+                    var item = items.find(x => x.element.Id == t.GoalActionId);
+                    if (item) {
+                        item.ApEvaluation = t.ApEvaluation;
+                    }
+                });
+            }
+        });
+    }
+
+    Vue.component("ApEvalItem", {
+        props: ["item"],
+        inject: ["kLg", "role"],
+        data() {
+            var that = this;
+            return {
+                isEditName: false,
+            };
+        },
+        watch: {
+            "item": {
+                handler() {
+                    if (this.item.DeletedBy == null && this.item.Id > 0) this.item.ModifiedBy = 1;
+                }, deep: true
+            }
+        },
+        template: "#apevalitemtemp",
+        computed: {
+        },
+        mounted() {
+            this.bindControl();
+        },
+        methods: {
+            bindControl() {
+                var that = this;
+
+                //priority
+                var ddlPriority = that.$refs.ddlPriority;
+                if (ddlPriority) {
+                    const priorityControl = $(ddlPriority).kendoDropDownList({
+                        dataTextField: "Name",
+                        dataValueField: "Id",
+                        dataSource: getPriorityData(),
+                        value: that.item.Priority,
+                        change: function () {
+                            that.item.Priority = Number(this.value());
+                            if (that.item.DeletedBy == null && that.item.Id > 0) that.item.ModifiedBy = 1;
+                            vmCommon.isChangeTabEval = true;
+                            that.$root.checkChangeTemplate();
+                        }
+                    }).data("kendoDropDownList");
+                    priorityControl.enable(that.role > 0);
+                }
+
+                //slider
+                var sliderEvaluation = that.$refs.sliderEvaluation;
+                if (sliderEvaluation) {
+                    const sliderControl = $(sliderEvaluation).kendoSlider({
+                        change: function () {
+                            that.item.Evaluation = Number(this.value());
+                            if (that.item.DeletedBy == null && that.item.Id > 0) that.item.ModifiedBy = 1;
+                            vmApEval.setModelChanged(true);
+                        },
+                        showButtons: false,
+                        min: -10,
+                        max: 10,
+                        smallStep: 1,
+                        value: that.item.Evaluation
+                    }).data("kendoSlider");
+                    sliderControl.enable(that.role > 0);
+                }
+            },
+            onDeleteItem() {
+                var that = this;
+                pConfirm(kLg.confirmDeleteItem).then(function () {
+                    that.$parent.deleteEval(that.item);
+                });
+            },
+            onShowName() {
+                var that = this;
+                that.isEditName = true;
+
+                var evalNameControl = that.$refs.evalname;
+                if (evalNameControl)
+                    setTimeout(function () {
+                        $(evalNameControl).val(that.item.Name);
+                        $(evalNameControl).select();
+                    }, 10);
+            },
+            onHideName() {
+                var that = this;
+                var evalNameControl = that.$refs.evalname;
+                if (evalNameControl) {
+
+                    var otherNames = that.$parent.items.filter(t => t != that.item && !t.DeletedBy).map(t => t.Name);
+
+                    var newName = $(evalNameControl).val().trim();
+                    if (newName.length && newName != that.item.Name && !otherNames.includes(newName)) {
+                        that.item.Name = newName;
+                        if (that.item.DeletedBy == null && that.item.Id > 0) that.item.ModifiedBy = 1;
+                        vmCommon.isChangeTabEval = true;
+                        that.$root.checkChangeTemplate();
+                    }
+
+                    $(evalNameControl).val("");
+                }
+
+                that.isEditName = false;
+            },
+        },
+        beforeDestroy() {
+            // Nên xóa destroy object đi để tránh tình trạng bộ nhớ rác nhiều làm app bị lag
+            this.$el.querySelectorAll('.rfEvalKendoPriority').forEach(priority => {
+                let kendoDrp = $(priority).data("kendoDropDownList");
+                if (kendoDrp) {
+                    kendoDrp.destroy();       // destroy kendo dropdownList
+                }
+            });
+            this.$el.querySelectorAll('.rfEvalKendoSlider').forEach(slider => {
+                let kendoSld = $(slider).data("kendoSlider");
+                if (kendoSld) {
+                    kendoSld.destroy();       // destroy kendo Slider
+                }
+            });
+        },
+    });
+
+    Vue.component("ApEvalBlock", {
+        props: ["items", "axisType", 'negative', 'neutral', 'positive'],
+        inject: ["kLg", "role", "getHashKey", 'setValTitle'],
+        template: "#apevalblocktemp",
+        data() {
+            var that = this;
+            return {
+                isHasAxisTitle: that.axisType == 1 || that.axisType == 2,
+                IsEditValTitleNg: false, IsEditValTitleNt: false, IsEditValTitlePv: false,
+                TxtNegative: this.negative, TxtNeutral: this.neutral, TxtPositive: this.positive,
+            };
+        },
+        computed: {
+            total: function () {
+                var that = this;
+                var items = that.items.filter(t => t.DeletedBy == null);
+
+                return items.length ? Math.round(items.map(t => {
+                    return t.Priority * t.Evaluation;
+                }).reduce((a, b) => a + b, 0) / items.length) : null;
+            },
+        },
+        mounted() {
+            this.bindSortable();
+        },
+        methods: {
+            bindSortable() {
+                if (this.role <= 0) return;
+
+                var that = this;
+                var beginIndex, endIndex;
+                $(that.$el).sortable({
+                    axis: "y",
+                    items: "tr.sortable",
+                    cancel: "a,.k-slider-track,.k-label,.k-tick,input.evalname", //,input.evalname
+                    //helper: "clone",
+                    cursor: "move",
+                    revert: false,
+                    opacity: 1,
+                    containment: "parent",
+                    tolerance: "pointer",
+                    start: function (event, ui) {
+                        beginIndex = ui.item.index();
+                    },
+                    stop: function (event, ui) {
+                        endIndex = ui.item.index();
+                        if (beginIndex == endIndex) return false;
+
+                        setTimeout(function () {
+                            //change index
+                            var temp = that.items.splice(beginIndex, 1);
+                            that.items.splice(endIndex, 0, temp[0]);
+
+                            //reset index
+                            var index = 0;
+                            that.items.forEach(t => {
+                                if (t.DeletedBy == null) {
+                                    t.MIndex = ++index;
+
+                                    if (t.Id > 0)
+                                        t.ModifiedBy = 1;
+                                }
+                            });
+                            vmCommon.isChangeTabEval = true;
+                            that.$root.checkChangeTemplate();
+                        }, 10);
+                    },
+                    helper: function (e, tr) {
+                        var originals = tr.children();
+                        var helper = tr.clone();
+                        $(helper).children().each(function (index) {
+                            $(this).width($(originals).eq(index).width())
+                        });
+                        return $(helper);
+                    }
+                });
+
+            },
+            onAddEval() {
+                if (this.role < 1) return;
+                var that = this;
+                var items = that.items.filter(t => !t.DeletedBy);
+                var newEvalItem = new APEvalItem();
+
+                //index, criteria
+                var mIndex = 0;
+                var criteriaId = 0;
+                if (items.length) {
+                    mIndex = Math.max(...items.map(t => t.MIndex)) + 1;
+                    criteriaId = Math.max(...items.map(t => t.CriteriaId)) + 1;
+                }
+                newEvalItem.MIndex = mIndex;
+                newEvalItem.CriteriaId = criteriaId;
+
+                //name
+                var i = 0;
+                var name = "";
+                var names = items.map(t => t.Name);
+                while (!name || names.indexOf(name) >= 0) {
+                    name = kLg.criteria + ' (' + (i + 1) + ')';
+                    i++;
+                }
+                newEvalItem.Name = name;
+                that.items.push(newEvalItem);
+                that.$root.checkChangeTemplate();
+                vmCommon.isChangeTabEval = true;
+            },
+            deleteEval(evalItem) {
+                if (this.role < 1) return;
+                var that = this;
+                var index = that.items.indexOf(evalItem);
+                if (index >= 0) {
+                    if (evalItem.Id)
+                        evalItem.DeletedBy = 1;
+                    else
+                        that.items.splice(index, 1);
+
+                    that.$root.checkChangeTemplate();
+                    vmCommon.isChangeTabEval = true;
+                }
+            },
+            onChangeValTitle(type, e) {     //type = -1: negative, 0: neutral, 1: positive
+               
+            },
+            onCompleteChangeValTitle(type, e) {     // -1: negative, 0: neutral, 1: positive
+                let newTtl, typeId;
+                switch (type) {
+                    case -1:    // negative
+                        newTtl = this.TxtNegative.trim();
+                        if (newTtl == '' || newTtl == this.negative) {
+                            this.TxtNegative = this.negative;
+                            this.resetInputValTitle();
+                            return;
+                        }
+                        typeId = this.axisType < 2 ? 4 : 7;
+                        this.setValTitle(typeId, newTtl);   // inject
+
+                        if (typeId == 4) {
+                            vmCommon.IsChangeTitleNegativeX = true;
+                        } 
+                        if (typeId == 7) {
+                            vmCommon.IsChangeTitleNegativeY = true;
+                        }
+                        delete vmCommon.isAddEvalTemplated;
+                        vmApEval.setModelChanged(true);
+                        this.TxtNegative = newTtl;
+                        this.resetInputValTitle();
+                        return;
+                    case 0:     // neutral
+                        newTtl = this.TxtNeutral.trim();
+                        if (newTtl == '' || newTtl == this.neutral) {
+                            this.TxtNeutral = this.neutral;
+                            this.resetInputValTitle();
+                            return;
+                        }
+                        typeId = this.axisType < 2 ? 5 : 8;
+                        this.setValTitle(typeId, newTtl);   // inject
+
+                        if (typeId == 5) {
+                            vmCommon.IsChangeTitleNeutralX = true;
+                        }
+                        if (typeId == 8) {
+                            vmCommon.IsChangeTitleNeutralY = true;
+                        }
+                        delete vmCommon.isAddEvalTemplated;
+                        vmApEval.setModelChanged(true);
+                        this.TxtNeutral = newTtl;
+                        this.resetInputValTitle();
+                        return;
+                    default:    // 1 positive
+                        newTtl = this.TxtPositive.trim();
+                        if (newTtl == '' || newTtl == this.positive) {
+                            this.TxtPositive = this.positive;
+                            this.resetInputValTitle();
+                            return;
+                        }
+                        typeId = this.axisType < 2 ? 6 : 9;
+                        this.setValTitle(typeId, newTtl);   // inject
+
+                        if (typeId == 6) {
+                            vmCommon.IsChangeTitlePositiveX = true;
+                        }
+                        if (typeId == 9) {
+                            vmCommon.IsChangeTitlePositiveY = true;
+                        }
+                        delete vmCommon.isAddEvalTemplated;
+                        vmApEval.setModelChanged(true);
+                        this.TxtPositive = newTtl;
+                        this.resetInputValTitle();
+                        return;
+                }
+            },
+            switchToInputEditValTitle(type, e) {
+                if (this.role < 1) return;
+                if (this.axisType > 2) return;  // khong dung cho Z
+                switch (type) {
+                    case -1:    // negative
+                        this.IsEditValTitleNg = true;
+                        this.IsEditValTitleNt = false;
+                        this.IsEditValTitlePv = false;
+                        break;
+                    case 0:     // neutral
+                        this.IsEditValTitleNg = false;
+                        this.IsEditValTitleNt = true;
+                        this.IsEditValTitlePv = false;
+                        break;
+                    default:    // 1 positive
+                        this.IsEditValTitleNg = false;
+                        this.IsEditValTitleNt = false;
+                        this.IsEditValTitlePv = true;
+                        break;
+                }
+                this.$nextTick(() => {
+                    // focus when DOM updated
+                    const eInput = this.$el.querySelector('input.valuationTitle');
+                    if (eInput) {
+                        if (eInput) {
+                            var len = eInput.value.length;
+                            if (eInput.setSelectionRange) {
+                                eInput.focus();
+                                eInput.setSelectionRange(0, len);
+                            } else if (eInput.createTextRange) {
+                                var t = eInput.createTextRange();
+                                t.collapse(true);
+                                t.moveStart('character', 0);
+                                t.moveEnd('character', len);
+                                t.select();
+                            }
+                        }
+                    }
+                });
+            },
+            resetInputValTitle() {
+                this.IsEditValTitleNg = false;
+                this.IsEditValTitleNt = false;
+                this.IsEditValTitlePv = false;
+            },
+            getClssTltipValTitleNeg(text, type) {
+                if(type == 0)
+                    if (text.length > 8) return 'dnb-tooltip';
+
+                if (text.length > 9) return 'dnb-tooltip';
+                return '';
+            },
+        },
+        watch: {
+            negative(newVal) {
+                this.TxtNegative = newVal;
+            },
+            neutral(newVal) {
+                this.TxtNeutral = newVal;
+            },
+            positive(newVal) {
+                this.TxtPositive = newVal;
+            },
+        },
+        //updated() { },
+    });
+    Vue.component("ApChartEvalXYZ", {
+        template: "#apchartevalxyztemp",
+        props: ['item', 'templates'],
+        inject: ['isHasControl'],
+        data() {
+            const clor = this.$root.Color || '#96E5D1';
+            const name = vmApEval.goalActionName || '';
+            const id = vmApEval.goalActionId || 'DaiNB';
+
+            let icon = vmGoalAction.goalActionEvalOptions.TypeId == vmCommon.GoalActionContentType.MainGoal ? `&#9679;` :
+                (vmGoalAction.goalActionEvalOptions.TypeId == vmCommon.GoalActionContentType.SubGoal ? `&diams;` : `&#9632;`);
+            
+            const cItem = {
+                Id: id, Name: `${icon} ${name}`,
+                EvalX: 0, EvalY: 0, EvalZ: 0, Color: clor
+            }
+            // Dùng itemFake (bg transparent) để Bubble hiển thị size của hình tròn đúng theo value Z (ở chế độ not_Assesment)
+            const itemFake = { Id: id, Name: 'DaiNB_FakeData_Sprint_507', EvalX: 0, EvalY: 0, EvalZ: 100, Color: '#ffffff00' };
+
+            return {
+                KendoChartVM: null,
+                LstDataEvalXYZ: [cItem, itemFake], TimeToGetAssesment: 0,
+                IsEnableAssesment: true,
+                IsAssesment: false,
+                Color: clor,
+                GoalActionId: id,
+            }
+        },
+        methods: {
+            createChartEvaluationXYZ() {
+                const id = this.GoalActionId;
+                this.KendoChartVM = kendo.observable({
+                    GaId: id,
+                    LstEvaluation: [],
+                    onSeriesHover: function (e) { // console.log(kendo.format("event :: seriesHover ({0} : {1})", e.category, e.value.size));
+                        findBubbleChrtTooltip();
+                        if (!e.category || e.dataItem.Color.length > 7) e.preventDefault();
+                    },
+                    onSeriesLeave: function (e) {
+                        delete vmCommon.TimeToDblClickBubbleTemplate;
+                    },
+                    onDataBound: function (e) {
+                        const lstEvl = e.sender.dataSource._data.filter(x => x.Name != 'DaiNB_FakeData_Sprint_507' && x.EvalX != null && x.EvalY != null);
+                        if (lstEvl.length) {
+                            let minXY = Number.MAX_SAFE_INTEGER;
+                            let minX = Number.MAX_SAFE_INTEGER;
+                            let minY = Number.MAX_SAFE_INTEGER;
+                            let minXR, minYR, xyR;
+                            lstEvl.filter((x) => {
+                                xyR = Math.abs(x.EvalZ) * 40 / 200;
+                                if (minX > x.EvalX) {
+                                    minX = x.EvalX;
+                                    minXR = xyR;
+                                }
+                                if (minY > x.EvalY) {
+                                    minY = x.EvalY;
+                                    minYR = xyR;
+                                }
+                                if (x.EvalX > 0 && x.EvalY > 0) {
+                                    if (minXY > x.EvalX - xyR) {
+                                        minXY = x.EvalX - xyR;
+                                    }
+                                    if (minXY > x.EvalY - xyR) {
+                                        minXY = x.EvalY - xyR;
+                                    }
+                                }
+                                if (minX && minY) {
+                                    if (minXY > minX - minXR) minXY = minX - minXR;
+                                    if (minXY > minY - minYR) minXY = minY - minYR;
+                                }
+                            });
+                            if (minX > 0 && minY > 0) {         // Góc phần 4 dương (Right-Top)                                
+                                if (minX < 18) minXR += 3;
+                                if (minY < 18) minYR += 3;
+                                let minXAxis = minX > minXR ? 0 : -20,
+                                    minYAxis = minY > minYR ? 0 : -20;
+                                let min = minXAxis < minYAxis ? minXAxis : minYAxis;
+                                if (minXY < 0) min = -20;
+                                let maxSz = min < 0 ? 170 : 190;    // 170 <=> 40, 190 <=> 40
+                                
+                                e.sender.options.xAxis.min = min; e.sender.options.xAxis.max = 120;
+                                e.sender.options.yAxis.min = min; e.sender.options.yAxis.max = 120;
+                                e.sender.options.series[0].maxSize = maxSz;
+                            } else {
+                                e.sender.options.xAxis.max = 120;  e.sender.options.yAxis.max = 120;
+                                e.sender.options.xAxis.min = -120; e.sender.options.yAxis.min = -120;
+                                e.sender.options.series[0].maxSize = 98;
+                            }
+                        } else {
+                            e.sender.options.xAxis.max = 120;  e.sender.options.yAxis.max = 120;
+                            e.sender.options.xAxis.min = -120; e.sender.options.yAxis.min = -120;
+                            e.sender.options.series[0].maxSize = 98;
+                        }
+                    },
+                    onClickBubble: function (e) {
+                        const item = e.dataItem;
+                        if (item.Id == e.data.GaId) return;       // click vào current item
+
+                        if (!vmCommon.TimeToDblClickBubbleTemplate) {
+                            vmCommon.TimeToDblClickBubbleTemplate = 1;
+                            setTimeout(function () {
+                                if (vmCommon.TimeToDblClickBubbleTemplate > 1) {
+                                    if (item && item.Id) {
+                                        var url = `/Pages/MsGoalAction.aspx?lang=${kLg.language}&projid=${projectId}&strid=${strategyId}`;
+                                        vmGoalAction.dataservice.cloneFilterToEdit({
+                                            GoalActionId: item.Id, GoalType: item.TypeId
+                                        }, function (res) {
+                                            const serObj = res.value;
+                                            if (serObj.ActPopup) {
+                                                url += `&actpopup=${serObj.ActPopup}`;
+                                                window.open(url, "_blank");
+                                            } else if (serObj.Role < 0) {
+                                                //window.location = "/Default.aspx?lang=" + kLg.language;
+                                                window.open(`/Default.aspx?lang=${kLg.language}`, "_blank");
+                                            } else if (serObj.Data) {
+                                                url = `/Pages/MsGoalAction.aspx?lang=${kLg.language}&projid=${projectId}&strid=${strategyId}`;
+                                                url += `&actpopup=${serObj.Data.ActpopupEncode}&fromactionplanconnect=1`;
+                                                window.open(url, "_blank");
+                                            }
+                                            delete vmCommon.TimeToDblClickBubbleTemplate;
+                                        });
+                                        return;     // exit Timeout function
+                                    }
+                                }
+                                delete vmCommon.TimeToDblClickBubbleTemplate;
+                            }, 234);
+                        } else {
+                            vmCommon.TimeToDblClickBubbleTemplate += 1;
+                        }
+                    },
+                    setListEvalModel: function (lst) {
+                        if (Array.isArray(lst)) {
+                            lst.filter(x => x.EvalX != null && x.EvalY != null).forEach(x => {
+                                if (-1 < x.EvalZ && x.EvalZ < 1 || !x.EvalZ)
+                                    x.ShowEvalZ = 0.045;
+                                else
+                                    x.ShowEvalZ = Math.abs(x.EvalZ) / 100;
+
+                                let icon = x.TypeId == vmCommon.GoalActionContentType.MainGoal ? `&#9679;` : `&diams;`;
+                                if (x.TypeId == vmCommon.GoalActionContentType.Action) icon = `&#9632;`;
+                                if (!x.TypeId) icon = '';
+
+                                let catN;
+                                let _name_ = x.Name;
+                                let valZ = x.EvalZ == null ? '' : `: ${x.EvalZ}`;
+                                if (_name_ != 'DaiNB_FakeData_Sprint_507') {
+                                    if (typeof _name_ == 'string' && _name_.length > 0) {
+                                        if (_name_.length > 40) {
+                                            _name_ = `${_name_.substring(0, 40)}...`;
+                                        }
+                                        catN = `${icon} ${_name_}${valZ}`;
+                                    }
+                                    else {
+                                        catN = `${icon} ${valZ}`;
+                                    }
+                                }
+                                x.CatName = catN;
+                            });
+                            this.set('LstEvaluation', lst);
+                        }
+                    },
+                });
+
+                kendo.bind($("#dnbChartEvaluationXYZ"), this.KendoChartVM);
+            },
+            updateLstDataEvalXYZ(isAssMnt) {
+                const lstData = vmCommon.deepCopy(this.LstDataEvalXYZ);
+                isAssMnt = isAssMnt || this.IsAssesment;
+                if (isAssMnt) {
+                    this.KendoChartVM.setListEvalModel(lstData);
+                } else {
+                    const id = this.GoalActionId;
+                    this.KendoChartVM.setListEvalModel(lstData.filter(x => x.Id == id));
+                }
+            },
+            updateEvalXYZ() {
+                const id = this.GoalActionId;
+                const item = this.LstDataEvalXYZ.find(evl => evl.Id == id && evl.Name != 'DaiNB_FakeData_Sprint_507');
+                const updateLstDataEvalXYZ = this.updateLstDataEvalXYZ;
+                return {
+                    setX: function (avgX) {
+                        if (item) item.EvalX = avgX;
+                        updateLstDataEvalXYZ();
+                    },
+                    setY: function (avgY) {
+                        if (item) item.EvalY = avgY;
+                        updateLstDataEvalXYZ();
+                    },
+                    setZ: function (avgZ) {
+                        if (item) item.EvalZ = avgZ;
+                        updateLstDataEvalXYZ();
+                    }
+                }
+            },
+            getEvalXYZ() {
+                var avgX = null, avgY = null, avgZ = null;
+                const lstEvalX = this.item.APEvaluations.filter(i => !i.DeletedBy || i.DeletedBy == null);
+                if (lstEvalX.length) {
+                    const arrX = lstEvalX.map(x => x.Priority * x.Evaluation);
+                    avgX = Math.round(arrX.reduce((bf, crr) => bf + crr, 0) / arrX.length);
+                }
+                const lstEvalY = this.item.APEvaluationsY.filter(i => !i.DeletedBy || i.DeletedBy == null);
+                if (lstEvalY.length) {
+                    const arrY = lstEvalY.map(y => y.Priority * y.Evaluation);
+                    avgY = Math.round(arrY.reduce((bf, crr) => bf + crr, 0) / arrY.length);
+                }
+                const lstEvalZ = this.item.APEvaluationsZ.filter(i => !i.DeletedBy || i.DeletedBy == null);
+                if (lstEvalZ.length) {
+                    const arrZ = lstEvalZ.map(z => z.Priority * z.Evaluation);
+                    avgZ = Math.round(arrZ.reduce((bf, crr) => bf + crr, 0) / arrZ.length);
+                }
+                return {
+                    EvalX: avgX, EvalY: avgY, EvalZ: avgZ
+                }
+            },
+            loadDataAssesment() {
+                const tempId = this.$root.ap.ApEvaluationTemplateId;
+                const gaId = this.GoalActionId;
+                const lstDataEval = this.LstDataEvalXYZ;
+                const updateLstDataEvalXYZ = this.updateLstDataEvalXYZ;
+                vmApEvalx.dataService.getDataAssesment(tempId, function (res) {
+                    if (!res || !Array.isArray(res.value)) return;
+                    const dataLst = res.value;
+                    lstDataEval.splice(2);      // xóa hết item từ thứ 3 trở đi
+                    dataLst.forEach(d => {
+                        if (d && d.Id != gaId) {
+                            lstDataEval.push(d);
+                        }
+                    });
+                    updateLstDataEvalXYZ(true);
+                });
+            },
+        },
+        created() {
+            initDOMChangeEvent(function (mutationLstLen) {
+                vmCommon.nodeBubbleChrtTooltip = document.querySelector(`.k-tooltip.k-chart-tooltip.k-chart-tooltip-inverse`);
+                if (vmCommon.nodeBubbleChrtTooltip && mutationLstLen == 2 && !vmCommon.Tmpioudfdfeifhd) {
+                    vmCommon.Tmpioudfdfeifhd = setTimeout(function () {
+                        findBubbleChrtTooltip();
+                        delete vmCommon.Tmpioudfdfeifhd;
+                    }, 333);
+                }
+            });
+        },
+        computed: {
+            IsShowCheckboxAssesment() {
+                if (vmCommon.checkCurrentPage(vmCommon.enumPage.TeamBoard)) {
+                    return this.isHasControl;
+                }
+                return true;
+            },
+            EvaluationItemXYZ() {
+                return this.getEvalXYZ();
+            },
+            CurrentTemplateName() {
+                const tempId = this.$root.ap.ApEvaluationTemplateId;
+                const tObj = this.templates.find(t => t.Id == tempId);
+                if (tObj) {
+                    if (vmCommon.CacheIsAssesment)      //chuyển từ tab khác sang (SWOT analysis, Product design)
+                        this.IsAssesment = true;
+                    else
+                        this.IsAssesment = false;
+
+                    this.IsEnableAssesment = true;
+                    return tObj.Name;
+                }
+                if (vmCommon.CacheIsAssesment) {      //chuyển từ tab khác sang (SWOT analysis, Product design)
+                    this.IsAssesment = true;
+                    this.IsEnableAssesment = true;
+                } else {
+                    this.IsAssesment = false;
+                    this.IsEnableAssesment = false;
+                }
+                return '';
+            },
+            IsShowChart() {
+                const eval = this.EvaluationItemXYZ;
+                if (eval.EvalX == null || eval.EvalY == null) return false;
+                return true;
+            },
+            CheckboxAssesmentTitle() { return kLg.LblShowAll; },
+        },
+        watch: {
+            'EvaluationItemXYZ.EvalX'(avgX) {
+                this.updateEvalXYZ().setX(avgX);
+            },
+            'EvaluationItemXYZ.EvalY'(avgY) {
+                this.updateEvalXYZ().setY(avgY);
+            },
+            'EvaluationItemXYZ.EvalZ'(avgZ) {
+                this.updateEvalXYZ().setZ(avgZ);
+            },
+            IsAssesment(newVal) {
+                if (!this.TimeToGetAssesment && newVal) {
+                    this.TimeToGetAssesment = Date.now();
+                    this.loadDataAssesment();
+                }
+                else if (this.TimeToGetAssesment && newVal) {
+                    const deltaSec = (Date.now() - this.TimeToGetAssesment) / 1000       // second;
+                    if (deltaSec > 6) {     // delay 6 seconds
+                        this.loadDataAssesment();
+                        this.TimeToGetAssesment = 0;
+                    } else this.updateLstDataEvalXYZ(newVal);
+                } else {
+                    this.updateLstDataEvalXYZ(newVal);
+                }
+            },
+        },
+        mounted() {
+            this.createChartEvaluationXYZ();
+            $("#dnbChartEvaluationXYZ").bind("kendo:skinChange", this.createChartEvaluationXYZ);
+
+            const evlXyz = this.getEvalXYZ();
+            this.updateEvalXYZ().setX(evlXyz.EvalX);
+            this.updateEvalXYZ().setY(evlXyz.EvalY);
+            this.updateEvalXYZ().setZ(evlXyz.EvalZ);
+
+            delete vmCommon.CacheIsAssesment;
+        },
+        beforeDestroy() {
+            const root = this.$root;
+            if (root && root.focusingTab != 1) {
+                vmCommon.CacheIsAssesment = this.IsAssesment;   //chuyển sang 2 tab khác (SWOT analysis, Product design)
+            }
+            if (vmCommon.EvMutationObserver) {
+                vmCommon.EvMutationObserver.disconnect();
+                delete vmCommon.EvMutationObserver;
+            }
+        },
+        //destroyed() { },
+    });
+    Vue.component("ApEval", {
+        props: ["item", "apcomment", "templates"],
+        inject: ["kLg", "role", "isHasControl"],
+        data() {
+            var that = this;
+            return {
+                comment: that.apcomment,
+                IsEditTitleX: false,
+                IsEditTitleY: false,
+                IsEditTitleZ: false
+            };
+        },
+        watch: {
+            "templates": function () {
+                this.bindTemplateControl();
+            }
+        },
+        template: "#apevaltemp",
+        computed: {
+            kLg: () => kLg,
+        },
+        mounted() {
+            this.bindControl();
+        },
+        methods: {
+            bindControl() {
+                this.bindTemplateControl();
+            },
+            bindTemplateControl() {
+                var that = this;
+                var parent = that.$parent;
+
+                var ddlTemplate = that.$refs.ddlTemplate;
+                if (ddlTemplate) {
+                    if (vmCommon.templateControl) {
+                        vmCommon.templateControl.setDataSource(that.templates);
+                        vmCommon.templateControl.value(that.$root.ap.ApEvaluationTemplateId);
+                    } else {
+                        vmCommon.templateControl = $(ddlTemplate).kendoDropDownList({
+                            dataTextField: "Name",
+                            dataValueField: "Id",
+                            optionLabel: that.kLg.btnSelectTemp,
+                            dataSource: that.templates,
+                            open: function (e) {
+                                vmCommon.PrevTemplateId = this.value();
+                            },
+                            change: function () {
+                                const templateId = this.value();
+                                parent.getEvalXYZByTemplateId(templateId);
+                            }
+                        }).data("kendoDropDownList");
+                        vmCommon.templateControl.value(that.$root.ap.ApEvaluationTemplateId);
+                        vmCommon.templateControl.enable(that.role > 0);
+                    }
+
+                }
+            },
+            onAddEvalTemplate() {
+                if (this.role < 1) return;
+
+                if (evalApp.ap.APEvaluations.APEvaluationData.APEvaluations.filter(t => t.DeletedBy != 1).length < 1 && evalApp.ap.APEvaluations.APEvaluationData.APEvaluationsY.filter(t => t.DeletedBy != 1).length < 1
+                    && evalApp.ap.APEvaluations.APEvaluationData.APEvaluationsZ.filter(t => t.DeletedBy != 1).length < 1) { //validation, no evaluation
+                    pAlert(kLg.msgRequiredElement);
+                    return;
+                }
+                popName(kLg.titleSaveTemplate).then(function () {
+                    vmApEvalx.SaveEvalTemp(templateAction.Add, popName.Data);
+                });
+            },
+            onChangeComment: function () {
+                if (this.role < 1) return;
+                this.$parent.ap.ApEvaluationComment = this.comment;
+                vmApEval.setModelChanged(true);
+            },
+            onEditEvalTemplate() {
+                if (this.role < 1) return;
+                if (evalApp.ap.ApEvaluationTemplateId == null) {
+                    pAlert(kLg.msgChooseTemplate);
+                    return;
+                }
+                if (evalApp.ap.APEvaluations.APEvaluationData.APEvaluations.filter(t => t.DeletedBy != 1).length < 1 && evalApp.ap.APEvaluations.APEvaluationData.APEvaluationsY.filter(t => t.DeletedBy != 1).length < 1
+                    && evalApp.ap.APEvaluations.APEvaluationData.APEvaluationsZ.filter(t => t.DeletedBy != 1).length < 1) { //validation, no evaluation
+                    pAlert(kLg.msgRequiredElement);
+                    return;
+                }
+
+                var itemTemp = evalApp.ap.ApEvaluationTemplates.find(t => t.Id === evalApp.ap.ApEvaluationTemplateId);
+                if (itemTemp == undefined) return;
+
+                evalApp.initOverrideTitleTemplate();
+                popName(kLg.titleSaveTemplate, itemTemp.Name).then(function () {
+                    vmApEvalx.SaveEvalTemp(templateAction.Update, popName.Data).then(function() {
+                        evalApp.saveData(false);
+                        //TODO: reload ap evaluation of other goal/action in overview (actionplan/teamboard)
+                        vmApEval.reloadApEvalationByTemplate(itemTemp.Id);
+                        if (vmCommon.checkCurrentPage(vmCommon.enumPage.ActionPlan)) {
+                            // update template ra ngoài tooltip
+                            MsaApp.overrideTitleTemplate(msGoalAction.EvaluationItem);
+                            delete msGoalAction.EvaluationItem;
+                        }
+                        vmApEval.setModelChanged(false);
+                        vmCommon.isOnEditEvalTemplate = true;
+                    });
+                });
+            },
+            onDeleteEvalTemplate() {
+                if (this.role < 1) return;
+                var data = evalApp.ap.ApEvaluationTemplates.filter(t => t.DeletedBy != 1);
+
+                    bindTemplate('deleteTempWindow', 'delete-temp-pop-eval', data);
+
+                    $('#lblTemplateNameDeleteTemplate').text(kLg.lblTemplateName);
+                    $('.btnChoose').text(kLg.btnDelTemp);
+                    $('.btnCancel').text(kLg.btnCancel);
+
+                    //pop auto height -> should write function
+                    vmApEval.deleteTempWindow = showPopup2(null, $('#deleteTempWindow'), null, kLg.DeleteTemplate, 640, $('#deleteTempWindow').height(), function () {
+                        vmApEval.deleteTempWindow.destroy(); //also remove div deleteTempWindow. Try $('#deleteTempWindow').empty(); $('#deleteTempWindow').html(''); -> All attributes were created by Kendo still exist
+                        vmApEval.deleteTempWindow = null;
+                        $('#frmApEval').append('<div id="deleteTempWindow"> </div>');// re add for later use
+                    });
+
+                if (vmApEval.deleteTempWindow) vmApEval.deleteTempWindow.element.focus();
+
+            },
+            onImportEvalTemplate() {
+                if (this.role < 1) return;
+                vmApImport.templateType = templateType.ApEvaluationTemplate;
+                vmApEval.setModelChanged(true);
+
+                vmApEval.dataservice.getEvalTemplateByUser(vmApImport.templateType, (data) => {
+                    if (vmApEval.curRole > 0) {
+                        vmApImport.lstAvaiTemplate = data;
+                        var path = "../Contents/MsPopGoalActionEval_PopImportTemplate.html";
+                        vmApImport.importTempWindown = showImportTempPopup(null, $("#apImportTempWindow"), path, function () {
+                            vmApImport.importTempWindown.destroy();
+                            vmApImport.importTempWindown == null;
+                            $('#frmApEval').prepend('<div id="apImportTempWindow"></div>');
+                        });
+                        vmApImport.importTempWindown.element.focus();
+                    }
+                });
+            },
+            switchToInputEditTitle(e, type, currentTitle) {
+                if (this.role < 1) return;
+                switch (type) {
+                    case 1: // title X
+                        this.IsEditTitleX = true;
+                        if (this.IsEditTitleY) this.IsEditTitleY = false;
+                        if (this.IsEditTitleZ) this.IsEditTitleZ = false;
+                        break;
+                    case 2: // title Y
+                        if (this.IsEditTitleX) this.IsEditTitleX = false;
+                        this.IsEditTitleY = true;
+                        if (this.IsEditTitleZ) this.IsEditTitleZ = false;
+                        break;
+                    case 3: // title Z
+                        if (this.IsEditTitleX) this.IsEditTitleX = false;
+                        if (this.IsEditTitleY) this.IsEditTitleY = false;
+                        this.IsEditTitleZ = true;
+                        break;
+                }
+                vmCommon.CacheTitleEval = currentTitle;
+                this.$nextTick(() => {
+                    // focus when DOM updated
+                    const eInput = this.$el.querySelector('.dnbinput-edittlteval');
+                    if (eInput) {
+                        var len = eInput.value.length;
+                        if (eInput.setSelectionRange) {
+                            eInput.focus();
+                            eInput.setSelectionRange(0, len);
+                        } else if (eInput.createTextRange) {
+                            var t = eInput.createTextRange();
+                            t.collapse(true);
+                            t.moveStart('character', 0);
+                            t.moveEnd('character', len);
+                            t.select();
+                        }
+                    }
+                });
+            },
+            onChangeTitle(e, type) {        // type: 1 = titleX, 2 = titleY, 3 = titleZ
+               
+            },
+            onCompleteChangeTitle(type, e) {    // onComplete ChangeTitle
+                let newText;
+                switch (type) {
+                    case 1: // title X
+                        newText = this.item.TitleX.trim();
+                        if (newText == '') {
+                            this.item.TitleX = vmCommon.CacheTitleEval;
+                            this.clearInputEditTitle();
+                            return;     // exit onComplete ChangeTitle
+                        }
+                        // Lưu lại vào vmCommon để dùng khi đóng popup (Save & Close || [x])
+                        if (newText !== vmCommon.CacheTitleEval) {
+                            vmCommon.IsChangeTitleX = true;
+                            delete vmCommon.isAddEvalTemplated;
+                        }
+                        break;
+                    case 2: // title Y
+                        newText = this.item.TitleY.trim();
+                        if (newText == '') {
+                            this.item.TitleY = vmCommon.CacheTitleEval;
+                            this.clearInputEditTitle();
+                            return;     // exit onComplete ChangeTitle
+                        }
+                        // Lưu lại vào vmCommon để dùng khi đóng popup (Save & Close || [x])
+                        if (newText !== vmCommon.CacheTitleEval) {
+                            vmCommon.IsChangeTitleY = true;
+                            delete vmCommon.isAddEvalTemplated;
+                        }
+                        break;
+                    case 3: // title Z
+                        newText = this.item.TitleZ.trim();
+                        if (newText == '') {
+                            this.item.TitleZ = vmCommon.CacheTitleEval;
+                            this.clearInputEditTitle();
+                            return;     // exit onComplete ChangeTitle
+                        }
+                        // Lưu lại vào vmCommon để dùng khi đóng popup (Save & Close || [x])
+                        if (newText !== vmCommon.CacheTitleEval) {
+                            vmCommon.IsChangeTitleZ = true;
+                            delete vmCommon.isAddEvalTemplated;
+                        }
+                        break;
+                }
+                vmApEval.setModelChanged(true);
+                this.clearInputEditTitle();
+            },
+            clearInputEditTitle() {
+                if (this.IsEditTitleX) this.IsEditTitleX = false;
+                if (this.IsEditTitleY) this.IsEditTitleY = false;
+                if (this.IsEditTitleZ) this.IsEditTitleZ = false;
+                delete vmCommon.CacheTitleEval;
+            },
+        },
+        //updated() { },
+    });
+
+    Vue.component("ApSwot", {
+        props: ["item"],
+        inject: ["kLg"],
+        data() {
+            return {};
+        },
+        template: "#apswottemp",
+        computed: {},
+        mounted() {},
+        methods: {}
+    });
+
+    Vue.component("ApProduct", {
+        props: ["item"],
+        inject: ["kLg"],
+        data() {
+            return {};
+        },
+        template: "#approevaltemp",
+        computed: {},
+        mounted() {},
+        methods: {}
+    });
+    var ga_model;
+    $(function () {
+        vmApEval.goalActionTemplateId = vmGoalAction.goalActionEvalOptions.goalActionTemplateId;
+        vmApEval.goalActionTemplate = vmGoalAction.goalActionEvalOptions.goalActionTemplate;
+        vmApEval.isShowDirect = vmGoalAction.goalActionEvalOptions.isShowDirect;
+
+        ga_model = vmGoalAction.goalActionEvalOptions.goalActionModel;
+
+        vmApEval.ApProductTemplateId = ga_model.ApProductTemplateId;
+        vmApEval.ApEvaluationTemplateId = ga_model.ApEvaluationTemplateId;
+        vmApEval.ApSwotanalyseTemplateId = ga_model.ApSwotanalyseTemplateId;
+        vmApEval.ApEvaluationComment = ga_model.ApEvaluationComment;
+
+        vmApEval.objectType = vmGoalAction.goalActionEvalOptions.objectType;
+        vmApEval.goalActionModel = ga_model;
+        vmApEval.goalActionId = undefined;
+        if (ga_model.Id && ga_model.Id != vmCommon.emptyGuid)
+            vmApEval.goalActionId = ga_model.Id;
+
+        vmApEval.goalActionName = ga_model.Name;
+        
+        vmApEval.curRole = vmGoalAction.goalActionEvalOptions.role;
+
+        // bind props tab 2
+        vmApSwotanalyse.role = vmApEval.curRole;
+        vmApSwotanalyse.goalActionTemplateId = vmApEval.goalActionTemplateId;
+        vmApSwotanalyse.isShowDirect = vmApEval.isShowDirect;
+
+        // bind props tab 3
+        vmApProduct.goalActionTemplateId = vmApEval.goalActionTemplateId;
+        vmApProduct.goalActionName = vmApEval.goalActionModel.Name;
+        vmApProduct.goalActionId = vmApEval.goalActionModel.Id;
+        vmApProduct.Role = vmApEval.curRole;
+        vmApProduct.goalActionModel = vmApEval.goalActionModel;
+        vmApProduct.isShowDirect = vmApEval.isShowDirect;
+
+        //
+        var isDisordered = vmGoalAction.actionOptions != undefined && vmGoalAction.actionOptions.isDisordered;
+        evalApp = new Vue({
+            el: "#pop-ap-eval",
+            data() {
+                return {
+                    Color: ga_model.MColor || ga_model.Color,
+                    role: vmGoalAction.goalActionEvalOptions.role,
+                    ap: {   //ApEvalSaving
+                        APEvaluations: {    //ApObjectSaving
+                            APEvaluationData:
+                            {
+                                APEvaluations: [],
+                                APEvaluationsY: [],
+                                APEvaluationsZ: [],
+                                TitleX: kLg.lblApAxisX,
+                                TitleY: kLg.lblApAxisY,
+                                TitleZ: kLg.lblApAxisZ,
+                                TitleNegativeX: kLg.lblNegative,
+                                TitleNeutralX: kLg.lblNeutral,
+                                TitlePositiveX: kLg.lblPositive,
+                                TitleNegativeY: kLg.lblNegative,
+                                TitleNeutralY: kLg.lblNeutral,
+                                TitlePositiveY: kLg.lblPositive,
+                            },
+                            ApSwotanalyses: [],
+                            TargetData: {}
+                        },
+                        ApEvaluationComment: ga_model.ApEvaluationComment,
+                        ApEvaluation: ga_model.ApEvaluation,
+                        ApEvaluationTemplateId: ga_model.ApEvaluationTemplateId,
+                        ApSwotanalyseTemplateId: ga_model.ApSwotanalyseTemplateId,
+                        ApProductTemplateId: ga_model.ApProductTemplateId,
+                        ApEvaluationTemplates: [],
+                        ApSwotanalyseTemplates: [],
+                        ApProductTemplates: []
+                    },
+                    focusingTab: 1,
+                    selectedTabs: [],
+                    isReady: false,
+                    isChangeTemplate: false, 
+                    isApplyTemplate: ga_model.IsApplyTemplate == true,
+                    isHasControl: !isDisordered,        // Dùng cho trang Teamboard (false = detach action)
+                }
+            },
+            provide() {
+                return {
+                    role: this.role,
+                    kLg: this.kLg,
+                    getHashKey: this.getHashKey,
+                    isHasControl: this.isHasControl,
+                    setValTitle: (typeId, newTile) => {
+                        const apEvalData = this.ap.APEvaluations.APEvaluationData;      // ref object
+                        return new Promise((reslv) => {
+                            switch (typeId) {
+                                case 4: // TitleNegativeX
+                                    apEvalData.TitleNegativeX = newTile;
+                                    break;
+                                case 5: //TitleNeutralX
+                                    apEvalData.TitleNeutralX = newTile;
+                                    break;
+                                case 6: //TitlePositiveX
+                                    apEvalData.TitlePositiveX = newTile;
+                                    break;
+                                case 7: //TitleNegativeY
+                                    apEvalData.TitleNegativeY = newTile;
+                                    break;
+                                case 8: //TitleNeutralY
+                                    apEvalData.TitleNeutralY = newTile;
+                                    break;
+                                case 9: //TitlePositiveY
+                                    apEvalData.TitlePositiveY = newTile;
+                                    break;
+                                default:
+                                    break;
+                            }
+                            reslv();
+                        });
+                    },
+                };
+            },
+            watch: {
+                "ap": {
+                    handler() {
+                        if (!this.isReady) return;
+                        if (vmCommon.isOnEditEvalTemplate) { delete vmCommon.isOnEditEvalTemplate; return; }
+                        if (vmApEval.modelChanged == false) vmApEval.setModelChanged(true);
+                    }, deep: true
+                }
+            },
+            created() {
+                this.getData();
+            },
+            mounted() {
+                this.getData();
+            },
+            computed: {
+                kLg: () => kLg,
+                apEvaluation: function () {
+                    var that = this;
+                    xEvalItems = that.ap.APEvaluations.APEvaluationData.APEvaluations.filter(t => t.DeletedBy == null);
+                    yEvalItems = that.ap.APEvaluations.APEvaluationData.APEvaluationsY.filter(t => t.DeletedBy == null);
+                    zEvalItems = that.ap.APEvaluations.APEvaluationData.APEvaluationsZ.filter(t => t.DeletedBy == null);
+
+                    if (xEvalItems.length == 0 && yEvalItems.length == 0 && zEvalItems.length == 0) return null;
+
+                    function calc(items) {
+                        return items.length ? Math.round(items.map(t => {
+                            return t.Priority * t.Evaluation;
+                        }).reduce((a, b) => a + b, 0) / items.length) : null;
+                    }
+
+                    var count = 0, total = 0;
+                    function counter(items) {
+                        if (items.length == 0) return;
+
+                        count++;
+                        total += calc(items);
+                    }
+
+                    counter(xEvalItems);
+                    counter(yEvalItems);
+                    counter(zEvalItems);
+
+                    return Math.round(total / count); 
+                }
+            },
+            methods: {
+                hasCriteria() {
+                    return this.ap.APEvaluations.APEvaluationData.APEvaluations.filter(t => !t.DeletedBy).length > 0 || this.ap.APEvaluations.APEvaluationData.APEvaluationsY.filter(t => !t.DeletedBy).length > 0 || this.ap.APEvaluations.APEvaluationData.APEvaluationsZ.filter(t => !t.DeletedBy).length > 0;
+                },
+                checkChangeTemplate() {
+                    // this.ap.ApEvaluationTemplateId có những TH: null, "" (string rỗng), Guid.Empty, Guid
+                    this.isChangeTemplate = !!this.ap.ApEvaluationTemplateId && this.ap.ApEvaluationTemplateId != vmCommon.emptyGuid && this.hasCriteria();
+                    delete vmCommon.isAddEvalTemplated;
+                    vmApEval.setModelChanged(true);
+                },
+                isChngTemplateValTitleXYZ() {
+                    if (!this.ap.ApEvaluationTemplateId) return false;
+
+                    const isChangeTlt = vmCommon.IsChangeTitleX || vmCommon.IsChangeTitleY || vmCommon.IsChangeTitleZ;
+                    if (isChangeTlt) return true;
+
+                    const apEvalData = this.ap.APEvaluations.APEvaluationData;      // ref object
+                    const tX = apEvalData.TitleX;
+                    const tY = apEvalData.TitleY;
+                    const tZ = apEvalData.TitleZ;
+                    const isChangeX = vmCommon.ChTemplateTltX && tX != vmCommon.ChTemplateTltX;
+                    const isChangeY = vmCommon.ChTemplateTltY && tY != vmCommon.ChTemplateTltY;
+                    const isChangeZ = vmCommon.ChTemplateTltZ && tZ != vmCommon.ChTemplateTltZ;
+                    return isChangeX || isChangeY || isChangeZ;
+                },
+                getHashKey() {
+                    return vmCommon.newGuid();
+                },
+                getData() {
+                    var that = this;
+                    if (that.selectedTabs.indexOf(that.focusingTab) >= 0) return;
+
+                    console.log("get data for:", that.focusingTab);
+                    switch (that.focusingTab) {
+                        case 1:
+                            that.getEvalData();
+                            break;
+                        case 2:
+                            that.getSwotData();
+                            break;
+                        case 3:
+                            that.getProductData();
+                            break;
+                    }
+                    that.selectedTabs.push(that.focusingTab);
+                },
+                setEvalData(data) {
+                    var that = this;
+                    if (data == undefined || data.APEvaluationData == undefined || data.APEvaluationData.APEvaluations == undefined)
+                        return;
+
+                    that.ap.APEvaluations.APEvaluationData.APEvaluations.splice(0);
+                    data.APEvaluationData.APEvaluations.forEach(t => that.ap.APEvaluations.APEvaluationData.APEvaluations.push(t));
+
+                    that.ap.APEvaluations.APEvaluationData.APEvaluationsY.splice(0);
+                    data.APEvaluationData.APEvaluationsY.forEach(t => that.ap.APEvaluations.APEvaluationData.APEvaluationsY.push(t));
+
+                    that.ap.APEvaluations.APEvaluationData.APEvaluationsZ.splice(0);
+                    data.APEvaluationData.APEvaluationsZ.forEach(t => that.ap.APEvaluations.APEvaluationData.APEvaluationsZ.push(t));
+
+                    that.ap.APEvaluations.APEvaluationData.TitleX = data.APEvaluationData.TitleX || kLg.lblApAxisX;
+                    that.ap.APEvaluations.APEvaluationData.TitleY = data.APEvaluationData.TitleY || kLg.lblApAxisY;
+                    that.ap.APEvaluations.APEvaluationData.TitleZ = data.APEvaluationData.TitleZ || kLg.lblApAxisZ;
+
+                    //
+                    that.ap.APEvaluations.APEvaluationData.TitleNegativeX = data.APEvaluationData.TitleNegativeX || kLg.lblNegative;
+                    that.ap.APEvaluations.APEvaluationData.TitleNeutralX = data.APEvaluationData.TitleNeutralX || kLg.lblNeutral;
+                    that.ap.APEvaluations.APEvaluationData.TitlePositiveX = data.APEvaluationData.TitlePositiveX || kLg.lblPositive;
+
+                    //
+                    that.ap.APEvaluations.APEvaluationData.TitleNegativeY = data.APEvaluationData.TitleNegativeY || kLg.lblNegative;
+                    that.ap.APEvaluations.APEvaluationData.TitleNeutralY = data.APEvaluationData.TitleNeutralY || kLg.lblNeutral;
+                    that.ap.APEvaluations.APEvaluationData.TitlePositiveY = data.APEvaluationData.TitlePositiveY || kLg.lblPositive;
+                },
+                getEvalData() {
+                    var that = this;
+                    const apEvalData = this.ap.APEvaluations.APEvaluationData;      // ref object
+                    var gaid = vmGoalAction.goalActionEvalOptions.goalActionModel.Id;
+                    vmApEvalx.dataService.getEvalData({ goalActionId: gaid }).then(function (res) {
+                        var data = res.value.Data;
+
+                        //AP EVALUATION TEMPLATES
+                        that.ap.ApEvaluationTemplates = data.ApEvaluationTemplates;
+
+                        //AP EVALUATION DATA
+                        if (vmApEval.goalActionModel.ActionPlanEvalData)
+                            that.setEvalData(vmCommon.deepCopy(vmApEval.goalActionModel.ActionPlanEvalData));
+
+                        setTimeout(function () {
+                            that.isReady = true;
+                        }, 10);
+                        vmApEval.setModelChanged(false);
+                    });
+                },
+                getSwotData() {
+                    $('#tabSwotAnalyse').load('/Contents/MsPopGoalActionEval_TabSwotAnalyse.html');
+                    //vmApEvalx.dataService.getSwotData({ goalActionId: vmGoalAction.goalActionEvalOptions.goalActionModel.Id }).then(function (res) {
+                    //    var data = res.value;
+
+                    //    that.ApSwotanalyseTemplates = data.ApSwotanalyseTemplates;
+                    //    that.ApSwotanalyses = data.ApSwotanalyse;
+                    //});
+                },
+                getProductData() {
+                    $('#tabProductStructure').load('/Contents/MsPopGoalActionEval_MsTabProductStructure.html');
+                    //vmApEvalx.dataService.getProductData({ TargetName: "", ChartName: "", GoalActionId: vmGoalAction.goalActionEvalOptions.goalActionModel.Id }).then(function (res) {
+                    //    var data = res.value;
+
+                    //    that.ApSwotanalyseTemplates = data.ApSwotanalyseTemplates;
+                    //    that.ApSwotanalyses = data.ApSwotanalyse;
+                    //});
+                },
+                getEvalXYZByTemplateId(templateId) {        // apply template
+                    const apEvalData = this.ap.APEvaluations.APEvaluationData;
+                    const lstX = apEvalData.APEvaluations;
+                    const lstY = apEvalData.APEvaluationsY;
+                    const lstZ = apEvalData.APEvaluationsZ;
+                    const apObj = this.ap;      // ref object
+
+                    if (!templateId || templateId === vmCommon.emptyGuid || templateId == kLg.btnSelectTemp) {
+                        this.ap.ApEvaluationTemplateId = null;
+                        this.isChangeTemplate = false;
+                        lstX.filter(x => { x.TemplateId = null; });
+                        lstY.filter(y => { y.TemplateId = null; });
+                        lstZ.filter(z => { z.TemplateId = null; });
+                        delete vmCommon.ChTemplateTltX;
+                        delete vmCommon.ChTemplateTltY;
+                        delete vmCommon.ChTemplateTltZ;
+                        delete vmCommon.PrevTemplateId;
+                        return;     // thoát khỏi hàm getEvalXYZByTemplateId
+                    }
+                    
+                    pConfirm(kLg.msgConfirmApplyNewTemplate).then(
+                        function ok() {
+                            evalApp.ap.ApEvaluationTemplateId = templateId;
+                            evalApp.isChangeTemplate = false;
+
+                            vmApEvalx.dataService.getEvalXYZByTemplateId(templateId, function (res) {
+                                if (!res || !res.value) return;
+                                // #region client
+                                const evlXyZObj = res.value;
+                                const lstEvlX = evlXyZObj.APEvaluations;
+                                const lstEvlY = evlXyZObj.APEvaluationsY;
+                                const lstEvlZ = evlXyZObj.APEvaluationsZ;
+
+                                for (let i = lstX.length - 1; i > -1; i--) {
+                                    if (!lstX[i].Id || lstX[i].TemplateId)
+                                        lstX.splice(i, 1);     // delete
+                                    else lstX[i].DeletedBy = 1;
+                                }
+                                for (let i = lstY.length - 1; i > -1; i--) {
+                                    if (!lstY[i].Id || lstY[i].TemplateId)
+                                        lstY.splice(i, 1);     // delete
+                                    else lstY[i].DeletedBy = 1;
+                                }
+                                for (let i = lstZ.length - 1; i > -1; i--) {
+                                    if (!lstZ[i].Id || lstZ[i].TemplateId)
+                                        lstZ.splice(i, 1);     // delete
+                                    else lstZ[i].DeletedBy = 1;
+                                }
+
+                                lstEvlX.forEach(x => {
+                                    x.ActionGoalId = vmApEval.goalActionId;
+                                    lstX.push(x);
+                                });
+                                lstEvlY.forEach(y => {
+                                    y.ActionGoalId = vmApEval.goalActionId;
+                                    lstY.push(y);
+                                });
+                                lstEvlZ.forEach(z => {
+                                    z.ActionGoalId = vmApEval.goalActionId;
+                                    lstZ.push(z);
+                                });
+                                delete vmCommon.isChangeTabEval;
+                                // #endregion client
+                                if (evlXyZObj.TitleX) {
+                                    apEvalData.TitleX = evlXyZObj.TitleX;
+                                    vmCommon.ChTemplateTltX = evlXyZObj.TitleX;
+                                } else {
+                                    apEvalData.TitleX = kLg.lblApAxisX;
+                                    delete vmCommon.ChTemplateTltX;
+                                }
+                                if (evlXyZObj.TitleY) {
+                                    apEvalData.TitleY = evlXyZObj.TitleY;
+                                    vmCommon.ChTemplateTltY = evlXyZObj.TitleY;
+                                } else {
+                                    apEvalData.TitleY = kLg.lblApAxisY;
+                                    delete vmCommon.ChTemplateTltY;
+                                }
+                                if (evlXyZObj.TitleZ) {
+                                    apEvalData.TitleZ = evlXyZObj.TitleZ;
+                                    vmCommon.ChTemplateTltZ = evlXyZObj.TitleZ;
+                                } else {
+                                    apEvalData.TitleZ = kLg.lblApAxisZ;
+                                    delete vmCommon.ChTemplateTltZ;
+                                }
+
+                                if (evlXyZObj.TitleNegativeX) {
+                                    apEvalData.TitleNegativeX = evlXyZObj.TitleNegativeX;
+                                } else apEvalData.TitleNegativeX = kLg.lblNegative;
+                                if (evlXyZObj.TitleNeutralX) {
+                                    apEvalData.TitleNeutralX = evlXyZObj.TitleNeutralX;
+                                } else apEvalData.TitleNeutralX = kLg.lblNeutral;
+                                if (evlXyZObj.TitlePositiveX) {
+                                    apEvalData.TitlePositiveX = evlXyZObj.TitlePositiveX;
+                                } else apEvalData.TitlePositiveX = kLg.lblPositive;
+                                if (evlXyZObj.TitleNegativeY) {
+                                    apEvalData.TitleNegativeY = evlXyZObj.TitleNegativeY;
+                                } else apEvalData.TitleNegativeY = kLg.lblNegative;
+                                if (evlXyZObj.TitleNeutralY) {
+                                    apEvalData.TitleNeutralY = evlXyZObj.TitleNeutralY;
+                                } else apEvalData.TitleNeutralY = kLg.lblNeutral;
+                                if (evlXyZObj.TitlePositiveY) {
+                                    apEvalData.TitlePositiveY = evlXyZObj.TitlePositiveY;
+                                } else apEvalData.TitlePositiveY = kLg.lblPositive;
+                            });
+                            delete vmCommon.PrevTemplateId;
+                    }, function cancel () {
+                            apObj.ApEvaluationTemplateId = vmCommon.PrevTemplateId;
+                            vmCommon.templateControl.value(apObj.ApEvaluationTemplateId);
+                            delete vmCommon.PrevTemplateId;
+                    });
+                    
+                },
+                onSelectTab(tabid) {
+                    if (tabid != 1) {
+                        if (!!vmCommon.templateControl) vmCommon.templateControl.destroy();
+                        delete vmCommon.templateControl;
+                    }
+                    var that = this;
+                    that.focusingTab = tabid;
+                    setTimeout(function () {
+                        that.getData();
+                    }, 10);
+                },
+                isChangeTitle() {
+                    const isChangeTlt = vmCommon.IsChangeTitleX || vmCommon.IsChangeTitleY || vmCommon.IsChangeTitleZ;
+                    const isChangeValTltNg = vmCommon.IsChangeTitleNegativeX || vmCommon.IsChangeTitleNegativeY;
+                    const isChangeValTltNr = vmCommon.IsChangeTitleNeutralX || vmCommon.IsChangeTitleNeutralY;
+                    const isChangeValTltPs = vmCommon.IsChangeTitlePositiveX || vmCommon.IsChangeTitlePositiveY;
+                    return isChangeTlt || isChangeValTltNg || isChangeValTltNr || isChangeValTltPs;
+                },
+                update() {
+                    var that = this;
+                    if (vmApEval.modelChanged == false && !this.isChangeTitle()) {
+                        vmGoalAction.popGoalActionEval.close();
+                        return true;
+                    }
+                    const isChangeTmpl = !!this.ap.ApEvaluationTemplateId && (vmCommon.isChangeTabEval || this.isChangeTitle());
+                    if (this.hasCriteria() && (that.isChangeTemplate || this.isChngTemplateValTitleXYZ() || isChangeTmpl)) {
+                        if (!vmCommon.isAddEvalTemplated) {
+                            this.initOverrideTitleTemplate();
+                            ynConfirm(kLg.msgOverwriteApTemplate).then(
+                                function () {
+                                    that.isApplyTemplate = true;
+                                    var tempObject = that.ap.ApEvaluationTemplates.find(t => t.Id == evalApp.ap.ApEvaluationTemplateId);
+                                    vmApEvalx.SaveEvalTemp(templateAction.Update, tempObject.Name).then(function () {
+                                        that.saveData();
+                                        //TODO: reload ap evaluation of other goal/action in overview (actionplan/teamboard)
+                                        vmApEval.reloadApEvalationByTemplate(tempObject.Id);
+
+                                        if (vmCommon.checkCurrentPage(vmCommon.enumPage.ActionPlan)) {
+                                            // update template ra ngoài tooltip
+                                            MsaApp.overrideTitleTemplate(msGoalAction.EvaluationItem);
+                                            delete msGoalAction.EvaluationItem;
+                                        }
+                                    });
+                                },
+                                function () {
+                                    that.ap.ApEvaluationTemplateId = null;
+                                    that.isApplyTemplate = false;
+                                    that.saveData();
+                                }
+                            );
+                        } else {
+                            that.saveData();
+                        }
+                    } else {
+                        if (!that.ap.ApEvaluationTemplateId) that.ap.ApEvaluationTemplateId = null; // null hoặc "" (string rỗng),
+                        if (!!that.ap.ApEvaluationTemplateId && that.ap.ApEvaluationTemplateId == vmCommon.emptyGuid)   // Guid.Empty
+                            that.ap.ApEvaluationTemplateId = null;
+                        if (!this.hasCriteria()) that.ap.ApEvaluationTemplateId = null;     // Kiểm tra cuối cùng Không có bất kỳ tiêu chí nào
+
+                        that.saveData();
+                    }
+                },
+                saveData(isCloseForm = true) {      // isCloseForm = false <=> từ nút Update của Template
+                    var that = this;
+                    var evalAppSaving = vmCommon.deepCopy(that.ap);
+                    evalAppSaving.ApEvaluation = that.apEvaluation;
+
+                    if (typeof vmApSwotanalyse != 'undefined' && vmApSwotanalyse != null) {
+                        evalAppSaving.APEvaluations.ApSwotanalyses = vmApSwotanalyse.getSaveData();
+                        evalAppSaving.ApSwotanalyseTemplates = vmApSwotanalyse.getSaveTemplate();
+                        evalAppSaving.ApSwotanalyseTemplateId = vmApSwotanalyse.ApSwotanalyseTemplateId;
+                    }
+
+                    if (typeof vmApProduct != 'undefined' && vmApProduct != null && typeof (vmApProduct) == 'object' && vmApProduct.SMTargetData != null && JSON.stringify(vmApProduct.SMTargetData) != JSON.stringify({})) {
+                        evalAppSaving.APEvaluations.TargetData = vmApProduct.getTargetToSave();
+                        evalAppSaving.ApProductTemplates = vmApProduct.getTemplateToSave();
+                        evalAppSaving.ApProductTemplateId = vmApProduct.ApProductTemplateId;
+                    }
+                    
+                    vmApEval.goalActionModel.set('ActionPlanEvalData', evalAppSaving.APEvaluations);
+                    vmApEval.goalActionModel.set('ApEvaluationComment', evalAppSaving.ApEvaluationComment);
+                    vmApEval.goalActionModel.set('ApEvaluation', evalAppSaving.ApEvaluation);
+
+                    vmApEval.goalActionModel.set('ApProductTemplateId', evalAppSaving.ApProductTemplateId);
+                    vmApEval.goalActionModel.set('ApProductTemplates', evalAppSaving.ApProductTemplates);
+                    vmApEval.goalActionModel.set('ApEvaluationTemplateId', evalAppSaving.ApEvaluationTemplateId);
+                    vmApEval.goalActionModel.set('ApEvaluationTemplates', evalAppSaving.ApEvaluationTemplates);
+                    vmApEval.goalActionModel.set('ApSwotanalyseTemplateId', evalAppSaving.ApSwotanalyseTemplateId);
+                    vmApEval.goalActionModel.set('ApSwotanalyseTemplates', evalAppSaving.ApSwotanalyseTemplates);
+                    vmApEval.goalActionModel.set('IsApplyTemplate', that.isApplyTemplate);
+                    vmApEval.goalActionModel.set('IsFromTemplate', false);
+
+                    // #region Khởi tạo các biến để lưu ra ngoài tooltip title X, X, Z
+                    const objEvlXYZ = evalAppSaving.APEvaluations.APEvaluationData;     // ref object
+                    const lstEvlX = objEvlXYZ.APEvaluations.filter(t => !t.DeletedBy);
+                    const lstEvlY = objEvlXYZ.APEvaluationsY.filter(t => !t.DeletedBy);
+                    const lstEvlZ = objEvlXYZ.APEvaluationsZ.filter(t => !t.DeletedBy);
+                    const evX = lstEvlX.length ? lstEvlX.map(x => x.Priority * x.Evaluation).reduce((a, b) => a + b, 0) / lstEvlX.length : null;
+                    const evY = lstEvlY.length ? lstEvlY.map(x => x.Priority * x.Evaluation).reduce((a, b) => a + b, 0) / lstEvlY.length : null;
+                    const evZ = lstEvlZ.length ? lstEvlZ.map(x => x.Priority * x.Evaluation).reduce((a, b) => a + b, 0) / lstEvlZ.length : 0;
+                    const templId = !evalAppSaving.ApEvaluationTemplateId ? null : evalAppSaving.ApEvaluationTemplateId;
+                    const templte = evalAppSaving.ApEvaluationTemplates.find(t => t.Id == evalAppSaving.ApEvaluationTemplateId);
+                    const templateN = templte ? templte.Name : null;
+                    const PopEvalObjItem = {
+                        TitleX: objEvlXYZ.TitleX, TitleY: objEvlXYZ.TitleY,
+                        TitleNegativeX: objEvlXYZ.TitleNegativeX,
+                        TitleNeutralX: objEvlXYZ.TitleNeutralX,
+                        TitlePositiveX: objEvlXYZ.TitlePositiveX,
+                        TitleNegativeY: objEvlXYZ.TitleNegativeY,
+                        TitlePositiveY: objEvlXYZ.TitlePositiveY,
+                        TitleNeutralY: objEvlXYZ.TitleNeutralY,
+                        EvalX: evX != null ? Math.round(evX) : null, EvalY: evY != null ? Math.round(evY) : null, EvalZ: Math.round(evZ),
+                        TemplateName: templateN, TemplateId: templId
+                    }
+                    // #endregion Khởi tạo các biến để lưu ra ngoài tooltip title X, X, Z
+
+                    if (vmApEval.goalActionModel.Id != undefined && vmApEval.goalActionModel.Id != null && vmApEval.goalActionModel.Id != vmCommon.emptyGuid) {
+
+                        // #region Title X, Y, Z, negative, neutral, positive
+                        const apEvalData = evalAppSaving.APEvaluations.APEvaluationData;        // ref object
+                        vmApEval.goalActionModel.ActionPlanEvalData.APEvaluationData.TitleNegativeX = apEvalData.TitleNegativeX;                        
+                        vmApEval.goalActionModel.ActionPlanEvalData.APEvaluationData.TitleNegativeY = apEvalData.TitleNegativeY;                        
+                        vmApEval.goalActionModel.ActionPlanEvalData.APEvaluationData.TitleNeutralX = apEvalData.TitleNeutralX;                        
+                        vmApEval.goalActionModel.ActionPlanEvalData.APEvaluationData.TitleNeutralY = apEvalData.TitleNeutralY;                        
+                        vmApEval.goalActionModel.ActionPlanEvalData.APEvaluationData.TitlePositiveX = apEvalData.TitlePositiveX;                        
+                        vmApEval.goalActionModel.ActionPlanEvalData.APEvaluationData.TitlePositiveY = apEvalData.TitlePositiveY;                        
+                        // #endregion Title X, Y, Z, negative, neutral, positive
+
+                        var goalActionModel = vmGoalAction.goalActionEvalOptions.goalActionModel;
+                        var entryData = {
+                            GoalActionId: goalActionModel.Id,
+                            Mdf: goalActionModel.Mdf,
+                            TypeId: vmGoalAction.goalActionEvalOptions.objectType,
+                            ApEvalSaving: evalAppSaving,
+                            TemplateId: that.ap.ApEvaluationTemplateId,
+                            IsApplyTemplate: that.isApplyTemplate
+                        };
+
+                        vmApEval.dataservice.saveEval(entryData, (serData) => {
+                            // #region Kiểm tra status của server return hàm call back nếu Conflick || Deleted 
+                            if (serData.value.ActionResult == vmApEval.actionResult.Conflict || serData.value.ActionResult == vmApEval.actionResult.Deleted) {
+                                pAlert(kLg.msgConflictData);
+                                deleteGlobal();
+                                return;
+                            }
+                            // #endregion kiểm tra status
+                            that.setEvalData(serData.value.APEvaluations);
+                            vmApEval.goalActionModel.set('ActionPlanEvalData', serData.value.APEvaluations);
+
+                            if (!vmApEval.isShowDirect) {
+                                //vmApEval.goalActionModel.set('Mdf', ++entryData.Mdf);
+                            }
+                            else {
+                                vmApEval.resetForm();
+                            }
+
+                            vmGoalAction.goalActionEvalOptions.cb();
+
+                            if (vmCommon.checkCurrentPage(vmCommon.enumPage.TeamBoard)) {
+                                vmCommon.Mediator.publish('RELOAD_BOARDLINE_COLUMN');
+                                deleteGlobal();
+                            }
+
+                            if (vmCommon.checkCurrentPage(vmCommon.enumPage.RoadMap)) {
+                                var quartCpn = vmCommon.getChildComponent(msRoadmapApp, "rm-view-quarter");
+                                var monthCpn = vmCommon.getChildComponent(msRoadmapApp, "rm-view-month");
+
+                                let cpn = quartCpn.length > 0 ? quartCpn[0] : monthCpn.length > 0 ? monthCpn[0] : null;
+                                if (cpn && cpn.isOpenNavigator && cpn.gaItem)
+                                    cpn.reLoadGoalActionContext();
+
+                                deleteGlobal();
+                            }
+
+                            if (vmCommon.checkCurrentPage(vmCommon.enumPage.ActionPlan)) {
+                                if (MsaApp.componentService(false).get(goalActionModel.Id)) {
+                                    var item = MsaApp.componentService(false).get(goalActionModel.Id).item || MsaApp.componentService(false).get(goalActionModel.Id).goal;
+                                    if (item) item.ApEvaluation = evalAppSaving.ApEvaluation;
+                                }
+
+                                if (MsaApp.componentService(true).get(goalActionModel.Id)) {
+                                    var item = MsaApp.componentService(true).get(goalActionModel.Id).item || MsaApp.componentService(true).get(goalActionModel.Id).goal;
+                                    if (item) item.ApEvaluation = evalAppSaving.ApEvaluation;
+                                }
+
+                                // #region update Title X, Y, Z ra ngoài tooltip
+                                PopEvalObjItem.Id = entryData.GoalActionId;
+                                MsaApp.updateListEvalXYZ([PopEvalObjItem]);
+                                // #endregion update Title X, Y, Z ra ngoài tooltip
+                                deleteGlobal();
+                                //if (isCloseForm && typeof evalApp == 'object' && evalApp != null && typeof evalApp.$refs.apeval == 'object') evalApp.$destroy();
+                            }
+                            vmApEval.setModelChanged(false);
+                            if (isCloseForm) {
+                                vmGoalAction.popGoalActionEval.close(); // gọi hàm popGoalActionEvalClosed_Onclick
+                            } else {      // từ nút Update của Template
+                                that.isChangeTemplate = false;
+                                clearCacheTitle();
+                            }
+                            return true;        // ??? return true trong callback của hàm gọi Handler (Không có tác dụng)
+                        });
+                    } else {
+                        // #region lưu lại title trong trường hợp tạo mới Goal/Action
+                        vmCommon.vmApEvalxDataServiceSaveTitleLang = function (goalId) {
+                            PopEvalObjItem.Id = goalId;
+                            MsaApp.updateListEvalXYZ([PopEvalObjItem]);
+                            deleteGlobal();
+                        }
+                        //if (vmCommon.checkCurrentPage(vmCommon.enumPage.ActionPlan)) { if (isCloseForm && typeof evalApp == 'object' && evalApp != null && typeof evalApp.$refs.apeval == 'object') evalApp.$destroy();
+                        //}
+                        // #endregion lưu lại title
+                        vmApEval.setModelChanged(false);
+                        if (isCloseForm) {
+                            vmGoalAction.popGoalActionEval.close(); // gọi hàm popGoalActionEvalClosed_Onclick
+                            return true;
+                        } else {      // từ nút Update của Template
+                            that.isChangeTemplate = false;
+                            clearCacheTitle();
+                        }
+                    }
+
+                    function clearCacheTitle() {
+                        delete vmCommon.IsChangeTitleX;
+                        delete vmCommon.IsChangeTitleY;
+                        delete vmCommon.IsChangeTitleZ;
+                        if (vmCommon.ChTemplateTltX) vmCommon.ChTemplateTltX = objEvlXYZ.TitleX;
+                        if (vmCommon.ChTemplateTltY) vmCommon.ChTemplateTltY = objEvlXYZ.TitleY;
+                        if (vmCommon.ChTemplateTltZ) vmCommon.ChTemplateTltZ = objEvlXYZ.TitleZ;
+                    }
+                },
+                initOverrideTitleTemplate() {
+                    // #region Khởi tạo các biến để lưu template ra ngoài tooltip
+                    if (vmCommon.checkCurrentPage(vmCommon.enumPage.ActionPlan)) {
+                        const evalAppSaving = vmCommon.deepCopy(this.ap);
+                        const objEvlXYZ = evalAppSaving.APEvaluations.APEvaluationData;     // ref object
+                        const lstEvlX = objEvlXYZ.APEvaluations.filter(t => !t.DeletedBy);
+                        const lstEvlY = objEvlXYZ.APEvaluationsY.filter(t => !t.DeletedBy);
+                        const lstEvlZ = objEvlXYZ.APEvaluationsZ.filter(t => !t.DeletedBy);
+                        const evX = lstEvlX.length ? lstEvlX.map(x => x.Priority * x.Evaluation).reduce((a, b) => a + b, 0) / lstEvlX.length : null;
+                        const evY = lstEvlY.length ? lstEvlY.map(x => x.Priority * x.Evaluation).reduce((a, b) => a + b, 0) / lstEvlY.length : null;
+                        const evZ = lstEvlZ.length ? lstEvlZ.map(x => x.Priority * x.Evaluation).reduce((a, b) => a + b, 0) / lstEvlZ.length : 0;
+                        const templte = evalAppSaving.ApEvaluationTemplates.find(t => t.Id == evalAppSaving.ApEvaluationTemplateId);
+                        const templateN = templte ? templte.Name : null;
+                        msGoalAction.EvaluationItem = {
+                            TitleX: objEvlXYZ.TitleX, TitleY: objEvlXYZ.TitleY,
+                            TitleNegativeX: objEvlXYZ.TitleNegativeX,
+                            TitleNeutralX: objEvlXYZ.TitleNeutralX,
+                            TitlePositiveX: objEvlXYZ.TitlePositiveX,
+                            TitleNegativeY: objEvlXYZ.TitleNegativeY,
+                            TitlePositiveY: objEvlXYZ.TitlePositiveY,
+                            TitleNeutralY: objEvlXYZ.TitleNeutralY,
+                            EvalX: evX != null ? Math.round(evX) : null, EvalY: evY != null ? Math.round(evY) : null, EvalZ: Math.round(evZ),
+                            TemplateName: templateN, TemplateId: evalAppSaving.ApEvaluationTemplateId
+                        }
+                    }
+                    // #endregion Khởi tạo các biến để lưu template ra ngoài tooltip
+                },
+            },
+            beforeDestroy() {
+                this.$children.filter(c => {
+                    c.$children.filter(gc => {
+                        gc.$destroy();
+                    });
+                    c.$destroy();
+                });
+            },
+            destroyed() {
+                deleteGlobal();
+            },
+        });
+        vmApEval.setModelChanged(false);
+    });
+
+    vmApEvalx.SaveEvalTemp = function (evalTempAction, name) {
+    //function SaveEvalTemp(evalTempAction, name) {
+        var that = evalApp;
+        var currentEvals = vmCommon.deepCopy(evalApp.ap.APEvaluations.APEvaluationData);
+        
+        var newEvals = currentEvals.APEvaluations.filter(t => t.DeletedBy != 1).map(t => {
+            t.Id = vmCommon.newGuid();
+            t.CreatedBy = 1;
+            t.ModifiedBy = 0;
+            t.DeletedBy = 0;
+            return t;
+        });
+
+        // map data to save
+        newEvals.map(item => {
+            if (isNaN(item.Id)) {
+                item.Id = 0;
+            }
+            return item;
+        });
+
+        var newEvalsY = currentEvals.APEvaluationsY.filter(t => t.DeletedBy != 1).map(t => {
+            t.Id = vmCommon.newGuid();
+            t.CreatedBy = 1;
+            t.ModifiedBy = 0;
+            t.DeletedBy = 0;
+            return t;
+        });
+
+        newEvalsY.map(item => {
+            if (isNaN(item.Id)) {
+                item.Id = 0;
+            }
+            return item;
+        });
+
+        var newEvalsZ = currentEvals.APEvaluationsZ.filter(t => t.DeletedBy != 1).map(t => {
+            t.Id = vmCommon.newGuid();
+            t.CreatedBy = 1;
+            t.ModifiedBy = 0;
+            t.DeletedBy = 0;
+            return t;
+        });
+
+        newEvalsZ.map(item => {
+            if (isNaN(item.Id)) {
+                item.Id = 0;
+            }
+            return item;
+        });
+
+
+
+        var newTemplate = {
+            Id: vmCommon.newGuid(),
+            Name: name,
+            Type: templateType.ApEvaluationTemplate,
+            APEvaluationData: currentEvals,
+            CreatedBy: 0,
+            ModifiedBy: 0,
+            ActionGoalId: vmApEval.goalActionId
+        };
+
+        if (evalTempAction == templateAction.Add) {
+            newTemplate.CreatedBy = 1;
+            if (currentEvals.TitleNegativeX == kLg.lblNegative) currentEvals.TitleNegativeX = null;
+            if (currentEvals.TitleNeutralX == kLg.lblNeutral) currentEvals.TitleNeutralX = null;
+            if (currentEvals.TitlePositiveX == kLg.lblPositive) currentEvals.TitlePositiveX = null;
+            if (currentEvals.TitleNegativeY == kLg.lblNegative) currentEvals.TitleNegativeY = null;
+            if (currentEvals.TitleNeutralY == kLg.lblNeutral) currentEvals.TitleNeutralY = null;
+            if (currentEvals.TitlePositiveY == kLg.lblPositive) currentEvals.TitlePositiveY = null;
+        }
+        else if (evalTempAction == templateAction.Update) {
+            var tempObject = that.ap.ApEvaluationTemplates.find(t => t.Id == evalApp.ap.ApEvaluationTemplateId);
+            if (tempObject == undefined) return;
+
+            tempObject.Name = newTemplate.Name;
+            tempObject.ModifiedBy = 1;
+
+            newTemplate = tempObject;
+            newTemplate.ActionGoalId = vmApEval.goalActionId;
+        }
+        newTemplate.APEvaluationData = currentEvals;
+
+        return vmApEval.dataservice.saveTemplate(newTemplate, (rs) => {
+            if (evalTempAction == templateAction.Add) {
+                newTemplate.Id = rs.value;
+
+                evalApp.ap.ApEvaluationTemplateId = newTemplate.Id;
+                evalApp.ap.ApEvaluationTemplates.push(newTemplate);
+                vmCommon.isAddEvalTemplated = true;
+            }
+            else if (evalTempAction == templateAction.Update) {
+                var tempObject = that.ap.ApEvaluationTemplates.find(t => t.Id == evalApp.ap.ApEvaluationTemplateId);
+                var tempIndex = that.ap.ApEvaluationTemplates.indexOf(tempObject);
+
+                tempObject.Name = newTemplate.Name;
+                tempObject.APEvaluationData = currentEvals;
+
+                that.ap.ApEvaluationTemplates.splice(tempIndex, 1);
+                that.ap.ApEvaluationTemplates.splice(tempIndex, 0, tempObject);
+
+            }
+
+            evalApp.isChangeTemplate = false;
+        });
+    };
+
+    //ENTITY
+    function APEvalItem() {
+        this.Id = 0;
+        this.TypeId = 0;
+        this.Priority = 0;
+        this.Evaluation = 0;
+        this.MIndex = 0;
+        this.CriteriaId = 0;
+        this.CreatedBy = 1;
+        this.DeletedBy = null;
+
+        return this;
+    };
+
+    function deleteGlobal() {
+        delete vmCommon.ChTemplateTltX;
+        delete vmCommon.ChTemplateTltY;
+        delete vmCommon.ChTemplateTltZ;
+        delete vmCommon.PrevTemplateId;
+        delete vmCommon.CacheTitleEval;
+        delete vmCommon.templateControl;
+        delete vmCommon.CacheIsAssesment;
+        delete vmCommon.IsChangeTitleX;
+        delete vmCommon.IsChangeTitleY;
+        delete vmCommon.IsChangeTitleZ;
+        delete vmCommon.IsChangeTitleNegativeX;
+        delete vmCommon.IsChangeTitleNegativeY;
+        delete vmCommon.IsChangeTitleNeutralX;
+        delete vmCommon.IsChangeTitleNeutralY;
+        delete vmCommon.IsChangeTitlePositiveX;
+        delete vmCommon.IsChangeTitlePositiveY;
+        delete vmCommon.isChangeTabEval;
+        delete vmCommon.isAddEvalTemplated;
+        delete vmCommon.EvMutationObserver;
+    }
+    function findBubbleChrtTooltip() {
+        vmCommon.nodeBubbleChrtTooltip = document.querySelector(`.k-tooltip.k-chart-tooltip.k-chart-tooltip-inverse`);
+        if (!vmCommon.nodeBubbleChrtTooltip) {
+            setTimeout(findBubbleChrtTooltip, 357);
+        } else {
+            const popEvl = document.querySelector(`div#popGoalActionEval.k-window-content.k-content`);
+            if (popEvl) {
+                let limT = $(popEvl).offset().top;
+                let tp = $(vmCommon.nodeBubbleChrtTooltip).offset().top;
+                if (limT > tp) {
+                    vmCommon.nodeBubbleChrtTooltip.style.top = `${limT}px`;
+                    vmCommon.nodeBubbleChrtTooltip.style.transition = `top 0.3s`;
+                }
+            }
+        }
+    }
+    function initDOMChangeEvent(fncCallback) {
+        const targetNode = document.body;
+        const config = { attributes: true, childList: true, subtree: true };
+        const callback = (mutationList, observer) => {
+            fncCallback(mutationList.length);
+        };
+        vmCommon.EvMutationObserver = new MutationObserver(callback);
+        vmCommon.EvMutationObserver.observe(targetNode, config);
+    }
+</script>

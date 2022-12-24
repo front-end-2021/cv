@@ -1,0 +1,146 @@
+﻿<div class="dnb-inline-block wrapper" style="min-width:100%" v-cloak>
+
+    <div class="div-info-measuresplan">
+        <div class="min-w" v-if="IsSharepoint && ViewTypeId < 0">
+            <p class="clear" v-if="ViewTypeId == -1"
+               style="font-size: 23px;text-align:center">{{kLg.LinkInActive}}</p>
+            <p class="clear" v-if="ViewTypeId == -2"
+               style="font-size: 23px;text-align:center">{{kLg.msgRestricIp}}</p>
+        </div>
+        <div class="min-w" v-if="IsSharepoint != true">
+            <div class="div-info-title" id="lblMarkettingMixId"
+                 v-bind:style="{
+                    width: ViewWidth + 'px',
+                    display: StyleSharepoint.display
+                 }"
+                 style="padding-top: 8px;font-size:17px;font-family: Lato-New;min-width:100%">
+                <span>{{kLg.tabRoadmap}}</span>
+            </div>
+            <div id="ms-view-month-quarter" style=" margin-top: 15px; margin-left: 888px;" class="navi-place"
+                 v-bind:style="{ marginBottom: StyleSharepoint.marginBottom }">
+                <span class="btn" v-bind:class="{ activebtn: ViewTypeId == 0 }" @click="saveViewStatus(0)" style="box-shadow: 0 3px 5px rgb(0 0 0 / 13%);">{{kLg.TabQuarter}}</span>
+                <span class="btn" v-bind:class="{ activebtn: ViewTypeId == 1 }" @click="saveViewStatus(1)" style="box-shadow: 0 3px 5px rgb(0 0 0 / 13%);">{{kLg.TabMonth}}</span>         
+            </div>
+
+        </div>
+    </div>
+    <!--Start View month or quarter-->
+    <CalendarHead :viewType="ViewTypeId" :StartEndM="ViewMonth" :StartEndQ="ViewQuarter" 
+                  :subFilter="subFilter" :isShowDepth="isShowDepth" :IsHidePath="IsHidePath"/>
+
+    <div class="rm-view-quarter dnb-msa-elements-overview" v-if="ViewTypeId == 0"
+         v-bind:style="{
+            width: (IsHidePath ? ViewWidth - 17 : ViewWidth) + 'px',
+            height: StyleHeightViewQuarter,
+            overflow: StyleWithTimeRangeTo.overflow }">
+
+        <!--use key to re-render-->
+        <rm-quarter-calendar v-if="ViewTypeId == 0" 
+                    v-bind:key="'carlendar-q-from-'+ViewFrom+'-to-'+ViewTo"
+                    :StartEnd="ViewQuarter" 
+                    :TimerangeStart="TimeRangeFrom" :TimerangeEnd="TimeRangeTo" />
+        <rm-view-quarter v-if="ViewTypeId == 0" class="dnb-w100p" 
+                    v-bind:key="KeyLabeling"
+                    :MinStart="ViewQuarter.Start" :MaxEnd="ViewQuarter.End"
+                    :TimerangeStart="TimeRangeFrom" :TimerangeEnd="TimeRangeTo"
+                    :MasterBlocks="Elements.MasterBlocks" :subFilter="subFilter" />
+    </div>
+
+    <div class="rm-view-month dnb-msa-elements-overview" v-if="ViewTypeId == 1"
+         v-bind:style="{
+            width: (IsHidePath ? ViewWidth - 15 : ViewWidth) + 'px',
+            height: StyleHeightViewMonth,
+            overflow: StyleWithTimeRangeTo.overflow
+         }">
+
+        <!--use key to re-render-->
+        <rm-month-calendar v-if="ViewTypeId == 1" 
+                    v-bind:key="'carlendar-m-from-'+ViewFrom+'-to-'+ViewTo"
+                    :StartEnd="ViewMonth" 
+                    :TimerangeStart="TimeRangeFrom" :TimerangeEnd="TimeRangeTo" />
+        <rm-view-month v-if="ViewTypeId == 1" 
+                    v-bind:key="KeyLabeling"
+                    :MinStart="ViewMonth.Start" :MaxEnd="ViewMonth.End"
+                    :TimerangeStart="TimeRangeFrom" :TimerangeEnd="TimeRangeTo"
+                    :MasterBlocks="Elements.MasterBlocks" :subFilter="subFilter" />
+    </div>
+
+    <div v-if="LblClientIp != ''" 
+         class="dnb-clientip_27559" 
+         style="text-align:center;">{{LblClientIp}}</div>
+
+    <div v-if="IsUpdatingOnServer"
+         style="width: 100vw; height: 100vh; background-color: #cdcdcd12; display: inline-block; position: fixed; top: 0; left: 0; z-index: 9999; cursor: wait;"></div>
+    <script id="tbHoverNameShowRmTooltip" type="text/x-kendo-template" style="width:380px;">
+        <div class="rm-tooltip-wrap" >
+           #if(data.Name) {#
+            <strong class="rmHtmlFormatName">#:kLg.gaLblName#</strong>
+            <div class="pDesContent dnbDesHtmlFormat">#=htmlEscape(data.Name)#</div>
+           #}#
+
+            #if(data.Start && data.End){#<div style="display:flex;margin-top:18px">
+            <div>
+            <strong class="rmHtmlFormat">#:kLg.labelStart#</strong>   </div>
+            <div class="pDesContent dnbDesHtmlFormat" style="margin-left:5px;">#=data.Start#</div>
+
+              <div style="margin-left:75px;">
+            <strong class="rmHtmlFormat">#:kLg.labelEnd#</strong></div>
+            <div class="pDesContent dnbDesHtmlFormat" style="margin-left:5px;">#=data.End#</div>
+              </div>
+           #}#
+
+           #if(data.Start && !data.End){#
+            <div style="display:flex;margin-top:18px">
+            <div>
+            <strong class="rmHtmlFormat">#:kLg.labelStart#</strong></div>
+            <div class="pDesContent dnbDesHtmlFormat" style="margin-left:5px;">#=data.Start#</div>
+            </div>
+           #}#
+
+            #if(data.CategoryName){#
+            <strong class="rmHtmlFormat">#:kLg.lblCategory#</strong>
+            <div class="pDesContent dnbDesHtmlFormat">#=htmlEscape(data.CategoryName)#</div>
+           #}#
+
+            #if(data.Persons){#
+            <strong class="rmHtmlFormat">#:kLg.lblResponsible#</strong>
+            <div class="pDesContent dnbDesHtmlFormat">#=htmlEscape(data.Persons)#</div>
+           #}#
+
+            #if(data.Description){#
+            <strong class="rmHtmlFormat">#:kLg.labelDes#</strong>
+            <div class="pDesContent dnbDesHtmlFormat">#=data.Description#</div>
+           #}#
+
+           #if(data.Purpose){#
+            <strong class="rmHtmlFormat">#:kLg.labelPurpose#</strong>
+            <div class="pDesContent dnbDesHtmlFormat">#=data.Purpose#</div>
+           #}#
+           #if(data.Effect){#
+            <strong class="rmHtmlFormat">#:kLg.labelEstimate#</strong>
+            <div class="pDesContent dnbDesHtmlFormat">#=data.Effect#</div>
+           #}#
+           #if(data.Arrived){#
+            <strong class="rmHtmlFormat">#:kLg.labelArrived#</strong>
+            <div class="pDesContent dnbDesHtmlFormat">#=data.Arrived#</div>
+           #}#
+           #if(data.ExpectedEffect){#
+            <strong class="rmHtmlFormat">#:kLg.gaLblExpectedEffect#</strong>
+            <div class="pDesContent dnbDesHtmlFormat">#=data.ExpectedEffect#</div>
+           #}#
+           #if(data.ActualEffect){#
+            <strong class="rmHtmlFormat">#:kLg.gaLblActualEffect#</strong>
+            <div class="pDesContent dnbDesHtmlFormat">#=data.ActualEffect#</div>
+           #}#
+
+           #if(data.OccuredEffect){#
+            <strong class="rmHtmlFormat">#:kLg.gaLblOccuredEffect#</strong>
+            <div class="pDesContent dnbDesHtmlFormat">#=data.OccuredEffect#</div>
+           #}#
+
+
+
+
+        </div>
+    </script>
+</div>

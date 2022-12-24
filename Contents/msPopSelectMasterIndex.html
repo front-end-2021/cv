@@ -1,0 +1,433 @@
+﻿<style>
+    .menu-title, .item-title {
+        height: 30px;
+        background-color: #38baf8;
+        line-height: 28px;
+        padding-left: 5px;
+        color: white;
+        padding: 1px;
+    }
+
+        .menu-title a {
+            color: white;
+        }
+
+    .menu-content {
+        width: 96%;
+        float: right;
+        display: none;
+    }
+
+    .menu-place {
+        margin-top: 4px;
+        position: relative;
+    }
+
+    .menu-title:hover {
+        cursor: pointer;
+    }
+
+    /*.cbx-index{}*/
+</style>
+
+<div id="pop-master-index" class="pop-wrapper">
+    <form id="masterindexform" role="form" class="form-horizontal">
+        <div class="kmessage">
+            <span id="kmessage"></span>
+        </div>
+
+        <div class="modal-body ms-modal-body" style="height: 459px; overflow-x: hidden; overflow-y: scroll;padding-top: 0 !important;" id="div-masterindex">
+            <div class="root" id="root"></div>
+        </div>
+
+        <div class="modal-market-footer">
+            <button id="btnUpdateMasterIndex" type="button" class="ms-button" onclick="vmKpiMasterIndex.updateIndex()">
+                <span class="icon-20 icon-close"></span>
+                <span id="lblMasterIndexClose">Speichern und schliessen</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script type="text/html" id="indextemplate">
+    #for(var i = 0; i < data.length; i++){#
+    #var item = data[i]; #
+    <div class="menu-place" level="#:item.Level#" typeid="#:item.TypeId#" mid="#:item.Id#">
+
+        #if(item.IsLatest){#
+        <div class="item-title pointer" onclick="vmKpiMasterIndex.SelectSubTitle(this)">
+            <div style="width: 24px; height: 24px; float: left;margin-right: 10px;"></div>
+            <span style="float: left; width: #:94-item.Level#%; overflow: hidden; word-break: break-word; height: 28px;">#:item.Name || ""#</span>
+        </div>
+        #}else{#
+        <div class="menu-title pointer" onclick="vmKpiMasterIndex.openSubItem(this)" id="#:item.Level#m#:item.Id#">
+            <span class="arrow-panel-online icon-24 icon-left-block arrow-collapse" style="margin-top: 2px"></span>
+            <span style="float: left; width: #:94-item.Level#%; overflow: hidden; word-break: break-word; height: 28px;">#:item.Name || ""#</span>
+        </div>
+        #}#
+
+        #if(item.HasSelect){#
+        <input type="checkbox" class="pull-right cbx-index" style="position: absolute; right: 5px; top: 5px;" onchange="vmKpiMasterIndex.selectSubItem(this)" #if(item.IsSelect){#checked#}# #if(!item.IsSelectable){#disabled#}# #if(!item.IsSelectable){#islock#}# />
+        #}#
+
+        <div class="clear"></div>
+        <div class="menu-content" id="#:item.Level#x#:item.Id#">
+        </div>
+        <div class="clear"></div>
+    </div>
+    #}#
+
+</script>
+
+
+<script type="text/javascript">
+    var vmKpiMasterIndex = {};
+    var vmKpiAction = vmKpiAction || {};
+    vmKpiMasterIndex.modelChanged = false;
+
+    var dColor = "#38baf8", //default color
+        mColor = "#2c9fd5"; //mask color
+
+    vmKpiMasterIndex.viewModel = undefined;
+
+    vmKpiMasterIndex.destroyPop = function () {
+        vmGoalAction.popKpiMasterIndex.destroy();
+        vmGoalAction.popKpiMasterIndex = null;
+        $(".body-content").after("<div id='popkpigoalindex'></div>");
+    };
+
+    vmGoalAction.popKpiMasterIndex.bind("close", function (e) {
+        if (vmKpiMasterIndex.modelChanged) {
+            if (confirm(kLg.saveConfirmQuestion)) {
+                vmKpiMasterIndex.updateIndex();
+            } else {
+                vmKpiMasterIndex.destroyPop();
+            }
+
+        } else {
+            vmKpiMasterIndex.destroyPop();
+        }
+
+    });
+
+    vmKpiMasterIndex.updateIndex = function () {
+        if (kpiMasterIndex.LongLinkId == null && kpiMasterIndex.GuidLinkId == null) {
+            vmKpiMasterIndex.message(kLg.InvalidData);
+            return;
+        }
+
+        //var mtopics = vmGoalAction.kpiMasterIndexOptions.kpiData.KpiMasterTopics;
+        //var mtopic = vmCommon.findById(kpiMasterIndex.KpiActionMasterTopicId, mtopics);
+
+        vmGoalAction.kpiMasterIndexOptions.cb(kpiMasterIndex);
+
+        //var mtopic = vmGoalAction.kpiMasterIndexOptions.topic;
+
+        //if (vmGoalAction.kpiMasterIndexOptions.IsEdit) {
+        //    var mindex = vmGoalAction.kpiMasterIndexOptions.kpiMasterIndex;
+
+        //    if (mindex.Id > 0 && (mindex.LinkIds != kpiMasterIndex.LinkIds)) {
+        //        mindex.DataState = dataState.Modified;
+        //    }
+
+        //    if (mindex.TypeId == 10 && mindex.GuidLinkId != kpiMasterIndex.GuidLinkId) {
+        //        vmGoalAction.kpiMasterIndexOptions.topicCpn.deleteItem({ GuidLinkId: mindex.GuidLinkId, TypeId: mindex.TypeId, KpiMasterIndexTimes: [] }, vmCommon.KpiGoalType.INDEXMASTER);
+        //    }
+
+        //    mindex.LongLinkId = kpiMasterIndex.LongLinkId;
+        //    mindex.GuidLinkId = kpiMasterIndex.GuidLinkId;
+        //    mindex.LinkIds = kpiMasterIndex.LinkIds;
+
+        //    mindex.TypeId = kpiMasterIndex.TypeId;
+        //    mindex.Name = kpiMasterIndex.Name;
+
+        //    //$("#mindexname" + kpiMasterIndex.Id).text(kpiMasterIndex.Name);
+        //} else {
+        //    mtopic.KpiMasterIndexes.push(kpiMasterIndex);
+        //    //vmKpiAction.addNewMasterIndex(kpiMasterIndex);
+        //}
+
+        vmKpiMasterIndex.modelChanged = false;
+        vmGoalAction.popKpiMasterIndex.close();
+    };
+
+    vmKpiMasterIndex.mergeSelected = function () {
+        var i;
+        for (i = 0; i < settings.length; i++) {
+            settings[i].IsSelect = false;
+            settings[i].IsPath = false;
+        }
+
+        function markParent(parentId, parentLevel) {
+            if (parentId == undefined || parentLevel <= 0) return;
+
+            var parent = vmCommon.findByFunc(settings, function (it) { return it.Id == parentId && it.Level == parentLevel; });
+            if (parent == undefined) return;
+
+            parent.IsPath = true;
+
+            markParent(parent.ParentId, parentLevel - 1);
+        };
+
+        function markChilds(parentId, parentLevel) {
+            var x, childLevel = parentLevel + 1;
+            var childs = $.grep(settings, function (it) {
+                return it.ParentId == parentId && it.Level == childLevel;
+            });
+
+            if (childs.length === 0) return;
+            for (x = 0; x < childs.length; x++) {
+                var child = childs[x];
+
+                child.IsSelect = true;
+
+                markChilds(child.Id, child.Level);
+            }
+
+        };
+
+        //itself
+        for (i = 0; i < settings.length; i++) {
+            var item = settings[i];
+            if (item.TypeId == kpiMasterIndex.TypeId && (item.Id == kpiMasterIndex.LongLinkId || item.Id == kpiMasterIndex.GuidLinkId)) {
+                item.IsSelect = true;
+
+                //mark parent
+                markParent(item.ParentId, item.Level - 1);
+
+                //mark childs
+                markChilds(item.Id, item.Level);
+                break;
+            }
+        }
+    };
+
+    vmKpiMasterIndex.setUpLanguage = function () {
+        $("#pop-master-index #lblMasterIndexClose").text(kLg.lblClose);
+    };
+
+    vmKpiMasterIndex.autoColor = function () {
+        for (var i = 0; i < settings.length; i++) {
+            var item = settings[i];
+            $("#" + item.Level + "m" + item.Id).css({ "background-color": item.IsPath ? mColor : dColor });
+        }
+    };
+
+    vmKpiMasterIndex.toggleIcon = function (elem, isOpen) {
+        var temp = $(elem).children("span.arrow-panel-online");
+        if (temp.length === 0) return;
+
+        var ico = temp[0];
+        if (isOpen) {
+            $(ico).removeClass("arrow-collapse").addClass("arrow-right-big");
+        } else {
+            $(ico).removeClass("arrow-right-big").addClass("arrow-collapse");
+        }
+    };
+
+    vmKpiMasterIndex.getSubItems = function (parentId, parentLevel) {
+        var subLevel = parentLevel + 1;
+        return $.grep(settings, function (it) { return it.ParentId == parentId && it.Level == subLevel; });
+    };
+
+    vmKpiMasterIndex.SelectSubTitle = function (e) {
+        var parent = $(e).closest("div.menu-place");
+        var cbs = $(parent).children("input.cbx-index");
+
+        if (cbs.length === 0) return;
+        var cbx = cbs[0];
+        $(cbx).click();
+    };
+
+    vmKpiMasterIndex.selectSubItem = function (e) {
+        vmKpiMasterIndex.message();
+
+        var flag = $(e).is(":checked");
+
+        var parent = $(e).closest("div.menu-place");
+        var pId = $(parent).attr("mid");
+        var pLevel = $(parent).attr("level");
+
+        if (pId == undefined || pLevel == undefined || isNaN(Number(pLevel))) return;
+
+        var item = vmCommon.findByFunc(settings, function (it) { return it.Id == pId && it.Level == pLevel; });
+        if (item == null) {
+            $(e).prop("checked", !flag);
+            return;
+        }
+
+        //change data
+        if (isNaN(Number(pId)))
+            kpiMasterIndex.GuidLinkId = flag ? pId : null;
+        else
+            kpiMasterIndex.LongLinkId = flag ? pId : null;
+
+        kpiMasterIndex.LinkIds = item.Ids;
+
+        kpiMasterIndex.TypeId = flag ? item.TypeId : null;
+        kpiMasterIndex.Name = flag ? item.Name : "";
+
+        $("#div-masterindex input.cbx-index:not([islock])").not(e).prop("checked", false);
+        $("#div-masterindex input.cbx-index:not([islock])").not(e).prop("disabled", false);
+
+        if (flag && !item.IsLatest) {
+            var contentId = item.Level + "x" + item.Id;
+            $("#" + contentId + " input.cbx-index:not([islock])").prop("checked", true);
+            $("#" + contentId + " input.cbx-index:not([islock])").prop("disabled", true);
+        } else if (!flag && !item.IsLatest) {
+            var contentId = item.Level + "x" + item.Id;
+            $("#" + contentId + " input.cbx-index:not([islock])").prop("checked", false);
+            $("#" + contentId + " input.cbx-index:not([islock])").prop("disabled", false);
+        }
+
+        vmKpiMasterIndex.mergeSelected();
+        vmKpiMasterIndex.autoColor();
+        vmKpiMasterIndex.modelChanged = true;
+    };
+
+    vmKpiMasterIndex.openSubItem = function (e) {
+
+        var parent = $(e).closest("div.menu-place");
+        var pId = $(parent).attr("mid");
+        var pLevel = $(parent).attr("level");
+
+        if (pId == undefined || pLevel == undefined || isNaN(Number(pLevel))) return;
+
+        pLevel = Number(pLevel);
+
+        var contentId = pLevel + "x" + pId;
+        var content = $("#" + contentId);
+
+        var dataCount = $(e).data("datacount");
+
+        if (dataCount != undefined) {
+
+            if ($(content).is(":visible")) {
+                $(content).hide(120);
+                vmKpiMasterIndex.toggleIcon(e, false);
+            } else {
+                $(content).show(dataCount > 0 ? 120 : 0);
+                vmKpiMasterIndex.toggleIcon(e, true);
+            }
+
+        } else {
+            var subs = vmKpiMasterIndex.getSubItems(pId, pLevel);
+            vmKpiMasterIndex.binding(contentId, subs, "indextemplate");
+
+            //bind color
+            for (var i = 0; i < subs.length; i++) {
+                var item = subs[i];
+                $("#" + item.Level + "m" + item.Id).css({ "background-color": item.IsPath ? mColor : dColor });
+            }
+
+            $(e).data("datacount", subs.length);
+
+            var cbxs = $(e).next("input.cbx-index");
+            if (cbxs.length > 0) {
+                var cbx = cbxs[0];
+                var flag = $(cbx).is(":checked");
+
+                if (flag) {
+                    $("#" + contentId + " input.cbx-index").prop("checked", true);
+                    $("#" + contentId + " input.cbx-index").prop("disabled", true);
+                }
+            }
+
+            $(content).show(subs.length > 0 ? 120 : 0);
+            vmKpiMasterIndex.toggleIcon(e, true);
+        }
+    };
+
+    vmKpiMasterIndex.binding = function (divId, data, tempId) {
+        var templateContent = $("#" + tempId).html();
+        data = data || [];
+
+        var template = kendo.template(templateContent);
+        $("#" + divId).html(template(data));
+    };
+
+    vmKpiMasterIndex.yolo = function () {
+        //var mtopics = vmGoalAction.kpiMasterIndexOptions.kpiData.KpiMasterTopics;
+        //var mtopic = vmCommon.findById(kpiMasterIndex.KpiActionMasterTopicId, mtopics);
+        var mtopic = vmGoalAction.kpiMasterIndexOptions.topic;
+        if (mtopic == undefined) return;
+
+        if (mtopic.TypeId == vmCommon.KpiGoalTopicType.LandRegion || mtopic.TypeId == vmCommon.KpiGoalTopicType.Goal) return;
+
+        var indexes = mtopic.KpiMasterIndexes;
+        var otherIndexes = indexes.filter(t => t.Id != kpiMasterIndex.Id);
+
+        function disableParent(source, parentId, parentLevel) {
+            if (parentId == undefined || parentLevel <= 0) return;
+
+            var parent = vmCommon.findByFunc(source, function (it) { return it.Id == parentId && it.TypeId == parentLevel; });
+            if (parent == undefined) return;
+
+            parent.IsSelectable = false;
+            disableParent(source, parent.ParentId, parentLevel - 1);
+        }
+
+        function disableChilds(source, parentId, parentLevel) {
+            var x, childLevel = parentLevel + 1;
+
+            var childs = $.grep(source, function (it) {
+                return it.ParentId == parentId && it.TypeId == childLevel;
+            });
+
+            if (childs.length === 0) return;
+
+            for (x = 0; x < childs.length; x++) {
+                var child = childs[x];
+
+                child.IsSelectable = false;
+
+                disableChilds(source, child.Id, child.TypeId);
+            }
+        }
+
+        for (var i = 0; i < otherIndexes.length; i++) {
+            var anotherIndex = otherIndexes[i];
+            var item = settings.find(t => t.Id == (anotherIndex.LongLinkId || t.Id == anotherIndex.GuidLinkId) && t.TypeId == anotherIndex.TypeId);
+            if (item == undefined) continue;
+
+            disableParent(settings, item.ParentId, item.TypeId - 1);
+            disableChilds(settings, item.Id, item.TypeId);
+        }
+    };
+
+    vmKpiMasterIndex.message = function (text, time) {
+        if (time) {
+            setTimeout(function () {
+                $("#pop-master-index #kmessage").text("");
+            }, time);
+        }
+
+        if (text == undefined) {
+            $("#pop-master-index #kmessage").text("");
+            return;
+        }
+
+        $("#pop-master-index #kmessage").text(text || "");
+        return;
+    };
+
+    //READY
+    var settings = [], kpiMasterIndex;
+    $(function () {
+        kpiMasterIndex = vmCommon.deepCopy(vmGoalAction.kpiMasterIndexOptions.kpiMasterIndex);
+        settings = vmCommon.deepCopy(vmGoalAction.kpiMasterIndexOptions.kpiSetting);
+        
+        //TODO: limited settings data
+        vmKpiMasterIndex.mergeSelected();
+        vmKpiMasterIndex.yolo();
+
+        var roots = $.grep(settings, function (it) { return it.Level === 1; });
+        vmKpiMasterIndex.binding("root", roots, "indextemplate");
+
+        if (kpiMasterIndex.LongLinkId != null || kpiMasterIndex.GuidLinkId != null) {
+            vmKpiMasterIndex.autoColor();
+        }
+
+        vmKpiMasterIndex.setUpLanguage();
+    });
+</script>

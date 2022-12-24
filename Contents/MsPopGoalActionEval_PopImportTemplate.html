@@ -1,0 +1,154 @@
+﻿<div class="modal-body ms-modal-body" style="overflow:auto; height:300px">
+    <form>
+        <table id='apTable' class="tbgrid modal-table">
+            <thead>
+                <tr>
+                    <th class="title bg-grey lblPrjName"></th>
+                    <th class="title bg-grey" id="lblPrjOwner"></th>
+                    <th class="title bg-grey" id="lblTemplateName">Template name</th>
+                    <th class="title bg-grey" id="lblProjectName">Project name</th>
+                </tr>
+            </thead>
+            <tbody id="ap-body-lstTemplate"></tbody>
+        </table>
+    </form>
+</div>
+<div class="modal-market-footer" id="divImportFooter">
+    <button type="button" class="ms-button" onclick="vmApImport.chooseTemplate()" tabindex="1"><span class="icon-20 icon-update margin-right6"></span><span class="btnChoose">Choose</span></button>
+    <button type="button" class="ms-button" onclick="vmApImport.closeImportPopup(this)"><span class="icon-20 icon-close margin-right6"></span><span class="btnCancel">Cancel</span></button>
+</div>
+<div id="loadingEditMaingoal" class="loading" />
+
+<script id="ap-template-temp" type="text/x-kendo-template">
+    # for(var i = 0; i < data.length; i ++) { #
+    <tr id="#=data[i].Id#">
+        <td>#=i + 1#</td>
+        <td>
+            <input class="cbTemp" type="checkbox" />
+        </td>
+        <td>#:data[i].Name#</td>
+        <td>#:data[i].ProjectName#</td>
+    </tr>
+    # } #
+</script>
+
+<script>
+    var vmApImport = vmApImport || {};
+
+    vmApImport.dataservice = (function () {
+        function callAjaxMsAPEvalHandler(divId, funcName, entryData, requestType, successCallBack, url = null) {
+            var _url = "../Handlers/MsActionPlanEvalHandler.ashx?funcName=" + funcName + "&projid=" + projectId + "&strid=" + strategyId;
+            if (url) {
+                _url = url;
+            }
+
+            callAjax(divId, _url, entryData, successCallBack, requestType);
+        }
+
+        var callAjaxByPost = function (funcName, entryData, successFunc) {
+            callAjaxMsAPEvalHandler('loadingProdEvaluation', funcName, JSON.stringify(entryData), AjaxConst.PostRequest, successFunc);
+        };
+
+        var callAjaxByGet = function (funcName, urlPara, successFunc) {
+            var _url = "../Handlers/MsActionPlanEvalHandler.ashx?funcName=" + funcName + "&projid=" + projectId + "&strid=" + strategyId + urlPara;
+            callAjaxMsAPEvalHandler('loadingProdEvaluation', funcName, null, AjaxConst.GetRequest, successFunc, _url);
+        };
+
+        var importTemplate = function (entryData, successFunc) {
+            callAjaxByPost("importTemplate", entryData, successFunc);
+        };
+
+        var getEvalTemplateByUser = function (templateType, successFunc) {
+            var urlPara = '&templateType=' + templateType;
+            callAjaxByGet("getTemplateByCreatedUser", urlPara, successFunc);
+        };
+
+        return {
+            importTemplate: importTemplate,
+            getEvalTemplateByUser: getEvalTemplateByUser,
+        };
+    })();
+
+
+    vmApImport.setupLabelLanguage = function () {
+        $('#lblImportTemplateTitle').text(kLg.btnImportTemp);
+        $('#lblTemplateName').text(kLg.lblTemplateName);
+        $('#lblProjectName').text(kLg.projectName);
+        $('span.btnChoose').text(kLg.btnChoose);
+        $('span.btnCancel').text(kLg.btnCancel);
+    }
+
+    vmApImport.closeImportPopup = function () {
+        enableButtonPopup('divImportFooter');
+        if (vmApImport.importTempWindown)
+            vmApImport.importTempWindown.close();
+    };
+
+    vmApImport.chooseTemplate = function () {
+
+        var listSelected = [],
+            $selectedTemp = $('.cbTemp:checked');
+        $selectedTemp.each(function () {
+            var id = $(this).parents('tr').attr('id');
+
+            vmApImport.lstAvaiTemplate.map(t => {
+                if (t.Id == id) {
+                    t.CreatedBy = 1;
+                    listSelected.push(t);
+                }
+            });
+        });
+
+        var importObj = {
+            ListId: listSelected.map(t => t.Id).join(','),
+            TemplateType: vmApImport.templateType
+        };
+
+        vmApImport.dataservice.importTemplate(importObj, (res) => {
+            var dictData = res.value;
+            listSelected.map(t => {
+                if (dictData.OldId != vmCommon.emptyGuid ) {
+                    var itemId = dictData.find(id => id.OldId == t.Id);
+                    if (itemId) t.Id = itemId.NewId;
+                }
+            });
+
+            switch (vmApImport.templateType) {
+                case templateType.ApEvaluationTemplate:
+                    evalApp.ap.ApEvaluationTemplates = evalApp.ap.ApEvaluationTemplates.concat(listSelected);
+                    
+                    break;
+                case templateType.ApProductTemplate:
+                    var appr = vmCommon.deepCopy(vmApProduct.ApProductTemplates);
+                    vmApProduct.ApProductTemplates = appr.concat(listSelected);
+                    vmApProduct.initddlProdDesignTemplate();
+                    break;
+                case templateType.ApSwotanalyseTemplate:
+                    var aps = vmCommon.deepCopy(vmApSwotanalyse.ApSwotanalyseTemplates);
+                    vmApSwotanalyse.ApSwotanalyseTemplates = aps.concat(listSelected);
+                    vmApSwotanalyse.initddlTemplate();
+                    break;
+            }
+        });
+
+        vmApImport.closeImportPopup();
+    };
+
+    vmApImport.loadForm = function () {
+        var that = this;
+
+        that.dataservice.getEvalTemplateByUser(that.templateType, function (res) {
+            that.lstAvaiTemplate = res.value;
+
+            bindTemplate("ap-body-lstTemplate", "ap-template-temp", res.value);
+            that.importTempWindown.center();
+        });
+
+        that.setupLabelLanguage();
+    };
+
+    $(function () {
+        vmApImport.loadForm();
+    });
+
+</script>

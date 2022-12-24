@@ -1,0 +1,688 @@
+﻿<div id="pop-set-role-land-region">
+    <div class="modal-body ms-modal-body">
+        <p class="clear10px"></p>
+        <label class="popup-lable" id="lblName">Vollständiger Name: Admin</label>
+        <div id="grid-region-land"></div>
+        <div id="grid-mtab"></div>
+        <label class=" Mtab" id="lblName"></label>
+        <div id="grid-setting-role"></div>
+        <div id="grid-filter-department"></div>
+    </div>
+    <div class="popup-footer" style="position:sticky;bottom:0px;">
+        <button type="button" class="ms-button" onclick="vmRoleRegionLand.SaveAndClose()" id="btnSaveSetRole">
+        <span class="icon-20  icon-close margin-right6"></span><span id="spanBtnClose">Save and Close</span></button>
+    </div>
+</div>
+<div class="loading" id="role-region-loading"></div>
+<script type="text/html" id="tmp-dropDown">
+    <select>
+        <option value="1">View</option>
+        <option value="2">Edit</option>
+        <option value="3">No Access</option>
+    </select>
+</script>
+
+<!-- get Setting Role -->
+<script type="text/html" id="template-setting-role">
+    <table class="tbmid tbgrid modal-table">
+        <thead>
+            <tr>
+                <th class="title bg-grey" width="151px">#:kLg.Setting#</th>
+                <th class="title bg-grey" width="140px">#:kLg.role#</th>
+            </tr>
+        </thead>
+        <tr>
+            <td style="padding-left: 8px;">
+                <span class="icon-24 icon-milestone floatleft"></span>
+                <div style="height: 24px; padding-top: 3px;" class="floatleft">#:kLg.Setting#</div>
+            </td>
+            <td>
+                <select class="ms-select">
+                    <option value="0" #if (data.RoleId == vmCommon.SettingRole.SETTING_EDIT) {# selected="selected" #}#>#:kLg.roleEdit#</option>
+                    <option value="1" #if (data.RoleId == vmCommon.SettingRole.SETTING_VIEW) {# selected="selected" #}#>#:kLg.roleView#</option>
+                </select>
+            </td>
+        </tr>
+    </table>
+</script>
+
+<!--GetFilterDepartment-->
+<script type="text/html" id="template-table-FilterDepartment">
+    <table class="tbmid tbgrid modal-table">
+        <thead>
+            <tr>
+                <th class="title bg-grey" width="151px">#:kLg.lblFilter#</th>
+                <th class="title bg-grey" width="140px">#:kLg.titleAStatusCrm#</th>
+            </tr>
+        </thead>
+        #for (var m=0; m < data.length; m++){#
+        #var filterDP = data[m];#
+        <tr mstype="filterDP" class="filterDP filterDP-draggable" msid="#=filterDP.Id#" 
+            data-mindex="#:filterDP.MIndex#">
+            <td style="padding-left: 8px;">
+                <span class="icon-24 icon-milestone floatleft"></span>
+                <div style="height: 24px; padding-top: 3px;" class="floatleft">#:filterDP.Name#</div>
+            </td>
+            <td>
+                <select class="ms-select">
+                    <option value="#:vmRoleRegionLand.RoleId.FilterView#"  #if (filterDP.RoleId == vmRoleRegionLand.RoleId.FilterView) {# selected="selected" #}#>#:kLg.gaLblShowIn#</option>
+                    <option value="#:vmRoleRegionLand.RoleId.FilterNoAccess#" #if (filterDP.RoleId == vmRoleRegionLand.RoleId.FilterNoAccess) {# selected="selected" #}#>#:kLg.isHidden#</option>
+                </select>
+            </td>
+        </tr>
+        #}#
+    </table>
+</script>
+<!--LOADMTAB-->
+<script type="text/html" id="template-table-Mtab">
+    <table class="tbmid tbgrid modal-table">
+        <thead>
+            <tr>
+                <th class="title bg-grey" width="151px">#:kLg.charPage#</th>
+                <th class="title bg-grey" width="140px">#:kLg.titleAStatusCrm#</th>
+            </tr>
+        </thead>
+        #for (var m=0; m < data.length; m++){#
+        #var mtab = data[m];#
+        <tr mstype="mtab" msid="#=mtab.Id#">
+            <td style="padding-left: 8px;">
+                <span class="icon-24 icon-milestone floatleft"></span>
+                <div style="height: 24px; padding-top: 3px;" class="floatleft">#:kLg[mtab.Name]#</div>
+            </td>
+            <td>
+                #if(vmRoleRegionLand.IsEdit) {#
+                <select class="ms-select">
+                    <option value="#:vmRoleRegionLand.RoleId.Tabview#" #if (mtab.RoleId == vmRoleRegionLand.RoleId.Tabview) {# selected="selected" #}#>#:kLg.gaLblShowIn#</option>
+                    <option value="#:vmRoleRegionLand.RoleId.TabNoAccess#" #if (mtab.RoleId == vmRoleRegionLand.RoleId.TabNoAccess) {# selected="selected" #}#>#:kLg.isHidden#</option>
+                </select>
+                #} else {#
+                # if(mtab.RoleId == vmRoleRegionLand.RoleId.Tabview) {# #:kLg.gaLblShowIn# #}#
+                # if(mtab.RoleId == vmRoleRegionLand.RoleId.TabNoAccess) {# #:kLg.isHidden# #}#
+                #}#
+            </td>
+        </tr>
+        #}#
+    </table>
+</script>
+
+<script type="text/html" id="template-table-land-region">
+    <table class="tbgrid modal-table">
+        <tr>
+            <th class="title bg-grey checkdepartmentick" width="500px">#:kLg.fibuLR#</th>
+            <th class="title bg-grey" width="150px">#:kLg.role#</th>
+            #if (vmRoleRegionLand.isDepartment) {#
+            <th class="title bg-grey" width="150px">#:kLg.CheckboxDP#</th>
+            #}#
+        </tr>
+        #for (var i = 0; i < data.length; i++){#
+        #var land=data[i];#
+        #if (land.RoleId == 0) {#
+        #vmRoleRegionLand.isAnyFirst = true;#
+        #if(vmRoleRegionLand.CurStrategyRole == vmRoleRegionLand.RoleId.StrategyEdit) {#
+        #land.RoleId = vmRoleRegionLand.RoleId.EditLand;#
+        #} else {#
+        #land.RoleId = vmRoleRegionLand.RoleId.ViewLand;#
+        #}#
+        #land.DataState = dataState.Modified;#
+        #}#
+        <tr mstype="land" msid="#=land.Id#">
+            <td style="padding-left: 8px;">
+                <span class="icon-24 icon-milestone floatleft"></span>
+                <div style="height: 24px; padding-top: 3px;" class="floatleft">#:land.Name#</div>
+            </td>
+            <td>
+                #if(vmRoleRegionLand.IsEdit) {#
+                <select class="ms-select" style=" margin-right: 10px;">
+                    <option value="#:vmRoleRegionLand.RoleId.EditLand#" 
+                            #if (land.RoleId == vmRoleRegionLand.RoleId.EditLand) {# selected="selected" #}#>#:kLg.roleEdit#</option>
+                    <option value="#:vmRoleRegionLand.RoleId.ViewLand#" 
+                            #if (land.RoleId == vmRoleRegionLand.RoleId.ViewLand) {# selected="selected" #}#>#:kLg.roleView#</option>
+                    <option value="#:vmRoleRegionLand.RoleId.LandNoAccess#" 
+                            #if (land.RoleId == vmRoleRegionLand.RoleId.LandNoAccess) {# selected="selected" #}#>#:kLg.noAccess#</option>
+                </select>
+                #} else {#
+                # if(land.RoleId == vmRoleRegionLand.RoleId.EditLand) {# #:kLg.roleEdit# #}#
+                # if(land.RoleId == vmRoleRegionLand.RoleId.ViewLand) {# #:kLg.roleView# #}#
+                # if(land.RoleId == vmRoleRegionLand.RoleId.LandNoAccess) {# #:kLg.noAccess# #}#
+                #}#
+            </td>
+        </tr>
+        #for (var j = 0; j< land.Regions.length; j++){#
+        # var region = land.Regions[j];#
+        #if(region.Id != 0){#
+        #if (region.RoleId == 0){#
+
+        #region.RoleId = land.RoleId == vmRoleRegionLand.RoleId.EditLand ? vmRoleRegionLand.RoleId.EditRegion : (land.RoleId == vmRoleRegionLand.RoleId.ViewLand ? vmRoleRegionLand.RoleId.ViewRegion: vmRoleRegionLand.RoleId.RegionNoAccess) ;#
+        #}#
+        <tr mstype="region" msid="#=region.Id#">
+            <td style="padding-left: 40px;">#:region.Name#</td>
+            <td>
+                #if(vmRoleRegionLand.IsEdit) {#
+                <select class="ms-select" style=" margin-right: 10px;">
+                    <option value="#:vmRoleRegionLand.RoleId.EditRegion#" 
+                            # if(region.RoleId == vmRoleRegionLand.RoleId.EditRegion) {# selected="selected" #}#>#:kLg.roleEdit#</option>
+                    <option value="#:vmRoleRegionLand.RoleId.ViewRegion#" 
+                            # if(region.RoleId == vmRoleRegionLand.RoleId.ViewRegion) {# selected="selected" #}#>#:kLg.roleView#</option>
+                    <option value="#:vmRoleRegionLand.RoleId.RegionNoAccess#" 
+                            # if(region.RoleId == vmRoleRegionLand.RoleId.RegionNoAccess) {# selected="selected" #}#>#:kLg.noAccess#</option>
+                </select>
+                #} else {#
+                # if(region.RoleId == vmRoleRegionLand.RoleId.EditRegion) {# #:kLg.roleEdit#  #}#
+                # if(region.RoleId == vmRoleRegionLand.RoleId.ViewRegion) {# #:kLg.roleView# #}#
+                # if(region.RoleId == vmRoleRegionLand.RoleId.RegionNoAccess) {# #:kLg.noAccess# #}#
+                #}#
+            </td>
+            <td style="padding-left: 80px;" class="isrowcheckbox">
+                #if (vmRoleRegionLand.isDepartment) {#
+                    <input id="checkboxrole#:region.Id#" type="checkbox" #if(region.IsRegionDefault == true) {# checked #}# 
+                           #if(region.RoleId == vmRoleRegionLand.RoleId.RegionNoAccess) {# disabled #}#  onchange=" vmRoleRegionLand.changeStandDardEntry(this, #:region.Id#) " />
+                #} #
+            </td>
+        </tr>
+        #}#
+        #}#
+        #}#
+    </table>
+</script>
+<script>
+</script>
+<script type="text/javascript">
+    var vmRoleRegionLand = vmRoleRegionLand || {};
+    vmRoleRegionLand.ProjectId = sHandler.ProjectId;
+    vmRoleRegionLand.AccountId = 20217;
+    vmRoleRegionLand.RoleId = {
+        EditLand: 14,
+        ViewLand: 16,
+        EditRegion: 15,
+        ViewRegion: 17,
+        LandNoAccess: 19,
+        RegionNoAccess: 20,
+        StrategyEdit: 7,
+        StrategyView: 8,
+        Empty: -1,
+        Tabview: 22,
+        TabNoAccess: 23,
+        FilterView: 26,
+        FilterNoAccess: 27
+    };
+
+    vmRoleRegionLand.ChangedList = [];
+    vmRoleRegionLand.isModified = false;
+
+    vmRoleRegionLand.isAnyFirst = false;
+    vmRoleRegionLand.ErrorsState = {
+        NoRole: -1,
+        Conflict: -3
+    };
+    vmRoleRegionLand.GetLandRegionByProject = function () {
+        var that = this;        // this = vmRoleRegionLand
+
+        let departmentids = '';
+        if (vmProject.curMem.IsDepartmentChange) {
+            departmentids = that.ListDepartment.length > 0 ? that.ListDepartment.join() : '';
+        }
+
+        let url = '../Handlers/ProjectHandler.ashx?funcName=getlistregionland&projid=' + that.ProjectId +
+            '&accid=' + that.AccountId + '&isdepartment=' + that.isDepartment
+            + '&departmentids=' + departmentids;
+
+        return new Promise((r, j) => {
+            callAjax('role-region-loading', url, null, function (data) {
+
+                if (data.value.length <= 0) data.value = [];
+                that.Lands = data.value;
+
+                if (vmProject.curMem.IsDepartmentChange) {
+                    that.Lands.map(t => t.DataState = dataState.Modified);
+                }
+
+                that.BindGridRegionLand(data.value);
+
+                $("#grid-region-land .ms-select").kendoDropDownList({
+                    change: that.OnChangeDropDown
+                });
+                var height = $(window).height() > 744 ? 744 : $(window).height();
+                setHeightPopUp(popUpRole, height);
+
+                r(true);
+
+            }, AjaxConst.GetRequest);
+        })
+    };
+
+    vmRoleRegionLand.OderIndexGetmtab = function (mtabs) {
+        var temp1 = mtabs[4];
+        var temp2 = mtabs[5];
+        var temp3 = mtabs[6];
+        mtabs[4] = temp3;
+        mtabs[5] = temp1;
+        mtabs[6] = temp2;
+        return mtabs
+    };
+
+    vmRoleRegionLand.GetMtab = function () {
+        var that = this;        // this = vmRoleRegionLand
+        let departmentids = '';
+        if (vmProject.curMem.IsDepartmentChange) {
+            departmentids = that.ListDepartment.length > 0 ? that.ListDepartment.join() : '';
+        }
+        var url = '../Handlers/ProjectHandler.ashx?funcName=getmtab&projid=' + that.ProjectId + '&mid=' + that.AccountId
+            + '&isDepartment=' + that.isDepartment + '&departmentids=' + departmentids;
+
+        return new Promise(r => {
+            callAjax('role-region-loading', url, null, function (data) {
+                //that.Mtabs = data.value;
+                that.Mtabs = vmRoleRegionLand.OderIndexGetmtab(data.value);
+                that.Mtabs.map(t => {
+
+                    t.RoleId == 0 && (t.RoleId = that.RoleId.Tabview);
+                    if (vmProject.curMem.IsDepartmentChange) {
+                        t.DataState = dataState.Modified;
+                    }
+                })
+
+                var template = kendo.template($('#template-table-Mtab').html());
+                $('#grid-mtab').append(template(data.value));
+                $("#grid-mtab .ms-select").kendoDropDownList({
+                    change: that.OnChangeMTabDropDown
+                });
+
+                r(true);
+            }, AjaxConst.GetRequest);
+        })
+    };
+    //filterdeparment
+    vmRoleRegionLand.BindFilterDepartment = function (dataArr) {
+        $('#grid-filter-department').html('');
+        var template = kendo.template($('#template-table-FilterDepartment').html());
+        $('#grid-filter-department').append(template(dataArr));
+        $("#grid-filter-department .ms-select").kendoDropDownList({
+            change: vmRoleRegionLand.OnChangeFilterDropDown
+        });
+        setupDragdropFilter();
+    }
+    vmRoleRegionLand.GetFilterDepartment = function () {
+        var that = this;        // this = vmRoleRegionLand
+        let departmentids = '';
+        if (vmProject.curMem.IsDepartmentChange) {
+            departmentids = that.ListDepartment.length > 0 ? that.ListDepartment.join() : '';
+        }
+        var url = '../Handlers/ProjectHandler.ashx?funcName=getfilterdepartment&projid=' + that.ProjectId + '&mid=' + that.AccountId
+            + '&isDepartment=' + that.isDepartment + '&departmentids=' + departmentids;
+        return new Promise(r => {
+            callAjax('role-region-loading', url, null, function (data) {
+                that.FilterCriteria = data.value;
+                that.FilterCriteria.forEach(t => {
+                    //t.RoleId == 0 && (t.RoleId == that.RoleId.Tabview);
+                    if (vmProject.curMem.IsDepartmentChange) {
+                        t.DataState = dataState.Modified;
+                    } else {
+                        t.DataState = dataState.Unchanged;
+                    }
+                })
+                let isDepartment = vmProject.isDepartment;
+
+                if (isDepartment) {
+                    vmRoleRegionLand.BindFilterDepartment(that.FilterCriteria);
+                    r(true);
+                } else {
+                    $('#grid-filter-department').remove();
+                    $('#grid-filter-department .ms-select').remove();
+                }
+            }, AjaxConst.GetRequest);
+
+        })
+    };
+    function setupDragdropFilter() {
+        $('tr.filterDP-draggable').draggable({
+            axis: "y", revert: "invalid",
+            start: function (event, ui) {
+                var $elm = ui.helper;
+                $elm.css({ 'background-color': 'rgb(196, 236, 255)', 'z-index': '1' });
+            }
+            ,stop: function (event, ui) {
+                var $elm = ui.helper; $elm.css({ 'background-color': '', 'z-index': '' });
+            }
+        });
+        $('tr.filterDP-draggable').droppable({
+            accept: ".filterDP-draggable",
+            drop: function (event, ui) {
+                var $elmFrom = ui.helper;
+                var $elmTo = $(this);
+                var fromMIndex = $elmFrom.attr('data-mindex');
+                var toMIndex = $elmTo.attr('data-mindex');
+                updateMIndex(+fromMIndex, +toMIndex);
+            },
+            over: function () {
+                $(this).css({ 'background-color': '#ddf4ff' });
+            },
+            out: function () {
+                $(this).css({ 'background-color': '' });
+            }
+        });
+
+        function updateMIndex(fromMIndex, toMIndex) {
+            var f = fromMIndex < toMIndex ? fromMIndex : toMIndex;
+            var t = fromMIndex < toMIndex ? toMIndex : fromMIndex;
+            var lstRange = vmRoleRegionLand.FilterCriteria.filter(i => {
+                return f <= i.MIndex && i.MIndex <= t
+            });
+            var len = lstRange.length;
+            if (fromMIndex > toMIndex) {
+                for (let i = 1; i < len; i++) {
+                    lstRange[i - 1].MIndex = lstRange[i].MIndex;
+                    lstRange[i - 1].DataState = dataState.Modified;
+                }
+                lstRange[len - 1].MIndex = toMIndex;
+                lstRange[len - 1].DataState = dataState.Modified;
+            } else {
+                for (let i = len - 1; i > 0; i--) {
+                    lstRange[i].MIndex = lstRange[i - 1].MIndex;
+                    lstRange[i].DataState = dataState.Modified;
+                }
+                lstRange[0].MIndex = toMIndex;
+                lstRange[0].DataState = dataState.Modified;
+            }
+            vmRoleRegionLand.FilterCriteria.sort((firstEl, secondEl) => {
+                return (firstEl.MIndex - secondEl.MIndex);
+            });
+            vmRoleRegionLand.BindFilterDepartment(vmRoleRegionLand.FilterCriteria);
+        }
+    }
+    
+    vmRoleRegionLand.changeStandDardEntry = function (e, regionId) {
+        var $this = $(e);
+        var isRegionDefault = $this.is(":checked");
+        var region, i = 0, j = 0;
+        for (var len = vmRoleRegionLand.Lands.length; i < len; i++) {
+            var item = vmRoleRegionLand.Lands[i];
+            j = 0;
+            for (var len2 = item.Regions.length; j < len2; j++) {
+                region = item.Regions[j];
+                if (region.Id == regionId) {
+                        vmRoleRegionLand.Lands[i].Regions[j].IsRegionDefault = isRegionDefault;
+                } else {
+                    vmRoleRegionLand.Lands[i].Regions[j].IsRegionDefault = false;
+                    if (isRegionDefault) {
+                        $("#checkboxrole" + region.Id).prop("checked", false);
+                    }
+                }
+            }
+        }
+    };
+
+    vmRoleRegionLand.GetSettingRole = function () {
+        var that = this;        // this = vmRoleRegionLand
+
+        var url = '../Handlers/ProjectHandler.ashx?funcName=getsettingrole&projid=' + that.ProjectId + '&mid=' + that.AccountId;
+        return new Promise(resolve => {
+            callAjax('role-region-loading', url, null, function (data) {
+                var rStatus = data.value.ResultStatus;
+                if (rStatus == vmCommon.ResultState.SUCCESS) {
+                    that.SettingRole = data.value.TheObject;
+
+                    var template = kendo.template($('#template-setting-role').html());
+                    $('#grid-setting-role').append(template(that.SettingRole));
+                    $("#grid-setting-role .ms-select").kendoDropDownList({
+                        change: function (e) {
+                            var roleId = getRoleId(e.sender.selectedIndex);
+
+                            vmRoleRegionLand.isModified = true;
+                            that.SettingRole.State = dataState.Modified;
+                            that.SettingRole.RoleId = roleId;
+                        }
+                    });
+
+                    resolve(true);
+                } else {
+                    $('#grid-setting-role').remove();       // remove để DOM khong bi thừa element
+                    $('#template-setting-role').remove();   // remove để DOM khong bi thừa element
+                }
+
+                function getRoleId(selectedIndex) {
+                    if (selectedIndex < 1) return vmCommon.SettingRole.SETTING_EDIT;
+                    if (selectedIndex < 2) return vmCommon.SettingRole.SETTING_VIEW;
+                }
+            }, AjaxConst.GetRequest);
+        })
+    };
+
+    vmRoleRegionLand.OnChangeDropDown = function (e) {
+        var that = vmRoleRegionLand;
+        that.isModified = true;
+
+        var elem = e.sender.element.closest('tr');
+        var regionid = $(elem).attr('msid');
+        var item = that.FindItem(regionid, $(elem).attr('mstype'));
+        item.RoleId = parseInt(this.value());
+        item.DataState = dataState.Modified;
+        //update child
+        if ($(elem).attr("mstype") === "land") {
+            item.Regions = item.Regions || [];
+            for (var i = 0; i < item.Regions.length; i++) {
+                if (item.Regions[i].DataState === dataState.Unchanged)
+                    item.Regions[i].DataState = dataState.Modified;
+            }
+        }
+        if (item.RoleId == vmRoleRegionLand.RoleId.RegionNoAccess) {
+            $('#checkboxrole' + regionid).prop('disabled', true);
+        } else {
+            $('#checkboxrole' + regionid).prop('disabled', false);
+        }
+
+    };
+
+    vmRoleRegionLand.OnChangeMTabDropDown = function (e) {
+        vmRoleRegionLand.isModified = true;
+
+        var index = e.sender.element.closest('tr').index();
+
+        var item = vmRoleRegionLand.Mtabs[index];
+
+        item.RoleId = parseInt(this.value());
+        item.DataState = dataState.Modified;
+    };
+    //Dropdown filterdepartment
+    vmRoleRegionLand.OnChangeFilterDropDown = function (e) {
+        vmRoleRegionLand.isModified = true;
+        var index = e.sender.element.closest('tr').index();
+
+        var item = vmRoleRegionLand.FilterCriteria[index];
+        item.RoleId = parseInt(this.value());
+        item.DataState = dataState.Modified;
+    };
+
+    vmRoleRegionLand.SaveAndClose = function () {
+        var that = this;        // this = vmRoleRegionLand
+        if (that.isModified || that.isAnyFirst || vmProject.curMem.IsDepartmentChange || that.isDepartment) that.UpdateRole();
+
+        popUpRole.close();
+    };
+
+    vmRoleRegionLand.UpdateRole = function () {
+        var that = this;        // this = vmRoleRegionLand
+        that.isModified = false;
+        that.isAnyFirst = false;
+        if (!that.isDepartment) {
+            that.Lands.map(l => {
+
+                if (vmProject.curMem.IsDepartmentChange) {
+
+                    l.DataState = dataState.Modified;
+
+                    l.Regions.map(r => r.DataState = dataState.Modified);
+                }
+            })
+
+            that.Mtabs.map(t => {
+                if (vmProject.curMem.IsDepartmentChange) {
+                    t.DataState = dataState.Modified;
+                }
+            })
+            vmProject.curMem.IsDepartmentChange = false;
+        }
+
+        var url = '../Handlers/ProjectHandler.ashx?funcName=updatelistregionland&projid=' + that.ProjectId;
+        var obj = {
+            FilterCriterias: that.FilterCriteria,
+            Mtabs: that.Mtabs,
+            Lands: that.Lands,
+            UserIds: that.UserIds,
+            AccountId: that.AccountId,
+            ListMember: that.ListMember,
+            IsDepartment: that.isDepartment,
+            SettingRole: that.SettingRole
+        };
+
+        callAjax('role-region-loading', url, JSON.stringify(obj), function (data) {
+            var state = parseInt(data.value);
+            switch (state) {
+                case that.ErrorsState.NoRole:
+                    pAlert(kLg.msgNoEditPermission).then(function () {
+                        location.reload();
+                    });
+                    break;
+                default:
+                    popUpRole = null;
+                    ; break;
+            }
+
+        }, AjaxConst.PostRequest);
+    };
+
+    vmRoleRegionLand.BindClosePopup = function () {
+
+        let that = this;        // this = vmRoleRegionLand
+
+        popUpRole.bind("close", function (e) {
+
+            if (that.isModified) {
+                if (!confirm(kLg.saveConfirmQuestion)) {
+                    popUpRole?.destroy();
+                    popUpRole = null;
+                    $('#pop-add-project').after('<div id="pop-setRole"></div>');
+                } else {
+                    that.UpdateRole();
+                    popUpRole?.destroy();
+                    popUpRole = null;
+                    $('#pop-add-project').after('<div id="pop-setRole"></div>');
+                }
+            } else {
+                if (vmProject.curMem.IsDepartmentChange) that.UpdateRole();
+
+                popUpRole?.destroy();
+                popUpRole = null;
+                $('#pop-add-project').after('<div id="pop-setRole"></div>');
+            }
+        });
+    };
+
+    vmRoleRegionLand.FindItem = function (id, type) {
+        var that = this;        // this = vmRoleRegionLand
+
+        if (type == "land") {
+
+            for (var i in that.Lands) {
+
+                if (that.Lands[i].Id == id) {
+                    return that.Lands[i];
+                }
+            }
+
+            return null;
+
+        } else {
+
+            for (var i in that.Lands) {
+
+                var parent = that.Lands[i];
+
+                if (!parent.Regions) continue;
+
+                for (var j in parent.Regions) {
+
+                    if (parent.Regions[j].Id == id) {
+                        return parent.Regions[j];
+                    }
+                }
+            }
+
+            return null;
+        }
+    };
+
+    vmRoleRegionLand.BindGridRegionLand = function (data) {
+        var template = kendo.template($('#template-table-land-region').html());
+        $('#grid-region-land').append(template(data));
+        if (!vmRoleRegionLand.isDepartment) {
+            $('.isrowcheckbox').css({ 'display': 'none' });
+            $('.checkdepartmentick').css({ 'width': '160px' });
+        }
+    };
+
+    vmRoleRegionLand.SetLang = function () {
+        $('#pop-set-role-land-region #spanBtnClose').html(kLg.lblClose);
+        $('#pop-set-role-land-region #role').html(kLg.role);
+    };
+
+    $(document).ready(function () {
+        let isDepartment = vmProject.isDepartment;
+
+        vmRoleRegionLand.ProjectId = vmProject.curProjectId;
+
+        if (isDepartment) {
+            vmRoleRegionLand.isDepartment = isDepartment;
+
+            $("#lblName").html(kLg.Department + ': ' + vmProject.curMem.DepartmentName);
+
+            vmRoleRegionLand.AccountId = vmProject.curMem.DepartmentId;
+            vmRoleRegionLand.UserIds = vmProject.curMem.Users;
+            // for sync data role
+            vmRoleRegionLand.ListMember = vmProject.curMem.ListMember;  
+        }
+        else {
+            vmRoleRegionLand.isDepartment = false;
+
+            $("#lblName").html(kLg.fullName + ': ' + vmProject.curMem.MemberName);
+
+            vmRoleRegionLand.AccountId = vmProject.curMem.MemberId;
+            vmRoleRegionLand.UserIds = [];
+
+            let listGroupDepartment = vmProject.curMem.ListDepartmentId;
+
+            vmRoleRegionLand.ListDepartment = vmProject.curMem.ListDepartment ? vmProject.curMem.ListDepartment.filter(t => listGroupDepartment.some(x => x == t)) : [];
+
+        }
+
+        vmRoleRegionLand.IsEdit = vmProject.isEdit;
+
+        vmRoleRegionLand.IsLoading = true;
+
+        $('#btnSaveSetRole').prop('disabled', true);
+       
+        vmRoleRegionLand.CurStrategyRole = vmProject.curMem.Role;
+        let loadLandregion = vmRoleRegionLand.GetLandRegionByProject();
+        let loadMTab = vmRoleRegionLand.GetMtab();
+        var executeAll = [loadLandregion, loadMTab];
+        if (!isDepartment) {
+            var getBindSettingRole = vmRoleRegionLand.GetSettingRole();
+            executeAll.push(getBindSettingRole);
+        }
+        else {
+            $('#grid-setting-role').remove();       // remove để DOM khong bi thừa element
+            $('#template-setting-role').remove();   // remove để DOM khong bi thừa element
+            
+            vmRoleRegionLand.GetFilterDepartment();
+        }
+
+        vmRoleRegionLand.BindClosePopup();
+        vmRoleRegionLand.SetLang();
+
+        Promise.all(executeAll).then(rArr => {
+            vmRoleRegionLand.IsLoading = false;
+
+            $('#btnSaveSetRole').prop('disabled', false);
+        });
+    });
+
+</script>

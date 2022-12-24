@@ -1,0 +1,365 @@
+﻿<style>
+    .modal-market-hr {
+        margin-bottom: 14px;
+    }
+    #fViewDataForm .individual-table-body tbody input[data-type="20"],
+    #fViewDataForm .individual-table-body tbody input[data-type="21"] {
+        background-color: gray !important;
+        border-color: gray !important;
+    }
+</style>
+<div id="pop-select-default"></div>
+<div id="pop-viewData" class="pop-wrapper">
+    <form id="fViewDataForm" role="form" class="form-horizontal">
+        <div class="modal-body ms-modal-body" style="height: 280px;overflow: auto;">
+
+            <div>
+                <label id="lblCategoryName">Name</label>
+                <div class="clear"></div>
+                <input id="textCategoryName" name="textCategoryName" tabindex="1" class="modal-input txtInput w-100per-fix" maxlength="250" data-bind="value: category.Name" />
+            </div>
+            <hr class="modal-market-hr">
+            <div class="clear0px" style="width: 100%; height: 23px;">
+                <div class="pull-left" style="margin-right: 30px;">
+                    <input type="checkbox" style="float: left;margin-right: 3px;margin-top: 3px;" data-bind="checked: viewdata.IsStandard, events: {change: onChangeStandard}" />
+                    <span id="lblStandard">Standard</span>
+                </div>
+                <div class="pull-left">
+                    <input type="checkbox" style="float: left;margin-right: 3px;margin-top: 3px;" data-bind="checked: viewdata.IsIndividual, events: {change: onChangeIndividual}" />
+                    <span id="lblIndividual">Individual</span>
+                </div>
+            </div>
+            <hr class="modal-market-hr">
+            <div class="individual-table-body" data-bind="visible: viewdata.IsIndividual">
+                <table style="width: 100%">
+                    <thead>
+                        <tr>
+                            <th style="width: 5%"></th>
+                            <th style="width: 50%"></th>
+                            <th style="width: 45%"></th>
+                        </tr>
+                    </thead>
+                    <tbody data-template="customview-template" data-bind="source: viewdata.ActionCustomViews"></tbody>
+                </table>
+                <hr class="modal-market-hr">
+            </div>
+            <div>
+                <label id="lblCategoryDescription">Description</label>
+                <div class="clear"></div>
+                <textarea id="textTopicDescription" tabindex="2" class="modal-textarea w-100per-fix" data-bind="value: category.Description"></textarea>
+            </div>
+
+        </div>
+        <div class="modal-market-footer">
+            <button id="btnUpdateViewData" type="button" class="ms-button" data-bind="events:{click: update}">
+                <span class="icon-20 icon-close"></span>
+                <span id="lblViewDataClose">Speichern und schliessen</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script id="customview-template" type="text/html">
+    <tr style="height: 32px;">
+        <td>
+            <input type="checkbox" data-bind="enabled: IsEnableCheckbox, checked: IsCheck, events: {change: onCheck}, attr: {data-type: TypeId}" />
+        </td>
+        <td>
+            <span class="pull-left" style="max-width:226px">#:vmCustomView.typeNames[TypeId]#</span>
+            <span id="icondrop#:TypeId#" class="icon-16 icon-dropdown-fix-gray pull-left" 
+                  style="margin-left: 6px;" data-toggle="dropdown" 
+                  data-bind="visible: IsHasDefault, css:{icon-dropdown-fix: IsCheck}, events:{click: openSelectDefault}"></span>
+        </td>
+        <td>
+            <input type="text" class="modal-input txtInput w-100per-fix" 
+                   data-bind="value: Label, visible: IsHasLabel, enabled: IsCheck, events:{change: onChangeLabel}" />
+        </td>
+    </tr>
+</script>
+
+<script type="text/javascript">
+    var vmCustomView = {};
+    vmCustomView.modelChanged = false;
+
+    vmCustomView.destroyPop = function () {
+        vmPopSetting.popupInstrument.destroy();
+        vmPopSetting.popupInstrument = null;
+        $("#pop-setting").after("<div id='pop-add-categories-place'></div>");
+    };
+
+    vmPopSetting.popupInstrument.bind("close", function (e) {
+        if (vmCustomView.modelChanged) {
+            if (confirm(kLg.saveConfirmQuestion)) {
+                if (!customViewModel.update()) e.preventDefault();
+            } else {
+                vmCustomView.destroyPop();
+            }
+
+        } else {
+            vmCustomView.destroyPop();
+        }
+    });
+    
+    vmCustomView.typeNames = {
+        [vmCommon.ActionCustomViewType.MASTERBUGET]: kLg.vtextMasterBudget,
+        [vmCommon.ActionCustomViewType.PRODUCT]: kLg.filterLblProduct,
+        [vmCommon.ActionCustomViewType.MARKET]: kLg.lblSubmarket,
+        [vmCommon.ActionCustomViewType.CUSTOMERJOURNEY]: kLg.vtextCustomerJourney,
+        [vmCommon.ActionCustomViewType.DESCRIPTION]: kLg.vtextDescription,
+        [vmCommon.ActionCustomViewType.EXPECTEDEFFECT]: kLg.vtextExpectedEffect,
+        [vmCommon.ActionCustomViewType.ACTUALEFFECT]: kLg.vtextActualEffect,
+        [vmCommon.ActionCustomViewType.RESPONSIBILITY]: kLg.vtextResponsibility,
+        [vmCommon.ActionCustomViewType.INVOLVEDPEOPLE]: kLg.vtextInvolvedPeoPle,
+        [vmCommon.ActionCustomViewType.CATEGORY]: kLg.lblNameAction,
+        [vmCommon.ActionCustomViewType.FIELD]: kLg.gaLblField,
+        [vmCommon.ActionCustomViewType.ADVERTISING]: kLg.lblNameAdvertisingMaterials,
+        [vmCommon.ActionCustomViewType.ADVERTISER]: kLg.lblNameAdvertiser,
+        [vmCommon.ActionCustomViewType.SUBJECTTHEMA]: kLg.lblNameSubjetThema,
+        [vmCommon.ActionCustomViewType.REGION]: kLg.lblRegions,
+        [vmCommon.ActionCustomViewType.COST]: kLg.vtextCost,
+        [vmCommon.ActionCustomViewType.UPSTREAM]: kLg.vtextUpStream,
+        [vmCommon.ActionCustomViewType.RESOURCEPLANNING]: kLg.vtextResourcePlanning,
+        [vmCommon.ActionCustomViewType.VISIBILITY]: kLg.vtextVisibility,
+        [vmCommon.ActionCustomViewType.ACTIVITY]: kLg.titleSubActionActivity,
+        [vmCommon.ActionCustomViewType.TODO]: kLg.titleToDos
+    };
+    function adjustPopupHeight() {
+        var modalfooterHeight = $('#fViewDataForm .modal-market-footer').height() + 2; // boder 1px
+        var individualBody = $('#fViewDataForm .individual-table-body');
+        var popHeight = individualBody.is(':hidden') ? 360 : vmCommon.getPopupHeight(individualBody.height() + 20 + 140 + 110, modalfooterHeight);        
+        var popWidth = $('#fViewDataForm .modal-body').width() + 20; // padding 10px
+        $('#fViewDataForm .modal-body').height(popHeight - modalfooterHeight - 20);
+        resizePopUp(vmPopSetting.popupInstrument, { width: popWidth, height: popHeight });
+    }
+    var category, viewData, isEdit, customViewModel, defaultSource = {}, otherUsedIds = {};
+    $(function () {
+        category = vmCommon.deepCopy(vmPopSetting.categoriesOptions.category);
+        viewData = vmCommon.deepCopy(vmPopSetting.categoriesOptions.viewData);
+
+        viewData.ActionCustomViews.forEach(acv => {     // hard code
+            if (acv.TypeId == vmCommon.ActionCustomViewType.ACTIVITY || acv.TypeId == vmCommon.ActionCustomViewType.TODO) {
+                acv.IsEnableCheckbox = false;
+            } else
+                acv.IsEnableCheckbox = true;
+        });
+
+        isEdit = vmPopSetting.categoriesOptions.isEdit;
+
+        customViewModel = kendo.observable({
+            category: category,
+            viewdata: viewData,
+            onChangeStandard: function () {
+                this.viewdata.set("IsStandard", true);
+                this.viewdata.set("IsIndividual", false); 
+
+                var viewItems = this.viewdata.ActionCustomViews;
+                for (var i = 0; i < viewItems.length; i++) {
+                    var item = viewItems[i];
+                    item.set("IsCheck", true);
+                    item.set("Label", "");
+                    item.set("DefaultValue", "");
+
+                    if (item.Id > 0) item.set("DataState", dataState.Modified);
+                }
+                adjustPopupHeight();
+            },
+            onChangeIndividual: function () {
+                this.viewdata.set("IsStandard", false);
+                this.viewdata.set("IsIndividual", true);
+                adjustPopupHeight();
+            },
+            onChangeLabel: function (e) {
+                var val0 = $(e.target).val();
+                var val = val0.trim();
+                //const label = e.data.Label;
+               // const isEmptyOrSpace = val == '' && (label == '' || label == null || label == undefined);
+                const hasSpaceStartEnd = val.length != val0.length;
+                if (hasSpaceStartEnd) {        // has spaces start/end
+                    //e.data.Label = val;                 // set label
+                    e.data.set('Label', val);                 // set label
+                    //const _customViewM = vmCommon.deepCopy(this.viewdata.ActionCustomViews);    // copy to set model
+                    //this.viewdata.set('ActionCustomViews', _customViewM);                       // set model
+                }
+
+                if (e.data.DataState == dataState.Unchanged) e.data.set("DataState", dataState.Modified);
+
+            },
+            onCheck: function (e) {
+                if (e.data.IsCheck == false) {
+                    e.data.set("Label", "");
+                    e.data.set("DefaultValue", "");
+
+                    //if un-check advertising --> un-check advertiser
+                    if (e.data.TypeId == vmCommon.ActionCustomViewType.ADVERTISING) {
+                        var advertisers = $.grep(this.viewdata.ActionCustomViews, function (it) { return it.TypeId == vmCommon.ActionCustomViewType.ADVERTISER; });
+                        for (var i = 0; i < advertisers.length; i++) {
+                            var advertiser = advertisers[i];
+
+                            if (advertiser.IsCheck) {
+                                advertiser.set("IsCheck", false);
+                                advertiser.set("Label", "");
+                                advertiser.set("DefaultValue", "");
+
+                                if (advertiser.DataState == dataState.Unchanged) advertiser.set("DataState", dataState.Modified);
+                            }
+                        }
+
+                    }
+                } else {
+
+                    //if check advertiser --> check advertising
+                    if (e.data.TypeId == vmCommon.ActionCustomViewType.ADVERTISER) {
+                        var advertisings = $.grep(this.viewdata.ActionCustomViews, function (it) { return it.TypeId == vmCommon.ActionCustomViewType.ADVERTISING; });
+                        for (var i = 0; i < advertisings.length; i++) {
+                            var advertising = advertisings[i];
+
+                            if (advertising.IsCheck == false) {
+                                advertising.set("IsCheck", true);
+
+                                if (advertising.DataState == dataState.Unchanged) advertising.set("DataState", dataState.Modified);
+                            }
+                        }
+                    }
+                }
+
+                if (e.data.DataState == dataState.Unchanged) e.data.set("DataState", dataState.Modified);
+            },
+            openSelectDefault: function (e) {
+                var source = defaultSource[e.data.TypeId];
+                vmPopSetting.defaultViewOptions = {};
+
+                function updateCallBack(viewItem) {
+                    if (viewItem.TypeId == vmCommon.ActionCustomViewType.ADVERTISING) {
+                        delete defaultSource[vmCommon.ActionCustomViewType.ADVERTISER];
+
+                        var advertiser = vmCommon.findByFunc(customViewModel.viewdata.ActionCustomViews, function (it) {
+                            return it.TypeId == vmCommon.ActionCustomViewType.ADVERTISER;
+                        });
+                        if (advertiser && advertiser.DefaultValue) {
+                            advertiser.set("DefaultValue", "");
+
+                            if (advertiser.DataState == dataState.Unchanged) advertiser.set("DataState", dataState.Modified);
+                        }
+                    }
+                }
+
+                function getSourceCallBack() {
+                    vmPopSetting.defaultViewOptions.Source = source;
+                    vmPopSetting.defaultViewOptions.viewItemModel = e.data;
+                    vmPopSetting.defaultViewOptions.func = updateCallBack;
+                    vmPopSetting.defaultViewOptions.OtherUsedIds = otherUsedIds[e.data.TypeId];
+
+                    vmCustomView.openPopSelectDefault(vmCustomView.typeNames[e.data.TypeId]);
+                };
+
+                var parentIds;
+                if (e.data.TypeId == vmCommon.ActionCustomViewType.ADVERTISER) {
+                    var advertising = vmCommon.findByFunc(this.viewdata.ActionCustomViews, function (it) {
+                        return it.TypeId == vmCommon.ActionCustomViewType.ADVERTISING;
+                    });
+
+                    if (advertising == null || advertising == undefined || advertising.DefaultValue == "") return;
+                    parentIds = advertising.DefaultValue.split(',').filter(e => { return e != ''; }).map(f => {
+                        return Number(f);
+                    });
+
+                    if (parentIds.length != 1) {
+                        return;
+                    }
+                }
+                
+                if (source == undefined) {
+                    vmPopSetting.dataservice.getSourceForDefaultView({
+                        typeId: e.data.TypeId,
+                        parentIds: parentIds,
+                        instrumentId: this.category.Id
+                    }, function (res) {
+                            defaultSource[e.data.TypeId] = res.value.Source;
+                            otherUsedIds[e.data.TypeId] = res.value.OtherUsedIds;
+
+                        source = defaultSource[e.data.TypeId];
+
+                        getSourceCallBack();
+                    });
+                } else {
+                    getSourceCallBack();
+                }
+            },
+            update: function () {
+                if (!vmCustomView.validForm()) return false;
+
+                if (!vmCustomView.modelChanged) {
+                    vmPopSetting.popupInstrument.close();
+                    return true;
+                }
+
+                var cate = this.category;
+                cate.ActionCustomViewData = this.viewdata;
+                vmPopSetting.dataservice.saveInstrument(cate, function (res) {
+                    switch (res.value) {
+                        case -3: //duplicate
+                            ShowToolTip($("#pop-viewData #textCategoryName"), "duplicate", "top");
+                            break
+                        case -1: //conflict
+                            //TODO: show alert, close form
+                            vmPopSetting.UpdateCallBack(res.value, cate.Type);
+                            vmCustomView.modelChanged = false;
+                            vmPopSetting.popupInstrument.close();
+                            break
+                        case 1: //success
+                            vmPopSetting.UpdateCallBack(res.value, cate.Type);
+                            vmCustomView.modelChanged = false;
+                            vmPopSetting.popupInstrument.close();
+                            //TODO: reload list categories, close form
+                            break
+                    }
+                });
+            }
+
+        });
+        customViewModel.bind("change", function () {
+            vmCustomView.modelChanged = true;
+        });
+
+        kendo.bind($("#pop-viewData"), customViewModel);
+
+        void function setUpLanguage () {
+            $("#pop-viewData #lblStandard").text(kLg.textStandard);
+            $("#pop-viewData #lblIndividual").text(kLg.textIndividual);
+            $("#pop-viewData #lblViewDataClose").text(kLg.lblClose);
+
+            $("#pop-viewData #lblCategoryName").text(kLg.lblName);
+            $("#pop-viewData #lblCategoryDescription").text(kLg.Description);
+        }();
+
+        adjustPopupHeight();
+    });
+
+    vmPopSetting.popSelectDefault;
+    vmCustomView.openPopSelectDefault = function (titlex) {
+        vmPopSetting.popSelectDefault = showPopup(vmPopSetting.popSelectDefault,
+            $('#pop-select-default'),
+            '../Contents/msPopSelectDefaultView.html',
+            {
+                title: titlex,
+                height: 430,
+                width: 500,
+                resizable: false
+            });
+    };
+
+    vmCustomView.validForm = function () {
+        if (customViewModel == undefined) return false;
+
+        var cate = customViewModel.category;
+        var name = cate.Name.trim();
+        if (name == null || name.length == 0) {
+            ShowToolTip($("#pop-viewData #textCategoryName"), kLg.msgRequired, "top");
+            return false;
+        }
+
+        return true;
+    };
+
+    $("#pop-viewData #textCategoryName").on("keydown", function () {$("#pop-viewData #textCategoryName").tooltip("destroy");});
+</script>

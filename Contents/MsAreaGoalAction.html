@@ -1,0 +1,568 @@
+﻿<style>
+    #dash-goalaction .goal-detail {
+        width: 600px;
+    }
+
+        #dash-goalaction .goal-detail .row-wrapper {
+            border-bottom: 1px solid #dcdcdc;
+            padding: 3px 0;
+        }
+
+            #dash-goalaction .goal-detail .row-wrapper:last-child {
+                border-bottom-width: 0;
+            }
+
+        #dash-goalaction .goal-detail .column-title {
+            width: 150px;
+        }
+
+        #dash-goalaction .goal-detail .column-info {
+            width: 600px;
+        }
+
+        #dash-goalaction .div-table-project {
+            padding-top: 0;
+            padding-bottom: 10px;
+        }
+        #dash-goalaction .tbgrid {
+            margin-bottom: 0;
+            margin-right: 0;
+        }
+        #dash-goalaction th[columnname] {
+            cursor: pointer;
+        }
+    
+    #dash-goalaction .goalActionName {
+        width: 411px; 
+    }
+    
+.popover .popover-title {
+        word-wrap: break-word;
+    }
+.exceeded-cost {
+           color: red;
+       }
+    .detail-dashboard {
+        white-space: pre;
+        width: 350px!important;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        float: left!important;
+    }
+</style>
+
+<div id="dash-goalaction" class="goal-action posRelative">
+    <div id="loading-goalaction" class="loading"></div>
+    <div class="div-info-title"><span class="table-title" id="lblCriticalPath">Kritischer Pfad</span></div>
+    <div id="placeHolder-projectList" class="div-table div-table-project">
+        <div class="pull-left">
+            <table class="tbgrid">
+                <thead>
+                    <tr>
+                        <th class="title bg-grey" width="440px" columnname="Name" scope="row" id="lblName">Name</th>
+                        <th class="title bg-grey" width="200px" columnname="FirstName" id="lblResponsibility">Verantwortlich</th>
+                        <th class="title bg-grey" width="200px" columnname="TypeText" id="lblArt">Art</th>
+                        
+                        <th class="title bg-grey" width="150px" id="lblIndex">Hinweis</th>
+                        <th class="title bg-grey" width="50px"  id="lblCreatedDate"></th>
+                    </tr>
+                </thead>
+                <tbody id="areaGoalAction"></tbody>
+            </table>
+            <div id="pagingGoalAction" class="pull-right"></div>    
+            <div class="clear"></div>
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>
+
+<script type="text/html" id="tempGoalAction">
+    # for(var i = 0; i < data.length; i ++) { #
+    # var goalAction = data[i]; #
+    <tr ondblclick="vmDashGoal.openActionGoal('#:goalAction.Id#')" data-goalactionid="#:goalAction.Id#">
+        <td class="td-v-align-top td-hover">
+            <div class="posRelative">
+                <div class="icon-left-block edit-span goalActionName content-break-word">#:goalAction.Name || ''#</div>
+                <div class="clear"></div>
+                <a href="\\#" class="goal-action-detail" id="#:goalAction.Id#" data-placement="right" goal-type="#:goalAction.Type#">#:kLg.lblDetail#</a>
+            </div>
+        </td>
+        <td class="td-hover table-td-link divDropProject ui-droppable" >
+            #=goalAction.PersonName#
+        </td>
+        <td>
+            #if(goalAction.Type == 1) {#
+            #:kLg.labelMainGoalName#
+            #} if(goalAction.Type == 2) {#
+            #:kLg.labelSubGoalName#
+            #} if(goalAction.Type == 3) {#
+            #:kLg.labelActionName#
+            #}#
+        </td>
+
+        <td>
+            #if(goalAction.OverDate && !goalAction.Finish && goalAction.IsActionCheck) {#
+            <span data-placement="top" class="icon-32  icon-calendar-orange pull-left"></span>
+            #}#
+            #if(goalAction.NonArchive && goalAction.Type != 3) {#
+            <span data-placement="top" class="icon-32  icon-target-orange pull-left"></span>
+            #}#
+            #if(goalAction.OverCost) {#
+            <span data-placement="top" class="icon-32 icon-money-orange pull-left"></span>
+            #}#
+        </td>
+        <td style="padding-right: 20px">
+            <span class="icon-16 icon-dropdow-dash" data-toggle="dropdown"></span>
+            <ul aria-labelledby="btnGroupVerticalDrop1" role="menu" class="popup-menu dropdown-menu ms-popup-menu posFixed">
+                <li class="cursor-pointer"><a class="dropdow-menu-li-a" data-toggle="modal" data-target=".bs-example-modal-lg" onclick="vmDashGoal.removeRada(this, '#:goalAction.Id#', #:goalAction.Type#)"><span class="icon-24  icon-left-block icon-remove"></span>#:kLg.delFromRadas#</a></li>
+
+                <li role="presentation" class="divider"></li>
+                <li class="cursor-pointer"><a class="dropdow-menu-li-a" onclick="vmDashGoal.redirectToActionGoal('#:goalAction.Id#', #:goalAction.Type#, #:goalAction.LandId#, #:goalAction.RegionId#, #:goalAction.IsSubmarketLink#)">
+                    <span class="icon-24  icon-left-block icon-open"></span>#:kLg.jumptToActionPlan#</a></li>
+            </ul>
+        </td>
+    </tr>
+    #}#
+</script>
+<script type="text/html" id="tempGoalDetail">
+    <div style="width: 600px" class="goal-detail">
+        <div class="row-wrapper">
+            <div class="column-title pull-left">#:kLg.Description#</div>
+            <div class="column-info pull-left content-break-word" style="width: 500px">#:vmCommon.TexEditor.stripHtml(data.Description)#</div>
+            <div class="clear"></div>
+        </div>
+
+        <div class="row-wrapper">
+            <div class="column-title pull-left">#:kLg.labelRes#</div>
+            <div class="column-info pull-left">#=data.Person || ''#</div>
+            <div class="clear"></div>
+        </div>
+        <div class="row-wrapper">
+            <div class="column-title pull-left">#:kLg.dashLblDuration#</div>
+            <div class="column-info pull-left">
+                #: data.Start && kendo.toString(data.Start.jsonToDate(), "d" ) || ''# #if(data.End){# #:kLg.gaLblTo# #}# #: data.End && kendo.toString(data.End.jsonToDate(), "d" ) || ''#
+            </div>
+            <div class="clear"></div>
+        </div>
+        <div class="row-wrapper">
+            <div class="column-title pull-left detail-dashboard">#:kLg.newLand#</div>
+            <div class="column-info pull-left detail-dashboard">#:data.LandName || ''#</div>
+            <div class="clear"></div>
+        </div>
+        <div class="row-wrapper">
+            <div class="column-title pull-left detail-dashboard">#:kLg.newRegion#</div>
+            <div class="column-info pull-left detail-dashboard">#:data.RegionName || ''#</div>
+            <div class="clear"></div>
+        </div>
+        #if(data.MarketsegmentName) {#
+        <div class="row-wrapper">
+            <div class="column-title pull-left detail-dashboard ">#:kLg.newMarketSegment#</div>
+            <div  class="column-info pull-left detail-dashboard">#:data.MarketsegmentName || ''#</div>
+            <div class="clear"></div>
+        </div>
+        <div class="row-wrapper">
+            <div class="column-title pull-left detail-dashboard">#:kLg.createNewSubmarket#</div>
+            <div class="column-info pull-left detail-dashboard">#:data.SubmarketName || ''#</div>
+            <div class="clear"></div>
+        </div>
+        <div class="row-wrapper">
+            <div class="column-title pull-left detail-dashboard">#:kLg.filterLblProduct#</div>
+            <div class="column-info pull-left detail-dashboard">#:data.ProductName || ''#</div>
+            <div class="clear"></div>
+        </div>
+        <div class="row-wrapper">
+            <div class="column-title pull-left detail-dashboard">#:kLg.createNewProductGroup#</div>
+            <div class="column-info pull-left detail-dashboard">#:data.ProductGroupName || ''#</div>
+            <div class="clear"></div>
+        </div>
+        #}#
+        #if(data.Type < 3){#
+        <div class="row-wrapper">
+            <div class="column-title pull-left">#:kLg.lblBudget#</div>
+            <div class="column-info pull-left #:getCssOverdueCost(data.ActualCost, data.Budget)#"> #if(data.Budget){# #:data.CurrencyName# &nbsp; #:vmCommon.formatCost(data.Budget)# #}#</div>
+            <div class="clear"></div>
+        </div>
+        #}#
+    </div>
+</script>
+<script type="text/html" id="tempPaging">
+    <ul class="pagination">
+        <li #if(CurrentPage == 1){# class="disabled" #}#><a href="\\#" #if(CurrentPage !=1){ # onclick="vmDashGoal.loadGoalAction(1)" # }#>&laquo;</a></li>
+        #for(var i = 0; i < data.pages.length; i ++) {#
+        
+        <li #if(data.pages[i] == CurrentPage){# class="active" #}# #if(data.pages[i] != CurrentPage){# onclick="vmDashGoal.loadGoalAction(#:data.pages[i]#)" #}#><a href="\\#">#:data.pages[i]#</a></li>
+        #}#
+
+        <li #if(CurrentPage == TotalPages){# class="disabled" #}#><a href="\\#" #if(data.TotalPages !=CurrentPage){ # onclick="vmDashGoal.loadGoalAction(#:data.TotalPages#)" #}#>&raquo;</a></li>
+    </ul>
+</script>
+
+<script type="text/html" id="tempShowDescription">
+    <div style="min-width: 50px; max-width: 300px">
+        <div class="row-wrapper">
+            <div class="content-break-word" style="text-align: center">#:data#</div>
+            <div class="clear"></div>
+        </div>
+    </div>
+</script>
+
+<script>
+    var vmDashGoal = vmDashGoal || {};
+    vmDashGoal.currentRegionId = 0;
+
+    vmDashGoal.dataservice = (function () {
+        var callAjaxGoalAction = function (divId, funcName, postData, getData, successCallBack) {
+            var url = "../Handlers/MsGoalAction.ashx?funcName=" + funcName + "&projid=" + projectId + "&strid=" + strategyId
+                + "&regId=" + vmDashGoal.currentRegionId + "&firstcreat=" + vmDashboard.tab6FromFirstCreat;
+            return callAjaxPostGet(divId, url, postData, getData, successCallBack);
+        };
+
+        var getMixWithFilter = function (postData, getData, successFunc) {
+            return callAjaxGoalAction('loading-goalaction', "getMixWithFilter", postData, getData, successFunc);
+        };
+
+        var getMixDetail = function (entryData, successFunc) {
+            return callAjaxGoalAction('loading-goalaction', "getMixDetail", null, entryData, successFunc);
+        };
+        var getMixShortDetail = function (entryData, successFunc) {
+            callAjaxGoalAction('loading-goalaction', "getMixShortDetail", null, entryData, successFunc);
+        };
+
+        var removeRadar = function (postData, getData, successFunc) {
+            callAjaxGoalAction('loading-goalaction', "removeRadar", postData, getData, successFunc);
+        };
+
+        return {
+            getMixWithFilter: getMixWithFilter,
+            getMixDetail: getMixDetail,
+            removeRadar: removeRadar,
+            getMixShortDetail: getMixShortDetail
+        };
+    })();
+
+   
+    vmDashGoal.loadGoalAction = function (pageIndex, mkey, value) {
+        var page = pageIndex || 1;
+        vmDashGoal.pageIndex = page;
+
+        vmDashGoal.filterQuery = msFilter.controlService.getQueryFilter(); //vmFilter.filterContainer || vmFilter.CreatFilterQuerry();
+        //vmDashGoal.filterQuery.dfilter = JSON.stringify(vmFilter.DFilter);
+        var getData = {
+            pageIndex: page
+        };
+        if (mkey && value) {
+            getData.mKey = mkey;
+            getData.value = value;
+        }
+        getData.mainGoalLabel = kLg.labelMainGoalName;
+        getData.subGoalLabel = kLg.labelSubGoalName;
+        getData.actionLabel = kLg.labelActionName;
+        
+        vmDashGoal.pageIndex = page;
+        vmDashGoal.mKey = mkey;
+        vmDashGoal.mValue = value;
+        
+        vmDashGoal.dataservice.getMixWithFilter(vmDashGoal.filterQuery, getData, function (serData) {
+            if (serData.value.Role < 0) {
+                
+                window.location = "/Default.aspx?lang=" + kLg.language;
+                return;
+            }
+            vmDashGoal.GoalActions = serData.value.Data;
+            //vmFilter.SetSubmarketTitle(serData.value.SubmarketTitle);
+            //vmFilter.BindFilter(vmFilter.DFilter);
+            
+            if ( vmDashGoal.GoalActions &&  vmDashGoal.GoalActions.ListGoalAction.length > 0) {
+
+                vmDashGoal.bindView(vmDashGoal.GoalActions);
+                vmDashGoal.setupDetail();
+
+            } else {
+                $('#areaGoalAction').empty();
+                $('#pagingGoalAction').empty();
+            }            
+        });
+        
+    };
+
+    vmDashGoal.bindView = function(goalActionDashboardView) {
+        bindTemplate('areaGoalAction', "tempGoalAction", goalActionDashboardView.ListGoalAction);
+        vmDashGoal.setupMenuIcon();
+        
+        var sortInfo = goalActionDashboardView.SortInfos;
+        
+        //Setup UI
+        var sortIcon = 'icon-order-desc';
+        if (sortInfo.SortType == 'ASC')
+            sortIcon = 'icon-order-asc';
+        $('#dash-goalaction th span').remove();
+        $('#dash-goalaction th[columnname=' + sortInfo.ColumnName + ']')
+            .attr('sortType', sortInfo.SortType)
+            .append('<span class="icon-16  icon-right-block  ' + sortIcon + '"></span>');
+
+        var pagingInfo = goalActionDashboardView.PagingInfo;
+        pagingInfo.pages = vmCommon.paging.getPages(pagingInfo.CurrentPage, pagingInfo.TotalPages);
+        bindTemplate('pagingGoalAction', "tempPaging", goalActionDashboardView.PagingInfo);
+        vmCommon.ShowToolTipDesIcon('#areaGoalAction span.icon-target-orange', kLg.icontargetorange, '#tempShowDescription');
+        vmCommon.ShowToolTipDesIcon('#areaGoalAction span.icon-calendar-orange', kLg.iconcalendarorange, '#tempShowDescription');
+        vmCommon.ShowToolTipDesIcon('#areaGoalAction span.icon-money-orange', kLg.iconmoneyorange, '#tempShowDescription');
+    };
+
+    vmDashGoal.findGoalAction = function(id) {
+        var goalActions = vmDashGoal.GoalActions.ListGoalAction;
+        for (var k = 0; k < goalActions.length; k++) {
+            if (goalActions[k].Id === id)
+                return goalActions[k];
+        }
+        return null;
+    }
+
+    vmDashGoal.setupDetail = function() {
+        $('#dash-goalaction .goal-action-detail').bind('mouseenter', function() {
+            var e = $(this);
+            var id = $(this).attr('id'),
+                type = $(this).attr('goal-type'),
+                name = $(this).siblings('.goalActionName').text();
+            e.unbind('mouseenter');
+            var goalaction = vmDashGoal.findGoalAction(id);
+            var entryData = { id: id, type: type };
+            vmDashGoal.dataservice.getMixDetail(entryData, function(serData) {
+                var template = kendo.template($('#tempGoalDetail').html());
+                
+                var goalActionData = serData.value.Data;
+                goalActionData.LandName = goalaction.LandName;
+                goalActionData.RegionName = goalaction.RegionName;
+                goalActionData.CurrencyName = goalaction.CurrencyName;
+                e.popover({
+                    html: true,
+                    content: template(goalActionData),
+                    title: htmlEncode(name),
+                    trigger: "hover"
+                }).popover('show');
+
+
+            });
+        });
+
+        $('#dash-goalaction .goal-action-detail').on('show.bs.popover', function() {
+            $('#dash-goalaction .popover').hide();
+        });
+        $('#dash-goalaction .goal-action-detail').on('shown.bs.popover', function () {
+            var that = $(this);
+            var $popover = that.next();
+            var popTop = parseInt($popover.css("top"));
+            var offsetTopPop = $popover.offset().top;
+            var distance = $('.submenu').first().offset().top + $('.submenu').first().height(); // 130
+            if (offsetTopPop < distance) {
+                var offsetTopPopReCaculate = offsetTopPop - distance;
+                var topPopReCal = popTop - offsetTopPopReCaculate;
+                $popover.css({ 'top': topPopReCal +20+ 'px' });
+            }
+        });
+    };
+
+    vmDashGoal.setupLanguage = function() {
+        $('#lblCriticalPath').text(kLg.lblCriticalPath);
+        $('#lblName').text(kLg.lblName);
+        $('#lblResponsibility').text(kLg.lblResponsible);
+        $('#lblArt').text(kLg.lblArt);
+        $('#lblIndex').text(kLg.lblIndex);
+    };
+
+    vmDashGoal.regisSort = function() {
+        $('#dash-goalaction th[columnname]').click(function() {
+            var columnName = $(this).attr('columnname'),
+                sortType = $(this).attr('sortType');
+            if (sortType) {
+                sortType = sortType == "ASC" ? "DESC" : "ASC";
+            } else {
+                sortType = "ASC";
+            }
+            vmDashGoal.loadGoalAction(null, columnName, sortType);
+        });
+    };
+
+    //ready
+    $(function () {
+        //vmFilter.deferred.promise().done(function() {
+        //    vmDashGoal.loadGoalAction(); 
+        //});
+        
+        vmDashGoal.loadGoalAction(); 
+        vmDashGoal.setupLanguage();
+        vmDashGoal.regisSort();
+        
+    });
+
+    vmDashGoal.removeRada = function (elem, id, type) {
+        pConfirm(kLg.confirmRemoveRadar)
+            .then(function () {
+                var postData = msFilter.controlService.getQueryFilter(), //vmFilter.filterContainer || vmFilter.CreatFilterQuerry(),
+                    getData = { id: id, type: type };
+                    getData.mainGoalLabel = kLg.labelMainGoalName;
+                    getData.subGoalLabel = kLg.labelSubGoalName;
+                    getData.actionLabel = kLg.labelActionName;
+        
+                vmDashGoal.dataservice.removeRadar(postData, getData, function(serData) {
+                    if (serData.value.Role < 0) {
+                        
+                        window.location = "/Default.aspx?lang=" + kLg.language;
+                        return;
+                    }
+                    var goalActionDashboardView = serData.value.Data;
+                    if (goalActionDashboardView && goalActionDashboardView.ListGoalAction.length > 0) {
+                        vmDashGoal.bindView(serData.value.Data);
+                        vmDashGoal.setupDetail();
+                    } else {
+                        $('#areaGoalAction').empty();
+                        $('#pagingGoalAction').empty();
+                    }
+                });
+            });
+    };
+
+    vmDashGoal.setupMenuIcon = function () {
+        $('#dash-goalaction span[data-toggle=dropdown]').click(function () {
+            var itemWidth = $(this).outerWidth();
+            var menuItemPos = $(this).offset();
+            var $ul = $(this).next();
+            var ulHeight = $ul.outerHeight(),
+                ulWidth = $ul.outerWidth();
+
+            var top, left;
+            if (menuItemPos.top + 18 + ulHeight > $(window).height()) //Go top
+            {
+                top = menuItemPos.top - ulHeight -5;
+            } else //Go bottom
+            {
+                top = menuItemPos.top + 18;
+            }
+
+            if (menuItemPos.left + ulWidth > $(window).width())
+                left = menuItemPos.left - ulWidth + itemWidth;
+            else
+                left = menuItemPos.left;
+
+            $ul.css({ top: top, left: left });
+        });
+    };
+
+    vmDashGoal.redirectToActionGoal = function (id, type, landId, regionId, islink) {
+        //var filter = vmFilter.filterContainer || vmFilter.CreatFilterQuerry();
+        var entryData = { id: id, type: type };
+        
+        vmDashGoal.dataservice.getMixShortDetail(entryData, function(serData) {
+            if (serData.value.Role < 0) {
+                
+                window.location = "/Default.aspx?lang=" + kLg.language;
+                return;
+            }
+
+            var data = serData.value.Data;
+            if (data) {
+                var url = '/Pages/MsGoalAction.aspx?lang=' + kLg.language + '&projid=' + projectId + '&strid=' + strategyId + '&actpopup=' + data.ActpopupEncode;
+                
+                //var url = '/Pages/MsGoalAction.aspx?lang=' + kLg.language + '&projid=' + projectId + '&strid=' + strategyId + '&fromdash=true';
+                //if (data.MarketsegmentId) url = url + '&maid=' + data.MarketsegmentId;
+                //if (data.SubmarketId) url = url + '&subid=' + data.SubmarketId;
+                //if (data.ProductGroupId) url = url + '&grid=' + data.ProductGroupId;
+                //if (data.ProductId) url = url + '&proid=' + data.ProductId;
+                //if (data.IndependencyChild) url = url + '&childid=' + data.IndependencyChild;
+                //if (data.IndependencyParent) url = url + '&parentid=' + data.IndependencyParent;
+                //url = url + '&landid=' + landId + '&regid=' + regionId + '&goalactionid=' + id;
+                //url = url + '&landactiontype=' + type + "&mgid=" + data.MaingoalId;
+                //if (data.SubGoalId) url = url + "&sgid=" + data.SubGoalId;
+                //url = url + "&islink=" + (islink ? 1 : 0);
+                url += '&fromdashinfo=1';
+                window.location = url;    
+            }
+        });
+    };
+
+    function getCssOverdueCost(actualCost, budget) {
+        if (actualCost > budget) {
+            return "exceeded-cost";
+        }
+        return "";
+    };
+
+    vmDashGoal.openActionGoal = function (id) {
+        var goal = vmDashGoal.findGoalAction(id);
+        var info = {
+            SubMarketProductId: goal.SubMarketProductId,
+            IndependencyId: goal.IndependencyId,
+            ProductId: goal.ProductId,
+            SubMarketId: goal.SubMarketId
+        };
+
+        vmGoalAction.regionId = (goal.IndependencyId > 0) ? -1 : goal.RegionId;
+        var entryData;
+        if (goal.Type === 3) {
+            var xxinfo = {
+                actionId: id,
+                subMarketProductId: goal.SubMarketProductId,
+                independencyId: goal.IndependencyId,
+                parentId: goal.GoalId,
+                title: kLg.titlepEditMainGoalNew1 + kLg.labelActionName + kLg.titlepEditMainGoalNew2,
+                isEdit: true
+            };
+
+            vmGoalAction.openPopUpAction2(xxinfo);
+            
+        } else {
+            let typeId = goal.ParentId && goal.ParentId != vmCommon.emptyGuid ? vmCommon.GoalActionContentType.SubGoal : vmCommon.GoalActionContentType.MainGoal
+            entryData = { goalId: id, independencyId: goal.IndependencyId, regionId: goal.RegionId, productId: goal.ProductId, subMarketId: goal.SubMarketId, subMarketProductId: info.SubMarketProductId, parentId: goal.ParentId, goalType: typeId };
+            vmGoalAction.dataservice.getGoal(entryData, function (serData) {
+                if (vmCommon.checkConflict(serData.value.ResultStatus)) {
+                    vmGoalAction.goalOptions = {
+                        IsEdit: true,
+                        Goal: serData.value.TheObject,
+                        Currency: serData.value.AreaInfo.Currency, //goal.CurrencyName
+                        IsMasterGoalKpi: serData.value.AreaInfo.IsMasterGoalKpi
+                    };
+
+                    if (typeof vmDashboard === 'object') {
+                        vmDashboard.AddressBar.ClientQuery.setActpopupEncoded(serData.value.Actpopup);
+                    }
+
+                    if (info.IndependencyId) {
+                        //vmFilter.bindIndependencyConnection(serData.value.CustomConnection);
+                    } else {
+                        vmGoalAction.bindCustomConnection(info, serData.value.CustomConnection);
+                    }
+                    vmGoalAction.goalOptions.TypeId = entryData.goalType;
+                    vmGoalAction.goalOptions.RegionSelectable = serData.value.RegionSelectable;
+                    vmGoalAction.goalOptions.ActionPlanRegions = serData.value.ActionPlanRegions;
+                    vmGoalAction.goalOptions.RegionId = goal.RegionId;
+                    vmGoalAction.goalOptions.IndependencyId = goal.IndependencyId;
+
+                    vmGoalAction.goalOptions.KpiGoalSelectable = serData.value.KpiGoalSelectable;
+                    vmGoalAction.goalOptions.IsHasKpi = serData.value.IsHasKpi;
+
+                    vmGoalAction.goalOptions.MasterGoal = serData.value.MasterGoal;
+                    vmGoalAction.goalOptions.SubProductGroups = serData.value.SubProductGroups;
+                    vmGoalAction.goalOptions.SubClientGroups = serData.value.SubClientGroups;
+                    vmGoalAction.goalOptions.IsHasKpiReport = serData.value.IsHasKpiReport;
+
+                    $.extend(vmGoalAction.goalOptions, info);
+                    vmGoalAction.goalOptions.role = serData.value.RoleId;
+                      
+                    if (goal.Type === 2) {
+                        vmFile.setAssignedU(entryData.goalId, vmCommon.enumType.SubGoal, serData.value.RoleId);
+                        vmGoalAction.goalOptions.GoalType = vmCommon.GoalType.SubGoal;
+
+                        vmGoalAction.showAddGoalPopup(kLg.titlepEditMainGoalNew1 + kLg.labelSubGoalName + kLg.titlepEditMainGoalNew2);
+                           
+                    } else {
+                        vmFile.setAssignedU(entryData.goalId, vmCommon.enumType.Goal, serData.value.RoleId);
+                        vmGoalAction.goalOptions.GoalType = vmCommon.GoalType.MainGoal;
+                        vmGoalAction.showAddGoalPopup(kLg.titlepEditMainGoalNew1 + kLg.labelMainGoalName + kLg.titlepEditMainGoalNew2);
+            
+                    }
+                }
+            });
+
+        }
+
+    };
+</script>

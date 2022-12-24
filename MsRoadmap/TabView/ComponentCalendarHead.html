@@ -1,0 +1,57 @@
+﻿<div v-bind:class="[ClassView.rmView]" class="dnbViewonHideWhenExport" :key="viewType"
+     style="position: sticky; top: 0; z-index: 9; box-shadow: none;">
+    <div class="dnb-calendar dnb-relative">
+
+        <depth-filter :subFilter="subFilter" v-if="isShowDepth" />
+        <div v-if="IsShow" class="dnb-absolute dnb-ex_preview-f_depth_lbling" style="top: 0px; left: 0;">
+            <div v-if="viewType == 1" style="width: 309px;height: 93px;background: #f1f1f1;"></div>
+            <div v-if="viewType == 0" style="width: 309px; background: #f1f1f1;" 
+                 v-bind:style="{height: StyleEmptyView.Height}"></div>
+        </div>
+
+        <div class="dnb-absolute" v-if="IsCalendarShow" style="top: 0px; background-color: white;" 
+             v-bind:style="{left: PosLeft, paddingRight: PadRight}">
+            <div class="dnb-years dnb-overhidden dnb-flex dnb-viewon-preview disable--select" v-if="viewType == 0">                <!--Bind Quarter-->
+                <div class="dnb-year dnb-year-2021" style="padding-bottom: 0"
+                     v-for="year in DisplayUI.Years">                                                           <!--Start for-->
+                    <h6 class="text-center dnb-colorc1 dnb-font-18 kvg-style-years">{{year.Year}}</h6>
+                    <div class="dnb-quaters dnb-flex" style="border-top: none !important;">
+                        <div class="dnb-quater-0" v-bind:class="['rm-quarter-' + (quarter.Odd)]" 
+                             v-for="quarter in year.Quaters" style="height: 51px;">                             <!--start for Quaters-->
+                            <h6 class="text-center dnb-color6d kgv-style-quarter">Q {{quarter.Quarter}}</h6>
+                            <div class="dnb-months dnb-flex">
+                                <div v-bind:style="{ width: month.Days + 'px', minWidth: month.Days + 'px', maxWidth: month.Days + 'px' }"
+                                     class="dnb-month" style="height: 36px;" v-for=" month in quarter.Months "> <!--start for Months-->
+                                    <h6 class="dnb-color-b2 text-center kgv-tyle-month"
+                                        style="font-size: 12px;padding-top: 9px; ">{{month.Name}}</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <div v-bind:style="{ width: DisplayUI.Width}" style="height: 96px;overflow:hidden"
+                 class="dnb-flex dnb-flex-col dnb-relative disable--select" v-if="viewType == 1">                 <!--Bind Month-->
+                <div class="dnb-years dnb-flex">
+                    <div class="dnb-year text-center" v-for="year in DisplayUI.Years"
+                         v-bind:style="{ minWidth:year.FlexGrow + 'px' }">
+                        <span>{{ year.FullYear }}</span>
+                    </div>
+                </div>
+                <div class="dnb-months dnb-relative dnb-flex" style="margin-left: 0; height: 54px;">
+                    <span class="dnb-month text-center" v-for="month in DisplayUI.Months"
+                          v-bind:style="{ minWidth: month.Width, maxWidth: month.Width }">
+                        {{ month.Name }}
+                    </span>
+                </div>
+                <div class="dnb-weeks dnb-flex dnb-absolute" style="top: 70px; left: 0; height: 26px;">
+                    <div class="dnb-week text-center" v-for="week in DisplayUI.Weeks">
+                        <div>{{ week }}</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

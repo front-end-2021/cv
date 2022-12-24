@@ -1,0 +1,112 @@
+﻿<style type="text/css">
+    .menu-title, .item-title {
+        height: 30px;
+        background-color: #38baf8;
+        line-height: 28px;
+        padding-left: 5px;
+        color: white;
+        padding: 1px;
+        cursor: pointer;
+        margin-bottom: 2px;
+    }
+
+    .kmessage {
+        height: 18px;
+        color: red;
+        margin-bottom: 2px;
+        padding-top: 2px;
+        padding-left: 0;
+    }
+</style>
+<div id="loading-crmlink" class="loading"></div>
+
+<div id="pop-crmlink" class="pop-wrapper">
+    <form id="fCrmLinkForm" role="form" class="form-horizontal">
+        <div class="modal-body ms-modal-body" id="div-crmlink" style="padding-top: 0 !important;">
+            <div class="kmessage">
+                <span class="error" id="kmessage"></span>
+            </div>
+            <div class="root" id="root" data-bind="source: crmData" data-template="crmtemplate"></div>
+        </div>
+
+        <!--<div class="modal-market-footer">
+            <button id="btnupdatecrmlink" type="button" class="ms-button" onclick="">
+                <span class="icon-20 icon-close"></span>
+                <span id="lblcrmlinkclose">Speichern und schliessen</span>
+            </button>
+        </div>-->
+    </form>
+</div>
+
+<script id="crmtemplate" type="text/html">
+    <div class="item-title" data-bind="events:{click: selectCrm}">
+        <div style="width: 24px; height: 24px; float: left;"></div>
+        <span data-bind="text: Name"></span>
+    </div>
+</script>
+
+<!-- ReSharper disable CoercedEqualsUsing -->
+<script type="text/javascript">
+    var vmCrmLink = {};
+    vmCrmLink.modelChanged = false;
+
+    var vmKpiAction = vmKpiAction || {};
+
+    vmCrmLink.destroyPop = function () {
+        vmGoalAction.popCrmLink.destroy();
+        vmGoalAction.popCrmLink = null;
+        $(".body-content").after("<div id='pop-selectcrmlink'></div>");
+    };
+
+    vmGoalAction.popCrmLink.bind("close", function (e) {
+        if (vmCrmLink.modelChanged) {
+            vmCrmLink.destroyPop();
+        } else {
+            vmCrmLink.destroyPop();
+        }
+    });
+
+    vmCrmLink.timeOut = undefined;
+    vmCrmLink.alert = function (mes, time) {
+        clearTimeout(vmCrmLink.timeOut);
+        $("#pop-crmlink #kmessage").text(mes);
+
+        if (mes && time) {
+            vmCrmLink.timeOut = setTimeout(function () {
+                $("#pop-crmlink #kmessage").text("");
+            }, time);
+        }
+    };
+
+    var crmData = [], crmLink, selectedItems, formatItem;
+    $(function () {
+        crmData = vmKpiAction.formatItemOptions.CrmData;
+        crmLink = vmKpiAction.formatItemOptions.crmLink;
+        selectedItems = vmKpiAction.formatItemOptions.selectedItems;
+
+        var viewModel = kendo.observable({
+            crmData: crmData,
+            selectCrm: function (e) {
+                if (vmCommon.findByFunc(selectedItems, function (it) { return it.Id == e.data.Id && it.Type == e.data.Type; })) {
+                    vmCrmLink.alert(e.data.Type == 2 ? kLg.msgCrmFormatExistOrganisation : kLg.msgCrmFormatExistPerson, 3000);
+                    return;
+                }
+
+                crmLink.BId = e.data.Id;
+                crmLink.TypeId = e.data.Type == 2 ? 1 : 2;
+                crmLink.Name = e.data.Name;
+
+                vmKpiAction.formatItemOptions.formatItem.ItemValues.push(crmLink);
+                //if (vmKpiAction.formatItemOptions.callback && typeof vmKpiAction.formatItemOptions.callback === "function") {
+                //    vmKpiAction.formatItemOptions.callback(crmLink);
+                //}
+
+                vmGoalAction.popCrmLink.close();
+            }
+        });
+
+        kendo.bind($("#pop-crmlink"), viewModel);
+    });
+
+</script>
+<!-- ReSharper restore CoercedEqualsUsing -->

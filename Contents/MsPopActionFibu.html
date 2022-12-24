@@ -1,0 +1,1210 @@
+﻿<style type="text/css">
+    table#fibu-table {
+/*        width: inherit;*/
+        border: none !important;
+    }
+
+        table#fibu-table input:not(.input-right) {           
+            text-align: center;
+        }
+
+        table#fibu-table input.input-right {            
+            text-align: right;
+        }
+
+        table#fibu-table .input-left {            
+            float:left;
+            text-align: left;
+            /*width: 100%;*/
+        }
+
+        table#fibu-table input.input-rate {
+            height: 32px;
+            padding-right: 6px;
+        }
+
+        table#fibu-table th {
+            font-size: 15px;
+            text-align: center;
+            padding: 0 8px 0 6px !important;
+        }
+
+        table#fibu-table td {
+            border: none !important;
+        }
+
+    .tbgrid th, .tbgrid td {
+        height: 38px;
+        padding: 2px 2px 2px 2px;
+        text-align: center;
+    }
+
+    .modal-table {
+        width: 100%;
+        margin: 2px 0 10px 0;
+    }
+
+    .k-datepicker .k-picker-wrap input[data-role=datepicker] {
+        height: 22px;
+        width: 100% !important;
+    }
+
+    .fibu-message {
+        height: 20px;
+        color: red;
+        margin-bottom: 2px;
+        padding-left: 2px;
+    }
+
+    #pop-action-fibu .tooltip.left .tooltip-arrow {
+        top: 50%;
+        right: 0;
+        margin-top: -5px;
+        border-width: 5px 0 5px 5px;
+        border-left-color: #CE3838;
+    }
+
+    .k-textbox > input, .k-picker-wrap .k-input, .k-numeric-wrap .k-input, .k-combobox .k-input {
+        width: 95% !important;
+        vertical-align: top;
+    }
+
+
+    #pop-action-fibu .ms-modal-body .modal-input {
+        padding: 0 2px 0 5px;
+        width: 400px !important;
+    }
+
+    .supplier .k-autocomplete {
+        width: 400px;
+        height: 30px;
+    }
+
+    .demo-section {
+        text-align: center;
+        line-height: 4em;        
+    }
+
+        .demo-section .k-button {
+            width: 250px;
+        }
+
+    .k-widget.k-notification.k-notification-info {
+        background-color: #38baf8;
+        color: white;
+        border-color: #38baf8;
+        height: 25px;
+        margin-bottom: 10px;
+        width: 248px;
+    }
+
+    .k-notification-wrap .k-icon.k-i-close {
+        display: none;
+    }
+
+    .k-icon.k-i-info {
+        float: left;
+        margin-top: 1px;
+    }
+
+    .k-i-note {
+        background-image: url('../Images/icon-sucess.png');
+    }
+
+    #appendto .k-notification-wrap {
+        padding-top: 4px !important;
+    }
+</style>
+<div id="loading-actionfibu" class="loading"></div>
+<div id="pop-action-fibu" class="pop-wrapper">
+    <form id="fActionFibu" role="form" class="form-horizontal">
+        <div class="modal-body ms-modal-body" style="height: 443px;overflow: auto">            
+            <div class="fibu-message">
+                <span id="fmessage"></span>
+            </div>
+
+            <div class="form-group noMargin">
+
+                <table class="tbgrid modal-table" id="fibu-table">
+                    <thead>
+                        <tr>
+                            <th class="title bg-grey" style="width: 17%;"></th>
+                            <th class="title bg-grey" id="lblFibuAccount" style="width: 17%;">
+                            </th>
+                            <th class="title bg-grey" id="lblFibuCosts" style="width: 17%;">
+                            </th>
+                            <th class="title bg-grey" id="lblFibuDate" style="width: 9%">
+                            </th>
+                            <th class="title bg-grey" style="width: 9%"></th>
+                            <th class="title bg-grey" id="lblExpectedCost" style="width: 9%">
+                            </th>
+                            <th class="title bg-grey" id="lblActualCost" style="width: 9%">
+                            </th>
+                            <th class="title bg-grey" style="width: 9%"></th>
+                            <th class="title bg-grey" style="width: 4%"></th>
+                        </tr>
+                    </thead>
+                    <tbody data-template="fibu-template" data-bind="source: actionFibus"></tbody>
+                    <tfoot>
+                        <tr>
+                            <td style="padding-left: 6px;padding-top: 6px;">
+                                <span class="icon-32 cursor-pointer icon-add" data-bind="events:{click: addActionFibu}, disabled: roleEdit"></span>
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td style="text-align: right;padding-right: 9px;"><span id="lblTotal" data-bind="visible: isShowTotal"></span></td>
+                            <td style="text-align: right;padding-right: 9px;"><b><span data-bind="text: totalExpected, visible: isShowTotal" style="white-space: nowrap;"></span></b></td>
+                            <td style="text-align: right;padding-right: 9px;"><b><span data-bind="text: totalActual, visible: isShowTotal" style="white-space: nowrap;"></span></b></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+                
+            </div>
+            <div style="position: relative;top: 25px; padding-left: 2px;">
+                <div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <div class="col-md-2" style="margin-left: -15px;">
+                                <label id="lblFibuSupplier" style="height: 20px;padding-top: 10px;margin-bottom: 15px;">Supplier</label>
+                            </div>
+                            <div class="col-md-2">
+                                <span id="staticNotification"></span>
+                                <div id="appendto" class="demo-section k-content"></div>
+                            </div>
+                            <div class="clear"></div>
+                            <div class="input-append supplier">
+                                
+                                <span id="NotiInvalidSupplier" style="position: absolute; left: -10px; color: red; margin-top: 6px; font-size: 22px;" class="valid-item hidden">*</span>
+                                <input class="col-md-4 txtInput"
+                                       id="acSupplier"
+                                       style="width: 400px; height: 30px; max-height: 30px !important;"
+                                       maxlength="100"
+                                       data-placeholder=" "
+                                       data-role="autocomplete"
+                                       data-text-field="Name"
+                                       data-value-field="Id"
+                                       data-filter="contains"
+                                       data-bind="value: SupplierName, source: SourceSuppliers, events: {select: selectSupplier}, disabled: roleEdit" />
+                                <span class="icon-32 icon-add col-md-2 margin-left10" style="margin-top: 1px !important; width: 0px;" data-bind="events: {click: addCatSupplier}"></span>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="clear"></div>
+
+                <div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label id="lblFibuDescription">Description</label>
+                            <div class="clear"></div>
+                            <div class="input-append">
+                                <textarea data-bind="value: fibuDescription, disabled: roleEdit" class="modal-textarea col-md-6" data-value-update="keyup"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="modal-market-footer">
+            <button id="btnUpdateFibu" type="button" class="ms-button" data-bind="events:{click: update}">
+                <span class="icon-20 icon-close"></span>
+                <span id="lblClose">Speichern und schliessen</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script type="text/html" id="fibu-template">
+    #data.role = roleInfo.get();#
+    <tr data-bind="visible: IsVisible">
+        <td>
+            <span style="position: absolute; left: 3px; color: red; margin-top: 6px; font-size: 22px;" class="valid-item hidden">*</span>
+            <select data-role="dropdownlist" style="width: #:e17p # px" class="input-left xxx"
+                    data-option-label=""
+                    data-value-primitive="true"
+                    data-text-field="Name"
+                    data-value-field="Id"
+                    data-bind="source: LandRegionSrc, value: FibuLandRegionId, events:{change: changeLandRegion}, disabled: role"></select>
+        </td>
+        <td>
+            <select data-role="dropdownlist" style="width: #:e17p # px" class="input-left xxx"
+                    data-option-label=""
+                    data-value-primitive="true"
+                    data-text-field="Name"
+                    data-value-field="Id"
+                    data-bind="source: KontoSrc, value: FibuKontenId, events:{change: changeFibuAccount}, disabled: role"></select>
+        </td>
+        <td>
+            <select data-role="dropdownlist" style="width: #:e17p # px" class="input-left xxx"
+                    data-option-label=""
+                    data-value-primitive="true"
+                    data-text-field="Name"
+                    data-value-field="Id"
+                    data-bind="source: KostenSrc, value: KostenstellenId, events:{change: changeFibuContent}, disabled: role"></select>
+        </td>
+        <td>
+            <input style="width: #:e09p # px; min-width: 110px;" tabindex="0" data-role="datepicker" name="startDate" maxlength="10" 
+                   data-bind="value: FibuDate, disabled: role" onblur="vmActionFibu.checkDate(this)" />
+        </td>
+        <td>
+            <input style="width: #:e09p#px; max-width: 92px;" focusevent="cost-focus" data-role="numerictextbox" data-spinners="false" class="fibu-input" data-format="\#\#.00 #:charPercent#" data-step="0.01" data-max="100" data-min="0"
+                   data-bind="value: FibuPercent, events:{change: changePercent}, disabled: role" />
+        </td>
+        <td>
+            <input style="width: #:e09p#px" focusevent="cost-focus" data-role="numerictextbox" data-spinners="false" class="fibu-input input-right" data-format="#:charCurrency# \#\#,\#.00" data-max="999999999999"
+                   data-bind="value: ExpectedCost, events:{change: changeExpectedCost}, enabled: isEditExpected, disabled: role" />
+        </td>
+        <td>
+            <input style="width: #:e09p#px" focusevent="cost-focus" data-role="numerictextbox" data-spinners="false" class="fibu-input input-right" data-format="#:charCurrency# \#\#,\#.00" data-max="999999999999"
+                   data-bind="value: ActualCost, events:{change: changeActualCost}, enabled: isEditActual, disabled: role" />
+        </td>
+        <td>
+            <input style="width: #:e09p#px" type="text" data-spinners="false" class="fibu-input input-right input-rate"
+                   data-bind="value: RateCost, disabled: notEdit" />
+        </td>
+        <td>
+            <span class="icon-32 icon-bin cursor-pointer" data-bind="events:{click: removeActionFibu}" style="margin-left: 5px;"></span>
+        </td>
+    </tr>
+</script>
+
+<script>
+    var currency = vmGoalAction.actionOptions ? vmGoalAction.actionOptions.currency : null,
+        expectedCost = vmGoalAction.fibuOptions.ExpectedCost, actualCost = vmGoalAction.fibuOptions.ActualCost,
+        firstData = vmCommon.deepCopy(vmGoalAction.fibuOptions.ActionFibus);
+    var charPercent = "\\%", charCurrency = "\\" + currency;
+
+    vmEditAction = vmEditAction || {};
+    vmActionFibu = {};
+    vmActionFibu.modelChanged = false;    
+    vmActionFibu.isAutoPercent = firstData.length === 0;    
+    vmActionFibu.SupplierName = "";
+
+    vmActionFibu.supplierIdx = -1;
+    vmActionFibu.sourceSuppliers = {};
+    
+    vmActionFibu.enumSupplierCatType = 14;
+    vmActionFibu.enumSupplierMarketing = 1;
+
+    vmActionFibu.dataservice = (function () {
+        var callAjaxFibu = function (divId, funcName, entryData, requestType, successCallBack) {
+            var url = "../Handlers/MsGoalAction.ashx?funcName=" + funcName + "&projid=" + projectId + "&regid=" + vmGoalAction.regionId;
+            return callAjax(divId, url, entryData, successCallBack, requestType);
+        };
+
+        var callAjaxByPost = function (funcName, entryData, successFunc) {
+            return callAjaxFibu("loading-actionfibu", funcName, JSON.stringify(entryData), AjaxConst.PostRequest, successFunc);
+        };
+
+        var updateActionFibu = function (entryDate, successFunc) {
+            callAjaxByPost("updateactionfibu", entryDate, successFunc);
+        };
+
+        return {
+            update: updateActionFibu
+        };
+    })();
+
+    vmActionFibu.viewModel = undefined;
+    var currencyRates = [], fibuSettings = [];
+    var roleInfo = function () {
+        var isEdit = false, lock = false;
+        var set = function (isedit) {
+            if (lock) {
+                return;
+            }
+
+            isEdit = isedit;
+            lock = true;
+        }
+
+        var get = function () {
+            return isEdit;
+        };
+
+        return {
+            set: set, get: get
+        }
+    }();
+
+    vmGoalAction.popActionFibu.bind("close", function (e) {
+        if (vmActionFibu.modelChanged) {
+            if (confirm(kLg.saveConfirmQuestion)) {
+                if (vmActionFibu.validData()) {
+                    vmActionFibu.viewModel.update();
+                } else {
+                    e.preventDefault();
+                }
+            } else {
+                
+                vmGoalAction.fibuOptions.Cost.set("Fibus", firstData);
+
+                vmActionFibu.destroyPop();
+            }
+        } else {
+            vmActionFibu.destroyPop();
+        }
+    });
+
+    vmActionFibu.destroyPop = function () {
+        vmGoalAction.popActionFibu.destroy();
+        vmGoalAction.popActionFibu = null;
+        $(".body-content").after("<div id='popActionFibu'></div>");
+    };
+
+    vmActionFibu.setupLanguage = function () {
+        $("#pop-action-fibu #lblFibuAccount").text(kLg.lblFibuAccount);
+        $("#pop-action-fibu #lblFibuCosts").text(kLg.lblFibuCosts);
+        $("#pop-action-fibu #lblFibuDate").text(kLg.lblValueData);
+
+        $("#pop-action-fibu #lblExpectedCost").text(kLg.gaLblExpectedCost);
+        $("#pop-action-fibu #lblActualCost").text(kLg.gaLblActualCost);
+
+        $("#pop-action-fibu #lblClose").text(kLg.lblClose);
+        $("#pop-action-fibu #lblTotal").text(kLg.titleTotal);
+        $("#pop-action-fibu #lblFibuSupplier").text(kLg.lblFilterSupplier);
+        $("#pop-action-fibu #lblFibuDescription").text(kLg.labelDes);
+    };
+
+    vmActionFibu.bindFocusEvent = function () {        
+        $("input[focusevent='cost-focus']").bind("focus", function () {
+            
+            var input = $(this);
+            try {
+                var costNumber = parseInt(input.val());
+                if (costNumber === 0) input.val(null);
+            } catch (e) {
+                input.val(null);
+            }
+        });
+    };
+
+    vmActionFibu.bindOverallView = function () {
+        currencyRates = vmGoalAction.fibuOptions.CurrencyRates;
+        fibuSettings = bindSettings(vmGoalAction.fibuOptions.FibuSettings);
+
+        var supName = getSupplierName(vmGoalAction.fibuOptions.FibuSupplierId);
+        roleInfo.set(vmGoalAction.fibuOptions.role < vmCommon.MemberRole.Edit);
+        vmActionFibu.viewModel = kendo.observable({
+            roleEdit: roleInfo.get(),
+            fibuStyle: { e13p: tableWidth * 0.13 - 2, e10p: tableWidth * 0.1 - 2, e11p: tableWidth * 0.11 - 2 },
+            isEditExpected: true,
+            isEditActual: true,
+            notEdit: true,
+            actionFibus: bindSource(vmGoalAction.fibuOptions.ActionFibus || []),
+            fibuSupplier: vmGoalAction.fibuOptions.FibuSupplier,
+            fibuDescription: vmGoalAction.fibuOptions.FibuDescription,
+            
+            SupplierName: (vmActionFibu.SupplierName === "" || vmActionFibu.SupplierName === undefined) ? supName : vmActionFibu.SupplierName,
+            SourceSuppliers: vmActionFibu.sourceSuppliers,
+            addActionFibu: function () {
+                if (this.roleEdit) {
+                    return;
+                }
+
+                var fibus = this.actionFibus;
+                fibus.push(getNewActionFibu());                
+                if (vmActionFibu.isAutoPercent) {
+                    var count = fibus.length;
+
+                    var per = Math.floor((100 / fibus.length) * 100) / 100;
+                    for (var i = 0; i < fibus.length; i++) {
+                        fibus[i].set("FibuPercent", per);
+                    }
+
+                    if (count > 1) {
+                        fibus[count - 1].set("FibuPercent", 100 - per * (count - 1));
+                    }
+
+                    //this.set("actionFibus", bindSource(fibus));
+                    //kendo.bind($("#pop-action-fibu"), vmActionFibu.viewModel);
+                    for (var i = 0; i < fibus.length; i++) {
+                        var item = fibus[i];
+                        item.set("LandRegionSrc", getFibuLandRegionSrc());
+                        item.set("KontoSrc", getFibuAccountSrc(item.FibuLandRegionId));
+                        item.set("KostenSrc", getFibuCostSrc(item.FibuLandRegionId, item.FibuKontenId));
+                        item.set("ActualCost", aroundCost(actualCost * (item.FibuPercent) / 100));
+                        item.set("ExpectedCost", aroundCost(expectedCost * (item.FibuPercent) / 100));
+                        item.set("RateCost", calRate((item.ActualCost || item.ExpectedCost), item.FibuLandRegionId));
+
+                        item.set("IsVisible", item.DataState !== dataState.Deleted);
+                    }
+
+                    
+                    $('#pop-action-fibu input[data-role=datepicker]').preventPressAlphabetChar(kLg.language === "de"|"pm" ? [46] : [47]);
+                    $('#pop-action-fibu input[data-role=datepicker]').kendoDatePicker({
+                        weekNumber: true
+                    });                    
+                }
+                vmActionFibu.adjustDropdownControl();
+                vmActionFibu.bindFocusEvent();
+
+            },
+            changeData: function (e) {
+                var item = e.data;
+
+                //update modified state
+                if (item.DataState === dataState.Unchanged) item.set("DataState", dataState.Modified);
+            },
+            changePercent: function (e) {                
+                vmActionFibu.isAutoPercent = false;
+                var item = e.data;
+
+                if (item.FibuPercent == null) item.set("FibuPercent", 0);
+
+                //update modified state
+                if (item.DataState === dataState.Unchanged) {
+                    item.set("DataState", dataState.Modified);
+                    item.set("ExpectedCost", aroundCost(expectedCost * item.FibuPercent / 100));
+                    item.set("ActualCost", aroundCost(actualCost * item.FibuPercent / 100));
+
+                    item.set("RateCost", calRate(item.ActualCost || item.ExpectedCost, item.FibuLandRegionId));
+
+                    //kendo.bind($("#pop-action-fibu"), vmActionFibu.viewModel);
+                    vmActionFibu.adjustDropdownControl();
+                    $('#pop-action-fibu input[data-role=datepicker]').preventPressAlphabetChar(kLg.language === "de" | "pm" ? [46] : [47]);
+                    $('#pop-action-fibu input[data-role=datepicker]').kendoDatePicker({
+                        weekNumber: true
+                    });                    
+                }
+                vmActionFibu.bindFocusEvent();
+            },
+            changeExpectedCost: function (e) {
+                vmActionFibu.isAutoPercent = false;
+                var item = e.data;
+
+                if (item.ExpectedCost == null) item.set("ExpectedCost", 0);
+
+                item.set("ExpectedCost", aroundCost(vmActionFibu.ValidCost(expectedCost, item.ExpectedCost)));
+                //item.set("ExpectedCost", (item.ExpectedCost));
+
+                //update modified state
+                if (item.DataState === dataState.Unchanged) {
+                    item.set("DataState", dataState.Modified);
+                    if (expectedCost !== 0) {
+                        item.set("FibuPercent", Math.round(((item.ExpectedCost / expectedCost) * 100) * 100) / 100);
+
+                        item.set("ActualCost", aroundCost(actualCost * item.FibuPercent / 100));
+                        item.set("RateCost", calRate(item.ActualCost || item.ExpectedCost, item.FibuLandRegionId));
+                    }
+
+                    //kendo.bind($("#pop-action-fibu"), vmActionFibu.viewModel);
+                    vmActionFibu.adjustDropdownControl();
+                    $('#pop-action-fibu input[data-role=datepicker]').preventPressAlphabetChar(kLg.language === "de" | "pm" ? [46] : [47]);
+                    $('#pop-action-fibu input[data-role=datepicker]').kendoDatePicker({
+                        weekNumber: true
+                    });                    
+                }
+                vmActionFibu.bindFocusEvent();
+            },
+            changeActualCost: function (e) {
+                vmActionFibu.isAutoPercent = false;
+                var item = e.data;
+
+                if (item.ActualCost == null) item.set("ActualCost", 0);
+
+                item.set("ActualCost", aroundCost(vmActionFibu.ValidCost(actualCost, item.ActualCost)));
+                //item.set("ActualCost", aroundCost(item.ActualCost));
+
+                //update modified state
+                if (item.DataState === dataState.Unchanged) {
+                    item.set("DataState", dataState.Modified);
+                    if (actualCost !== 0) {
+                        item.set("FibuPercent", Math.round(((item.ActualCost / actualCost) * 100) * 100) / 100);
+
+                        item.set("ExpectedCost", aroundCost(expectedCost * item.FibuPercent / 100));
+                        item.set("RateCost", calRate(item.ActualCost || item.ExpectedCost, item.FibuLandRegionId));
+                    }
+
+                    //kendo.bind($("#pop-action-fibu"), vmActionFibu.viewModel);
+                    vmActionFibu.adjustDropdownControl();
+                    $('#pop-action-fibu input[data-role=datepicker]').preventPressAlphabetChar(kLg.language === "de" | "pm" ? [46] : [47]);
+                    $('#pop-action-fibu input[data-role=datepicker]').kendoDatePicker({
+                        weekNumber: true
+                    });                    
+                }
+                vmActionFibu.bindFocusEvent();
+            },
+            changeLandRegion: function (e) {
+                var item = e.data;
+
+                //update modified state
+                if (item.DataState === dataState.Unchanged) item.set("DataState", dataState.Modified);
+
+                item.set("FibuKontenId", 0);
+                item.set("KostenstellenId", 0);
+                item.set("RateCost", calRate(item.ActualCost || item.ExpectedCost, item.FibuLandRegionId));
+                item.set("KontoSrc", getFibuAccountSrc(item.FibuLandRegionId));
+
+                //kendo.bind($("#pop-action-fibu"), vmActionFibu.viewModel);
+                vmActionFibu.adjustDropdownControl();
+                $('#pop-action-fibu input[data-role=datepicker]').preventPressAlphabetChar(kLg.language === "de" | "pm" ? [46] : [47]);
+                $('#pop-action-fibu input[data-role=datepicker]').kendoDatePicker({
+                    weekNumber: true
+                });   
+
+                vmActionFibu.bindFocusEvent();
+            },
+            changeFibuAccount: function (e) {
+                var item = e.data;
+
+                //update modified state
+                if (item.DataState === dataState.Unchanged) item.set("DataState", dataState.Modified);
+
+                item.set("KostenstellenId", 0);
+                item.set("KostenSrc", getFibuCostSrc(item.FibuLandRegionId, item.FibuKontenId));
+
+                //kendo.bind($("#pop-action-fibu"), vmActionFibu.viewModel);
+                vmActionFibu.adjustDropdownControl();
+                $('#pop-action-fibu input[data-role=datepicker]').preventPressAlphabetChar(kLg.language === "de" | "pm" ? [46] : [47]);
+                $('#pop-action-fibu input[data-role=datepicker]').kendoDatePicker({
+                    weekNumber: true
+                });  
+
+                vmActionFibu.bindFocusEvent();
+            },
+            changeFibuContent: function (e) {
+                var item = e.data;
+
+                //modify
+                if (item.DataState === dataState.Unchanged) item.set("DataState", dataState.Modified);
+                vmActionFibu.bindFocusEvent();
+            },
+            removeActionFibu: function (e) {
+                if (this.roleEdit) {
+                    return;
+                }
+
+                vmActionFibu.isAutoPercent = false;
+
+                var item = e.data;
+                var src = this.get("actionFibus");
+                var index = src.indexOf(item);
+
+                if (item.DataState === dataState.Added) {
+                    src.splice(index, 1);
+                    vmActionFibu.modelChanged = false;
+                } else {
+                    item.set("IsVisible", false);
+                    item.set("DataState", dataState.Deleted);
+                    vmActionFibu.modelChanged = true;
+                }
+                
+
+                //kendo.bind($("#pop-action-fibu"), vmActionFibu.viewModel);
+                vmActionFibu.adjustDropdownControl();
+                $('#pop-action-fibu input[data-role=datepicker]').preventPressAlphabetChar(kLg.language === "de" | "pm" ? [46] : [47]);
+                $('#pop-action-fibu input[data-role=datepicker]').kendoDatePicker({
+                    weekNumber: true
+                });
+
+                vmActionFibu.bindFocusEvent();
+            },
+            update: function () {
+
+                if (!vmActionFibu.validData()) {
+                    return;
+                }
+
+                if (this.actionFibus != null) {
+                    for (var i = 0; i < this.actionFibus.length; i++) {
+                        var fibu = this.actionFibus[i];
+                        if (fibu.FibuDate) {
+                            if (typeof fibu.FibuDate === "string")  fibu.set("FibuDate", fibu.FibuDate);
+                            fibu.set("FibuDate", changeHourOfDate(fibu.FibuDate));
+                        }
+                    }
+                }
+
+                vmGoalAction.fibuOptions.ActionFibus = this.actionFibus;
+
+                //update action info
+                var costModel = vmGoalAction.fibuOptions.Cost;
+                costModel.set("FibuSupplier", this.fibuSupplier);
+                costModel.set("FibuDescription", this.fibuDescription);
+
+                if (costModel.Id) costModel.set("DataState", dataState.Modified);
+
+                var sid = getSupplierId(vmActionFibu.viewModel.get("SupplierName"));
+                costModel.set("FibuSupplierId", sid !== -1 ? sid : 0);
+
+                if (vmActionFibu.modelChanged) vmEditAction.modelChanged = true;
+                vmActionFibu.modelChanged = false;
+                vmGoalAction.popActionFibu.close();
+            },
+            totalExpected: function () {
+                var sum = 0;
+
+                $.each(this.get("actionFibus"), function (index, item) {
+                    sum += item.DataState !== dataState.Deleted ? item.ExpectedCost : 0;
+                });
+
+                return currency + " " + kendo.toString(sum, "##,#.00");
+            },
+            totalActual: function () {
+                var sum = 0;
+
+                $.each(this.get("actionFibus"), function (index, item) {
+                    sum += item.DataState !== dataState.Deleted ? item.ActualCost : 0;
+                });
+
+                return currency + " " + kendo.toString(sum, "##,#.00");
+            },
+            isShowTotal: function () {
+                return $.grep(this.get("actionFibus"), function (it) { return it.DataState !== dataState.Deleted; }).length > 0;
+            },
+            selectSupplier: function (e) {
+                vmActionFibu.supplierIdx = e.item.index();
+            },
+            addCatSupplier: function () {
+                if (this.roleEdit) {
+                    return;
+                }
+
+                //HoaND - add supplier categories at popFibuForm
+                var inputText = vmActionFibu.viewModel.get("SupplierName");
+
+                if (inputText == null || inputText.trim().length < 1) {
+                    $('#acSupplier').tooltip('destroy');
+                    $('#acSupplier').attr("title", kLg.msgRequired);
+                    $('#acSupplier').tooltip({ trigger: "manual" }).tooltip('show');
+                } else {
+                    inputText = inputText.trim();
+
+                    if (!isValidSupplierText(inputText.trim())) {
+                        $('#acSupplier').tooltip('destroy');
+                        $('#acSupplier').attr("title", kLg.msgMaxlenghNameCurrencySpecialCharacter);
+                        $('#acSupplier').tooltip({ trigger: "manual" }).tooltip('show');
+                    } else if (isContainSupplierName(inputText)) {
+                        ShowToolTip2($('#acSupplier'), kLg.msgNameIsExisted, "top");
+                    } else {
+                        addSupplierCatData(inputText);
+                    }
+                }
+
+            }
+        });
+
+        $('#acSupplier').focus(function () {
+            $('#acSupplier').tooltip('destroy');
+        });
+
+        vmActionFibu.viewModel.bind("change", function (e) {
+            vmActionFibu.clearAlert();
+            
+            vmActionFibu.modelChanged = true;
+        });
+
+        kendo.bind($("#pop-action-fibu"), vmActionFibu.viewModel);
+        vmActionFibu.setupLanguage();
+        vmActionFibu.adjustDropdownControl();
+
+        $('#pop-action-fibu input[data-role=datepicker]').preventPressAlphabetChar(kLg.language === "de" | "pm" ? [46] : [47]);
+        $('#pop-action-fibu input[data-role=datepicker]').kendoDatePicker({
+            weekNumber: true
+        });
+
+        vmActionFibu.bindFocusEvent();
+    };
+
+    var tableWidth = screen.width - 50 - 20,
+        e17p = tableWidth * 0.17 - 2, e09p = tableWidth * 0.09 - 2, e10p = tableWidth * 0.10 - 2;
+
+    //Break Point -- Main()
+    $(function () {
+        getSupplierCatData();
+    });
+
+    function getSupplierCatData(sname) {
+        var url = "../Handlers/SettingHandler.ashx?funcName=getallcategoriesbytype&parentType=" + vmActionFibu.enumSupplierMarketing + "&type=" + vmActionFibu.enumSupplierCatType + "&projid=" + projectId;
+
+        callAjax('categories-loading', url, null, function (data) {
+            vmActionFibu.sourceSuppliers = data.value;
+            vmActionFibu.SupplierName = sname;
+            vmActionFibu.bindOverallView();
+
+
+        }, AjaxConst.GetRequest);
+    }
+
+    function getSupplierCatDataNoReload(sname) {
+        var url = "../Handlers/SettingHandler.ashx?funcName=getallcategoriesbytype&parentType=" + vmActionFibu.enumSupplierMarketing + "&type=" + vmActionFibu.enumSupplierCatType + "&projid=" + projectId;
+
+        callAjax('categories-loading', url, null, function (data) {
+            vmActionFibu.sourceSuppliers = data.value;
+            vmActionFibu.SupplierName = sname;
+
+            vmActionFibu.viewModel.set("SourceSuppliers", vmActionFibu.sourceSuppliers);
+
+        }, AjaxConst.GetRequest);
+    }
+
+    vmActionFibu.enumsRoleConflict = {
+        conflict: -1,
+        noRole: 0,
+        using: -2,
+        nameExist: -3
+    };
+
+    var staticNotification = $("#staticNotification").kendoNotification({
+        appendTo: "#appendto",
+        autoHideAfter: 2000,
+        width: kLg.language === "en" ? 250: 290
+
+    }).data("kendoNotification");
+
+    function addSupplierCatData(sname) {
+        if (!sname) return;
+
+        var url = "../Handlers/SettingHandler.ashx?funcName=addcategories&projid=" + projectId;
+
+        var sCat = {};
+        sCat.Id = 0;
+        sCat.Name = sname;
+        sCat.Type = vmActionFibu.enumSupplierCatType;
+        sCat.ParentType = vmActionFibu.enumSupplierMarketing;
+        sCat.NonArchive = false;
+
+        callAjax('add-categori-loading', url, JSON.stringify(sCat), function (data) {
+            var state = data;
+            switch (state) {                
+                case vmActionFibu.enumsRoleConflict.nameExist:
+                    $('#acSupplier').tooltip('destroy');
+                    $('#acSupplier').attr("title", kLg.msgDuplicateName);
+                    $('#acSupplier').tooltip({ trigger: "manual" }).tooltip('show');
+                    break;
+                default:
+                    if (!vmCommon.checkCurrentPage(vmCommon.enumPage.SubMarket))
+                        msFilter.controlService.reLoadDataFilter();
+
+                    getSupplierCatDataNoReload(sname);
+                    var label = (kLg.lblFilterSupplier.length < 13) ? kLg.lblFilterSupplier : kLg.lblFilterSupplier.substr(0, 12);
+                    staticNotification.show("<div><span style=\"\">" + kLg.SupplierAdded.format(label) + "<span></div>");
+                    break;
+            }
+        }, AjaxConst.PostRequest);
+    }
+
+
+    function isValidSupplierText(t) {
+        if (!t) return false;
+
+        return /^[^<>'"|]+$/.test(t);
+    }
+
+    function getSupplierId(sname) {
+        var ret = -1;
+
+        if (!sname) return ret;
+
+        if (vmActionFibu.sourceSuppliers) {
+            for (var i = 0; i < vmActionFibu.sourceSuppliers.length; i++) {
+                if (vmActionFibu.sourceSuppliers[i].Name === sname) {
+                    ret = vmActionFibu.sourceSuppliers[i].Id;
+                    break;
+                }
+            }
+        }
+
+        return ret;
+    }
+
+    function getSupplierName(sid) {
+        var ret = "";
+
+        if (!sid) return ret;
+
+        if (vmActionFibu.sourceSuppliers) {
+            for (var i = 0; i < vmActionFibu.sourceSuppliers.length; i++) {
+                if (vmActionFibu.sourceSuppliers[i].Id === parseInt(sid)) {
+                    ret = vmActionFibu.sourceSuppliers[i].Name;
+                    break;
+                }
+            }
+        }
+
+        return ret;
+    }
+
+    function isContainSupplierName(t) {
+        if (!vmActionFibu.sourceSuppliers) return false;
+
+        var ret = false;
+
+        for (var i = 0; i < vmActionFibu.sourceSuppliers.length; i++) {
+            if (vmActionFibu.sourceSuppliers[i].Name === t) {
+                ret = true;
+                break;
+            }
+        }
+
+        return ret;
+    }
+
+    //rebind old list actionFibu
+    function bindSource(actionFibus) {
+        for (var i = 0; i < actionFibus.length; i++) {
+            var item = actionFibus[i];
+            item.LandRegionSrc = getFibuLandRegionSrc();
+            item.KontoSrc = getFibuAccountSrc(item.FibuLandRegionId);
+            item.KostenSrc = getFibuCostSrc(item.FibuLandRegionId, item.FibuKontenId);
+            item.ActualCost = aroundCost(actualCost * (item.FibuPercent) / 100);
+            item.ExpectedCost = aroundCost(expectedCost * (item.FibuPercent) / 100);
+            item.RateCost = calRate((item.ActualCost || item.ExpectedCost), item.FibuLandRegionId);
+
+            item.IsVisible = item.DataState !== dataState.Deleted;
+        }
+
+        return actionFibus;
+    };
+
+    function aroundCost(cost) {
+        if (cost === 0) {
+            return 0;
+        }
+
+        var newCost = 0;
+
+        var isNegative = cost < 0 ? -1 : 1;
+        cost = Math.abs(cost);
+
+        var x = Number(((((cost % 1).toFixed(2) * 10) % 1) / 10).toFixed(2));
+        if (x === 0) {
+            newCost = cost;
+        }
+
+        if (x < 0.03) {
+            newCost = cost - x;
+        } else if (x < 0.05) {
+            newCost = cost - x + 0.05;
+        } else if (x === 0.05) {
+            newCost = cost;
+        } else if (x < 0.08) {
+            newCost = cost - x + 0.05;
+        } else {
+            newCost = cost - x + 0.1;
+        }
+
+        return isNegative * newCost;
+    };
+
+    function calRate(cost, fibuLandRegionId) {
+        var rate = getRateById(fibuLandRegionId);        
+        if (!rate) return null;        
+
+        if (!rate.Rate || rate.Rate == null || rate.Rate.length <= 0)
+            rate.Rate = "1";
+        if (!rate.ExtRate || rate.ExtRate == null || rate.ExtRate.length <= 0)
+            rate.ExtRate = "1";
+        var rs = aroundCost(cost * (Number(rate.Rate) / Number(rate.ExtRate)));
+
+        return rs != null ? rate.Name + " " + kendo.toString(rs, "##,#.00") : null;
+    };
+
+    //Land-Region
+    function getFibuLandRegionSrc() {
+        return fibuSettings.landRegions;
+    };
+
+    //Fibu Account
+    function getFibuAccountSrc(parentId) {
+        var res = $.grep(fibuSettings.fibuAccounts, function (it) {
+            return it.ParentId === parentId;
+        });
+
+        if (parentId) {
+            res.unshift({ FibuKostenstellens: [], Id: 0, LandRegionId: null, LandRegionName: null, MType: 0, Name: "", ParentId: -1 });
+        }
+
+        return res;
+    };
+
+    //Fibu Cost
+    function getFibuCostSrc(grandId, parentId) {
+        var res = $.grep(fibuSettings.fibuCosts, function (it) {
+            return it.GrandId === grandId && it.ParentId === parentId;
+        });
+
+        if (parentId > 0) {
+            res.unshift({ GrandId: -1, Id: 0, LandRegionId: null, LandRegionName: null, MType: 0, Name: "", ParentId: -1 });
+        }
+
+        return res;
+    };
+
+    //return new actionFibu instance
+    function getNewActionFibu() {
+        return {
+            Id: 0,
+            ActionId: null,
+            FibuLandRegionId: 0,
+            FibuKontenId: 0,
+            KostenstellenId: 0,
+            FibuDate: null,
+            FibuPercent: 0,
+            DataState: dataState.Added,
+            LandRegionSrc: getFibuLandRegionSrc(),
+            KontoSrc: [],
+            KostenSrc: [],
+            ActualCost: 0,
+            ExpectedCost: 0,
+            RateCost: null,
+            MIndex: 0,
+            IsVisible: true
+        };
+    };
+
+    function bindSettings(fibuSettings) {
+        var objSettings = { landRegions: [], fibuAccounts: [], fibuCosts: [] };
+        for (var i = 0; i < fibuSettings.length; i++) {
+            var lrItem = fibuSettings[i];
+            objSettings.landRegions.push(lrItem);
+
+            for (var j = 0; j < lrItem.FibuKontens.length; j++) {
+                var faItem = lrItem.FibuKontens[j];
+                faItem.ParentId = lrItem.Id;
+                objSettings.fibuAccounts.push(faItem);
+
+                for (var k = 0; k < faItem.FibuKostenstellens.length; k++) {
+                    var fcItem = faItem.FibuKostenstellens[k];
+                    fcItem.GrandId = lrItem.Id;
+                    fcItem.ParentId = faItem.Id;
+                    objSettings.fibuCosts.push(fcItem);
+                }
+            }
+        }
+
+        return objSettings;
+    };
+
+    function getRateById(id) {
+        var rate = undefined;
+        if (!id) {
+            return rate;
+        }
+
+        for (var i = 0; i < currencyRates.length; i++) {
+            if (currencyRates[i].Id === id) {
+                rate = currencyRates[i];
+            }
+        }
+
+        return rate;
+    }
+
+    vmActionFibu.validData = function () {
+        vmActionFibu.clearAlert();
+
+        var datas = vmActionFibu.viewModel.get("actionFibus");
+        var fibus = $.grep(datas, function (it) { return it.DataState !== dataState.Deleted; });
+        var supplier = vmActionFibu.viewModel.get("SupplierName");
+        var sid = getSupplierId(supplier);
+
+
+        if (fibus.length === 0) {
+
+            if (sid === -1 && supplier) {
+                $("#NotiInvalidSupplier").removeClass("hidden");
+                vmActionFibu.message(kLg.InvalidData);
+                return false;
+            }
+            vmActionFibu.message();
+            return true;
+        }
+
+        var wrongIndex = [];
+        //valid data
+        var percent = 0;
+        for (var i = 0; i < fibus.length; i++) {
+            var fibu = fibus[i];
+            if (fibu.FibuLandRegionId === 0) {
+
+                if (wrongIndex.indexOf(i) === -1) {
+                    wrongIndex.push(i);
+                }
+            }
+
+            percent += fibu.FibuPercent;
+        }
+
+        if (!checkNotify(wrongIndex, kLg.InvalidData)) {
+            return false;
+        }
+
+        //valid duplicate fibu
+        wrongIndex = [];
+        var count = fibus.length;
+        for (var j = 0; j < count - 1; j++) {
+            var srcItem = fibus[j];
+            for (var k = j + 1 ; k < count; k++) {
+                var desItem = fibus[k];
+                if (srcItem.FibuLandRegionId === desItem.FibuLandRegionId && srcItem.FibuKontenId === desItem.FibuKontenId && srcItem.KostenstellenId === desItem.KostenstellenId) {
+
+                    if (wrongIndex.indexOf(j) === -1) {
+                        wrongIndex.push(j);
+                    }
+
+                    if (wrongIndex.indexOf(k) === -1) {
+                        wrongIndex.push(k);
+                    }
+                }
+            }
+        }
+
+        if (!checkNotify(wrongIndex, kLg.msgFibuDuplicate)) {
+            return false;
+        }
+
+        //valid percent
+        if (percent !== 100) {
+            vmActionFibu.message(kLg.msgFibuInvalidPercent);
+            return false;
+        }
+        //valid date
+        wrongIndex = [];
+
+        for (var f = 0; f < datas.length; f++) {
+
+            var fitem = datas[f];
+            if (fitem.DataState === dataState.Deleted) continue;
+            var dvalue = $("#fibu-table tbody tr:eq(" + f + ") td:eq(3) input[data-role='datepicker']").val().trim();
+            fitem.FibuDate = $("#fibu-table tbody tr:eq(" + f + ") td:eq(3) input[data-role='datepicker']").data("kendoDatePicker").value();
+
+            if (fitem.FibuDate == null && dvalue.length > 0) {
+                if (wrongIndex.indexOf(f) === -1) {
+                    wrongIndex.push(f);
+                }
+            }
+        }
+
+        if (!checkNotify(wrongIndex, kLg.msgDateInValid)) {
+            return false;
+        }
+
+        //valid suplier
+        if (sid === -1 && supplier) {
+            $("#NotiInvalidSupplier").removeClass("hidden");
+            vmActionFibu.message(kLg.InvalidData);
+            return false;
+        }
+
+        return true;
+    };
+
+    function checkNotify(wrongIndex, mes) {
+        if (wrongIndex.length > 0) {
+            vmActionFibu.message(mes);
+
+            var trs = $("#fibu-table tbody tr:visible");
+
+            for (var t = 0; t < wrongIndex.length; t++) {
+                var row = wrongIndex[t];
+                var rowItem = $(trs[row]).find("td span.valid-item");
+                $(rowItem).removeClass("hidden");
+
+            }
+            return false;
+        }
+
+        return true;
+    };
+
+    vmActionFibu.message = function (text) {
+        if (text == undefined) {
+            $("#fmessage").text("");
+            return;
+        }
+
+        $("#fmessage").text(text);
+        return;
+    };
+
+    vmActionFibu.clearAlert = function () {
+        vmActionFibu.message();
+        var valids = $("#fibu-table span[class~='valid-item']");
+        for (var i = 0; i < valids.length; i++) {
+            if (!$(valids[i]).hasClass("hidden")) {
+                $(valids[i]).addClass("hidden");
+            }
+        }
+
+        if (!$("#NotiInvalidSupplier").hasClass("hidden")) {
+            $("#NotiInvalidSupplier").addClass("hidden");
+        }
+    };
+
+    vmActionFibu.isNegative = function (number) {
+        return number < 0;
+    };
+
+    vmActionFibu.ValidCost = function (total, cost) {
+        if (cost === 0) {
+            return cost;
+        }
+
+        if (total === 0) {
+            return 0;
+        }
+
+        if (vmActionFibu.isNegative(total)) {
+            return cost >= total && cost <= 0 ? cost : total;
+        } else {
+            return cost >= 0 && cost <= total ? cost : total;
+        }
+    };
+
+    vmActionFibu.checkDate = function (e) {
+        var index = $(e).closest("tr").index();
+        var inputDate = $(e);
+        inputDate.preventPressAlphabetChar(kLg.language === "de"|"pm" ? [46] : [47]);
+        
+        var startdateString = inputDate.val();
+        inputDate.val(vmCommon.autoFormatDate(startdateString, kLg.language));
+
+        var startdatePicker = vmCommon.convertDateFormat(inputDate.val(), kLg.language);
+        if (startdatePicker != null) {
+            var year = startdatePicker.getFullYear();
+            if (year >= 1900 && year <= 2099) {
+                inputDate.data("kendoDatePicker").value(startdatePicker);
+
+                var abc = vmActionFibu.viewModel.actionFibus[index];
+                abc.set("FibuDate", inputDate.data("kendoDatePicker").value());
+
+                if (abc.DataState !== dataState.Added) {
+                    abc.set("DataState", dataState.Modified);
+                }
+            }
+        }
+
+        var actionfibus = vmActionFibu.viewModel.get("actionFibus");
+
+        if (actionfibus) {
+            if (actionfibus[index].DataState !== dataState.Added)
+                actionfibus[index].set("DataState", dataState.Modified);
+            //vmActionFibu.viewModel.set("actionFibus", actionfibus);
+        }
+    };
+
+    vmActionFibu.adjustDropdownControl = function () {
+        setTimeout(function () {
+            var w = $("#fibu-table th[id='lblFibuAccount']").width();
+            if (w && !isNaN(w)) {
+                $("#fibu-table .xxx").width(w + 12);
+            }
+        }, 50);
+    };
+
+    $('#pop-action-fibu').keydown(function (e) {
+        if (e.keyCode == 13) {
+            e.preventDefault();
+            return;
+        }
+    });
+
+</script>

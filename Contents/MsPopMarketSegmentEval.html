@@ -1,0 +1,214 @@
+﻿ <style>
+     #pMarketSegmentRegionEvaluation .k-slider .k-label {
+         font-size: 10px !important;
+     }
+ </style>
+
+       <div class="modal-body ms-modal-body" style="height: 400px;">
+            <div class="bui-content">
+                <div>
+                    <div id="pMarketSegmentRegionEvaluation">
+                        <span id="pMSR-title" class="floatleft title-market-eval"></span>
+                        <div class="floatright" style="line-height: 36px;">
+                            <input type="checkbox" onchange="changeMarketSegmentRegion()" id="cbActive" tabindex="1"/>
+                            <label id="lblActive" for="cbActive" style="padding-left: 5px; font-weight: bold;">active </label> 
+                        </div>
+                        <p class="clearx2"></p>
+                        <div class="ms-layout-wrap">
+                            <button class="k-button btnAddTemp" tabindex="0" onclick="vmMSRE.btnAddTemp_Onclick(templateAction.Add, this)">Add</button>
+                            <button class="k-button btnUpdateTemp" tabindex="0" onclick="vmMSRE.btnAddTemp_Onclick(templateAction.Update, this)" >Update</button>
+                            <button class="k-button btnDelTemp" tabindex="0" onclick="vmMSRE.btnOpenTemplate_Onclick(templateType.MarketSegmentReview);"></button>
+
+                            <select id="ddlEvalTemp" tabindex="0" class="ms-dropdown">
+                                <option value="0">Choose layout</option>
+                                <asp:literal runat="server" id="litOption"></asp:literal>
+                            </select>
+
+                            <button class="k-button btnImportTemp" tabindex="0" onclick="showImportTemplate(templateType.MarketSegmentReview);">Import templates</button>
+                        </div>
+                        <p class="clearx2"></p>
+                        <table class="tbgrid modal-table" id="tblReview">
+                            <thead>
+                                <tr>
+                                    <td class="title" id="lblCriteria"></td>
+                                    <td class="title" id="lblPriority" style="width:140px"></td>
+                                    <td class="title" id="lblEvaluation" style="width:300px"></td>
+                                    <td class="title" style="width:48px"></td>
+                                </tr>
+                            </thead>
+                            <tbody id="body-eval"></tbody>
+                            <tfoot>
+                                <tr>
+                                    <td ><span class="icon-28 icon-add-small pull-left" onclick="addEval();"></span>
+                                    </td>
+                                    <td colspan="3">
+                                        <span id="txtTotalEvaluation" class="span-bold pull-right"></span>
+                                    </td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                        <p class="label lblComment">Berkemtn</p>
+                        <textarea id="txtEvaluationComment" onchange="changeMarketSegmentRegion()" class="modal-textarea w-98per" tabindex="1"></textarea>
+                        <p class="clear2px"></p>
+                        <span id="lblVolumeStrategy" style="margin-left: 8px;margin-right: 10px;">Volume Strategy</span>
+                        <select id="ddlStrategy" class="ddlStrategy" style="width: 350px;" tabindex="1"></select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="loadingEvaluation" class="loading" />
+
+<div id="importTempWindow"></div>
+<div id="popEditTempWindow"></div>
+
+<div id="eval-compe-temp-pop" class="popTempWrapper" style="display: none;">
+    <div class="modal-body ms-modal-body">
+        <form>
+            <div class="form-group">
+                
+                <label id="lblEvalTempName">Template name</label>
+                <div class="clear"></div>
+                <input id="txtTempName" name="txtTempName" class="modal-input txtInput w-100per" value="#=data.Name#" />
+            </div>
+        </form>
+    </div>
+    <div class="modal-market-footer">
+        <button type="button" class="ms-button" onclick="closeLayout(this)"><span class="icon-16 icon-close margin-right6"></span><span id="textCancelButton">Cancel</span></button>
+        <button type="button" class="ms-button" id="btnSaveTemplateMaketSegment"><span class="icon-16 icon-update margin-right6"></span><span id="textUpdateButton">OK</span> SON</button>
+    </div>
+</div>
+
+<!-- mahn: resize tooltip -->
+<style type="text/css">
+    .tooltip-inner {
+        max-width: 400px;
+    }
+</style>
+
+<!--Region Evaluation template-->
+<script id="prodEval-temp" type="text/html">
+    # for(var i = 0; i < data.length; i ++) { #
+    <tr index="#=i#" val="#=data[i].Id#" type="RE" id="#=data[i].Id#">
+        <td class="itemDraggable td-hover field_value dragRegionEvaluationhandler" id="#:data[i].Id#" val="#=data[i].Id#">
+            <span class="icon-16  icon-arow-towway-vertical"></span>
+            <span title="#: data[i].Name#" class="w-300 label-input" onclick="editing(this);">#: data[i].Name#</span>
+            <input class="hiddenTextbox w-300" value="#: data[i].Name#" onblur="editing(this);" onchange="changeEvalName(this)" style="display: none" />
+        </td>
+        <td class="field_drop textcenter">
+            <select class="dd prodEvalDropdown" style="width: 60px">
+                <option value="10" # if(data[i].Priority==10) { # selected="selected" #}#> 10 </option>
+                <option value="9" # if(data[i].Priority==9) { # selected="selected" #}#> 9 </option>
+                <option value="8" # if(data[i].Priority==8) { # selected="selected" #}#> 8 </option>
+                <option value="7" # if(data[i].Priority==7) { # selected="selected" #}#> 7 </option>
+                <option value="6" # if(data[i].Priority==6) { # selected="selected" #}#> 6 </option>
+                <option value="5" # if(data[i].Priority==5) { # selected="selected" #}#> 5 </option>
+                <option value="4" # if(data[i].Priority==4) { # selected="selected" #}#> 4 </option>
+                <option value="3" # if(data[i].Priority==3) { # selected="selected" #}#> 3 </option>
+                <option value="2" # if(data[i].Priority==2) { # selected="selected" #}#> 2 </option>
+                <option value="1" # if(data[i].Priority==1) { # selected="selected" #}#> 1 </option>
+                <option value="0" # if(data[i].Priority==0) { # selected="selected" #}#> 0 </option>
+                <option value="-1" # if(data[i].Priority==-1) { # selected="selected" #}#> -1 </option>
+                <option value="-2" # if(data[i].Priority==-2) { # selected="selected" #}#> -2 </option>
+                <option value="-3" # if(data[i].Priority==-3) { # selected="selected" #}#> -3 </option>
+                <option value="-4" # if(data[i].Priority==-4) { # selected="selected" #}#> -4 </option>
+                <option value="-5" # if(data[i].Priority==-5) { # selected="selected" #}#> -5 </option>
+                <option value="-6" # if(data[i].Priority==-6) { # selected="selected" #}#> -6 </option>
+                <option value="-7" # if(data[i].Priority==-7) { # selected="selected" #}#> -7 </option>
+                <option value="-8" # if(data[i].Priority==-8) { # selected="selected" #}#> -8 </option>
+                <option value="-9" # if(data[i].Priority==-9) { # selected="selected" #}#> -9 </option>
+                <option value="-10" # if(data[i].Priority==-10) { # selected="selected" #}#> -10 </option>
+            </select>
+        </td>
+        <td class="field_slider noPaddingRight">
+            <input class="w-160 evalSlider" value="#=data[i].Evaluation#" />
+        </td>
+        <td class="td-bin td-v-align-middle"><span class="icon-28  icon-bin-small pull-left" onclick="delEval(this)"></span></td>
+    </tr>
+    # } #
+
+</script>
+
+<!--Region Evaluation row template-->
+<script id="prodEval-row-temp" type="text/html">
+    <td class="field_value itemDraggable td-hover dragRegionEvaluationhandler">
+        <span class="icon-16  icon-arow-towway-vertical"></span>
+        <span title="#: data.Name#" class="w-300 label-input" onclick="editing(this);">#: data.Name#</span>
+        <input class="hiddenTextbox w-300" value="#: data.Name#" onblur="editing(this);" onchange="changeEvalName(this)" style="display: none" />
+    </td>
+    <td class="field_drop textcenter">
+        <select class="dd prodEvalDropdown" style="width: 60px">
+            <option value="10" # if(data.Priority == 10) { # selected="selected" #}#> 10 </option>
+            <option value="9" # if(data.Priority == 9) { # selected="selected" #}#> 9 </option>
+            <option value="8" # if(data.Priority == 8) { # selected="selected" #}#> 8 </option>
+            <option value="7" # if(data.Priority == 7) { # selected="selected" #}#> 7 </option>
+            <option value="6" # if(data.Priority == 6) { # selected="selected" #}#> 6 </option>
+            <option value="5" # if(data.Priority == 5) { # selected="selected" #}#> 5 </option>
+            <option value="4" # if(data.Priority == 4) { # selected="selected" #}#> 4 </option>
+            <option value="3" # if(data.Priority == 3) { # selected="selected" #}#> 3 </option>
+            <option value="2" # if(data.Priority == 2) { # selected="selected" #}#> 2 </option>
+            <option value="1" # if(data.Priority == 1) { # selected="selected" #}#> 1 </option>
+            <option value="0" # if(data.Priority == 0) { # selected="selected" #}#> 0 </option>
+            <option value="-1" # if(data.Priority == -1) { # selected="selected" #}#> -1 </option>
+            <option value="-2" # if(data.Priority == -2) { # selected="selected" #}#> -2 </option>
+            <option value="-3" # if(data.Priority == -3) { # selected="selected" #}#> -3 </option>
+            <option value="-4" # if(data.Priority == -4) { # selected="selected" #}#> -4 </option>
+            <option value="-5" # if(data.Priority == -5) { # selected="selected" #}#> -5 </option>
+            <option value="-6" # if(data.Priority == -6) { # selected="selected" #}#> -6 </option>
+            <option value="-7" # if(data.Priority == -7) { # selected="selected" #}#> -7 </option>
+            <option value="-8" # if(data.Priority == -8) { # selected="selected" #}#> -8 </option>
+            <option value="-9" # if(data.Priority == -9) { # selected="selected" #}#> -9 </option>
+            <option value="-10" # if(data.Priority == -10) { # selected="selected" #}#> -10 </option>
+        </select>     
+    </td>
+    <td class="field_slider noPaddingRight">
+        <input class="w-160 evalSlider" value="#=data.Evaluation#" />
+    </td>
+    <td class="td-bin td-v-align-middle"><span class="icon-28  icon-bin-small pull-left" onclick="delEval(this)"></span></td>
+</script>
+
+<!--Delete Template Popup-->
+<script id="delete-temp-pop" type="text/x-kendo-template">
+    <div class="modal-body ms-modal-body" style="overflow:auto; height:420px">
+        <form>
+            <table id='myTable' class="tbgrid modal-table">
+                <thead>
+                    <tr>
+                        <th class="title bg-grey lblPrjName"></th>
+                        <th class="title bg-grey" id="lblPrjOwner"></th>
+                        <th class="title bg-grey" id="lblTemplateNamePopDeleteTemp">Template name</th>
+                        <!--<th class="title bg-grey" id="lblProjectName">Project name</th>-->
+                    </tr>
+                </thead>
+                <tbody>
+                    # for(var i = 0; i < data.length; i ++) { #
+                    <tr id="#=data[i].Id#">
+                        <td>#=i + 1#</td>
+                        <td>
+                            <input class="cbTemp" type="checkbox" />
+                        </td>
+                        <td>#:data[i].Name#</td>
+                        <!--<td>#:data[i].ProjectName#</td>-->
+                    </tr>
+                    # } #
+                </tbody>
+            </table>
+        </form>
+    </div>
+    <div class="modal-market-footer" id="divImportFooter">
+        <button type="button" class="ms-button" onclick="vmMSRE.btnDeleteTemplate_Onclick()" tabindex="1"><span class="icon-20 icon-bin-sub margin-right6"></span><span class="btnChoose">Delete</span></button>
+        <button type="button" class="ms-button" onclick="btnCloseDelTemplatePopup_Onclick(this)"><span class="icon-20 icon-close margin-right6"></span><span class="btnCancel">Cancel</span></button>
+    </div>
+</script>
+<script src="/Scripts/msMarketsegmentEval.js"></script>
+<script>
+
+    function btnCloseDelTemplatePopup_Onclick(elm) {
+        if (typeof vmMSRE == 'object' && typeof vmMSRE.btnCloseDelTemplatePopup_Onclick == 'function') {
+            vmMSRE.btnCloseDelTemplatePopup_Onclick();
+        }
+    }
+
+    $(function() {        
+        $('#pMarketSegmentRegionEvaluation .k-draghandle').removeAttr("href");
+    });
+</script>

@@ -1,0 +1,694 @@
+﻿<style type="text/css">
+    #area-edit-independency .k-multiselect .k-input {
+        display: none !important;
+    }
+
+    #area-edit-independency ul.ulsub {
+        padding-left: 0 !important;
+        margin-bottom: 0 !important;
+    }
+
+        #area-edit-independency ul.ulsub li {
+            margin-right: 3px;
+            margin-top: 3px;
+            padding: 3px;
+            box-shadow: 0 2px 6px rgba(0,0,0,.2), 0 2px 3px rgba(0,0,0,.05);
+            padding-bottom: 5px;
+            display: inline-block;
+        }
+</style>
+
+<div id="loading-independency" class="loading"></div>
+<div id="area-edit-independency" class="pop-wrapper">
+    <div class="modal-body ms-modal-body">
+        <form role="form" id="fEditIndependency" class="form-horizontal">
+            <div class="form-group noMarginLeft noMarginRight" data-bind="invisible: IsOverallThreadNameInvisible">
+                <label class="col-sm-4 no-padding-right" for="txtIndependencyName" id="lblOverallThread">Independence name</label>
+                <div class="col-sm-6" style="width: 56%">
+                    <input type="text" name="txtIndependencyName" data-placement="bottom" tabindex="0" id="txtIndependencyName" class="w-98per modal-input txtInput" onkeypress=" vmIndependence.activeModelChange() "
+                           data-bind="value: IndependencyFull.ParentName, enabled: isEdit" maxlength="100">
+                </div>
+            </div>
+            <div class="form-group noMarginLeft noMarginRight" data-bind="invisible: IsThreadNameVisible">
+                <label class="col-sm-4 control-label-left no-padding-right" for="txtThreadName" id="lblThread">Thread name</label>
+                <div class="col-sm-6" style="width: 56%">
+                    <input type="text" name="txtThreadName" data-placement="bottom" id="txtThreadName" class="w-98per modal-input txtInput" onkeypress=" vmIndependence.activeModelChange() "
+                           data-bind="value: IndependencyFull.ChildName, enabled: isEdit" maxlength="100">
+                </div>
+            </div>
+            <div class="form-group noMarginLeft noMarginRight">
+                <label class="col-sm-4 control-label-left no-padding-right radio-label" id="lblShowIn">Show in</label>
+                <div class="col-sm-6" style="width: 56%">
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="rdRegion" id="optionsRadios1" value="true" tabindex="0" data-bind="checked: IndependencyFull.AllRegion, events:{change: changeRegion}, enabled: IndependencyFull.IsCreater">
+                            <span id="lblAllRegion">All region</span>
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="rdRegion" id="optionsRadios2" value="false" tabindex="0" data-bind="checked: IndependencyFull.AllRegion, events:{change: changeRegion}, enabled: IndependencyFull.IsCreater">
+                            <span id="lblChooseSomeRegion">Choose some region</span>
+                        </label>
+                    </div>
+                    <div>
+                        <div data-bind="visible: visibleRegionSelect">
+                            <select id="ddlRegion" name="ddlRegion" class="col-md-10" multiple data-text-field="Name" data-value-field="Id" data-bind="source: ListRegions, value: IndependencyFull.Regions, enabled: IndependencyFull.IsCreater"></select>
+                        </div>
+                        <div data-bind="visible: visibleRegionLabel">
+                            <ul data-bind="source: ListRegions" data-template="selectedregion-temp" class="ulsub"></ul>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="form-group noMarginLeft noMarginRight" data-bind="visible: isSelectAccount" style="height: 36px;" id="selectaccount">
+                <label class="col-sm-4 control-label-left no-padding-right"></label>
+                <div class="col-sm-6" style="width: 56%">
+                    <div style="padding-left: 0 !important;">
+                        <label id="accountstatus" class="pull-left" style="margin-top: 15px;"></label>
+                        <select data-role="multiselect"
+                                data-placeholder=" "
+                                data-text-field="AccountName"
+                                data-value-field="AccountId"
+                                data-bind="enabled: isEdit, source: accountSrc, value: selectedAccount, events:{ select: onSelectAct, deselect: onDeSelectAct }" style="margin-top: 5px"></select>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group noMarginLeft noMarginRight">
+                <label class="col-sm-4 control-label-left no-padding-right radio-label"></label>
+                <div class="col-sm-2" style="width: 20%">
+                    <div class="radio" style="padding-left: 0 !important;">
+                        <label>
+                            <input type="checkbox" name="rdRegion" id="cbxIsMaster" tabindex="0" data-bind="checked: IndependencyFull.IsMasterGoal, enabled: isEdit, events:{ change: changeMasterState}">
+                            <span id="lblIsMasterGoal">Masterziele</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <div class="radio" style="padding-left: 0 !important;">
+                        <label>
+                            <input type="checkbox" name="rdRegion" id="cbxIsMasterKpi" tabindex="0" data-bind="checked: IndependencyFull.IsMasterGoalKpi, enabled: isEdit, events:{ change: changeMasterState}">
+                            <span id="lblIsMasterGoalKpi">MasterzieleKpi</span>
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+            <div class="form-group noMarginLeft noMarginRight">
+                <label id="labelCurrency" class="col-sm-4 control-label-left no-padding-right radio-label">Currency</label>
+                <div class="col-sm-6" style="width: 56%">
+                    <!--<label id="lblCurrency" style="font-weight: normal !important; width: 100%">Währung</label>-->
+                    <select id="ddlCurrency"
+                            data-role="dropdownlist"
+                            data-text-field="Name"
+                            data-value-field="Id"
+                            data-bind="source: ListCurrency, value: IndependencyFull.CurrencyId, enabled: isEdit"></select>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="clear"></div>
+    <div class="modal-market-footer" style="margin-top: 10px;">
+        <button id="btnUpdate" type="button" tabindex="5" class="ms-button" data-bind="events: {click: valid}">
+            <span class="icon-20 icon-close"></span>
+            <span id="lblClose">Close</span>
+        </button>
+    </div>
+</div>
+
+<script id="selectedregion-temp" type="text/html">
+    <li class="">
+        <div style="height: 20px; float: left; margin-right: 3px; padding-top: 3px; white-space: nowrap; max-width: 250px; overflow: hidden;"><span style="">#:Name#</span></div>
+    </li>
+</script>
+
+<script src="../Scripts/jquery.multiple.select.js"></script>
+<!-- ReSharper disable once CoercedEqualsUsing -->
+<script>
+    var vmIndependence = vmIndependence || {};
+    var noRoleRegions = [];
+
+    var isSelectAccount = false, selectedAccount = [], accountSrc = [], selectedItemAll = { AccountId: -1, AccountName: kLg.lblAllUser }, isRemoved = false;
+
+    vmIndependence.dataservice = (function () {
+        var createIndependenceFull = function (entryDate, successFunc) {
+            vmGoalAction.dataservice.callAjaxByPost("createIndependenceFull", entryDate, successFunc, 'loading-independency');
+        };
+
+        //SONPT.
+        var createIndependence = function (entryDate, successFunc) {
+            vmGoalAction.dataservice.callAjaxByPost("createIndependence", entryDate, successFunc, 'loading-independency');
+        };
+
+        var updateIndependencyFull = function (entryDate, successFunc) {
+            vmGoalAction.dataservice.callAjaxByPost("updateIndependencyFull", entryDate, successFunc, 'loading-independency');
+        };
+
+        var checkHasMasterAssign = function (entryDate, successFunc) {
+            vmGoalAction.dataservice.callAjaxByPostWithOutLoading("checkhasmasterassign", entryDate, successFunc);
+        };
+
+        return {
+            createIndependence: createIndependence,
+            createIndependenceFull: createIndependenceFull,
+            updateIndependencyFull: updateIndependencyFull,
+            checkHasMasterAssign: checkHasMasterAssign
+        };
+    }());
+
+    vmIndependence.setupLanguage = function () {
+        $("#area-edit-independency #lblOverallThread").text(kLg.gaLblOverallThread);
+        $("#area-edit-independency #lblThread").text(kLg.gaLblThread);
+        $("#area-edit-independency #lblAllRegion").text(kLg.sendAll + ' ' + kLg.lblRegions );
+        $("#area-edit-independency #lblShowIn").text(kLg.gaLblShowIn);
+        $("#area-edit-independency #lblChooseSomeRegion").text(kLg.gaLblChooseRegionPre + ' ' + kLg.lblRegions);
+        $('#area-edit-independency #lblClose').text(kLg.lblClose);
+
+        $('#area-edit-independency #lblIsMasterGoal').text(kLg.textMasterbudget);
+        $('#area-edit-independency #lblIsMasterGoalKpi').text(kLg.textMastergoal);
+
+        $('#labelCurrency').text(kLg.Currency);
+    };
+
+    vmIndependence.validFormX = function () {
+        var ind = vmIndependence.viewModel.IndependencyFull;
+        var regions = $("#area-edit-independency #ddlRegion").multipleSelect("getSelects");
+        var selectedActs = vmIndependence.viewModel.selectedAccount;
+
+        var flag = !((ind.AllRegion === false || ind.AllRegion === "false") && regions.length === 1 && selectedActs.length === 0);
+
+        //invalid data
+        if (!flag) {
+            ShowToolTip2($("#accountstatus"), kLg.InvalidData, "left");
+            return false;
+        }
+
+        //remove owner
+        if ((ind.AllRegion === false || ind.AllRegion === "false") && !isRemoved && regions.length === 1 && (ind.CreatedBy != vmUser.currentAccount.Id) && $.grep(selectedActs, function (it) { return (it.AccountId === -1 || it.AccountId === ind.CreatedBy); }).length === 0) {
+            ShowToolTip2($("#accountstatus"), kLg.msgRemoveOwnerInThema, "left");
+            return false;
+        }
+
+        return true;
+    };
+
+    vmIndependence.setupValidation = function () {
+        $('#fEditIndependency').validate({
+            rules: {
+                txtIndependencyName: {
+                    maxlength: 100,
+                    required: true
+                },
+                txtThreadName: {
+                    maxlength: 100,
+                    required: true
+                }
+            },
+            messages: {
+                txtIndependencyName: {
+                    required: kLg.msgRequired,
+                    maxlength: kLg.msgMaxlenghName
+                },
+                txtThreadName: {
+                    required: kLg.msgRequired,
+                    maxlength: kLg.msgMaxlenghName
+                }
+            }
+        });
+    };
+
+    vmIndependence.AdjustPopupHeight = function () {
+        var fix = $("#area-edit-independency div.ms-modal-body").height();
+        setHeightPopUpFix(vmGoalAction.popEditIndependence, fix + 81);
+    };
+
+    vmGoalAction.popEditIndependence.bind("close", function (e) {
+        if (vmIndependence.modelChanged) {
+            if (confirm(kLg.saveConfirmQuestion)) {
+                if (vmIndependence.validFormX() || $('#fEditIndependency').valid()) {
+                    vmIndependence.viewModel.valid();
+                    var selectedRegions = [];
+                    if (!this.IndependencyFull) return;
+                    if (this.IndependencyFull.AllRegion == "true" || this.IndependencyFull.AllRegion == true) {
+                        selectedRegions = vmGoalAction.setting.ListFullRegion;
+                    } else {
+                        selectedRegions = $('#area-edit-independency #ddlRegion').multipleSelect("getSelects");
+                    }
+                    if (selectedRegions.length <= 0) {
+                        return;
+                    }
+                    vmGoalAction.popEditIndependence.destroy();
+                    vmGoalAction.popEditIndependence = null;
+                    $('.body-content').after('<div id="popEditIndependence"></div>');
+                } else {
+                    e.preventDefault();
+                }
+            } else {
+                cancel();
+            }
+        } else {
+            cancel();       // khong save
+        }
+
+        if (MsaApp.hasKeyMapDelegate(`reloadData_Independency`)) {
+            MsaApp.deleteMapDelegate(`reloadData_Independency`);
+        } else {
+            MsaApp.deleteMapDelegate(`showPopupAddTheme_FromSupperTheme`);
+            MsaApp.deleteMapDelegate(`showPopupAddIndependence_Btn`);
+        }
+
+        function cancel() {
+            vmGoalAction.popEditIndependence.destroy();
+            vmGoalAction.popEditIndependence = null;
+            $('.body-content').after('<div id="popEditIndependence"></div>');
+        }
+    });
+
+    //Pageload
+    $(function () {
+
+        limitedTabKey();
+        vmIndependence.independencyFull = {};
+
+        if (vmGoalAction.IsEditIndependency) {
+
+            vmIndependence.independencyFull = {
+                ParentName: vmGoalAction.IndepencencyOptions.Name,
+                ChildName: vmGoalAction.IndepencencyOptions.Name,
+                AllRegion: vmGoalAction.IndepencencyOptions.SelectAllRegion,
+                Regions: vmGoalAction.IndepencencyOptions.Regions,
+                IsMasterGoal: vmGoalAction.IndepencencyOptions.IsMasterGoal,
+                IsMasterGoalKpi: vmGoalAction.IndepencencyOptions.IsMasterGoalKpi,
+                CurrencyId: vmGoalAction.IndepencencyOptions.CurrencyId,
+                IsCreater: vmGoalAction.IndepencencyOptions.IsCreater && vmGoalAction.IndepencencyOptions.IsEdit,
+                IsEdit: vmGoalAction.IndepencencyOptions.IsEdit,
+                Accounts: vmGoalAction.IndepencencyOptions.Accounts,
+                CreatedBy: vmGoalAction.IndepencencyOptions.CreatedBy,
+                ParentId: vmGoalAction.IndepencencyOptions.ParentId
+            };
+            vmIndependence.OldRegions = vmGoalAction.IndepencencyOptions.Regions;
+        } else {
+            vmIndependence.independencyFull = {
+                ParentName: "",
+                ParentId: vmGoalAction.parentId,
+                ChildName: "",
+                AllRegion: true,
+                Regions: [],
+                IsMasterGoal: false,
+                IsMasterGoalKpi: false,
+                CurrencyId: vmGoalAction.setting.ListCurrency[0].Id,
+                IsCreater: true,
+                IsEdit: true,
+                Accounts: [],
+                CreatedBy: vmUser.currentAccount.Id
+            };
+        }
+
+        isSelectAccount = !vmIndependence.independencyFull.AllRegion && (vmIndependence.independencyFull.Regions.length === 1);
+        if (isSelectAccount) {
+            var temp = vmCommon.deepCopy(vmIndependence.independencyFull.Accounts);
+            selectedAccount = vmIndependence.independencyFull.Accounts;
+
+            if (selectedAccount.length === 0) {
+                selectedAccount.push(selectedItemAll);
+                accountSrc = [selectedItemAll];
+            } else {
+                accountSrc = msFilter.controlService.getAccountRole(vmIndependence.independencyFull.Regions[0]);//vmFilter.GetAccountRole(vmIndependence.independencyFull.Regions[0]);
+                accountSrc.unshift(selectedItemAll);
+            }
+
+            if (temp.length > 0 && $.grep(temp, function (it) { return it.AccountId === vmIndependence.independencyFull.CreatedBy; }).length === 0) {
+                isRemoved = true;
+            }
+        }
+
+        for (var i = 0; i < vmGoalAction.listRegions.length; i++) {
+            if (vmGoalAction.listRegions[i].RoleId <= 0) {
+                noRoleRegions.push(vmGoalAction.listRegions[i].Id);
+            }
+        }
+
+        vmIndependence.viewModel = kendo.observable({
+            visibleRegionSelect: vmIndependence.independencyFull.IsCreater || vmIndependence.independencyFull.AllRegion,
+            visibleRegionLabel: !vmIndependence.independencyFull.IsCreater && !vmIndependence.independencyFull.AllRegion,
+            selectedAccount: selectedAccount,
+            accountSrc: accountSrc,
+            isSelectAccount: isSelectAccount,
+
+            changeSelectAccount: function () {
+                $("#accountstatus").tooltip("destroy");
+
+                var lst = $("#area-edit-independency #ddlRegion").multipleSelect("getSelects");
+                if (lst.length === 1) {
+                    var regionId = lst[0];
+                    var regionItem = vmCommon.findById(Number(regionId), vmGoalAction.listRegions);
+                    this.set("isSelectAccount", regionItem.RoleId > 0);
+
+                    if (!this.isSelectAccount) {
+                        this.set("accountSrc", [selectedItemAll]);
+                        this.set("selectedAccount", [selectedItemAll]);
+                    }
+
+                } else {
+                    this.set("isSelectAccount", false);
+                }
+
+                if (this.isSelectAccount) {
+                    this.set("accountSrc", [selectedItemAll]);
+                    this.set("selectedAccount", [selectedItemAll]);
+                }
+
+                $("#cbxIsMaster").removeAttr("disabled");
+                $("#cbxIsMasterKpi").removeAttr("disabled");
+                vmIndependence.AdjustPopupHeight();
+            },
+            onSelectAct: function (e) {
+                $("#accountstatus").tooltip("destroy");
+
+                if (e.dataItem.AccountId === -1) {
+                    this.set("accountSrc", [selectedItemAll]);
+
+                    $("#cbxIsMaster").removeAttr("disabled");
+                    $("#cbxIsMasterKpi").removeAttr("disabled");
+                    vmIndependence.AdjustPopupHeight();
+                    return;
+                }
+
+                this.IndependencyFull.set("IsMasterGoal", false);
+                this.IndependencyFull.set("IsMasterGoalKpi", false);
+                $("#cbxIsMaster").attr("disabled", "disabled");
+                $("#cbxIsMasterKpi").attr("disabled", "disabled");
+                vmIndependence.AdjustPopupHeight();
+            },
+            onDeSelectAct: function (e) {
+                var regionId = Number($("#area-edit-independency #ddlRegion").multipleSelect("getSelects")[0]);
+
+                if (e.dataItem.AccountId === -1) {
+                    var src = msFilter.controlService.getAccountRole(regionId);
+                    for (var i = 0; i < src.length; i++) {
+                        this.accountSrc.push(src[i]);
+                    }
+                }
+
+                vmIndependence.AdjustPopupHeight();
+            },
+
+            isEdit: vmIndependence.independencyFull.IsEdit,
+            ListRegions: vmGoalAction.listRegions, //Nếu là thread con thì lấy list region của thread cha
+            ListCurrency: vmGoalAction.setting.ListCurrency,
+            IsOverallThreadNameInvisible: (vmGoalAction.parentId > 0),
+            IsThreadNameVisible: !((vmGoalAction.parentId > 0) || (vmGoalAction.parentId == 0 && !vmGoalAction.IsEditIndependency)),
+            IndependencyFull: vmIndependence.independencyFull,
+            changeRegion: function (e) {
+                $("#accountstatus").tooltip("destroy");
+
+                if (e.data.IndependencyFull.AllRegion == "true") {
+                    $("#area-edit-independency #ddlRegion").multipleSelect("disable");
+                    vmIndependence.independencyFull.AllRegion = true;
+
+                    this.set("accountSrc", []);
+                    this.set("selectedAccount", []);
+                    this.set("isSelectAccount", false);
+                    vmIndependence.AdjustPopupHeight();
+                } else {
+                    $('#area-edit-independency #ddlRegion').multipleSelect("enable");
+                    vmIndependence.independencyFull.AllRegion = false;
+
+                    this.changeSelectAccount();
+                    vmIndependence.AdjustPopupHeight();
+                }
+
+                $("#cbxIsMaster").removeAttr("disabled");
+                $("#cbxIsMasterKpi").removeAttr("disabled");
+            },
+            changeMasterState: function () {
+                $("#area-edit-independency #cbxIsMaster").tooltip("destroy");
+                $("#area-edit-independency #cbxIsMasterKpi").tooltip("destroy");
+            },
+            valid: function () {
+                if (vmGoalAction.IsEditIndependency && vmIndependence.independencyFull.IsMasterGoal && !this.IndependencyFull.IsMasterGoal) {
+                    vmIndependence.dataservice.checkHasMasterAssign({ id: vmGoalAction.IndepencencyOptions.Id }, function (res) {
+                        if (res.value) {
+                            ShowToolTip2($("#area-edit-independency #cbxIsMaster"), kLg.msgExistingConnectionToMaster, "top");
+                        } else {
+                            vmIndependence.viewModel.update();
+                        }
+
+                        return;
+                    });
+                } else {
+                    vmIndependence.viewModel.update();
+                }
+            },
+
+            update: function () {
+                if (!this.isEdit) {
+                    vmGoalAction.popEditIndependence.close();
+                    return;
+                }
+
+                if (!vmIndependence.validFormX() || !$('#fEditIndependency').valid()) {
+                    return;
+                }
+
+                var selectedRegions = [], selectedActs = [];
+                if (this.IndependencyFull.AllRegion == "true" || this.IndependencyFull.AllRegion == true) {
+                    selectedRegions = vmCommon.selectProperty(vmGoalAction.listRegions, "Id") || [];
+                } else {
+                    selectedRegions = $('#area-edit-independency #ddlRegion').multipleSelect("getSelects");
+                    if (selectedRegions.length === 1) {
+                        selectedActs = $.grep(this.selectedAccount, function (it) { return it.AccountId !== -1 });
+                    }
+                }
+
+                this.IndependencyFull.Accounts = selectedActs;
+
+                if (selectedRegions.length === 0) {
+                    pAlert(kLg.msgRequiredAtLeastRegion);
+                    return;
+                }
+
+                //if (this.IndependencyFull.IsMasterGoal) {
+                //    vmFilter.HasMasterGoal = true;
+                //}
+
+                var cry;
+                for (var i = 0; i < vmGoalAction.setting.ListCurrency.length; i++) {
+                    if (vmGoalAction.setting.ListCurrency[i].Id === this.IndependencyFull.CurrencyId) {
+                        cry = vmGoalAction.setting.ListCurrency[i];
+                    }
+                }
+
+                if (cry == undefined) {
+                    return;
+                }
+
+                var entryData;
+                if (vmGoalAction.IsEditIndependency) {  //Update INDEPENDENCE || THEME
+                    //var ischangeRegions = !vmIndependence.OldRegions.equals(selectedRegions);
+
+                    var independency = {
+                        Id: vmGoalAction.IndepencencyOptions.Id, Name: this.IndependencyFull.ChildName, Mdf: vmGoalAction.IndepencencyOptions.Mdf, Regions: selectedRegions, SelectAllRegion: vmIndependence.independencyFull.AllRegion, IsMasterGoal: this.IndependencyFull.IsMasterGoal, CurrencyId: this.IndependencyFull.CurrencyId,
+                        IsMasterGoalKpi: this.IndependencyFull.IsMasterGoalKpi,
+                        Accounts: this.IndependencyFull.Accounts
+                    };
+
+                    entryData = {
+                        Independency: independency,
+                        OldRegions: vmIndependence.OldRegions
+                    };
+
+                    vmIndependence.dataservice.updateIndependencyFull(entryData, function (serData) {
+                        if (!vmGoalAction.checkRole(serData)) return;
+                        vmIndependence.modelChanged = false;
+
+                        if (vmCommon.checkConflict(serData.value.ResultStatus)) {
+                            vmGoalAction.updateIndependency(independency);
+                            
+                            var filterRegions = msFilter.controlService.getRegionFilter();
+                            var isContains = selectedRegions.some(t => filterRegions.indexOf(Number(t)) >= 0);
+
+                            if (!isContains) {
+                                msFilter.controlService.resetFilterWithRegion([selectedRegions[0]], function () {
+                                    msFilter.controlService.reLoadData();
+                                });
+                            } else {
+                                var indpendence = serData.value.TheObject;
+
+                                //var masterStatus = (independency.IsMasterGoal && independency.IsMasterGoalKpi) ? 3 : ((!independency.IsMasterGoal && !independency.IsMasterGoalKpi) ? 0 : (independency.IsMasterGoalKpi ? 2 : 1));
+                                MsaApp.checkAndUpdateTheme(indpendence);        //reloadAllDataOfPage
+
+                                //update data filter
+                                setTimeout(function () {
+                                    msFilter.controlService.reLoadDataFilter();
+                                }, 200);
+                            }
+
+                            vmGoalAction.popEditIndependence.close();
+                        }
+                    });
+                } else {      // Add INDEPENDENCE || THEME
+                    var ind = this.IndependencyFull;
+                    entryData = {
+                        ParentName: this.IndependencyFull.ParentName, ChildName: this.IndependencyFull.ChildName, Regions: selectedRegions, ParentId: this.IndependencyFull.ParentId, SelectAllRegion: vmIndependence.independencyFull.AllRegion, IsMasterGoal: this.IndependencyFull.IsMasterGoal, CurrencyId: this.IndependencyFull.CurrencyId,
+                        IsMasterGoalKpi: this.IndependencyFull.IsMasterGoalKpi,
+                        Accounts: this.IndependencyFull.Accounts
+                    };
+
+                    vmIndependence.dataservice.createIndependenceFull(entryData, function (serData) {
+                        if (!vmGoalAction.checkRole(serData)) return;
+                        vmIndependence.modelChanged = false;
+
+                        var filterRegions = msFilter.controlService.getRegionFilter();
+                        var isContains = selectedRegions.some(t => filterRegions.indexOf(t) >= 0);
+                        
+                        if (!isContains) {
+                            msFilter.controlService.resetFilterWithRegion([selectedRegions[0]], function () {
+                                msFilter.controlService.reLoadData().then((res) => {
+                                    console.log('msFilter.controlService.reLoadData 1', isContains);
+
+                                });
+                            });
+                        } else {
+                            if (msFilter.controlService.hasCriteriaFilter()) {
+                                msFilter.controlService.resetFilter(true);
+                            } else {
+                                msFilter.controlService.reLoadData();
+                            }
+
+                            //if ((ind.ParentId > 0 && !msFilter.controlService.hasParent(ind.ParentId, mFilter.enumFilter.independency)) || !vmIndependence.isFitIndependencyEmpty()) {
+                            //    msFilter.controlService.resetFilter(true);
+                            //} else {
+                            //    msFilter.controlService.reLoadData();
+                            //}
+
+                            //if (ind.ParentId > 0 && msFilter.controlService.hasParent(ind.ParentId, mFilter.enumFilter.independency)) {
+                            //    if (entryData.SelectAllRegion || (entryData.Accounts.length === 0) || ($.grep(entryData.Accounts, function (it) { return it.AccountId === vmUser.currentAccount.Id; }).length > 0)) {
+                            //        if (vmIndependence.isFitIndependencyEmpty()) {
+                            //            if (vmSetting && vmSetting.ProjectInfo.IsHiddenGoalContent)
+                            //                msFilter.controlService.resetFilter(true);
+                            //            else {
+                            //                msFilter.controlService.resetFilterExcept([mFilter.enumFilter.landregion, mFilter.enumFilter.independency]).then((res) => {
+                            //                    console.log('msFilter.controlService.resetFilterExcept !vmSetting || !vmSetting.ProjectInfo.IsHiddenGoalContent 1', isContains);
+                            //                });
+                            //            }
+
+                            //        } else {
+                            //            msFilter.controlService.resetFilter(true);
+                            //        }
+                            //    }
+                            //} else {
+                            //    if (ind.ParentId == 0 || msFilter.controlService.hasCriteria(mFilter.enumFilter.market) || msFilter.controlService.hasCriteria(mFilter.enumFilter.marketScope) || msFilter.controlService.hasCriteria(mFilter.enumFilter.productGroup)) {
+                            //        msFilter.controlService.resetFilter(true);
+                            //    }
+                            //    else {
+                            //        if (entryData.SelectAllRegion || (entryData.Accounts.length === 0) || ($.grep(entryData.Accounts, function (it) { return it.AccountId === vmUser.currentAccount.Id; }).length > 0)) {
+                            //            if (vmIndependence.isFitIndependencyEmpty()) {
+                            //                if (vmSetting && vmSetting.ProjectInfo.IsHiddenGoalContent)
+                            //                    msFilter.controlService.resetFilter(true);
+                            //                else {
+                            //                    msFilter.controlService.resetFilterExcept([mFilter.enumFilter.landregion, mFilter.enumFilter.independency]).then((res) => {
+                            //                        console.log('msFilter.controlService.resetFilterExcept !vmSetting || !vmSetting.ProjectInfo.IsHiddenGoalContent 2', isContains);
+
+                            //                    });
+                            //                }
+
+                            //                msFilter.controlService.reLoadData().then((res) => {
+                            //                    console.log('msFilter.controlService.reLoadData 2', isContains);
+
+                            //                });
+                            //            } else {
+                            //                msFilter.controlService.resetFilter(true);
+                            //            }
+                            //        }
+                            //    }
+                            //}
+
+                            //update data filter
+                            setTimeout(function () {
+                                msFilter.controlService.reLoadDataFilter();
+                            }, 200);
+                        }
+
+                        if (typeof MsaApp == 'object') {
+                            MsaApp.reloadDataIndependency(serData.value.TheObject);
+                            MsaApp.setMapDelegate(`reloadData_Independency`, true);
+                        }
+
+                        vmGoalAction.popEditIndependence.close();
+
+                    });
+                }
+            }
+        });
+
+        vmIndependence.viewModel.bind("change", function () {
+            vmIndependence.modelChanged = true;
+        });
+        vmIndependence.activeModelChange = function () {
+            vmIndependence.modelChanged = true;
+        };
+
+        kendo.bind($("#area-edit-independency"), vmIndependence.viewModel);
+        $('#area-edit-independency #ddlRegion').multipleSelect({
+            selectAll: false,
+            maxHeight: 120,
+            width: "100%",
+            onCheckAll: function () {
+                vmIndependence.modelChanged = true;
+            },
+            onUncheckAll: function () {
+                vmIndependence.modelChanged = true;
+            },
+            onOptgroupClick: function () {
+                vmIndependence.modelChanged = true;
+            },
+            onClick: function () {
+                vmIndependence.modelChanged = true;
+                vmIndependence.viewModel.changeSelectAccount();
+            }
+        });
+
+        $("#area-edit-independency #ddlRegion").multipleSelect("disableSelects", noRoleRegions);
+
+        if (!vmIndependence.viewModel.IndependencyFull.AllRegion && vmIndependence.viewModel.IndependencyFull.Regions.length === 1 && $.grep(vmIndependence.viewModel.IndependencyFull.Accounts, function (it) { return it.AccountId !== -1; }).length > 0) {
+            $("#cbxIsMaster").attr("disabled", "disabled");
+            $("#cbxIsMasterKpi").attr("disabled", "disabled");
+        }
+
+        if (vmIndependence.viewModel.IndependencyFull.AllRegion) {
+            $("#area-edit-independency #ddlRegion").multipleSelect("disable");
+        } else if (vmIndependence.viewModel.IndependencyFull.IsCreater) {
+            $("#area-edit-independency #ddlRegion").multipleSelect("enable");
+        } else {
+            $("#area-edit-independency #ddlRegion").multipleSelect("disable");
+        }
+
+        vmIndependence.AdjustPopupHeight();
+        vmIndependence.setupLanguage();
+        vmIndependence.setupValidation();
+
+        vmGoalAction.focusFirstInput('#area-edit-independency');
+        vmIndependence.modelChanged = false;
+    });
+
+    vmIndependence.isFitIndependencyEmpty = function () {
+        //if (!vmSetting.ProjectInfo.IsHiddenGoalContent) return true;
+
+        var searchFilter = msFilter.controlService.getWorkingRange(vmCommon.FilterType.ActionPlan);
+        var flag = searchFilter.Text || searchFilter.Start || searchFilter.End || msFilter.controlService.hasCriteria(mFilter.enumFilter.market) || msFilter.controlService.hasCriteria(mFilter.enumFilter.marketScope) || msFilter.controlService.hasCriteria(mFilter.enumFilter.productGroup);
+
+        //var flag = $.grep(vmFilter.DFilter, function (it) { return it.TypeValue === vmFilter.enumFilter.textsearch && it.ParentValue && it.ParentValue.trim(); }).length > 0 ||
+        //    $.grep(vmFilter.DFilter, function (it) { return it.TypeValue === vmFilter.enumFilter.workingRange && (it.ChildValue || it.ChildValue1); }).length > 0 ||
+        //    vmFilter.isHasSubmarketProduct() ||
+        //    vmFilter.isHasCriteria();
+
+        return !flag;
+    };
+
+</script>

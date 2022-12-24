@@ -1,0 +1,1655 @@
+﻿<!--<link href="../Css/newkendo/kendo.common.min.css" rel="stylesheet" />
+<link href="../Css/newkendo/kendo.default.min.css" rel="stylesheet" />-->
+
+<style type="text/css">
+    /*task : 7298*/
+    .k-window-titlebar .k-link {
+        border-radius: 0;
+    }
+    #chkLinkCrownProject {
+        float: left;
+        margin-left: 3px;
+        margin-right: 3px;
+        margin-bottom: 20px;
+        margin-top: 3px;
+    }
+    div.k-animation-container > div[data-role=colorpicker] {
+        height: 144px;
+        width: 217px;
+    }
+
+    .k-colorpalette .k-item {
+        width: 12px !important;
+        height: 12px !important;
+        padding: 0;
+    }
+
+        .k-colorpalette .k-item.k-state-selected {
+            border: none;
+        }
+
+    .k-window, .k-window-titlebar, .k-dropdown, .k-dropdown-wrap, .k-datepicker, .k-picker-wrap, .k-calendar-container.k-state-border-up, .k-list-container {
+        border-radius: 0;
+    }
+
+    .k-button-group .k-tool-icon {
+        border-style: none;
+    }
+
+    .fragensetName .tooltip-inner {
+        background: #F7F7F7 !important;
+        min-width: 200px !important;
+        max-width: 300px !important;
+        min-height: 30px;
+        color: #080808 !important;
+        font-size: 14px !important;
+        word-wrap: break-word !important;
+    }
+    .question .tooltip-inner {
+        background-color: #ce3838 !important;
+        color: #ffffff !important;
+        text-decoration: none;
+        font-size: 12px !important;
+        min-height:18px!important;
+    }
+    .fragensetName .tooltip.top .tooltip-arrow {
+        border-top-color: #F7F7F7 !important;
+    }
+
+    .k-input {
+        padding: 0 0;
+    }
+
+    .k-list-container {
+        max-width: 300px !important;
+        min-width: 200px !important;
+    }
+
+    .popup-footer {
+        border: 1px solid #E7E7E7;
+        background-color: #F7F7F7;
+        height: 57px;
+        margin-top: 12px;
+        text-align: left;
+    }
+
+    .checkbox-div {
+        margin-left: 12px;
+    }
+
+    .crow-file {
+        padding-left: 6px;
+        width: 98%;
+        margin-left: 12px;
+    }
+
+        .crow-file .k-header {
+            background-image: none;
+            background-color: initial;
+        }
+
+        .crow-file > .k-widget, .k-upload-files, .k-file {
+            border-style: none;
+        }
+
+        .crow-file .k-upload-files {
+            width: 100%;
+            padding-left: 1%;
+        }
+
+        .crow-file .k-warning {
+            top: -2px !important;
+        }
+
+    .btn-attach {
+        float: left;
+        display: inline-flex;
+        height: 20px;
+        width: 100px;
+    }
+
+    .crow-control {
+        padding-top: 10px !important;
+    }
+
+    .crow-display {
+        position: relative;
+    }
+
+    .ulfile {
+        margin: 0;
+        list-style-type: none;
+        padding-left: 6px !important;
+    }
+
+        .ulfile li {
+            height: 30px;
+            margin-bottom: 2px;
+            padding-top: 5px;
+            padding-left: 2px;
+        }
+
+    .icon-remove {
+        background-position: -44px -7px;
+        display: block;
+    }
+
+    .unsave {
+        background-color: #ffcdd2;
+    }
+
+        .unsave span {
+            color: red;
+        }
+
+    .notification-file {
+        border: 1px solid red;
+        border-radius: 3px;
+        position: absolute;
+        top: 16px;
+        background-color: #ffcdd2;
+        left: 200px;
+        display: none;
+        text-align: center;
+        vertical-align: middle;
+        min-width: 234px;
+        max-width: 380px;
+        min-height: 36px;
+        max-height: 36px;
+        padding: 7px;
+    }
+
+    .size {
+        float: right;
+        margin-right: 12px;
+        margin-top: 1px;
+    }
+
+    .sub-attachname {
+        width: 540px;
+        overflow: hidden;
+        height: 20px;
+        float: left;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        padding-top: 1px;
+    }
+
+    .crow-report {
+    }
+
+        .crow-report span {
+            border-color: #38baf8 !important;
+        }
+
+        .crow-report .k-dropdown {
+            background-color: #38baf8;
+            border-radius: 3px;
+            width: 190px;
+        }
+
+        .crow-report .k-dropdown-wrap {
+            background-color: #38baf8;
+            border-radius: 3px;
+        }
+
+        .crow-report .k-state-hover {
+            color: white !important;
+        }
+
+        .crow-report .k-input {
+            background-color: #38baf8;
+            color: white !important;
+        }
+
+        .crow-report .k-select {
+            background-color: #38baf8;
+        }
+
+    /**/
+    .k-editor-dialog.k-window-content {
+        padding-top: 10px !important;
+        overflow: hidden !important;
+    }
+
+    .k-editor-dialog .k-imagebrowser .k-breadcrumbs.k-textbox {
+        padding-right: 2px;
+        display: none !important;
+    }
+
+    .k-editor-dialog .k-imagebrowser .k-upload .k-icon {
+        vertical-align: sub !important;
+    }
+
+    .k-editor-dialog .k-button {
+        background-color: #38baf8 !important;
+        background-image: none !important;
+        border: 0 !important;
+        color: white !important;
+    }
+
+    .k-editor-dialog .k-edit-buttons {
+        margin-bottom: 12px !important;
+    }
+
+    .zoomin {
+        position: absolute;
+        /*top: 53%;*/
+        left: 90%;
+        z-index: 99999;
+        color: #2e2e2e;
+        cursor: pointer;
+        float: right;
+    }
+
+    .zoominDiv {
+        position: fixed;
+        top: 5%;
+        z-index: 999984;
+        width: 60%;
+        left: 20%;
+        max-height: 1000px;
+        /*width: 1141px;*/
+    }
+
+    .zoominDivPopup {
+        top: 5% !important;
+        width: 60% !important;
+        left: 20% !important;
+    }
+
+    .zoominTable {
+        height: 900px !important;
+    }
+
+    .zoominHeader {
+        display: none !important;
+    }
+
+    .zoomout {
+        position: fixed;
+        top: 6.2%;
+        left: 77.5%;
+        z-index: 9999999;
+        color: gray;
+        cursor: pointer;
+        /*background-color: white;*/
+        width: 28px;
+        height: 28px;
+        border: 1px solid #c5c5c5;
+    }
+
+    .icon-zoom {
+        background-position: -180px -662px;
+        display: block;
+    }
+
+    a#btnZoomIn:hover {
+        color: gray;
+        text-decoration: none !important;
+    }
+
+    a#btnZoomOut:hover {
+        background-color: #bdb4af;
+        text-decoration: none !important;
+    }
+
+    .icon-close-zoom {
+        background-position: -44px -117px;
+        display: block;
+    }
+
+    #btnZoomOut.k-window-action .k-icon {
+        margin: 6px;
+        vertical-align: top;
+    }
+
+    div.k-widget.k-window.zoominDivPopup {
+        padding-top: 0 !important;
+    }
+
+    #cp-editor a.k-tool {
+        color: black !important;
+    }
+
+    #txtMailBCC_CProject_taglist > li, #txtMailCC_CProject_taglist > li {
+        border-radius: 12px;
+        background-color: transparent;
+        border-width: 0;
+        margin: 3px 1px 1px 2px;
+    }
+    #txtMailBCC_CProject_taglist > li > span:first-child > span, 
+    #txtMailCC_CProject_taglist > li > span:first-child > span {
+        display: inline-block; overflow: hidden; 
+        max-width: 200px; max-height:20px;
+    }
+
+        #txtMailBCC_CProject_taglist > li > span:first-child > span,
+        #txtMailCC_CProject_taglist > li > span:first-child > span {
+            display: inline-block;
+            overflow: hidden;
+            max-width: 200px;
+        }
+
+        #txtMailBCC_CProject_taglist > li:hover, #txtMailCC_CProject_taglist > li:hover {
+            background-color: #F7F7F7;
+            border-width: 1px;
+            margin: 2px 0px 0px 1px;
+        }
+
+    #txtMailCC_CProject .k-item, #txtMailBCC_CProject .k-item {
+        line-height: 1em;
+        min-width: 300px;
+    }
+
+    #txtMailCC_CProject .k-item, #txtMailBCC_CProject .k-item {
+        line-height: 1em;
+        min-width: 300px;
+    }
+
+    /* Material Theme padding adjustment*/
+
+    .k-material #txtMailCC_CProject-list .k-item,
+    .k-material #txtMailCC_CProject-list .k-item.k-state-hover,
+    .k-materialblack #txtMailCC_CProject-list .k-item,
+    .k-materialblack #txtMailCC_CProject-list .k-item.k-state-hover,
+    .k-material #txtMailBCC_CProject-list .k-item,
+    .k-material #txtMailBCC_CProject-list .k-item.k-state-hover,
+    .k-materialblack #txtMailBCC_CProject-list .k-item,
+    .k-materialblack #txtMailBCC_CProject-list .k-item.k-state-hover {
+        padding-left: 5px;
+        border-left: 0;
+    }
+
+    #txtMailCC_CProject-list, #txtMailBCC_CProject-list {
+        background-color: transparent;
+        padding: 0px;
+        border: none;
+        box-shadow: none;
+    }
+
+        #txtMailCC_CProject-list .k-list-scroller,
+        #txtMailBCC_CProject-list .k-list-scroller {
+            background-color: #e9e9e9;
+        }
+
+            #txtMailCC_CProject-list .k-list-scroller > ul.k-list > li,
+            #txtMailBCC_CProject-list .k-list-scroller > ul.k-list > li {
+                margin: 2px;
+            }
+
+            #txtMailCC_CProject-list .k-list-scroller > ul.k-list:not(:empty),
+            #txtMailBCC_CProject-list .k-list-scroller > ul.k-list:not(:empty) {
+                border: 1px solid #c5c5c5;
+                box-shadow: 0 2px 2px 0 rgba(0,0,0,.3);
+            }
+
+    .k-animation-container #txtMailCC_CProject-list .k-nodata,
+    .k-animation-container #txtMailBCC_CProject-list .k-nodata {
+        display: none !important;
+    }
+
+    #txtMailCC_CProject-list .k-item > span, #txtMailBCC_CProject-list .k-item > span {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        display: inline-block;
+        max-width: 270px;
+        overflow: hidden;
+        vertical-align: top;
+        margin: 10px 10px 10px 5px;
+    }
+
+    #txtMailCC_CProject-list h3, #txtMailBCC_CProject-list h3 {
+        width: 100%; max-width: 256px; max-height: 32px;
+        display:inline-block;
+        font-weight: normal; font-size: 14px; 
+        margin: 0 0 1px 0; padding: 0;
+    }
+
+    #txtMailCC_CProject-list p, #txtMailBCC_CProject-list p {
+        margin: 0;
+        padding: 0;
+        font-size: .8em;
+    }
+
+    input[aria-labelledby="txtMailBCC_CProject_label"], input[aria-labelledby="txtMailCC_CProject_label"] {
+        background-color: transparent !important;
+        border: none !important;
+    }
+</style>
+<div class="pop-wrapper" id="pop-add-cproject">
+    <div class="modal-body ms-modal-body" data-bind="events:{change: formChange}" style="        height: 655px;
+        overflow-x: hidden;
+        overflow-y: scroll;
+">
+        <form id="add-cproject-form">
+            <div style="width: 640px;" class="pull-left">
+                <label class="popup-lable" id="lblCPName">Projektname</label> <span id="cliptext" style="display: none; position: absolute;"> </span>
+                <div class="clear"></div>
+                <input class="popup-input input-cow-width-description" name="CProjectName" maxlength="100" id="txtNameCProject" data-bind="value: cproject.Name" data-value-update="keyup" onkeyup=" vmEditCProject.activeModelChange() " />
+                <div class="clear"></div>
+                <label id="lblCPDescription">Projektbeschreibung</label>
+                <div class="clear"></div>
+                <textarea value="" class="popup-input input-cow-width-description input-cow-height" name="CProjectDescription" id="txtDescriptionCProject" data-bind="value: cproject.Description" data-value-update="keyup" onkeyup=" vmEditCProject.activeModelChange() "></textarea>
+                <div class="clear"></div>
+                <label id="lblCPQuestionTitle">Fragebogentitel</label>
+                <div class="clear"></div>
+                <input value="" class="popup-input input-cow-width-description " maxlength="100" name="CProjectQuestionTitle" id="txtQuestionTitleCProject" data-bind="value: cproject.QuestionTitle" data-value-update="keyup" onkeyup=" vmEditCProject.activeModelChange() " />
+                <div class="clear"></div>
+                <label id="lblCPQuestionDescription">Fragebogenbeschreibung</label>
+                <div class="clear"></div>
+                <textarea value="" class="popup-input input-cow-width-description input-cow-height" name="CProjectQuestionDescription" id="txtQuestionDescriptionCProject" data-bind="value: cproject.QuestionDescription" data-value-update="keyup" onkeyup=" vmEditCProject.activeModelChange() "></textarea>
+                <div class="clear"></div>
+
+                <label id="lblFinishText">Schluss Text</label>
+                <div class="clear"></div>
+                <textarea value="" class="popup-input input-cow-width-description input-cow-height" name="finishtext" id="txtFinishText" data-bind="value: cproject.FinishText" data-value-update="keyup" onkeyup=" vmEditCProject.activeModelChange() "></textarea>
+
+                <div class="checkbox-div">
+                    <input type="checkbox" data-bind="checked: cproject.IsOrderLabel" /> <span id="lblOrderLabel">Fragen mit Nummerierung versehen</span>
+                </div>
+                <div class="checkbox-div">
+                    <input type="checkbox" data-bind="checked: cproject.IsPagging" /> <span id="lblPaggingLabel">Navigation einblenden</span>
+                </div>
+
+                <div class="checkbox-div">
+                    <input type="checkbox" data-bind="checked: cproject.IsNotNavigator" /> <span id="lblNavigatorLabel">Themennavigation ausblenden</span>
+                </div>
+
+                <div class="checkbox-div" data-bind="invisible: cproject.IsAnonymous">
+                    <input type="checkbox" data-bind="checked: cproject.IsAllowPdfPerson" /> <span id="lblAllowPdfPerson">Allow pdf for person</span>
+                </div>
+
+                <div class="checkbox-div" data-bind="invisible: cproject.IsAnonymous">
+                    <input type="checkbox" data-bind="checked: cproject.IsAllowPdfActivities" /> <span id="lblAllowPdfActivities">Allow pdf for activities</span>
+                </div>
+
+            </div>
+            <div class="pull-left">
+                <div class="logo-cow">
+                    <label class="lable-md-organ" id="lblCPLogo">Logo</label>
+                    <div class="clear"></div>
+                    <div>
+                        <div class="wrapper-image" style="position: relative;" id="div-show-logo">
+                            <div class="img-logo">
+                                <img data-bind="attr: { src: cproject.Logo }, events: { change: onchangeLogo }" alt="" id="imgLogo">
+                            </div>
+                            <span class="icon-32  icon-bin-logo icon-bin icon-bin-filter icon-cow-bin" data-bind="events:{click: deleteLogo}"></span>
+                        </div>
+                    </div>
+                    <div class="div-item" id="div-upload-logo">
+                        <input type="file" id="txtLogo" style="display: none;" accept="image/*" data-bind="events:{change: changeLogo}" />
+                        <button type="button" class="ms-button pull-left btn-cow-modal" id="btnAddLogo" onclick=" addLogo(); ">
+                            <span class="icon-20 icon-img-white pull-left margin-right6"></span>
+                            <span id="lblCPUploadLogo">Logo hinzufügen</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="clear"></div>
+            <table class="tbgrid modal-table table-cowproject">
+                <tr>
+                    <th class="title bg-grey" width="230px" id="lblCPOwner">Vollständiger Name</th>
+                    <th class="title bg-grey" style="width: 200px; max-width: 150%;" id="lblCPQuestion">Frageset</th>
+                    <th class="title bg-grey" style="width: 250px;" id=" lblcpstartdate">Start</th>
+                    <th class="title bg-grey" style="width: 250px;" id="lblCPEndDate">Geplantes Ende</th>
+                </tr>
+                <tr>
+                    <td><span data-bind="text :cproject.FullName"></span></td>
+                    <td class="fragensetName question">
+                        <select style="width: auto; max-width: 300px; min-width: 200px"
+                                id="ddlFragenset"
+                                class="toolName"
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                data-role="dropdownlist"
+                                data-text-field="Name"
+                                data-value-field="Id"
+                                data-bind="value: cproject.CrmFragensetId, source: fragensetSource, disabled :cproject.CheckCrmFragenset,events: { change:changeFragenset } "></select>
+                    </td>
+                    <td>
+                        <div class="input-append date form_datetime1">
+                            <input size="16" type="text" id="txtStartDate" data-role="datepicker" data-bind="value: cproject.StartDate, events: {change: dateChange}, disabled :cproject.CheckCrmFragenset" autocomplete="off" />
+                            <!--<span class="add-on span-time"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-th"></i></span>-->
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-append date form_datetime1">
+                            <input size="16" type="text" id="txtEndDate" data-role="datepicker" data-bind="value: cproject.EndDate, events: {change: dateChange}" autocomplete="off" />
+                            <!--<span class="add-on span-time"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-th"></i></span>-->
+                        </div>
+                    </td>
+                </tr>
+
+            </table>
+            <div class="checkbox-div">
+                <input style="float: left;" type="checkbox" data-bind="events: {change: checkLinkCP }, checked: cproject.IsAnonymous,disabled :cproject.IsDisableAnonymous,"  /> 
+                <span id="chkLinkCrownProject"></span>
+                <span class="icon-20 icon-url" style="float: left;" data-bind="events: { click: copyAnonymousLink}, visible: cproject.Iconcopylink"></span>
+            </div>
+            <div class="col-md-12" style="margin: 0; padding: 0 0 20px 0;">
+                <!--<div class="col-md-12">
+            <label id="lblMailAddress">Email-Adresse</label>
+            <div class="clear"></div>
+        </div>-->
+                <div class="col-md-4 pull-left" data-bind="invisible: cproject.IsAnonymous">
+                    <label id="lblMailAddress">Email-Adresse</label>
+                    <div class="clear"></div>
+                    <select data-role="dropdownlist" class="w-100per"
+                            data-value-primitive="true"
+                            data-text-field="EmailAddress"
+                            data-value-field="Id"
+                            data-bind="source: cproject.MailsList, value: cproject.CrmAccountSmtpId, disabled: roleEdit, events: {change: mailsSendIndexChange}"></select>
+                </div>
+            </div>
+
+            <table class="popup-table-email" data-bind="invisible: cproject.IsAnonymous">
+
+                <tr>
+                    <td>
+                        <label for="txtMailCC_CProject">CC</label>
+                        <div class="clear"></div>
+                        <input value="" class="popup-input input-cow-width" name="lblCPCC" id="txtMailCC_CProject" data-bind="value: cproject.MailCc"
+                               style="width: 99%;background-color: transparent;padding-bottom:2px;min-height:27px;height:100%" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="txtMailBCC_CProject">BCC</label>
+                        <div class="clear"></div>
+                        <input value="" class="popup-input input-cow-width" name="lblCPBCC" id="txtMailBCC_CProject" data-bind="value: cproject.MailBcc"
+                               style="width: 99%;background-color: transparent;padding-bottom:2px;min-height:27px;height:100%" />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label id="lblCPSubject">Mail Betreff</label>
+                        <div class="clear"></div>
+                        <input value="" class="popup-input input-cow-width" maxlength="500" name="CProjectSubject" id="txtSubjectCProject" data-bind="value: cproject.Subject" data-value-update="keyup" onkeyup="vmEditCProject.activeModelChange()" style="width: 99%;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a id="btnZoomOut" role="button" href="#" class="k-window-action k-link zoomout zoominHeader" onclick=" zoomOut(); ">
+                            <span role="presentation" class="k-icon k-i-close"></span>
+                        </a>
+                        <div style="margin-top: 20px;">
+                            <label id="lblCPEmailContent" style="float: left;">Mail Text</label>
+                            <a id="btnZoomIn" class="icon-32 icon-zoom zoomin" onclick="zoomIn();">
+                                <p style="margin-left: 22px" id="lblZoomIn"></p>
+                            </a>
+                        </div>
+                        <div class="clear"></div>
+                        <div id="cp-editor">
+                            <textarea id="txtEmailContentCProject" style="height: 450px" data-bind="value: cproject.EmailContent, events: { change: formChange }" data-value-update="keyup"></textarea>
+                        </div>
+                    </td>
+                </tr>
+
+            </table>
+            <div class="crow-file">
+                <img id="xxx" />
+                <div class="crow-control" data-bind="invisible: cproject.IsAnonymous">
+
+                    <input name="cpfile" id="cpfile" type="file" style="display: none;" multiple />
+                    <button type="button" class="ms-button btn-attach margin-left6" name="uploadFile" id="btnAttach" onclick="openCrowdFileDialog();" style="margin-right: 0"><span class="icon-16 icon-upload" style="float: left;"></span><span id="lblAttach">Attach...</span></button>
+                </div>
+
+                <div class="crow-control pull-right crow-report" style="padding-top:13px!important;" data-bind="invisible: cproject.IsAnonymous">
+                    <select style="width: auto; max-width: 200px; min-width: 200px"
+                            id="ddlreport"
+                            data-role="dropdownlist"
+                            data-text-field="Name"
+                            data-value-field="Id"
+                            data-bind="value: cproject.ReportId, source: reports, enabled : isHasReport "></select>
+                </div>
+
+                <div class="crow-control pull-right crow-report" style="margin-right:10px; padding-top:13px !important;"data-bind="invisible: cproject.IsAnonymous">
+                    <select style="width: auto; max-width: 200px; min-width: 200px"
+                            class="crm-drop pull-left w-100per" id="word-drop"
+                            data-value-primitive="true"
+                            data-role="dropdownlist"
+                            data-text-field="Name"
+                            data-value-field="Id"
+                            data-bind="value: wordTemplateId, source: wordSrc"></select>
+                </div>
+
+                <div class="clear"></div><br />
+
+                <div class="crow-display"data-bind="invisible: cproject.IsAnonymous" >
+                    <div class="notification-file" id="notifile">
+                        <span id="lblNoti"></span>
+                    </div>
+                    <ul id="ulfile" data-template="ulfile-template" data-bind="source: attFiles" class="ulfile"></ul>
+                </div>
+
+            </div>
+        </form>
+    </div>
+    <div class="popup-footer" style="margin-top: 0 !important;">
+        <button type="button" class="ms-button" data-bind="events:{click:update }"><span class="icon-20 icon-close margin-right6"></span><span id="lblClose">Speichern und schliessen</span></button>
+    </div>
+</div>
+
+<script type="text/html" id="ulfile-template">
+    <li data-bind="visible: IsShow, attr:{ class: SaveClass }">
+        <div style="width: 50px; height: 28px; float: left;">
+            #if(TypeId == 7){#
+            <span class="pull-left icon-20 icon-embeded" iname="#:Name#" iwidth="#:Width#" iheight="#:Height#" style="width: 22px !important; height: 20px; margin-right: 3px;" data-clipboard-target="\#cliptext"></span>
+            #}else{#
+            <span class="pull-left" style="width: 22px !important;height: 20px; margin-right: 3px;"></span>
+            #}#
+            <span data-bind="attr:{class: Icon}"></span>
+        </div>
+        <div class="sub-attachname">
+            <span data-bind="text: Name"></span>
+        </div>
+
+        <span class="pull-right icon-20 icon-remove" data-bind="attr:{did: PhysicalName}, events:{click: removeAttach}" style="cursor: pointer;"></span>
+        <span data-bind="text: DisplaySize" class="size"></span>
+    </li>
+</script>
+
+<div id="load-logo"></div>
+<div class="loading" id="add-cproject-loading"></div>
+<script src="../Scripts/clipboard/clipboard.min.js"></script>
+<script type="text/javascript">
+    var cprojectViewModel;
+    var vmEditCProject = {};
+    vmEditCProject.sdate = true;
+    vmEditCProject.edate = true;
+    var isValid = true;
+    var projectId = sHandler.ProjectId;
+    var strategyId = sHandler.StrategyId;
+
+    function addLogo() {
+        $('#txtLogo').click();
+    }
+
+    vmEditCProject.IsModified = false;
+    vmEditCProject.SetupValidate = function () {
+        $('#add-cproject-form').validate({
+            rules: {
+                CProjectName: {
+                    required: true
+                    /// maxlength: 100
+                }
+            },
+            messages: {
+                CProjectName: {
+                    required: kLg.requiredName
+                    // maxlength: kLg.msgMaxlenghName
+                }
+            }
+        });
+        $("#txtStartDate,#txtEndDate").kendoDatePicker({
+            min: new Date(1753, 1, 1),
+            max: new Date(9999, 12, 31),
+            weekNumber: true
+        });
+    };
+    vmEditCProject.showLogoForm = function (status) {
+        var imageForm = $('#div-show-logo'),
+            uploadForm = $('#div-upload-logo');
+        if (status) {
+            uploadForm.addClass('hidden');
+            if (imageForm.hasClass('hidden')) {
+                imageForm.removeClass('hidden');
+            }
+        } else {
+            if (uploadForm.hasClass('hidden')) {
+                uploadForm.removeClass('hidden');
+            }
+            imageForm.addClass('hidden');
+        }
+    };
+
+    vmEditCProject.setupLanguage = function () {
+        $('#lblClose').text(kLg.lblClose);
+        $('#chkLinkCrownProject').text(kLg.CkeckLink);
+        $('#lblClose').text(kLg.lblClose);
+        $('#lblCPName').text(kLg.titleCPName);
+        $('#lblCPDescription').text(kLg.titleCPDescription);
+        $('#lblCPQuestionTitle').text(kLg.titleCPQuestionTitle);
+        $('#lblCPQuestionDescription').text(kLg.titleCPQuestionDescription);
+        $('#lblCPSubject').text(kLg.titleCPSubject);
+        $('#lblCPEmailContent').text(kLg.titleCPEmailContent);
+        $('#lblCPUploadLogo').text(kLg.linkAddLogo);
+        $('#lblCPLogo').text(kLg.titleCPLogo);
+        $('#lblCPOwner').text(kLg.titleCPOwner);
+        $('#lblCPQuestion').text(kLg.titleCPQuestion);
+        $('#lblCPStartDate').text(kLg.titleCPOStartDate);
+        $('#lblCPEndDate').text(kLg.titleCPEndDate);
+        $("#lblOrderLabel").text(kLg.textIsOrderLabel);
+        $("#lblPaggingLabel").text(kLg.textIsPagging);
+
+        $("#lblAttach").text(kLg.lblAttach);
+        $("#lblNavigatorLabel").text(kLg.titleIsNotNavigator);
+
+        $("#lblNoti").text();
+        $("#lblZoomIn").text(kLg.zoomInWindow);
+        //$("#lblZoomOut").text(kLg.zoomOutWindow);
+
+        $("#lblMailAddress").text(kLg.maTitleMailAddress);
+
+        $("#lblAllowPdfPerson").text(kLg.lblAllowPdfPerson);
+        $("#lblAllowPdfActivities").text(kLg.lblAllowPdfActivities);
+
+        $("#lblFinishText").text(kLg.lblFinishText);
+    };
+
+    $('#txtStartDate').blur(function (e) {
+        var date = $(this).val();
+        var isValid = checkDataValid(date);
+        if (!isValid) {
+            vmEditCProject.clearErrorTooltip(this, "title");
+            $(this).attr("title", kLg.msgDateInValid);
+            $(this).tooltip({ trigger: "manual" }).tooltip('show').attr("title", "");
+            vmEditCProject.sdate = false;
+            vmEditCProject.IsModified = true;
+            return;
+        }
+        //cprojectViewModel.cproject.StartDate = kendo.parseDate(date);
+        vmEditCProject.IsModified = true;
+        vmEditCProject.sdate = true;
+        vmEditCProject.clearErrorTooltip(this, "title");
+        cprojectViewModel.dateChange(null, e);
+
+    });
+    function checkDataValid(dateStr) {
+        if (dateStr.length === 0) {
+            return true;
+        }
+        var date = kendo.parseDate(dateStr);
+        var isValid = date && date > new Date(1753, 1, 1) && date < new Date(9999, 12, 31);
+        return isValid;
+    }
+    $('#txtEndDate').blur(function (e) {
+
+        var date = $(this).val();
+        var isValid = checkDataValid(date);
+        if (!isValid) {
+            vmEditCProject.clearErrorTooltip(this, "title");
+            $(this).attr("title", kLg.msgDateInValid);
+            $(this).tooltip({ trigger: "manual" }).tooltip('show').attr("title", "");
+            vmEditCProject.edate = false;
+            vmEditCProject.IsModified = true;
+            return;
+        }
+        //cprojectViewModel.cproject.EndDate = kendo.parseDate(date);
+        vmEditCProject.edate = true;
+        vmEditCProject.clearErrorTooltip(this, "title");
+        //vmEditCProject.IsModified = true;
+        cprojectViewModel.dateChange(null, e);
+
+    });
+    vmEditCProject.clearErrorTooltip = function (elm, attrName) {
+        $(elm).removeAttr(attrName);
+        $(elm).tooltip('destroy');
+    };
+
+    $("#txtNameCProject,#txtQuestionTitleCProject,#txtSubjectCProject").on('keydown', function (e) {
+        if (e.keyCode == 9 || e.keyCode == 13) {
+            e.preventDefault();
+            return;
+        }
+    });
+    popUpAddProject.bind("close", function (e) {
+        //e.sender.element.focus();
+        //vmEditCProject.IsModified = true;
+        if (vmEditCProject.IsModified == true) {
+            if (!confirm(kLg.saveConfirmQuestion)) {
+                destroyDialog();
+
+            } else {
+                e.preventDefault();
+                if (!$('#add-cproject-form').valid() || !isValid || !vmEditCProject.isValidDate() || !vmEditCProject.isRequireQuestion()) {
+                    return;
+                };
+                cprojectViewModel.update();
+                destroyDialog();
+            }
+        } else {
+            destroyDialog();
+        }
+    });
+
+    vmEditCProject.fixDate = function (project) {
+        project.StartDate = vmCommon.tryToServerDate(project.StartDate);
+        project.EndDate = vmCommon.tryToServerDate(project.EndDate);
+    };
+
+    function destroyDialog() {
+        removeEditor();
+        popUpAddProject.destroy();
+        popUpAddProject = null;
+        $('.body-content').after('<div id="pop-add-cproject-place"></div>');
+    }
+
+    function removeEditor() {
+        var editor = $("#txtEmailContentCProject").data("kendoEditor");
+        editor.focus();
+        $(document.body).focus();
+
+        if (editor) {
+            editor.wrapper.find("iframe").remove();
+            if (!vmCommon.getCurrentBrowser() === vmCommon.Browser.Edge) {
+                editor.destroy();
+            } else {
+                editor = null;
+            }
+
+            $("#cp-editor").empty();
+        }
+    };
+
+    function getEditorLanguage() {
+        $("#editorscript").remove();
+        var langUrl = "/Scripts/editors/kendo.messages." + kLg.languageCode + ".min.js";
+        $("head").append($("<script id='editorscript'><\/script>").attr("src", langUrl));
+    };
+
+    vmEditCProject.genSize = function (size) {
+        return Math.round(((size / (1024))) * 100) / 100 + " KB";
+    };
+
+    vmEditCProject.genAttachSaveState = function (attach) {
+        attach.SaveClass = attach.SaveState === vmCommon.SaveState.UnSaved ? "unsave" : "";
+        return attach;
+    };
+
+    vmEditCProject.showNotification = function () {
+        var ulH = $("#ulfile").height();
+        var ulW = $("#ulfile").width();
+
+        $("#lblNoti").text(kLg.msgFileDontAttach);
+
+        var noH = $("#notifile").height();
+        var noW = $("#notifile").width();
+
+        $("#notifile").css({ "top": ulH / 2 - noH / 2, "left": ulW / 2 - noW / 2 }).show();
+        setTimeout(function () {
+            $(".notification-file").show().fadeOut(1500);
+        }, 1500);
+    };
+
+    function bindReportName(name) {
+        switch (name) {
+            case "reportPersonHighScores":
+                return kLg.reportPersonHighScores;
+            case "reportUserSoftware":
+                return kLg.reportUserSoftware;
+            case "reportVisitingClients":
+                return kLg.reportVisitingClients;
+            default:
+                return name;
+        }
+    };
+
+    vmEditCProject.isValidDate = function () {
+        var listDate = $('#pop-add-cproject input[data-role=datepicker]');
+        for (var i = 0; i < listDate.length; i++) {
+            if ($(listDate[i]).val() == "") continue;
+            if ($(listDate[i]).data("kendoDatePicker").value() == null) {
+                $(listDate[i]).focus();
+                return false;
+            }
+        }
+        return true;
+    };
+
+    vmEditCProject.isRequireQuestion = function () {
+        if (cprojectViewModel.cproject.IsAnonymous == true && cprojectViewModel.cproject.CrmFragensetId == 0) {
+            $(".toolName").attr('title', kLg.SelectQuestionaire);
+            $(".toolName").tooltip({ placement: 'bottom', trigger: 'manual' }).tooltip('show');
+            setTimeout(function () {
+                $(".toolName").tooltip('destroy');
+            }, 1000);
+            return false;
+        } else return true;
+    };
+
+    vmEditCProject.validAttachFile = function (files) {
+        var nSize = 0;
+        for (var i = 0; i < files.length; i++) {
+            nSize += files[i].size;
+        }
+
+        if (nSize > (20 * 1024 * 1024)) {
+            pAlert(kLg.msgAttachOverSize);
+            return false;
+        }
+
+        var atts = cprojectViewModel.get("attFiles");
+        var flist = $(atts, function (it) {
+            return it.DataState !== dataState.Deleted || it.SaveState !== vmCommon.SaveState.UnSaved;
+        });
+
+        for (var i = 0; i < flist.length; i++) {
+            nSize += flist[i].Size;
+        }
+
+        if (nSize > (20 * 1024 * 1024)) {
+            pAlert(kLg.msgAttachOverSize);
+            return false;
+        }
+
+        return true;
+    };
+
+    vmEditCProject.readURL = function (input) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            $('#imgLogo').attr('src', e.target.result);
+        };
+        reader.readAsDataURL(input.target.files[0]);
+    };
+
+    vmEditCProject.saveLogo = function (data) {
+        var url = '../Handlers/CrmCrowdProjectHandler.ashx?funcName=savelogo&projid=' + projectId + "&strid=" + strategyId;
+        vmCommon.sendFile(url, data);
+    };
+
+
+    vmEditCProject.callBackData = function (res) {
+        if (res == vmCrmEnum.ResultStatus.CONFLICT) {
+            pAlert(kLg.projectConflict);
+        }
+        if (res == vmCrmEnum.ResultStatus.USING) {
+            pAlert(kLg.isAccess);
+        }
+
+        if (res == vmCrmEnum.ResultStatus.NOCHANGE) {
+            pAlert(kLg.isNoChangeAnonymous);
+        }
+
+        if (popUpAddProject != null) {
+            popUpAddProject.close();
+        }
+        vmCProjectList.dataservice.getprojectbyproject(null, vmCProjectList.loadProjectListTemplate);
+    };
+
+    $('span.toolName').hover(
+        function () {
+            setToolTip();
+
+        },
+        function () {
+            $(this).tooltip('destroy');
+        }
+    );
+    function setToolTip() {
+        var nameF = $('span.toolName');
+        nameF.each(function () {
+            var fragensetName = $("#ddlFragenset").data("kendoDropDownList").text();
+            if (fragensetName.trim().length == 0) {
+                return;
+            }
+            $(this).attr("title", fragensetName);
+            $(this).tooltip({ trigger: "manual" }).tooltip('show');
+        });
+    }
+
+    function UpdateCPProject(cpProject) {
+        var project = cpProject;
+        project.Logo = (project.Logo != '') ? (project.Logo + '#' + new Date().getTime()) : (project.Logo);
+
+        cpProject.Attachs = cpProject.Attachs || [];
+        for (var i = 0; i < project.Attachs.length; i++) {
+            var attItem = project.Attachs[i];
+            attItem.Icon = "pull-left icon-20 icon-" + setFileIcon(attItem.TypeId);
+            attItem.DisplaySize = vmEditCProject.genSize(attItem.Size);
+
+            vmEditCProject.genAttachSaveState(attItem);
+        }
+
+        return project;
+    };
+
+    function openCrowdFileDialog() {
+        $("#pop-add-cproject #cpfile").click();
+    };
+
+    $("#pop-add-cproject #cpfile").change(function (e) {
+        var files = $(this).prop("files");
+        if (files.length === 0) {
+            return false;
+        }
+
+        if (!vmEditCProject.validAttachFile(files)) {
+            return false;
+        }
+
+        var cpdata = new FormData();
+        var count = 0;
+
+        //if (validFileUpload(files)) {
+        for (var i = 0; i < files.length; i++) {
+            cpdata.append(files[i].name, files[i]);
+            count++;
+        }
+        //}
+
+        if (count > 0) {
+            var url = "../Handlers/DFolderHandler.ashx?funcName=addattach&projid=" + projectId + "&strid=" + strategyId;
+            vmCommon.sendFile(url, cpdata, function (res) {
+                var resFiles = res.value;
+                var eCount = 0;
+
+                for (var i = 0; i < resFiles.length; i++) {
+                    resFiles[i].Icon = "pull-left icon-20 icon-" + setFileIcon(resFiles[i].TypeId);
+                    resFiles[i].DataState = dataState.Added;
+                    resFiles[i].DisplaySize = vmEditCProject.genSize(resFiles[i].Size);
+
+                    vmEditCProject.genAttachSaveState(resFiles[i]);
+                    cprojectViewModel.attFiles.push(resFiles[i]);
+
+                    if (resFiles[i].SaveState === vmCommon.SaveState.UnSaved) {
+                        eCount++;
+                    }
+                }
+
+                if (eCount > 0) {
+                    vmEditCProject.showNotification();
+                }
+
+            }, "cploading");
+        }
+        $(this).val("");
+
+        return false;
+    });
+
+    $("#pop-add-cproject").on("mouseenter", "span.icon-embeded", function (e) {
+        var iname = $(this).attr("iname");
+        var iwidth = $(this).attr("iwidth");
+        var iheight = $(this).attr("iheight");
+
+        if (iname && iwidth && iheight) {
+            $("#cliptext").css({ "display": "block" });
+            $("#cliptext").text("<img src=\"cid:" + iname.replace(" ", "_") + "\" width=\"" + iwidth + "\" height=\"" + iheight + "\" alt=\"" + iname.replace(" ", "_") + "\" />");
+        }
+
+    });
+    $("#pop-add-cproject").on("mouseout", "span.icon-embeded", function (e) {
+        $("#cliptext").text("");
+        $("#cliptext").css({ "display": "none" });
+    });
+
+    function zoomOutLeft() {
+        var ww = $(window).width();
+        if (ww === 1903) {
+            $("#btnZoomOut").attr('style', 'left: 77.5% !important');
+        } else if (ww < 1903) {
+            var down = 77.5 + ((1903 - ww) / 28.75);
+            $("#btnZoomOut").attr('style', 'left: ' + down + '% !important');
+        }
+    }
+
+    var widthEditor = 0;
+
+    function zoomIn() {
+        widthEditor = $('#cp-editor').width();
+        $('#cp-editor').removeAttr('style');
+        $('div#pop-add-cproject-place').parent().addClass("zoominDivPopup");
+        $('#cp-editor').addClass("zoominDiv");
+        $('table.k-widget.k-editor.k-header.k-editor-widget').addClass("zoominTable");
+        $('div.k-window-titlebar.k-header').addClass("zoominHeader");
+        $('#btnZoomOut').removeClass("zoominHeader");
+
+        //if (!$('#trplus').length) {
+        //    $('<tr><td id="trplus"><br /></td></tr>').insertBefore('table.k-widget.k-editor.k-header.k-editor-widget > tbody > tr:first');
+        //}
+    }
+
+    function zoomOut() {
+        $('div#pop-add-cproject-place').parent().removeClass("zoominDivPopup");
+        $('#cp-editor').removeClass("zoominDiv");
+        $('table.k-widget.k-editor.k-header.k-editor-widget').removeClass("zoominTable");
+        $('div.k-window-titlebar.k-header').removeClass("zoominHeader");
+        $('#btnZoomOut').addClass("zoominHeader");
+        $('#cp-editor').attr('style', 'width :' + widthEditor + 'px !important');
+    }
+
+    function bindClipBoard() {
+        var clip = new Clipboard(".icon-embeded");
+        clip.on("success", function (e) {
+            ShowToolTip2($(e.trigger), kLg.msgCopied, "top");
+            setTimeout(function () {
+                $(e.trigger).tooltip("destroy");
+            }, 300);
+        });
+    };
+
+    vmEditCProject.getFrageWithDocument = function (id) {
+        var listFragenset = vmCProjectList.fragenset;
+        for (var i = 0; i < listFragenset.length; i++) {
+            if (listFragenset[i].Id.toString() === id) {
+                return listFragenset[i].IsDocument;
+            }
+        }
+        return false;
+    };
+
+    var crownProjectAPI;
+
+    $(function () {
+        var wordTemplates = vmCProjectList.words;
+
+        if (!wordTemplates.find(t => t.Id == 0)) {
+            wordTemplates.unshift({ Id: 0, Name: kLg.titleSelectWordTemplate });
+        }
+
+        var cp = UpdateCPProject(vmCProjectList.editProject.Project);
+        var now = new Date();
+
+        now.setHours(0, 0, 0, 0);
+        crownProjectAPI = (function () {
+            let _folder = undefined;
+            function getFolder(dateStr) {
+                let createD = dateStr.split('-'),
+                    folder = parseInt(createD[0]) + '_' + parseInt(createD[1]) + '_';                   // YYYY-MM
+                createD = createD[2].split('T');
+                folder += parseInt(createD[0]) + '_';                                                   // -dd
+                createD = createD[1].split(':');
+                folder += parseInt(createD[0]) + '_' + parseInt(createD[1]) + '_' + parseInt(createD[2]);   // HH:mn:ss
+
+                return folder;      // 2020_3_2_1_0 (year_month_day_hour_minute_second)
+            };
+            function getCrowdFolder() {
+                let d = cp.CreatedDate;
+                if (_folder === undefined && d) {
+                    if (cp.Id !== 0) {
+                        _folder = getFolder(d);
+                    } else {
+                        d = new Date(cp.CreatedDate.toUTCString().split(' GMT')[0]);
+                        let fName = d.getFullYear().toString() + '_' + (d.getMonth() + 1) + '_' + (d.getDate()) + '_'
+                            + (d.getHours()) + '_' + (d.getMinutes()) + '_' + (d.getSeconds());
+                        _folder = fName;
+                    }
+                };
+
+                return _folder;
+            };
+            return {
+                Folder: getCrowdFolder(),
+                CrowdId: cp.Id || 0
+            }
+        })();
+
+        var reports = [{ Id: 0, Name: kLg.titleSelectReport }],
+            isHasReport = false;
+
+        if (vmCProjectList.reports && vmCProjectList.reports.length > 0) {
+            isHasReport = true;
+
+            for (var i = 0; i < vmCProjectList.reports.length; i++) {
+                var rp = vmCProjectList.reports[i];
+                rp.Name = bindReportName(rp.Name);
+                reports.push(rp);
+            }
+        }
+        vmCProjectList.fragenset.unshift({ Id: "", Name: "" });
+
+        getEditorLanguage();
+        cp.Iconcopylink = cp.IsAnonymous
+        cprojectViewModel = kendo.observable({
+            checkLinkCP: function (e) {
+                var that = this;
+                if (cprojectViewModel.cproject.IsAnonymous == true) {
+                    ynConfirmCheckbox(kLg.AlertCheckboxCP).then(function () {
+                        that.cproject.set("Iconcopylink", true);
+                        that.cproject.set("IsAllowPdfPerson", false);
+                        that.cproject.set("IsAllowPdfActivities", false);
+                        that.cproject.MailCc = 0;
+                        that.cproject.MailBcc = 0;
+                        that.cproject.MailsList = 0;
+                        that.cproject.CrmAccountSmtpId = 0;
+                        that.cproject.Subject = "";
+                        that.cproject.EmailContent = "";
+                        that.wordTemplateId = 0;
+                        that.cproject.ReportId = 0;
+                        for (var i = 0; i < that.attFiles.length; i++) {
+                            that.attFiles[i].set("DataState", dataState.Deleted);
+                            that.attFiles[i].set("IsShow", false);
+                        }
+                    });
+                } else {
+                    that.cproject.set("Iconcopylink", false);
+                }
+            },
+            copyAnonymousLink: function (e) {
+                if (vmCProjectList.editProject.IsEdit == false) {
+                    var i = $(e.currentTarget);
+                    i.attr('title', kLg.Savecopylink);
+                    i.tooltip({ placement: 'top', trigger: 'manual' }).tooltip('show');
+                    setTimeout(function () {
+                        i.tooltip('destroy');
+                    }, 1000);
+
+                    return;
+                } else {
+                    var that = this;
+                    if (that.cproject.Id > 0 && that.cproject.IsAnonymous && that.cproject.CrmFragensetId > 0) {
+                        var fragenset = that.fragensetSource.find(t => t.Id == that.cproject.CrmFragensetId);
+                        if (!fragenset) return;
+
+                        var url = "../Handlers/CrmCrowdProjectViewHandler.ashx?funcName=getanonymouslink&projid=" + projectId + "&strid=" + strategyId + "&lang=" + language;
+
+                        var entryData = {
+                            CrmCrowdProjectId: this.cproject.Id,
+                            CrmFragensetId: this.cproject.CrmFragensetId,
+                            IsNotNavigator: this.cproject.IsNotNavigator,
+                            ThemaId: fragenset.CrmThemaId,
+                            CrmPersonId: -2,
+                            StatusProtocolId: -1,
+                            CrmActivityId: -1
+                        };
+
+                        callAjax('add-cproject-loading', url, JSON.stringify(entryData), function (res) {
+                            var link = res.value;
+
+                            if (link) {
+                                setTimeout(function () {
+                                    vmCommon.coppyToClipboard(link);
+                                    var i = $(e.currentTarget);
+                                    i.attr('title', kLg.CopyClipBoard);
+                                    i.tooltip({ placement: 'top', trigger: 'manual' }).tooltip('show');
+                                    setTimeout(function () {
+                                        i.tooltip('destroy');
+                                    }, 555);
+                                }, 100);
+                            } else {
+                                void (0);
+                            }
+
+                        }, AjaxConst.PostRequest);
+                    }
+                }
+
+
+
+                
+            },
+
+            isHasReport: isHasReport,
+            reports: reports,
+            cproject: cp,
+            wordSrc: wordTemplates,
+            wordTemplateId: wordTemplates.find(t => t.Id == cp.WordTemplateId) == null ? 0 : cp.WordTemplateId,
+            attFiles: cp.Attachs,
+            mails: cp.MailsList,
+            mailDefaultValue: cp.CrmAccountSmtpId,
+            mailsSendIndexChange: function (e) {
+                //var idx = e.sender.selectedIndex;
+            },
+            getEmbeded: function (e) {
+            },
+            removeAttach: function (e) {
+                var idx = this.attFiles.indexOf(e.data);
+                if (e.data.Id > 0) {
+                    this.attFiles[idx].set("DataState", dataState.Deleted);
+                    this.attFiles[idx].set("IsShow", false);
+                } else {
+                    this.attFiles.splice(idx, 1);
+                }
+            },
+            fragensetSource: vmCProjectList.fragenset,
+            update: function (e) {
+                if ($('#add-cproject-form').valid() && isValid && vmEditCProject.isValidDate() && vmEditCProject.isRequireQuestion()) {
+                    var file = $('#txtLogo').prop('files');
+                    if (file.length > 0) {
+                        var data = new FormData();
+                        var logoname = vmCommon.newGuid() + "." + getFileExtention(file[0].name);
+                        file[0].name = logoname;
+                        data.append("logo", file[0]);
+                        data.append("logoname", logoname);
+                        this.cproject.set("Logo", "../LogoUpload/" + logoname);
+
+                        vmEditCProject.saveLogo(data, function (res) {
+                            if (res !== vmCrmEnum.ResultStatus.SUCCESS) {
+                                //Show Alert
+                            }
+                        });
+                    }
+
+                    this.cproject.MailCc = this.cproject.MailCc ? this.cproject.MailCc.map(t => t.AccountTypeId_Id) : [];
+                    this.cproject.MailBcc = this.cproject.MailBcc ? this.cproject.MailBcc.map(t => t.AccountTypeId_Id) : [];
+
+                    this.cproject.set('WordTemplateId', this.wordTemplateId);
+
+                    var funcName = vmCProjectList.editProject.IsEdit ? "update" : "add",
+                        theProject = this.cproject;
+
+                    var atts = $.grep(this.attFiles, function (it) {
+                        return it.SaveState !== vmCommon.SaveState.UnSaved;
+                    });
+
+                    //check change attach file
+                    var isAdded = $.grep(this.attFiles, function (it) {
+                        return it.DataState === dataState.Added;
+                    }).length > 0;
+                    var isDeleted = $.grep(this.attFiles, function (it) {
+                        return it.DataState === dataState.Deleted;
+                    }).length > 0;
+
+                    if (isAdded || isDeleted) {
+                        vmEditCProject.IsModified = true;
+                        theProject.Attachs = atts;
+                    }
+
+                    vmEditCProject.fixDate(theProject);
+
+                    (function saveChange(data, funcName) {
+                        if (vmEditCProject.IsModified == true) {
+                            var url = '../Handlers/CrmCrowdProjectHandler.ashx?funcName=' + funcName + "&projid=" + projectId + "&strid=" + strategyId;
+                            callAjax('add-cproject-loading', url, JSON.stringify(data), vmEditCProject.callBackData, AjaxConst.PostRequest);
+                            vmEditCProject.IsModified = false;
+                        } else {
+                            if (popUpAddProject != null) {
+                                popUpAddProject.close();
+                            }
+                        }
+                    })(theProject, funcName);
+                }
+
+            },
+            dateChange: function (e, blueEvent) {
+
+                if (!vmEditCProject.sdate || !vmEditCProject.edate) {
+                    return false;
+                }
+
+                isValid = (this.cproject.StartDate == null || this.cproject.EndDate == null || this.cproject.StartDate <= this.cproject.EndDate);
+                if (!isValid) {
+                    var elem = e == null ? blueEvent.target : e.sender.element[0];
+                    if (elem.id == "txtStartDate") {
+                        this.cproject.set("EndDate", this.cproject.StartDate);
+                        isValid = true;
+                    }
+                }
+
+                if (isValid) {
+                    vmEditCProject.clearErrorTooltip('#txtStartDate', "title");
+                    vmEditCProject.clearErrorTooltip('#txtEndDate', "title");
+                } else {
+                    $('#txtEndDate').attr("title", kLg.msgValidateStartEndDate);
+                    $('#txtEndDate').tooltip({ trigger: "manual" }).tooltip('show');
+                    //vmEditCProject.edate = false;
+                    return false;
+                }
+
+                if (this.cproject.EndDate != null && this.cproject.EndDate != undefined && this.cproject.EndDate < now) {
+                    $('#txtEndDate').attr("title", kLg.msgValidateDateWithNow);
+                    $('#txtEndDate').tooltip({ trigger: "manual" }).tooltip('show');
+                } else {
+                    vmEditCProject.clearErrorTooltip('#txtEndDate', "title");
+                }
+
+                vmEditCProject.IsModified = true;
+                return isValid;
+            },
+            deleteLogo: function (e) {
+                this.cproject.set("Logo", "");
+                $('#txtLogo').val('');
+                vmEditCProject.IsModified = true;
+                vmEditCProject.showLogoForm(false);
+            },
+            changeLogo: function (e) {
+                if (e.target.value != "") {
+                    vmEditCProject.readURL(e);
+                    vmEditCProject.showLogoForm(true);
+                }
+                vmEditCProject.IsModified = true;
+            },
+            formChange: function () {
+                vmEditCProject.IsModified = true;
+            },
+            changeFragenset: function () {
+                var value = $("#ddlFragenset").val();
+                var isDocument = vmEditCProject.getFrageWithDocument(value);
+                if (isDocument && !this.cproject.get("IsAllowPdfPerson")) {
+                    this.cproject.set("IsAllowPdfPerson", isDocument);
+                }
+            }
+        });
+
+        vmEditCProject.activeModelChange = function () {
+            vmEditCProject.IsModified = true;
+        };
+        cprojectViewModel.bind("change", function () {
+            vmEditCProject.IsModified = true;
+        });
+
+        kendo.bind($('#pop-add-cproject'), cprojectViewModel);
+
+        var isHasLogo = (vmCProjectList.editProject.Project.Logo != undefined && vmCProjectList.editProject.Project.Logo != '');
+        vmEditCProject.showLogoForm(isHasLogo);
+        vmEditCProject.SetupValidate();
+        vmEditCProject.setupLanguage();
+        limitedTabKey();
+
+        $("#txtEmailContentCProject").kendoEditor({
+            resizable: true,
+            tools: [
+                "bold",
+                "italic",
+                "underline",
+                "strikethrough",
+                "justifyLeft",
+                "justifyCenter",
+                "justifyRight",
+                "justifyFull",
+                "insertUnorderedList",
+                "insertOrderedList",
+                "indent",
+                "outdent",
+                "createLink",
+                "unlink",
+                "insertImage",
+                "insertFile",
+                "subscript",
+                "superscript",
+                "createTable",
+                "addRowAbove",
+                "addRowBelow",
+                "addColumnLeft",
+                "addColumnRight",
+                "deleteRow",
+                "deleteColumn",
+                "viewHtml",
+                "formatting",
+                "cleanFormatting",
+                "fontName",
+                {
+                    name: "fontSize",
+                    items: [
+                        { text: "7", value: "9px" },
+                        { text: "8", value: "11px" },
+                        { text: "9", value: "12px" },
+                        { text: "10", value: "13px" },
+                        { text: "11", value: "15px" },
+                        { text: "12", value: "16px" },
+                        { text: "13", value: "17px" },
+                        { text: "14", value: "19px" },
+                        { text: "15", value: "21px" },
+                        { text: "18", value: "24px" },
+                        { text: "20", value: "26px" },
+                        { text: "24", value: "32px" },
+                        { text: "30", value: "40px" }
+                    ]
+                },
+                "foreColor",
+                "backColor",
+                "print"
+            ],
+            imageBrowser: {
+                messages: {
+                    dropFilesHere: "Drop files here",
+                    overwriteFile: null
+                },
+                schema: {
+                    model: {
+                        fields: {
+                            name: { field: "Name" },
+                            type: { field: "Type" },
+                            size: { field: "Size" }
+                        }
+                    }
+                },
+                transport: {
+                    read: { url: "../api/imagebrowser/getdata?pid=" + projectId + "&crfol=" + (crownProjectAPI.Folder || '') + '&crwid=' + crownProjectAPI.CrowdId },
+
+                    destroy: function (res) {
+                        $.ajax({
+                            type: "GET",
+                            url: "../api/imagebrowser/destroy?crfol=" + (crownProjectAPI.Folder || '') + "&name=" + res.data.Name,
+                            success: function (res) {
+                                $('.k-loading-mask').hide();
+                            }
+                        });
+                        $("#k-editor-image-url").val("");
+                    },
+                    //create: { url: "api/default/create", type: "POST" },
+                    thumbnailUrl: function (path, name) {
+                        return document.location.origin + "/ImgBrowser/Thumbnail/" + (crownProjectAPI.Folder ? crownProjectAPI.Folder + "/" : '') + name;
+
+                    },
+                    uploadUrl: `../api/imagebrowser/upload?pid=${projectId}&crfol=${crownProjectAPI.Folder || ''}&accid=-1&aid=${vmCommon.emptyGuid}&astype=crm`,
+                    imageUrl: function (name) {
+                        //$.ajax({
+                        //    type: "GET", url: "../api/imagebrowser/imagex?path=" + path, data: { path: path },
+                        //    success: function (res) { $("#k-editor-image-url").val(res); }
+                        //});
+                        return document.location.origin + "/ImgBrowser/" + (crownProjectAPI.Folder ? crownProjectAPI.Folder + '/' : '') + name;
+                    }
+                }
+            }
+        });
+
+        var ccDataSrc = new kendo.data.DataSource({
+            transport: {
+                read: function (op) {
+                    var mailCc = $("#txtMailCC_CProject").data("kendoMultiSelect");
+                    var res = cprojectViewModel.get('cproject.MailCc') || [];
+
+                    if (op.data && op.data.filter && op.data.filter.filters[0]) {
+                        var filter = op.data.filter.filters[0].value;
+
+                        if (filter.trim().length > 0) {
+
+                            return vmCProjectList.dataservice.getpeopleautocomplete(filter.trim()).then(data => {
+
+                                res = data.filter(m => { return !res.some(r => r.AccountTypeId_Id == m.AccountTypeId_Id); });
+
+                                mailCc.isFilter = true;
+                                mailCc.open();
+
+                                op.success(res);
+
+                                mailCc.isFilter = false;
+                            });
+                        }
+                        else {
+                            mailCc.isFilter = false;
+                            mailCc.close();
+                        }
+                    }
+
+                    op.success(res);
+                }
+            },
+            serverFiltering: true
+        });
+
+        var bccDataSrc = new kendo.data.DataSource({
+            transport: {
+                read: function (op) {
+                    var res = cprojectViewModel.get('cproject.MailBcc') || [];
+                    var mailBcc = $("#txtMailBCC_CProject").data("kendoMultiSelect");
+
+                    if (op.data && op.data.filter && op.data.filter.filters[0]) {
+                        var filter = op.data.filter.filters[0].value;
+                        if (filter.trim().length > 0) {
+
+                            return vmCProjectList.dataservice.getpeopleautocomplete(filter.trim()).then(data => {
+                                res = data.filter(m => { return !res.some(r => r.AccountTypeId_Id == m.AccountTypeId_Id); });
+
+                                mailBcc.isFilter = true;
+                                mailBcc.open();
+
+                                op.success(res);
+
+                                mailBcc.isFilter = false;
+                            });
+                        }
+                        else {
+                            mailBcc.isFilter = false;
+                            mailBcc.close();
+                        }
+                    }
+
+                    op.success(res);
+                }
+            },
+            serverFiltering: true
+        });
+
+
+
+        $("#txtMailCC_CProject").kendoMultiSelect({
+            dataValueField: "AccountTypeId_Id",
+            dataTextField: "Name",
+            dataSource: ccDataSrc,
+            
+            itemTemplate: `<span class="k-state-default">
+                                    <h3>#: data.Name #</h3>
+                                    <p>#: data.Email #</p>
+                           </span>`,
+            tagTemplate: `<span class="selected-value">
+                             #:data.Name#
+                            </span>
+                            <span>(#:data.Email#)</span>`,
+            open: function (e) {
+                console.log(e.sender.isFilter);
+                !e.sender.isFilter && e.preventDefault();
+            }
+        });
+
+        $("#txtMailBCC_CProject").kendoMultiSelect({
+            dataValueField: "AccountTypeId_Id",
+            dataTextField: "Name",
+            dataSource: bccDataSrc,
+            itemTemplate: `<span class="k-state-default">
+                                    <h3>#: data.Name #</h3>
+                                    <p>#: data.Email #</p>
+                           </span>`,
+            tagTemplate: `<span class="selected-value">
+                             #:data.Name#
+                            </span>
+                            <span>(#:data.Email#)</span>`,
+            open: function (e) {
+                !e.sender.isFilter && e.preventDefault();
+            }
+        });
+
+        bindClipBoard();
+
+        var strEndDate = $('#txtEndDate').val();
+        if (strEndDate != null && strEndDate.length != 0) {
+            var ed = kendo.parseDate(strEndDate);
+            if (ed < now) {
+                $("#txtStartDate").data('kendoDatePicker').enable(false);
+                $("#txtEndDate").data('kendoDatePicker').enable(false);
+            } else {
+                $("#txtStartDate").data('kendoDatePicker').enable(true);
+                $("#txtEndDate").data('kendoDatePicker').enable(true);
+            }
+        }
+
+        vmCommon.resetTabIndexCrowd('add-cproject-form');
+        $('#txtNameCProject').focus();
+    });
+</script>

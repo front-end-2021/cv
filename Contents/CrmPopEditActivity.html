@@ -1,0 +1,2429 @@
+﻿<style type="text/css">
+    textarea {
+        resize: none;
+    }
+
+    .div-item .ms-drop {
+        margin-top: 4px;
+        margin-left: 150px !important;
+    }
+
+    .crm-drop {
+        width: 174px !important;
+    }
+
+    .activity-datetime {
+        background-color: white !important;
+    }
+
+    .act-time {
+        width: 150px !important;
+    }
+
+    #source-relation .tooltip {
+        top: -1px;
+    }
+
+    #source-relation .tooltip-arrow {
+        top: 50%;
+    }
+
+    #source-relation .tooltip-inner {
+        height: 30px;
+        max-height: 30px;
+        white-space: nowrap;
+        padding: 8px 8px;
+    }
+
+    .k-autocomplete .k-input {
+        height: 1.65em;
+        line-height: 1.65em;
+        padding: 0.177em 0;
+        text-indent: 4px;
+        border: 0px !important;
+        margin: 0;
+    }
+    .autosearch {
+        top: -1px !important;
+    }
+    /* multiselect */
+    .divtag .k-multiselect-wrap input[class~="k-input"] {
+        /*display: none !important;*/
+        border: none !important;
+        background-color: white !important;
+    }
+
+    .divtag .k-multiselect-wrap {
+        border-radius: 0px !important;
+    }
+
+    .divtag .k-multiselect.k-header {
+        border-color: #E7E7E7 !important;
+    }
+
+    .k-animation-container .k-state-focused {
+        border-width: 0;
+        border-color: #E7E7E7;
+        box-shadow: none;
+    }
+    /**/
+    .divtag .k-multiselect-wrap li[class~="k-button"] {
+        color: #2e2e2e;
+        border-color: #fafafa;
+        background-color: #fafafa;
+        border-radius: 30px;
+        max-width: 99%;
+    }
+
+        .divtag .k-multiselect-wrap li[class~="k-button"]:hover {
+            color: #2e2e2e;
+            border-color: #EBEBEB;
+            background-color: #EBEBEB;
+            border-radius: 30px;
+            max-width: 99%;
+        }
+
+    .divtag .k-multiselect, #ddlTags-list {
+        width: 393px !important;
+    }
+
+    .divtag li[class~="k-button"] span {
+        word-wrap: break-word;
+    }
+    .editsearch .k-multiselect-wrap input[class~="k-input"] {
+        border: none !important;
+        background-color: white !important;
+    }
+    .editsearch .k-multiselect-wrap {
+        border-radius: 0px !important;
+    }
+    .editsearch .k-multiselect.k-header {
+        border-color: #E7E7E7 !important;
+    }
+    .editsearch .k-multiselect-wrap li[class~="k-button"] {
+        color: #2e2e2e;
+        border-color: #fafafa;
+        background-color: #fafafa;
+        border-radius: 30px;
+        max-width: 99%;
+    }
+    .editsearch .k-multiselect-wrap li[class~="k-button"] {
+        color: #2e2e2e;
+        border-color: #fafafa;
+        background-color: #fafafa;
+        border-radius: 30px;
+        max-width: 99%;
+    }
+   .editsearch .k-multiselect-wrap li[class~="k-button"]:hover {
+        color: #2e2e2e;
+        border-color: #EBEBEB;
+        background-color: #EBEBEB;
+        border-radius: 30px;
+         max-width: 99%;
+   }
+    .editsearch .k-multiselect, #ddlTags-list {
+        width: 393px !important;
+    }
+    .editsearch li[class~="k-button"] span {
+        word-wrap: break-word;
+    }
+    /* multiselect */
+
+    .goal-truncate {
+        height: 17px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: inline-block;
+        max-width: 373px;
+    }
+
+    .goal-item {
+        margin-right: 3px;
+        margin-top: 2px;
+        padding: 5px;
+        box-shadow: 0 2px 6px rgba(0,0,0,.2), 0 2px 3px rgba(0,0,0,.05);
+        padding-bottom: 5px;
+        display: inline-flex;
+        float: left;
+    }
+
+    .menu-title {
+        background-color: #33a6dc;
+    }
+
+    .td-v-align-middle div {
+        margin: 0;
+        padding: 0;
+    }
+
+    #source-relation .td-hover:hover .icon-arow-towway-vertical {
+        background-position: -154px -8px;
+        text-indent: -999px;
+        float: left;
+        margin-left: -15px;
+        margin-right: -20px;
+        display: block;
+        margin-top: 7px;
+    }
+
+    #source-relation .input-search {
+        width: inherit !important; 
+        border: 0 none !important;
+    }   
+
+    .ms-unlink {
+        text-decoration: none;
+        color: black;
+    }
+    .ms-unlink:hover {
+        text-decoration: none;
+        color: black;
+    }
+
+    .ms-link {
+        text-decoration: underline;
+        cursor: pointer;
+    }
+    .dropdow-menu-li-a {
+        padding: 0px 40px 0px 10px !important;
+        clear: none !important;
+        width: 70%;
+        line-height: 1.7 !important;
+        margin-bottom: -9px;
+        margin-top: -9px;
+        cursor: pointer;
+    }
+    .k-picker-wrap {
+        border-width: 1px;
+        border-style: solid;
+        padding: 0 1.9em 0 0;
+    }
+
+    table.tblcontrol {
+        width: 100%;
+    }
+
+    table.tblcontrol td {
+        border: none !important;
+        padding: 0 2px 0 2px !important;
+        width: 32px !important;
+    }
+
+    #edit-form-activity .tpnotification.tpextend {
+        top: 18px !important;
+    }
+
+    #edit-form-activity .tpnotification {
+        position: absolute;
+        right:-5px;
+        top: 32px;
+    }
+
+        #edit-form-activity .tpnotification .k-notification-wrap {
+            padding-top: 5px;
+            padding-left: 5px;
+        }
+
+    #edit-form-activity .tpnotification .k-widget.k-notification.k-notification-info {
+        background-color: #38baf8;
+        color: white;
+        border-color: #38baf8;
+    }
+
+    #edit-form-activity .tpnotification .k-notification-wrap .k-i-info {
+        margin-right: 4px;
+        margin-top: -1px;
+    }
+    /*#region text editor*/
+    .iv-textedit-removebtn {
+        position: absolute; top:10px;right:154px;
+        display:inline-flex;margin-top:3px;
+    }
+    .iv-textedit-removebtn .remove-item {margin-top: 5px;}
+    .dnbTextAreaEditor {
+        width: 418px; max-height:100px;
+        margin-right: -3px;
+        margin-left: -3px;
+    }
+    .dnbTextAreaEditor > table.k-editor {
+        border: none; 
+        max-height: 36px; min-height:36px;
+        background-color: transparent;
+    }
+    .dnbTextAreaEditor > table.k-editor iframe.k-content {
+        background-color: #F7F7F7;
+        max-height: 85px; min-height:85px !important;
+    }
+    .dnbTextAreaEditor > table.k-editor .k-editable-area {
+        border-color: #E7E7E7; padding: 0 !important;
+    }
+    .dnbTextAreaEditor td.k-editor-toolbar-wrap {
+        height: 0
+    }
+    .dnbTextAreaEditor .modal-textarea {
+        min-height: 70px;
+        display: inline-block;
+        width: 91%;
+        max-height: 155px;
+    }
+    .dnbTextAreaEditor[data-crm-id="crmActivityNote"], 
+    .dnbTextAreaEditor[data-crm-id="-crmActivityNote"] {   /* Addnew Person*/
+        width: 418px;
+    }
+    .iv-relationship-box {position:relative;margin-top:-8px;}
+    .iv-relationship-box .dnbTextAreaEditor.txtedit-relationship-box {
+        width: 186px;
+    }
+    .iv-relationship-box .dnbTextAreaEditor.txtedit-relationship-box .k-editor iframe.k-content{
+        box-sizing: border-box;
+    }
+    .iv-relationship-box .iv-textedit-removebtn{
+        right: -15px;
+    }
+    .dnbTextAreaEditor[data-crm-id="crmActivityNote"] > table.k-editor iframe.k-content,
+    .dnbTextAreaEditor[data-crm-id="-crmActivityNote"] > table.k-editor iframe.k-content { /* Addnew Person*/
+        min-height: 165px;
+    }
+    .iv-icexpand-texteditor {
+        margin-right: 5px;
+        position: absolute;
+        right: -4px;
+        top: -14px;
+    }
+    .dnbTextAreaEditor[data-crm-id="crmActivityNote"] + .iv-icexpand-texteditor,
+    .dnbTextAreaEditor[data-crm-id="-crmActivityNote"] + .iv-icexpand-texteditor { /* Addnew Person*/        
+        top: -9px;
+    }
+    .texteditor-status-box {position:relative;margin-top:15px;width: 318px;max-width: 318px;}
+    .texteditor-status-box .dnbTextAreaEditor {width: 322px;}
+    .k-editor-toolbar-wrap span.k-widget.k-colorpicker.k-header.k-editor-widget[role="textbox"] {
+        width: 30px
+    }
+    .dnb-noteeditor-lbl {margin-bottom:0;position:relative;z-index:9;top:3px}
+    /*endregion text editor*/
+    .icon-24.icon-export { filter:brightness(3);min-height:21px;margin-right:3px;}
+</style>
+<link href="../Css/multiple-select.css" rel="stylesheet" />
+<div id="popselectgoal" class="loading"></div>
+<div id="popframe"></div>
+<div id="pop-Reminder"></div>
+<div id="staticNotification"></div>
+<div id="edit-form-activity">
+    <div id="activitycontent" class="modal-body ms-modal-body" style="height: 610px; overflow-x: hidden; overflow-y: scroll;">
+        <div class="clear"></div>
+        <table class="modal-table-mass margin-modal">
+            <tbody>
+                <tr>
+                    <td colspan="2">
+                        <label id="lblName">Name</label>
+                        <div class="clear"></div>
+                        <input class="modal-mass-input margin-modal input-icon" id="txtName" data-value-update="keyup" data-bind="value: activity.Name" maxlength="100">
+
+                    </td>
+                    <td colspan="2">
+                        <div style="float: right;">
+                            <span class="icon-55 icon-activity" style=""></span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <label id="lblResponbility">Verantwortung</label>
+                        <div class="clear"></div>
+                        <div class="div-item  editsearch">                            
+                            <select data-role="multiselect"
+                                    data-placeholder=""
+                                     data-filter="contains"
+                                    data-text-field="Name"
+                                    data-value-field="Id"
+                                    data-bind="value: oldAcc, source: accountSrc, events: { change: autoCheckReminder, filtering:multiSelectFiltering}"
+                                    id="ddlTags"></select>
+
+                        </div>
+
+                    </td>
+                    <td rowspan="2" colspan="2">
+                        <label class="dnb-noteeditor-lbl" id="lblNote">Berschreibung</label>
+                        <div class="clear"></div>
+                        <div style="position:relative;top:-4px;">
+                            <div class="dnbTextAreaEditor" data-crm-id="crmActivityNote">
+                                <textarea rows="1" class="modal-textarea" data-value-update="keyup"
+                                          data-role="editor" data-tools="[]"
+                                          data-bind="value: activity.Note,
+                                        events: {
+                                            keyup: onKeyUpChangeNoteEditor,
+                                            paste: onKeyUpChangeNoteEditor,
+                                            change: onChangeNoteEditor
+                                        }">
+                            </textarea>
+                            </div>
+                            <span class="icon-16 iv-icexpand-texteditor"
+                                  data-bind="events: {click: onExpandNotesPopup}"> </span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <label id="lblCategory">Kategorie</label>
+                        <div class="clear"></div>                        
+                        <div class="div-item divtag">                            
+                            <select data-role="multiselect"
+                                    data-placeholder=""
+                                    data-filter="contains"
+                                    data-text-field="Name"
+                                    data-value-field="Id"
+                                    data-bind="value: oldCat, source: cateSrc, events: {change: onChangeCategories, deselect: deselectCategories, select: selectCategories,filtering:multiSelectFiltering} "
+
+                                    id="ddlCategories"></select>
+
+                        </div>
+                    </td>
+                    
+                </tr>
+                <tr>
+                    <td>
+                        <label id="lblPriority">Priorität</label>
+                        <div class="clear"></div>
+
+                        <select class="crm-drop pull-left"
+                                data-value-primitive="true"
+                                data-role="dropdownlist"
+                                data-text-field="Name"
+                                data-value-field="Id"
+                                data-bind="value: activity.PriorityId, source: prioritySrc" ></select>
+                    </td>
+                    <td>
+                        <div class="modal-mass-checkbox">
+                            <input id="cbFinish" type="checkbox" data-bind="checked: activity.Finish, events: { change: autoCheckReminder}">
+                            <label class="checkbox-lable" id="lblFinish">Erledigt</label>
+                        </div>
+                    </td>
+                    <td>
+                        <label id="lblAction">Massnahme</label>
+                        <div class="clear"></div>
+                        <span class="icon-32 cursor-pointer icon-add" data-bind="events:{click: selectGoal}, visible: visibleSelectGoal"></span>
+                        <div class="goal-item" data-bind="invisible: visibleSelectGoal">
+                            <div class="pull-left">
+                                <a class="goal-truncate" data-bind="text: activity.SubGoalName, attr: {class: activity.ActionClass}, events:{click: redirectSubGoal}">
+                                </a>
+                            </div>
+                            <span class="icon-20 ms-icon-delete-gray" style="cursor: pointer;zoom: 85%;" data-bind="events:{click: removeGoal }"></span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="lbl-datime" id="lblBegin">Beginn</label>
+                        <div class="clear"></div>
+                        <div class="input-append date">
+                            <input class="activity-datetime" id="txtStartDate" data-role="datepicker" data-bind="value: activity.StartDate, events:{change: dateChange}" autocomplete="off" />
+                        </div>
+                    </td>
+                    <td class="padding-left0">
+                        <label class="lbl-datime">&nbsp;</label>
+                        <div class="clear"></div>
+                        <div class="input-append date act-time">
+                            <input class="activity-datetime" id="txtStartTime" data-role="timepicker" data-parse-formats="['HH:mm:ss']" data-bind="value: activity.StartTime, events:{change: dateChange}" autocomplete="off" />
+                        </div>
+                    </td>
+                    <td colspan="2"></td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="lbl-datime" id="lblDue">Fällig</label>
+                        <div class="clear"></div>
+                        <div class="input-append date">
+                            <input class="activity-datetime" id="txtDueDate" data-role="datepicker" data-bind="value: activity.DueDate, events:{change: dateChange}" autocomplete="off" />
+                        </div>
+                    </td>
+                    <td class="padding-left0">
+                        <label class="lbl-datime">&nbsp;</label>
+                        <div class="clear"></div>
+                        <div class="input-append date act-time" style="float: left;">
+                            <input class="activity-datetime" id="txtDueTime" data-role="timepicker" data-parse-formats="['HH:mm:ss']" data-bind="value: activity.DueTime, events:{change: dateChange}" autocomplete="off" />
+                        </div>
+                        <div style="width: 15px;float: right;"  data-bind="click: setGoalActionOutlook">
+                            <div class="icon-24 iconright-modal-mass margin-right6" data-toggle="dropdown" style="width: 23px; height: 23px;"></div>
+                            <ul role="menu" class="dropdown-menu ms-popup-menu posAbsolute" style="left: auto;top: auto; bottom: auto;padding-right:2px">
+                                <li class="reminder" data-bind="click: openReminder, visible: checkEndDate"><a class="dropdow-menu-li-a a69" data-toggle="modal" data-target=".bs-example-modal-lg"> <span class="icon-24  icon-left-block icon-reminder"></span><span id="lblReminder" style="margin-left: 10px;">Erinnerung</span></a></li>
+                                <li data-bind="visible: checkEndDate" role="presentation" class="divider icon-divider reminder"></li>
+                                <li><a class="dropdow-menu-li-a a69 assignInfo" href="mailto:?Subject=" target="_top" style="margin-right: -17px;">
+                                    <span class="icon-24  icon-left-block icon-assigninfo"></span><span id="lblAssignInfo" style="margin-left: 10px;">Zuweisen / Info</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                    <td colspan="2"></td>
+                </tr>
+                
+                <tr>
+                    <td colspan="4">
+                        <hr class="modal-active-hr">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label id="lblRelationship">Beziehung</label>
+                    </td>
+                    <td class="padding-left0">
+                        <label id="lblName">Name</label>
+                    </td>
+                    <td>
+                        <label id="lblRolle">Rolle</label>
+                    </td>
+                </tr>
+            </tbody>
+            <tbody id="source-relation" data-template="temp-relation" data-bind="source: activity.CrmActivityRelationshipClients"></tbody>
+            <tfoot>
+                <tr>
+                    <td></td>
+                    <td class="padding-left0">
+                        <div class="clearx2"></div>
+                        <a class="add-net" id="linkAddRelation" data-bind="events: {click: addRelation}, visible: activity.isAddRelationship">Relationship hinzufügen</a>
+                    </td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+        <div class="clear"></div>
+
+        <label class="popup-lable" id="lblStatusProtocol">Statusprotokoll</label>
+        <table class="tbgrid modal-table modal-mass-tb-status">
+            <thead>
+                <tr>
+                    <th class="title bg-grey" width="125px" id="lblDateStatus">Datum</th>
+                    <th class="title bg-grey" width="125px" id="lblStatus">Status</th>
+                    <th class="title bg-grey" width="320px" id="lblComment">Bemerkung</th>
+                    <th class="title bg-grey" width="238px"></th>
+                </tr>
+            </thead>
+            <tbody id="source-status" data-template="temp-status" data-bind="source: activity.CrmStatusProtocolClients"></tbody>
+        </table>
+        <div class="modal-mass-iconplus">
+            <button id="btnaddstatus" type="button" class="ms-button" data-bind="events:{click: addStatus}"><span class="icon-16 icon-right-block icon-plus"></span><span id="lblAddStatus">Status hinzufugen</span></button>
+        </div>
+
+    </div>
+    <div class="modal-market-footer">
+        <button type="button" class="ms-button" data-bind="events:{click: update}" id="btnClose"><span class="icon-16 icon-close"></span><span id="lblClose">Speichern und schliessen</span></button>
+        <span class="pull-right foot-last-change" data-bind="text: activity.LastChange"></span>
+    </div>
+</div>
+
+<script id="temp-relation" type="text/html">
+    <tr class="td-hover itemRelation" data-categoryid="#:CategoryId#" data-crmid="#:CrmId#"
+         data-bind="visible: IsVisible, events:{change: onChange}">
+        <td >
+            <div style="width: 190px">
+                <span class="icon-16  icon-arow-towway-vertical"></span>
+                <select class="crm-drop pull-left"
+                        data-role="dropdownlist"
+                        data-text-field="Name"
+                        data-value-field="Id"
+                        data-bind="value: CategoryId, source: relationSrc, events: {change: changeAutoSource}"></select>
+            </div>
+        </td>
+        <td class="padding-left0">
+            <div class="autosearch" data-bind="attr: {IsDefault: IsDefault }" style="width: 196px">
+                <input class="input-search"
+                       data-placeholder=" "
+                       data-value-primitive="false"
+                       data-role="autocomplete"
+                       data-auto-bind="true"
+                       data-text-field="Name"
+                       data-value-field="Id"
+                       data-filter="contains"
+                       data-bind="value: TempName, source: src, events: { select: autoRelation}"/>
+                <span class="iconsearch"></span>
+            </div>
+        </td>
+        <td id="tdRolle" >
+            <div style="width: 205px">
+                <select class="crm-drop pull-left"
+                        data-role="dropdownlist"
+                        data-text-field="Name"
+                        data-value-field="Id"
+                        data-bind="value: RoleId, source: roleSrc, events: {change: onChangeRoll}"></select>
+
+                <span id="btnRemoveRelation" class="icon-16 icon-remove-blue remove-item pull-right" data-bind="events:{click: removeRelation}"></span>
+            </div>
+        </td>
+        <td></td>
+    </tr>
+
+</script>
+
+<script id="temp-status" type="text/html">
+    <tr>
+        <td>
+            <div class="input-append date">
+                <input data-role="datepicker" data-bind="value: Date"/>
+            </div>
+        </td>
+        <td>
+            <select class="crm-drop pull-left"
+                    data-option-label=" "
+                    data-value-primitive="true"
+                    data-role="dropdownlist"
+                    data-text-field="Name"
+                    data-value-field="Id"
+                    data-bind="value: StatusId, source: statusSrc, events:{ change: onChangeStatus }, disabled: IsUsed"></select>
+        </td>
+        <td style="position: relative;">
+            <div class="texteditor-status-box" >
+                <div class="dnbTextAreaEditor dnbStatusTextEditor" data-bind="attr: {data-status-crm-id: Id }">
+                    <textarea rows="1" class="modal-textarea" data-value-update="keyup"
+                              data-role="editor" data-tools="[]"
+                              data-bind="value: Description,
+                                        events: {
+                                            keyup: onKeyUpChangeStatusEditor,
+                                            paste: onKeyUpChangeStatusEditor,
+                                            change: onChangeStatusEditor
+                                        }">
+                            </textarea>
+                </div>
+                <span class="icon-16 iv-icexpand-texteditor"
+                      data-bind="events: {click: onExpandStatusPopup}"> </span>
+            </div>
+            <div id="staticNotification#:Id#"></div>
+            <div class="tpnotification #:IsCheck?'tpextend':''#" style="position:absolute;" id="tp#:Id#"></div>
+        </td>
+        <td class="td-bin td-v-align-middle" style="padding: 5px !important; position: relative;">
+            <table class="tblcontrol">
+                <tbody>
+                <tr>
+                    <td type="email">
+                        <span class="icon-32 pointer" style="float: left;" 
+                              data-bind="events: {click: onManualSend}, visible: IsManualSend, css:{icon-m: IsSend != true, icon-m-old: IsSend}" id="spid#:Id#"></span>
+                        <span class="icon-32 icon-timepoint pointer showtimepoint" style="float: left;" 
+                              data-bind="events:{click : onShowTimePoint},visible: IsAutoSend" spid="#:Id#"></span>
+                    </td>
+                    <td type="template">
+                        <span class="icon-32 icon-statuslink pointer" style="float: left;" data-bind="events: {click: getStatusLink}, visible: IsVisible"></span>
+                        <span class="icon-32 icon-statusword pointer" style="float: left;" data-bind="events: {click: getWordFile}, visible: IsVisibleWord"></span>
+                    </td>
+                    <td type="file">
+                        <span id="btnActSatusFileOrFolder" data-value-field="Id" data-bind="events: {click: addFileAssigned},
+                        css: {icon-32: isIcon32, icon-assignedfile-circle: StatusHasFileAssgined, icon-folder-circle: StatusHasFileAssgined != true}"></span>
+                    </td>
+                    <td type="control">
+                        <span id="btnRemoveStatus" class="icon-32 icon-bin pointer" style="float: left;" data-bind="events: {click: removeStatus}"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            
+            <table style="width: 100%" data-bind="visible: IsShowCheck">
+                <tr>
+                    <td style="height: 23px;width: 10px;padding: 0 !important;border: none;padding-top: 2px !important;"><div class="pull-left" style="margin-right: 4px;">
+                        <input type="checkbox" data-bind="checked: IsCheck, events:{change: onChangeStatus}" /></div></td>
+                    <td style="height: 23px;padding: 0 !important;border: none;padding-top: 4px !important;">
+                        <div class="pull-left" style="width: 100px;margin-right: 4px;white-space: nowrap;overflow: hidden;padding-top: 1px;">
+                        <label data-bind="text: NameCheck"></label></div></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</script> 
+
+<script id="frametemp" type="text/html">
+    <div class="modal-body ms-modal-body" style="height: 100%">
+        <form style="height: 100%">
+            <iframe id="qframe" src="#:data#" style="width: 100%; height: 100% !important"></iframe>
+        </form>
+    </div>
+</script>
+
+<script src="../Scripts/jquery.multiple.selectwithicon.js"></script>
+
+<script type="text/javascript">
+    var actViewModel = undefined, statusId = -1, isChangePosition = false, maxIndex = 0,
+        isProcessing = false;
+    vmEditAct.isModified = false, isReloadForm = false,
+    relationRemoved = [];
+    var itemIsValid = true;
+    vmEditAct.sdate = true;
+    vmEditAct.edate = true;
+    vmEditAct.stime = true;
+    vmEditAct.etime = true;
+    vmEditAct.theActivity = {};
+    var listIdSelectedPerson = [];
+    var listIdSelectedOrg = [];
+    var statusTimeout, isAddNew = true;
+    
+    vmEditAct.popSelectGoal = undefined;
+    vmEditAct.openPopSelectGoal = function () {
+        vmEditAct.popSelectGoal = undefined;
+
+        var options = { height: 500, width: 650 };
+        vmEditAct.popSelectGoal = showPopup(vmEditAct.popSelectGoal, $("#popselectgoal"),
+            "/Contents/MsPopSelectGoal.html",
+            {
+                title: kLg.titleSelectSubGoal,
+                height: options.height,
+                width: options.width,
+                resizable: false
+            });
+    };
+
+    vmEditAct.popFrame = undefined;
+    vmEditAct.openPopFrame = function (data) {
+        vmEditAct.popFrame = undefined;
+        var template = kendo.template($("#frametemp").html());
+        $("#popframe").html(template(data.Status.Link));
+        
+        vmEditAct.popFrame = $("#popframe").kendoWindow({
+            actions: [
+                "Maximize",
+                "Close"
+            ],
+            modal: true,
+            title: "",
+            height: $(window).height() - 40,
+            width: $(window).width() * 0.96,
+            scrollable: false,
+            resizable: false,
+            activate: function () { $('body').css('overflow-y', 'hidden'); },
+            close: function (e) {
+                $('body').css('overflow-y', '');
+                var percent = sessionStorage.getItem("percent");
+                var isClickFinish = sessionStorage.getItem("isclickfinish");
+                if ((percent && percent >= 90) || isClickFinish) {
+                    //change status file icon
+                    var statusIcon = $(data.Element).closest("tr").children("td[type='file']").find("span");
+
+                    $(statusIcon).removeClass("icon-folder-circle");
+                    $(statusIcon).addClass("icon-assignedfile-circle");
+
+                    //change activity file icon
+                    if (data.Status.IsAllowPdfActivities) {
+                        var actIcon = $("#pop-edit-crm_wnd_title").next("div.k-window-actions").find("#iconEmpty");
+
+                        $(actIcon).removeClass("icon-folder-white");
+                        $(actIcon).addClass("icon-folder-full-white");
+                    }
+                }
+                sessionStorage.removeItem("percent");
+                sessionStorage.removeItem("isclickfinish");
+
+                vmEditAct.popFrame.destroy();
+                vmEditAct.popFrame = null;
+                $("#pop-edit-crm").after("<div id='popframe'></div>");
+            }
+        });
+
+        vmEditAct.popFrame = $("#popframe").data("kendoWindow");
+
+        vmEditAct.popFrame.center().open();
+    };
+
+    vmCrmEnum.ActivityListType = [
+        { Id: 1, Name: kLg.textPerson },
+        { Id: 2, Name: kLg.textOrganisation }
+    ];
+
+    vmEditAct.popEditActivity.bind("close", function (e) {
+        vmEditAct.resetData();
+
+        if (vmEditAct.isModified) {
+            if (confirm(kLg.saveConfirmQuestion)) {
+                if (vmEditAct.validForm() && itemIsValid && isValidStatus() && isValdRelationship() && vmEditAct.sdate && vmEditAct.edate && vmEditAct.stime && vmEditAct.etime && validSubGoal()) {
+                    actViewModel.update(e);
+                    
+                    vmFile.setOffMenuIcon();
+                    vmCommon.PopupInstance.close("activity");
+                } else {
+                    e.preventDefault();
+                }
+            } else {
+                if (isAddNew) {
+                    vmFile.dataservice.deleteCrm({ id: vmEditAct.actOptions.activity.Id, type: vmCrmEnum.SettingType.Activities }, function(res) {
+                        if (isReloadForm) {
+                            vmCrmFilterControl.reloadfilter(vmEditAct.actOptions.activity.Id, vmCrmEnum.SettingType.Activities);
+                        }
+                    });
+                } else if (isReloadForm) {
+                        vmCrmFilterControl.reloadfilter(vmEditAct.actOptions.activity.Id, vmCrmEnum.SettingType.Activities);
+                }
+
+                vmEditAct.destroyPop();
+            }
+        } else {
+            if (isAddNew) {
+                vmFile.dataservice.deleteCrm({ id: vmEditAct.actOptions.activity.Id, type: vmCrmEnum.SettingType.Activities }, function(res) {
+                    if (isReloadForm) {
+                        vmCrmFilterControl.reloadfilter(vmEditAct.actOptions.activity.Id, vmCrmEnum.SettingType.Activities);
+                    }
+                });
+            }
+            else {
+                vmCrmFilterControl.reloadfilter(vmEditAct.actOptions.activity.Id, vmCrmEnum.SettingType.Activities);
+            }
+
+            vmEditAct.destroyPop();
+        }
+    });
+
+    vmEditAct.destroyPop = function () {
+        if (vmEditAct.popEditActivity) {
+            vmEditAct.popEditActivity.destroy();
+            vmEditAct.popEditActivity = null;
+        }
+        $('.body-content').after('<div id="pop-edit-crm"></div>');
+        vmFile.setOffMenuIcon();
+        vmCommon.PopupInstance.close("activity");
+    };
+
+    vmEditAct.getStatusCate = function (listActivityCate) {
+        var listStatusCat = [];
+
+        var catStatus = vmEditAct.Cate[vmCrmEnum.ActivitieSetting.Status];
+        for (var i = 0; i < catStatus.length; i++) {
+            if ($.grep(listActivityCate, function (it) { return it.CategoryId == catStatus[i].ParentId; }).length > 0) {
+                listStatusCat.push(catStatus[i]);
+            }
+        }
+        return listStatusCat;
+    };
+    vmEditAct.getChangeStatusCate = function (listActivityCate) {
+        var listStatusCat = [];
+        var catStatus = vmEditAct.Cate[vmCrmEnum.ActivitieSetting.Status];
+        for (var i = 0; i < catStatus.length; i++) {
+            if ($.grep(listActivityCate, function (it) { return it.Id == catStatus[i].ParentId; }).length > 0) {
+                listStatusCat.push(catStatus[i]);
+            }
+        }
+        return listStatusCat;
+    };
+
+    vmEditAct.getDisableCategory = function () {
+        var cats = vmEditAct.Cate[vmCrmEnum.ActivitieSetting.Status];
+        var status = actViewModel.activity.CrmStatusProtocolClients;
+
+        var statusIsUseds = $.grep(status, function (it) { return it.IsUsed; });
+        if (statusIsUseds.length === 0) return [];
+
+        var parentIds = [];
+        for (var i = 0; i < statusIsUseds.length; i++) {
+            var cat = vmCommon.findById(statusIsUseds[i].StatusId, cats);
+            if (cat && parentIds.indexOf(cat.ParentId) === -1) {
+                parentIds.push(cat.ParentId);
+            }
+        }
+
+        return parentIds;
+    };
+
+    vmEditAct.getChangeListStatus = function (listStatusCat, listStatus) {
+        for (var i = 0; i < listStatus.length; i++) {
+            if (listStatusCat.length === 0) {
+                
+            } else {
+                if ($.grep(listStatusCat, function (it) { return it.Id == listStatus[i].StatusId; }).length === 0) {
+                    
+                }
+            }
+        }
+
+        return listStatus;
+    };
+
+    var fromCrm;
+    var srcIndex = 0, desIndex = 0;
+    vmEditAct.bindSortTable = function (el) {
+        $(el).sortable({
+            axis: "y",
+            items: "tr",
+            
+            helper: "clone",
+            cursor: "n-resize",
+            revert: false,
+            opacity: 0.8,
+            zIndex: 1000000,
+            tolerance: "pointer",
+            containment: $(el),
+            start: function (event, ui) {
+                srcIndex = ui.item.index();
+            },
+            stop: function (event, ui) {
+                desIndex = ui.item.index();
+                var lst = vmCommon.deepCopy(actViewModel.activity.CrmActivityRelationshipClients);
+
+                var temp = lst.splice(srcIndex, 1);
+                lst.splice(desIndex, 0, temp[0]);
+
+                isChangePosition = true;
+
+                var temps = vmCommon.selectProperty(lst, "Id");
+
+                if (temps != null && temps.length > 0) {
+                    vmEditAct.dataservice.updateRelationIndex({ ids: temps.join(), CrmActivityId: actViewModel.activity.Id }, function (res) { });
+                }
+
+                for (var i = 0; i < lst.length; i++) {
+                    lst[i].MIndex = ++i;
+                }
+
+                actViewModel.activity.set("CrmActivityRelationshipClients", lst);
+            }
+        });
+    };
+
+    vmEditAct.setStatusEditorYScroll = function () {
+        var bodyTxtEditor;
+        $(`.dnbTextAreaEditor.dnbStatusTextEditor > table.k-editor .k-editable-area`).find('textarea').each(function () {
+            bodyTxtEditor = $(this).data('kendoEditor').body;
+            $(bodyTxtEditor).css({ 'overflow-y': 'scroll' });
+        });
+    };
+    
+    $(function () {
+        vmFile.assginedIcon("pop-edit-crm", vmEditAct.popEditActivity)  // Khách hàng không muốn export trong form edit => KH lại muốn (siêu dự đoán)
+            .then(function () {                                       // Nhưng nên giữ lại để lần sau có thể KH muốn (vì export luôn trong form cũng tiện mà)
+            // add icon exportActivityDocx
+            $("#pop-edit-crm_wnd_title").next().prepend(`<a role="button" href="javascript:void(0);" id="popupExportActivityDocx" class="icon-open-file" tabindex="2">
+                 <span role="presentation" class="icon-24 icon-left-block icon-export" style="width: 18px;background-position-y: -608px !important;"></span></a>`);
+            $('#popupExportActivityDocx').click(function exportActivityDocx(e) {
+                if (!!actViewModel) {
+                    actViewModel.updateThenExport();
+                }
+            });
+
+            // add icon duplicateActivityCrm
+            $("#pop-edit-crm_wnd_title").next().prepend(`<a role="button" href="javascript:void(0);" id="popupDuplicateActivityCrm" class="icon-open-file" tabindex="2">
+                <span role="presentation" class="icon-24 icon-left-block icon-copy-white" style="background-position-y: -153px;"></span></a>`);
+            $('#popupDuplicateActivityCrm').click(function (e) {
+                if (!!actViewModel) {
+                    actViewModel.updateThenDuplicate();
+                }
+            });
+        });
+        var i, oldAcc = [];
+        var oldCat = [];
+        if (vmEditAct.actOptions.IsEdit) isAddNew = false;
+
+        vmEditAct.theActivity = vmEditAct.actOptions.activity;
+        vmEditAct.actOptions.IsEdit = true;
+
+        if (vmEditAct.theActivity.ModifiedDate) {
+            vmEditAct.theActivity.LastChange = kLg.LastChange + ": " + kendo.toString(vmEditAct.theActivity.ModifiedDate.jsonToDate(), "d") + " " + vmEditAct.theActivity.ModifiedName;
+        }
+
+        var accs = vmEditAct.actOptions.Accounts;
+        for (i = 0; i < accs.length; i++) {
+            if ($.grep(vmEditAct.theActivity.CrmActivityPersons, function (it) { return it.AccountId == accs[i].Id; }).length > 0) {
+                oldAcc.push(accs[i]);
+            }
+        }
+
+        var cats = vmEditAct.Cate[1];
+        for (i = 0; i < cats.length; i++) {
+            if ($.grep(vmEditAct.theActivity.CrmActivityCategories, function (it) { return it.CategoryId == cats[i].Id; }).length > 0) {
+                oldCat.push(cats[i]);
+            }
+        }
+
+        if (vmEditAct.theActivity.CrmStatusProtocolClients.length > 0) {
+            for (i = 0; i < vmEditAct.theActivity.CrmStatusProtocolClients.length; i++) {
+                
+                vmEditAct.theActivity.CrmStatusProtocolClients[i].ClassName = vmEditAct.theActivity.CrmStatusProtocolClients[i].Files.length > 0 ? "icon-32 icon-assignedfile-circle" : "icon-32 icon-folder-circle";
+            }
+        }
+
+        if (vmEditAct.theActivity.CrmActivityRelationshipClients.length > 0) {
+            for (i = 0; i < vmEditAct.theActivity.CrmActivityRelationshipClients.length; i++) {
+                var item = vmEditAct.theActivity.CrmActivityRelationshipClients[i];
+                item.TempName = item.CrmName;
+                item.DataState = dataState.Unchanged;
+                item.IsVisible = true;
+                item.src = item.TypeId === 1 ? vmEditAct.actOptions.proPerson : vmEditAct.actOptions.proOrg;
+            }
+        }
+
+        vmEditAct.theActivity.isAddRelationship = vmEditAct.theActivity.CrmActivityRelationshipClients.length >= 5 ? false : true;
+        //
+        kendo.data.binders.widget.blur = kendo.data.Binder.extend({
+            init: function (element, bindings, options) {
+                kendo.data.Binder.fn.init.call(this, element, bindings, options);
+                var binding = this.bindings.blur;
+                $(element.input).bind("blur", function () { binding.get(); });
+            },
+            refresh: function () { }
+        });
+
+        kendo.data.binders.widget.keyPress = kendo.data.Binder.extend({
+            init: function (element, bindings, options) {
+                kendo.data.Binder.fn.init.call(this, element, bindings, options);
+                var binding = this.bindings.keyPress;
+                $(element.input).bind("keypress", function () { binding.get(); });
+            },
+            refresh: function () { }
+        });
+
+        var roleSrc = vmEditAct.Cate[vmCrmEnum.ActivitieSetting.Rolle];
+
+        var subGoals = vmEditAct.actOptions.SubGoals;
+        
+        roleSrc.unshift({ Extension: null, Id: 0, Name: " ", Type: 12 });
+        maxIndex = vmEditAct.theActivity.CrmActivityRelationshipClients && vmEditAct.theActivity.CrmActivityRelationshipClients.length > 0 ? vmEditAct.theActivity.CrmActivityRelationshipClients.last().MIndex : 0;
+        function getCreatedDate(activity) {
+            var createDate = activity.CreatedDate;
+            if (Object.prototype.toString.call(createDate) === "[object Date]")
+                return createDate;
+
+            if (createDate && typeof createDate == 'string') {
+                if (createDate.includes('-')) {
+                    activity.CreatedDate = new Date();
+                    return activity.CreatedDate;
+                } else {
+                    return createDate.jsonToDate();
+                }
+            }
+            activity.CreatedDate = new Date();
+            return activity.CreatedDate;
+        }
+        vmEditAct.theActivity.ActionClass = "goal-truncate " + (vmEditAct.theActivity.ActionId ? "ms-link" : "ms-unlink");
+        actViewModel = kendo.observable({
+            activity: vmEditAct.theActivity,            
+            cateSrc: vmEditAct.Cate[vmCrmEnum.ActivitieSetting.Category],
+            prioritySrc: vmEditAct.Cate[vmCrmEnum.ActivitieSetting.Priority],
+            statusSrc: vmEditAct.getStatusCate(vmEditAct.theActivity.CrmActivityCategories),
+            roleSrc: roleSrc,
+            isIcon32: true,
+            relationSrc: vmCrmEnum.ActivityListType,
+            accountSrc: vmEditAct.actOptions.Accounts,
+            oldAcc: oldAcc,
+            oldCat: oldCat,
+            multiSelectFiltering: function (e) {
+                var filter = e.filter;
+                if (filter) {
+                    filter.value = filter.value.replace(/\s\s+/g, ' ');
+                    if (filter.value.indexOf(' ') == 0) {
+                        filter.value = filter.value.slice(1);
+                    };
+                    e.sender.input.val(filter.value);
+                };
+
+            },
+            checkEndDate: function() {
+                if (vmEditAct.theActivity.CrmActivityPersons.length === 0 || vmEditAct.theActivity.Finish) {
+                    return false;
+                }
+
+                if (vmEditAct.theActivity.DueDate === undefined || vmEditAct.theActivity.DueDate === null) {
+                    return false;
+                } else {
+                    var d = new Date();
+                    var duadate;
+                    if (typeof vmEditAct.theActivity.DueDate === "string") {
+                        duadate = vmEditAct.theActivity.DueDate.jsonToDate();
+                    } else {
+                        duadate = vmEditAct.theActivity.DueDate;
+                    }
+                    if (!compareDate(d, duadate) || equalDate(d, duadate)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            },
+            openReminder: function(e) {
+                vmEditAct.openPopReminder(e, vmCommon.EnumTypeReminder.Activity);
+            },
+            autoCheckReminder: function (e) {
+                var listAcc = vmCommon.deepCopy(this.get("oldAcc")).sort(SortByLastName);
+                this.set("oldAcc", listAcc);
+
+                if (this.oldAcc.length > 0 && !this.activity.Finish && this.activity.DueDate !== null) {
+                    vmEditAct.showHideReminder('block');
+                } else {
+                    vmEditAct.showHideReminder('none');
+                }
+                return true;
+            },
+            setGoalActionOutlook: function (e) {
+                var listEmail = "";
+                var activityOutlook = actViewModel.activity;
+                for (var i = 0; i < actViewModel.oldAcc.length; i++) {
+                    if (i === actViewModel.oldAcc.length - 1) {
+                        listEmail += actViewModel.oldAcc[i].Email;
+                    } else {
+                        listEmail += actViewModel.oldAcc[i].Email + "; ";
+                    }
+                }
+                var name = activityOutlook.Name ? activityOutlook.Name : " ";
+                name = name.replaceAll("&", "%26");
+                var des = activityOutlook.Note ? activityOutlook.Note : "";
+
+                if (vmEditAct.actOptions.Url === undefined) {
+                    vmEditAct.actOptions.Url = "";
+                }
+
+                var body = des + " \n " + vmEditAct.actOptions.Url;
+
+                $('a.assignInfo').removeAttr("href");
+                if (des === "" && vmEditAct.actOptions.Url === "") {
+                    $('a.assignInfo').attr("href", "mailto:" + listEmail + "?Subject=" + name);
+                } else {
+                    $('a.assignInfo').attr("href", "mailto:" + listEmail + "?Subject=" + name + "&Body=" + encodeURIComponent(body));
+                }
+
+                $('a.assignInfo').attr("target", "_top");
+            },
+            visibleSelectGoal: vmEditAct.theActivity.SubGoalId == null ? true : false,
+            redirectSubGoal: function () {
+                if (!this.activity.ActionId || !this.activity.SubPath) return;
+
+                var strategyId = strategies[1];
+                var actionId = this.activity.ActionId;
+                var url = "../Handlers/MsGoalAction.ashx?funcName=getMixShortDetail" + "&projid=" + projectId + "&strid=" + strategyId;
+                callAjaxPostGet('divloading', url, null, { id: actionId, type: 3 }, function (serData) {
+                    if (serData.value.Role < 0) {
+                        window.location = "/Default.aspx?lang=" + kLg.language;
+                        return;
+                    }
+
+                    var data = serData.value.Data;
+                    if (data) {
+                        url = '/Pages/MsGoalAction.aspx?lang=' + kLg.language + '&projid=' + projectId + '&strid=' + strategyId + '&actpopup=' + data.ActpopupEncode;
+                        url += '&fromcrm=true';
+
+                        window.open(url, "_blank");
+                    }
+                });
+                
+            },
+            isCancel: false,
+            deleteCateId: null,
+            deselectCategories: function(e) {
+                
+                var item = e.dataItem;
+                var disableLst = vmEditAct.getDisableCategory();
+
+                if (disableLst.indexOf(item.Id) >= 0) {
+                    this.set("isCancel", true);
+                    var index = actViewModel.oldCat.indexOf(item);
+
+                    setTimeout(function() {
+                        actViewModel.oldCat.splice(index, 0, item);
+                    }, 0);
+                } else {
+                    this.set("deleteCateId", item.Id);
+                }
+            },
+            onChangeCategories: function() {
+
+                if (!this.isCancel) {
+                    var cats = vmEditAct.getChangeStatusCate(actViewModel.get("oldCat"));
+
+                    actViewModel.set("statusSrc", cats);
+                    var listStatus = vmEditAct.getChangeListStatus(cats, this.activity.CrmStatusProtocolClients);
+
+                    if (this.deleteCateId) {
+                        var childIds = [], parentId = this.deleteCateId;
+                        var tempCats = vmEditAct.Cate[vmCrmEnum.ActivitieSetting.Status];
+
+                        for (var i = 0; i < tempCats.length; i++) {
+                            if (tempCats[i].ParentId !== parentId) continue;
+                            childIds.push(tempCats[i].Id);
+                        }
+
+                        var statusIds = [];
+                        for (var i = 0; i < listStatus.length; i++) {
+
+                            if (childIds.indexOf(listStatus[i].StatusId) === -1) continue;
+
+                            statusIds.push(listStatus[i].StatusId);
+
+                            listStatus[i].set("StatusId", null);
+                            listStatus[i].set("FirstStatusId", null);
+                            listStatus[i].set("Link", null);
+                            listStatus[i].set("IsVisible", false);
+                            listStatus[i].set("CrowdProjectId", null);
+                            listStatus[i].set("CrmPersonId", null);
+                            listStatus[i].set("IsVisibleWord", null);
+                            listStatus[i].set("IsShowCheck", false);
+                        }
+
+                        vmEditAct.dataservice.deleteCategory({ activityId: this.activity.Id, CategoryId: parentId, StatusIds: statusIds.join() }, function() {});
+                        this.set("deleteCateId", null);
+                    }
+
+                    actViewModel.activity.set("CrmStatusProtocolClients", listStatus);
+                }
+
+                this.set("isCancel", false);
+            },
+            selectCategories: function(e) {
+                vmEditAct.dataservice.addCategory({ activityId: this.activity.Id, CategoryId: e.dataItem.Id}, function () { });
+            },
+            removeGoal: function () {
+                function removeSubGoal() {
+
+                    var entryData = { activityId: actViewModel.activity.Id, actionId: actViewModel.activity.ActionId, mdf: actViewModel.activity.Mdf, isDeleteAction: actViewModel.activity.IsDeleteAction };
+                    vmEditAct.dataservice.deleteActionLink(entryData, function (res) {
+                        
+                        var rs = res.value;
+                        if (rs === -1) {
+                            //todo: conflict
+                        } else {
+                            actViewModel.set("visibleSelectGoal", true);
+                            actViewModel.activity.set("FisrtSubGoalId", null);
+                            actViewModel.activity.set("SubGoalId", null);
+                            actViewModel.activity.set("SubGoalName", "");
+                            actViewModel.activity.set("SubPath", "");
+                            actViewModel.activity.set("Mdf", entryData.mdf + 1);
+
+                            actViewModel.activity.set("IsDeleteAction", null);
+                            actViewModel.activity.set("ActionClass", "goal-truncate ms-unlink");
+                        }
+                    }); 
+                }
+
+                pConfirm(kLg.msgRemoveSubGoalLink).then(
+                    function () {
+                        if (actViewModel.activity.IsDeleteAction == null) {
+                            actViewModel.activity.set("IsDeleteAction", true);
+                        }
+
+                        removeSubGoal();
+                    },
+                    function () {
+                        if (actViewModel.activity.IsDeleteAction == null) {
+                            actViewModel.activity.set("IsDeleteAction", false);
+                        }
+
+                        removeSubGoal();
+                    }
+                );
+
+            },
+            selectGoal: function (e) {
+                var actName = this.activity.Name;
+                if (!this.activity.StartDate || !actName || actName.trim().length === 0) {
+                    ShowToolTip2($(e.target), kLg.msgRequiredAddLink, "right");
+
+                    setTimeout(function () {
+                        $(e.target).tooltip("destroy");
+                    }, 2000);
+
+                    return;
+                }
+
+                vmEditAct.optGoal = { SubGoals: subGoals, actModel: actViewModel };
+                vmEditAct.openPopSelectGoal();
+            },
+            addRelation: function (e) {
+                if (this.activity.CrmActivityRelationshipClients.length < 5) {
+                    this.activity.CrmActivityRelationshipClients.push({
+                        Id: 0, CrmId: 0, TempName: '', CrmName: '', TypeId: 1, CategoryId: 1, DataState: dataState.Added, IsVisible: true,
+                        src: vmEditAct.GetFilterSource(vmEditAct.actOptions.proPerson), RoleId: 0, MIndex: ++maxIndex, CrmActivityId: this.activity.Id
+                    });
+                }
+                if (this.activity.CrmActivityRelationshipClients.length === 5) {
+                    this.activity.set("isAddRelationship", false);
+                }
+                vmEditAct.AdjustPopupHeight();
+                vmCommon.resetTabIndex('edit-form-activity');
+            },
+            addStatus: function () {
+
+                vmEditAct.dataservice.getNewStatusId({ CrmActivityId: this.activity.Id }, function(res) {
+                    var newId = res.value;
+                    actViewModel.activity.CrmStatusProtocolClients.unshift(
+                        {
+                            Id: newId,
+                            Date: new Date(),
+                            StatusId: null,
+                            FirstStatusId: null,
+                            Description: "",
+                            DataState: dataState.Unchanged,
+                            IsVisible: false,
+                            Files: [],
+                            HasFile: false,
+                            ClassName: "icon-32 icon-folder-circle",
+                            Link: "",
+                            Mdf: 0,
+                            IsUsed: false,
+                            IsVisibleWord: false,
+                            WordTemplateId: null,
+                            CrmPersonId: null,
+                            CrowdProjectId: null,
+                            IsCheck: false,
+                            NameCheck: "",
+                            IsShowCheck: false,
+                            IsManualSend: false,
+                            IsAutoSend: false,
+                            IsUserSoftware: false,
+                            QDay: null,
+                            QTime: null,
+                            IsSend: false,
+                            IsAllowPdfActivities: false,
+                            IsOpenQuestion: false
+                        }
+                    );
+                    vmEditAct.AdjustPopupHeight();
+                    $('#source-status input[data-role=datepicker]').kendoDatePicker({
+                        weekNumber: true
+                    });
+                    $('#source-status div.input-append.date').attr('style', 'width: 135px');
+                    $('span.k-widget.k-datepicker.k-header').removeClass('k-input');
+                    vmCommon.resetTabIndex('edit-form-activity');
+                    vmEditAct.setStatusEditorYScroll();
+                });
+
+            },
+            removeStatus: function (e) {
+                var list = this.activity.CrmStatusProtocolClients;
+                var index = list.indexOf(e.data);
+                list.splice(index, 1);
+                vmEditAct.AdjustPopupHeight();
+
+                vmEditAct.dataservice.deleteStatus({ Ids: [e.data.Id].join(), crmActivityId: this.activity.Id }, function (res) { });
+            },
+            onChangeStatus: function (e) {
+                var list = this.activity.CrmStatusProtocolClients;
+                this.updateStatus(list.indexOf(e.data));
+            },
+            updateStatus: function(index) {
+                var list = this.activity.CrmStatusProtocolClients;
+                var status = list[index];
+                status.CrmActivityId = this.activity.Id;
+                status.Date = changeHourOfDate(status.Date);
+                isReloadForm = true;
+
+                vmEditAct.dataservice.updateStatus(status, function (res) {
+
+                    var state = res.value.ResultStatus;
+                    var newStatus = res.value.TheObject;
+
+                    if (state === -2) {
+                        //todo: status is used
+                        alert("is used");
+                        return;
+                    } else if (state === -1) {
+                        //todo: conflict
+                        alert("conflict");
+                        return;
+                    }
+
+                    //status = newStatus;
+                    status.set("CrmFragensetId", newStatus.CrmFragensetId);
+                    status.set("CrmPersonId", newStatus.CrmPersonId);
+                    status.set("Link", newStatus.Link);
+                    status.set("CrowdProjectId", newStatus.CrowdProjectId);
+                    status.set("Mdf", newStatus.Mdf);
+                    status.set("IsVisible", newStatus.IsVisible);
+                    status.set("IsUsed", newStatus.IsUsed);
+                    status.set("FirstStatusId", newStatus.FirstStatusId);
+                    status.set("StatusId", newStatus.StatusId);
+                    status.set("Date", newStatus.Date);
+                    status.set("Description", newStatus.Description);
+                    status.set("WordTemplateId", newStatus.WordTemplateId);
+                    status.set("IsVisibleWord", newStatus.IsVisibleWord);
+
+                    status.set("IsCheck", newStatus.IsCheck);
+                    status.set("NameCheck", newStatus.NameCheck);
+                    status.set("IsShowCheck", newStatus.IsShowCheck);
+
+                    status.set("IsManualSend", newStatus.IsManualSend);
+                    status.set("IsAutoSend", newStatus.IsAutoSend);
+                    status.set("IsUserSoftware", newStatus.IsUserSoftware);
+                    status.set("QDay", newStatus.QDay);
+                    status.set("QTime", newStatus.QTime);
+
+                    status.set("IsSend", newStatus.IsSend);
+                    status.set("IsOpenQuestion", newStatus.IsOpenQuestion);
+                    status.set("IsAllowPdfActivities", newStatus.IsAllowPdfActivities);
+
+                    //fix
+                    var mailElement = $("#spid" + status.Id);
+                    if ($(mailElement).is(":visible")) {
+
+                        if (status.IsSend) {
+                            $(mailElement).removeClass("icon-m");
+                            $(mailElement).addClass("icon-m-old");
+                        } else {
+                            $(mailElement).removeClass("icon-m-old");
+                            $(mailElement).addClass("icon-m");
+                        }
+
+                    }
+                    
+                });
+            },
+            onManualSend: function (e) {
+                var item = e.data;
+
+                if (item.IsSend) {
+                    //TODO: redirect to crowdprojectview
+                    if (item.CrowdProjectId != null && item.CrowdProjectId > 0) {
+                        window.open("/Pages/CrmCrowdProjectView.aspx?lang=" + language + "&projid=" + projectId + "&strid=" + strategyId + "&cpid=" + item.CrowdProjectId, "_blank");
+                    }
+                    
+                } else {
+                    //send email
+                    item.set("IsSend", true);
+                    vmEditAct.dataservice.manualSendEmail({ StatusProtocolId: item.Id }, function (res) {
+                        if (res.value == 1) {
+                            
+                        }
+                        else if (res.value == -3) {
+                            item.set("IsSend", false);
+                            pAlert(kLg.msgReportUserSoftwareNotCompleted100Percent);
+                        }
+                        else {
+                            //TODO: refresh page
+                        }
+                    });
+                }
+
+            },
+            onShowTimePoint: function (e) {
+                var item = e.data;
+
+                if (this.activity.DueDate == null || !item.IsAutoSend || item.QDay == null || item.QTime == null) return;
+
+                var duedate;
+                if (typeof actViewModel.activity.DueDate === "string") {
+                    duedate = actViewModel.activity.DueDate.jsonToDate();
+                } else {
+                    duedate = new Date(actViewModel.activity.DueDate);
+                }
+
+                duedate.addDays(-item.QDay);
+
+                var content = kendo.toString(duedate, "d") + " " + kendo.toString(item.QTime, "t");
+                var staticNotification = $("#staticNotification" + item.Id).data("kendoNotification");
+                if (staticNotification === undefined) {
+                    staticNotification = $("#staticNotification" + item.Id).kendoNotification({
+                        animation: false,
+                        appendTo: "#tp" + item.Id,
+                        autoHideAfter: 2000,
+                        height: 30
+
+                    }).data("kendoNotification");
+                } else {
+                    staticNotification.hide();
+                }
+
+                staticNotification.show(content, "info");
+
+            },
+            getStatusLink: function (e) {
+                vmEditAct.qFrameOptions = {};
+
+                var item = e.data;
+                if (!e.data.Link) {
+
+                    var staticNotification = $("#staticNotification" + item.Id).data("kendoNotification");
+                    if (staticNotification == null || staticNotification == undefined) {
+                        staticNotification = $("#staticNotification" + item.Id).kendoNotification({
+                            animation: false,
+                            appendTo: "#tp" + item.Id,
+                            autoHideAfter: 2000,
+                            height: 30
+
+                        }).data("kendoNotification");
+                    } else {
+                        staticNotification.hide();
+                    }
+
+                    staticNotification.show(kLg.msgStatusNoFragenset, "info");
+
+                    return;
+                }
+
+                if (!e.data.IsUsed) {
+                    e.data.set("IsUsed", true);
+                    vmEditAct.dataservice.openQuestion({ protocolId: e.data.Id }, function () { });
+                }
+
+                vmEditAct.openPopFrame({ Element: e.target, Status: e.data });
+                //vmEditAct.qFrameOptions.Link = e.data.Link;
+                //vmEditAct.qFrameOptions.statusElement = e.target;
+                //window.open(e.data.Link, "_blank");
+            },
+            getWordFile: function (e) {
+                if (e.data.WordTemplateId == null) return;
+
+                this.save(function () {
+                    setTimeout(function () {
+                        vmEditAct.dataservice.getWordFile({ protocolId: e.data.Id }, function (res) {
+                            var state = res.value.ResultStatus;
+                            var fileInfo = res.value.TheObject;
+
+                            if (state === -2) {
+                                //todo: status is used
+                                alert("is used");
+                                return;
+                            } else if (state === -1) {
+                                //todo: conflict
+                                alert("conflict");
+                                return;
+                            }
+
+                            e.data.set("HasAssigned", true); //StatusHasFileAssgined
+                            e.data.set("StatusHasFileAssgined", true);
+                            vmEditAct.isModified = false;
+
+                            vmCommon.GetFileFromUrl("../FileUpload/" + fileInfo.Path, fileInfo.Name);
+                        });
+                    }, 100);
+                    
+
+                });
+            },
+            addFileAssigned: function (e) {
+                var activity = e.data;
+                vmFile.openFileAsignCrm(activity.Id, vmCommon.enumType.CrmStatusProtocol, e.target);
+            },
+            removeRelation: function (e) {
+                
+                if (e.data.Id > 0) {
+                    vmEditAct.dataservice.deleteRelation({ Id: e.data.Id, CrmActivityId: e.data.CrmActivityId, TypeId: e.data.TypeId }, function () { });
+                }
+
+                var index = this.activity.CrmActivityRelationshipClients.indexOf(e.data);
+                this.activity.CrmActivityRelationshipClients.splice(index, 1);
+
+                actViewModel.activity.set("isAddRelationship", true);
+
+                vmEditAct.AdjustPopupHeight();
+                vmCommon.resetTabIndex("edit-form-activity");
+            },
+            removeControl: function (e) {
+                removeControl(e);
+                vmEditAct.AdjustPopupHeight();
+                vmCommon.resetTabIndex('edit-form-activity');
+            },            
+            autoRelation: function (e) {
+                var item = e.sender.dataItem(e.item.index());
+                e.data.set("CrmId", item.Id);
+                e.data.set("CrmName", item.Name);
+                e.sender.element.closest('tr.itemRelation').attr('data-crmid', item.Id);
+                if (e.data.get("Id") > 0) {
+                    e.data.set("DataState", dataState.Modified);
+                }
+                this.saveRelation(e.data);
+            },
+            saveRelation: function (data) {
+                data.ActivityMdf = this.activity.Mdf;
+                vmEditAct.dataservice.saveRelation(data, function (res) {
+                    var state = res.value.ResultStatus;
+                    var relation = res.value.TheObject;
+                    if (state === -1) {
+                        pAlert(kLg.lblConflict);
+                    } else {
+                        data.set("Id", relation.Id);
+                        data.set("Mdf", relation.Mdf);
+                    }
+                });
+            },
+            onChangeRoll: function (e) {                
+                if (e.data.CrmId > 0) {
+                    this.saveRelation(e.data);
+                } 
+            },
+            changeAutoSource: function (e) {
+                e.data.set("TempName", '');
+                e.data.set("TypeId", e.data.CategoryId);
+                e.data.set("CrmId", 0);                
+                e.sender.element.closest('tr.itemRelation').attr('data-categoryid', e.data.CategoryId);
+                if (e.data.get("Id") > 0) {
+                    e.data.set("DataState", dataState.Modified);
+                }
+                switch (e.data.CategoryId) {
+                    case 1:
+                        e.data.set("src", vmEditAct.GetFilterSource(vmEditAct.actOptions.proPerson));
+                        break;
+                    case 2:
+                        e.data.set("src", vmEditAct.GetFilterSource(vmEditAct.actOptions.proOrg));
+                        break;
+                }
+            },
+            onChange: function (e) {
+                if (e.data.Id > 0) {
+                    e.data.set("DataState", dataState.Modified);
+                }
+            },
+            onKeyUpChangeStatusEditor: function (e) {
+                if (!e || !e.target) {
+                    return;
+                }
+
+                var innerHTML = e.target.innerHTML;
+                var dataItem = e.data;
+                dataItem.set("DataState", dataState.Modified);
+                
+                if (dataItem.Description == innerHTML) {
+                    return;
+                }
+                var newValue = vmCommon.getClearAttrNotNeed(innerHTML);
+                
+                vmEditAct.dataservice.updateStatusEditorPopup({
+                    Id: dataItem.Id, Description: newValue
+                }, function (res) {
+                    vmEditAct.isModified = true;
+                });
+                //onChangeStatus(e);
+            },
+            onChangeStatusEditor: function (e) {
+                var dataItem = e.data;
+                var innerHTML = e.sender.body.innerHTML;
+                let innerText = e.sender.body.innerText.trim();
+                let isHasImg = innerHTML.includes('<img ');
+                var newValue = vmCommon.getClearAttrNotNeed(innerHTML);
+                if (innerText == '' && !isHasImg) {
+                    dataItem.set("Description", '');
+                } else {
+                    dataItem.set("Description", newValue);
+                }
+            },
+            onKeyUpChangeNoteEditor: function (e) {
+                vmEditAct.isModified = true;
+            },
+            onChangeNoteEditor: function (e) {
+                var dataItem = e.data.activity;
+                var innerHTML = e.sender.body.innerHTML;
+                let innerText = e.sender.body.innerText.trim();
+                let isHasImg = innerHTML.includes('<img ');
+                var newValue = vmCommon.getClearAttrNotNeed(innerHTML);
+                if (innerText == '' && !isHasImg) {
+                    dataItem.set('Note', '');
+                } else
+                    dataItem.set('Note', newValue);
+            },
+            onExpandNotesPopup: function (e) {
+                var dataItem = e.data.activity;
+                var SaveBtn, createdDate = getCreatedDate(this.activity);
+                var fakePersonId = -(Date.now());
+                if (vmEditAct.theActivity.Name == null) {
+                    fakePersonId = '-crmActivityNote';
+                    $(`[data-crm-id="crmActivityNote"]`).attr('data-crm-id', fakePersonId);
+                    
+                } else {
+                    fakePersonId = 'crmActivityNote';
+                    SaveBtn = function (newValue) { 
+                        if (dataItem.Note == newValue && !vmCommon.TexEditor.hasImg(newValue)) {
+                            return;
+                        }
+                        newValue = vmCommon.getClearAttrNotNeed(newValue);
+                        dataItem.set('Note', newValue);
+
+                        vmEditAct.dataservice.updateNoteEditorPopup({ Id: dataItem.Id, Note: newValue }, function (res) {
+                            vmEditAct.isModified = true;
+                        });
+                    };
+                }
+                vmCommon.TexEditor.addWindowEditor(`[data-crm-id="${fakePersonId}"]`,
+                    SaveBtn,
+                    function Close(newValue) {
+                        if (dataItem.Note == newValue && !vmCommon.TexEditor.hasImg(newValue)) {
+                            return;
+                        }
+                        newValue = vmCommon.getClearAttrNotNeed(newValue);
+                        if (newValue.trim() == '' && !vmCommon.TexEditor.hasImg(newValue)) {
+                            dataItem.set('Note', '');
+                        } else
+                            dataItem.set('Note', newValue);                 // run viewModel.bind('change')
+                    }, createdDate
+                );
+            },
+            onExpandStatusPopup: function (e) {
+                var dataItem = e.data;
+                var SaveBtn, createdDate = getCreatedDate(this.activity);
+                if (vmEditAct.theActivity.Name != null) {
+                    SaveBtn = function (newValue) {
+                        if (dataItem.Description == newValue) {
+                            return;
+                        }
+                        newValue = vmCommon.getClearAttrNotNeed(newValue);
+                        dataItem.set('Description', newValue);
+
+                        vmEditAct.dataservice.updateStatusEditorPopup({ Id: dataItem.Id, Description: newValue }, function (res) {
+                            vmEditAct.isModified = true;
+                        });
+                    };
+                }
+
+                vmCommon.TexEditor.addWindowEditor(`[data-status-crm-id="${dataItem.Id}"]`,
+                    SaveBtn,
+                    function Close(newValue) {
+                        if (dataItem.Description == newValue) {
+                            return;
+                        }
+                        newValue = vmCommon.getClearAttrNotNeed(newValue);
+                        if (newValue.trim() == '' && !vmCommon.TexEditor.hasImg(newValue)) {
+                            newValue = '';
+                        }
+                        dataItem.set('Description', newValue);                 // run viewModel.bind('change')
+                        vmEditAct.dataservice.updateStatusEditorPopup({
+                            Id: dataItem.Id,
+                            Description: newValue
+                        }, function (res) { vmEditAct.isModified = true; });
+                    }, createdDate
+                );
+            },
+            dateChange: function (e, blueEvent) {
+
+                if (!vmEditAct.sdate || !vmEditAct.edate || !vmEditAct.stime || !vmEditAct.stime) {
+                    return;
+                }
+                if (typeof this.activity.StartDate === 'string') {
+                    this.activity.StartDate = this.activity.StartDate.jsonToDate();
+                }
+                if (typeof this.activity.DueDate === 'string') {
+                    this.activity.DueDate = this.activity.DueDate.jsonToDate();
+                }
+                if (typeof this.activity.StartTime === 'string') {
+                    this.activity.StartTime = timeSpanToJsonDate(this.activity.StartTime);
+                }
+                if (typeof this.activity.DueTime === 'string') {
+                    this.activity.DueTime = timeSpanToJsonDate(this.activity.DueTime);
+                }
+
+                this.activity.StartDate = getCurrentHourOfDate(this.activity.StartDate);
+                this.activity.DueDate = getCurrentHourOfDate(this.activity.DueDate);
+                var elem = e == null ? blueEvent.target : e.sender.element[0];
+
+                if (this.activity.StartDate == null || this.activity.DueDate == null) {
+                    itemIsValid = true;
+                    $('.activity-datetime').tooltip('destroy');
+
+                    if (this.activity.DueDate == null) {
+                        vmEditAct.showHideReminder('none');
+                    } else if (!this.activity.Finish && this.oldAcc.length > 0) {
+                        vmEditAct.showHideReminder('block');
+                    }
+
+                    return;
+                } else {
+                    if (elem.id == 'txtStartDate') {
+                        if (!compareDate(this.activity.StartDate, this.activity.DueDate)) {
+                            this.activity.set("DueDate", cloneDate(this.activity.StartDate));
+                            if (this.activity.StartTime != null && this.activity.DueTime != null) {
+                                if (!compareTime(this.activity.StartTime, this.activity.DueTime)) {
+                                    this.activity.set("DueTime", this.activity.StartTime);
+                                }
+                            }
+                        }
+                        if (equalDate(this.activity.StartDate, this.activity.DueDate)) {
+                            if (this.activity.StartTime != null && this.activity.DueTime != null) {
+                                if (!compareTime(this.activity.StartTime, this.activity.DueTime)) {
+                                    this.activity.set("DueTime", this.activity.StartTime);
+                                }
+                            }
+                        }
+                        itemIsValid = true;
+                        $('.activity-datetime').tooltip('destroy');
+                        return;
+                    }
+
+                    if (elem.id == 'txtStartTime') {
+                        if (!compareDate(this.activity.StartDate, this.activity.DueDate)) {
+                            itemIsValid = false;
+                            $('#txtDueDate').attr("title", kLg.msgValidateStartEndDate);
+                            $('#txtDueDate').tooltip({ trigger: "manual" }).tooltip('show');
+                            
+                            return;
+                        } else {
+                            if (equalDate(this.activity.StartDate, this.activity.DueDate)) {
+                                if (this.activity.StartTime != null && this.activity.DueTime != null) {
+                                    if (!compareTime(this.activity.StartTime, this.activity.DueTime)) {
+                                        this.activity.set("DueTime", this.activity.StartTime);
+                                    }
+                                }
+                            }
+                        }
+                        itemIsValid = true;
+                        $('.activity-datetime').tooltip('destroy');
+                        return;
+                    }
+
+                    if (elem.id == 'txtDueDate') {
+                        if (!compareDate(this.activity.StartDate, this.activity.DueDate)) {
+                            itemIsValid = false;
+                            $(elem).attr("title", kLg.msgValidateStartEndDate);
+                            $(elem).tooltip({ trigger: "manual" }).tooltip('show');
+                            
+                            vmEditAct.showHideReminder('none');
+                            return;
+                        } else {
+                            if (equalDate(this.activity.StartDate, this.activity.DueDate)) {
+                                if (this.activity.StartTime != null && this.activity.DueTime != null) {
+                                    if (!compareTime(this.activity.StartTime, this.activity.DueTime)) {
+                                        this.activity.set("DueTime", this.activity.StartTime);
+                                    }
+                                }
+                            }
+                        }
+                        
+                        itemIsValid = true;
+                        $('.activity-datetime').tooltip('destroy');
+                        if (!this.activity.Finish && this.oldAcc.length > 0) {
+                            vmEditAct.showHideReminder('block');
+                        }
+                        return;
+                    }
+                    if (elem.id == 'txtDueTime') {
+                        if (!compareDate(this.activity.StartDate, this.activity.DueDate)) {
+                            itemIsValid = false;
+                            $('#txtDueDate').attr("title", kLg.msgValidateStartEndDate);
+                            $('#txtDueDate').tooltip({ trigger: "manual" }).tooltip('show');
+                            return;
+                        } else {
+                            if (equalDate(this.activity.StartDate, this.activity.DueDate)) {
+                                if (this.activity.StartTime != null && this.activity.DueTime != null) {
+                                    if (!compareTime(this.activity.StartTime, this.activity.DueTime)) {
+                                        itemIsValid = false;
+                                        $(elem).attr("title", kLg.msgValidateStartEndDate);
+                                        $(elem).tooltip({ trigger: "manual" }).tooltip('show');
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                        itemIsValid = true;
+                        $('.activity-datetime').tooltip('destroy');
+                        return;
+                    }
+
+                }
+            },
+            buildingActivityData: function() {
+                var listAccounts = vmCommon.pushApply([], this.oldAcc, function (item) { return { AccountId: item.Id }; });
+                var listCategories = vmCommon.pushApply([], this.oldCat, function (item) { return { CategoryId: item.Id }; });
+
+                this.activity.set("CrmActivityPersons", listAccounts);
+                this.activity.set("CrmActivityCategories", listCategories);
+
+                var theActivity = this.activity;
+                for (i = 0; i < theActivity.CrmStatusProtocolClients.length; i++) {
+                    theActivity.CrmStatusProtocolClients[i].Date = getCurrentHourOfDate(theActivity.CrmStatusProtocolClients[i].Date);
+                }
+                if (relationRemoved.length > 0) {
+                    for (i = 0; i < relationRemoved.length; i++) {
+                        theActivity.CrmActivityRelationshipClients.push(relationRemoved[i]);
+                    }
+                }
+                theActivity.CategoryId = theActivity.CategoryId === "" ? null : theActivity.CategoryId;
+                theActivity.PriorityId = theActivity.PriorityId === "" ? null : theActivity.PriorityId;
+                theActivity.StartTime = jsonDateToTimeSpan(theActivity.StartTime);
+                theActivity.DueTime = jsonDateToTimeSpan(theActivity.DueTime);
+
+                var relationLst = theActivity.CrmActivityRelationshipClients;
+                theActivity.CrmActivityRelationshipClients = vmEditAct.rebindRelationshipIndex(relationLst);
+
+                return theActivity;
+            },
+            save: function (callback) {
+                if (!vmEditAct.sdate || !vmEditAct.edate || !vmEditAct.stime || !vmEditAct.etime) 
+                    return;
+
+                if (!vmEditAct.validForm() || !itemIsValid || !isValidStatus() || !isValdRelationship() || !validSubGoal())
+                    return;
+
+                if (isProcessing)
+                    return;
+
+                isProcessing = true;
+                var funcName = vmEditAct.actOptions.IsEdit ? "update" : "create";
+                var listAccounts = vmCommon.pushApply([], this.oldAcc, function (item) { return { AccountId: item.Id }; });
+                var listCategories = vmCommon.pushApply([], this.oldCat, function (item) { return { CategoryId: item.Id }; });
+
+                this.activity.set("CrmActivityPersons", listAccounts);
+                this.activity.set("CrmActivityCategories", listCategories);
+                this.activity.Reminder = vmEditAct.theActivity.Reminder;
+                var theActivity = this.activity;
+
+                if (relationRemoved.length > 0) {
+                    for (i = 0; i < relationRemoved.length; i++) {
+                        theActivity.CrmActivityRelationshipClients.push(relationRemoved[i]);
+                    }
+                }
+
+                theActivity.CategoryId = theActivity.CategoryId === "" ? null : theActivity.CategoryId;
+                theActivity.PriorityId = theActivity.PriorityId === "" ? null : theActivity.PriorityId;
+                theActivity.StartTime = jsonDateToTimeSpan(theActivity.StartTime);
+                theActivity.DueTime = jsonDateToTimeSpan(theActivity.DueTime);
+                theActivity.Note = vmCommon.getClearAttrNotNeed(theActivity.Note);
+                //theActivity.CrmStatusProtocolClients = [];
+                //theActivity.CrmActivityRelationshipClients = [];
+
+                //save
+                vmEditAct.dataservice.saveActivity(funcName, theActivity, function (res) {
+                    if (res.value === vmCrmEnum.ResultStatus.CONFLICT) {
+                        pAlert(kLg.msgConflickData);
+                    }
+
+                    actViewModel.activity.set("Mdf", actViewModel.activity.Mdf + 1); 
+
+                    if (callback && typeof callback == "function")
+                        callback(res);
+
+                    //vmEditAct.isModified = false;
+                    isProcessing = false;
+                });
+            },
+            update: function (e) {
+                if (!vmEditAct.isModified && !isAddNew) { // && !isReloadForm
+                    if (isReloadForm) {
+                        vmCrmFilterControl.reloadfilter(vmEditAct.actOptions.activity.Id, vmCrmEnum.SettingType.Activities);
+                    }
+                    vmEditAct.destroyPop();
+                    return;
+                }                
+                this.save(function (res) {
+                    vmEditAct.isModified = false;
+                    vmEditAct.destroyPop();
+                    vmCrmFilterControl.reloadfilter(res.value, vmCrmEnum.SettingType.Activities);
+                });
+            },
+            updateThenExport: function () {
+                if (!vmEditAct.isModified && !isAddNew) { // && !isReloadForm
+                    if (isReloadForm) {
+                        vmCrmFilterControl.reloadfilter(vmEditAct.actOptions.activity.Id, vmCrmEnum.SettingType.Activities);
+                    }
+                    exportDocx();
+                    return;
+                }
+                this.save(function (res) {
+                    vmEditAct.isModified = false;
+                    vmCrmFilterControl.reloadfilter(res.value, vmCrmEnum.SettingType.Activities);
+                    exportDocx();
+                });
+
+                function exportDocx() {
+                    var entry = { Id: vmEditAct.actOptions.activity.Id, Lang: kLg.language };
+                    vmEditAct.dataservice.exportDocx(entry, function (res) {
+                        if (res.value.ResultStatus == vmCommon.ResultState.SUCCESS) {
+                            var fileInfo = res.value.TheObject;
+                            vmCommon.GetFileFromUrl("../TempExport/" + fileInfo.Path, fileInfo.Name);
+                        }
+                    });
+                }
+            }, 
+
+            updateThenDuplicate: function () {
+                if (!vmEditAct.isModified && !isAddNew) { // && !isReloadForm
+                    if (isReloadForm) {
+                        vmCrmFilterControl.reloadfilter(vmEditAct.actOptions.activity.Id, vmCrmEnum.SettingType.Activities);
+                    }
+                    duplicateActivity();
+                    return;
+                }
+                this.save(function (res) {
+                    vmEditAct.isModified = false;
+                    vmCrmFilterControl.reloadfilter(res.value, vmCrmEnum.SettingType.Activities);
+                    duplicateActivity();
+                });
+
+                function duplicateActivity() {
+                    var entry = { Id: vmEditAct.actOptions.activity.Id };
+                    vmEditAct.dataservice.duplicateActivity(entry, function (res) {
+                        vmCommon.showNotification("#popupDuplicateActivityCrm", kLg.duplicateActivity, 2000, 20, 300).then(function ($element) {
+                            const $notifyWrap = $element.find('.k-notification-wrap').first();
+                            $notifyWrap.css({ 'display': 'flex', 'align-items': 'center', 'justify-content': 'space-between' });
+                            $notifyWrap.children('span').first().css({ 'padding-right': '9px', 'margin-left': '-6px' });
+                            $notifyWrap.children('div').last().css({ 'display': 'flex', 'width': '100%', 'justify-content': 'space-between' });
+                        });
+                    });
+                }
+            }
+        });
+
+        actViewModel.bind("change", function (e) {
+            isReloadForm = true;
+            vmEditAct.isModified = true;
+        });
+
+        kendo.bind($('#edit-form-activity'), actViewModel);
+        vmEditAct.bindSortTable("#source-relation");
+        getCreatedDate(actViewModel.activity);
+        vmEditAct.setupLanguage();
+        limitedTabKey();
+        $('#edit-form-activity #txtName').focus();
+
+        vmEditAct.AdjustPopupHeight();
+
+        $("*[data-role='timepicker']").kendoTimePicker(
+        {
+            format: "HH:mm",
+            parseFormats: ["HH:mm"]
+        });
+
+        $(".activity-datetime[data-role='datepicker']").kendoDatePicker({
+            weekNumber: true
+        });
+        $('#source-status input[data-role=datepicker]').kendoDatePicker({
+            weekNumber: true
+        });
+        $('#source-status div.input-append.date').attr('style', 'width: 135px');
+        $('span.k-widget.k-datepicker.k-header').removeClass('k-input');
+
+        vmCommon.resetTabIndex('edit-form-activity');
+        isReloadForm = false;
+        
+        $('#edit-form-activity .k-widget.k-multiselect.k-header > div.k-multiselect-wrap.k-floatwrap').attr('tabindex', '0');
+
+        void function bindSaveRightMouseEvent() {
+            var textarea = `.dnbTextAreaEditor textarea[data-role="editor"]`;
+            actViewModel.activity.CrmStatusProtocolClients.filter(dataItem => {
+                textarea = `.dnbTextAreaEditor[data-status-crm-id="${dataItem.Id}"] textarea[data-role="editor"]`;
+                $(textarea).data("kendoEditor").bind("paste", function onPasteRightMouse (e) {
+                    vmEditAct.isModified = true;
+                });
+                return true;
+            });
+            textarea = `.dnbTextAreaEditor[data-crm-id="crmActivityNote"] textarea[data-role="editor"]`;
+            $(textarea).data("kendoEditor").bind("paste",
+                function onPasteRightMouse(e) {
+                    vmEditAct.isModified = true;
+                });
+
+            vmEditAct.setStatusEditorYScroll();
+
+            var bodyTxtEditor = $('.dnbTextAreaEditor[data-crm-id="crmActivityNote"] > table.k-editor .k-editable-area').find('textarea').data('kendoEditor').body;
+            $(bodyTxtEditor).css({'overflow-y': 'scroll'});
+        }();
+    });
+
+    function removeControl(ctr) {
+        var type = ctr.target.id;
+        var index, list = [];
+        switch (type) {
+            case "btnRemoveRelation":
+                list = actViewModel.activity.CrmActivityRelationshipClients;
+                actViewModel.activity.set("isAddRelationship", true);
+                break;
+            case "btnRemoveStatus":
+                list = actViewModel.activity.CrmStatusProtocolClients;
+                break;
+        }
+
+        index = list.indexOf(ctr.data);
+        var objItem = list[index];
+
+        //TienPM - If remove item, add item to list relationship
+        if (fromCrm != undefined && objItem.CrmId == fromCrm.Id && objItem.TypeId == fromCrm.TypeId) {
+            var cate = { Id: fromCrm.Id, MIndex: 0, Mdf: 0, Name: objItem.CrmName, ParentId: 0, ParentIndex: 0 };
+            if (objItem.TypeId == 1) {
+                cate.Type = 1;
+                if ($.grep(vmEditAct.actOptions.proPerson, function (it) { return it.Id === cate.Id && it.Type === cate.Type }).length === 0) {
+                    vmEditAct.actOptions.proPerson.push(cate);
+                    vmEditAct.actOptions.proPerson.sort(function (a, b) { return a.Name > b.Name; });
+                }
+            } else {
+                cate.Type = 2;
+                if ($.grep(vmEditAct.actOptions.proOrg, function (it) { return it.Id === cate.Id && it.Type === cate.Type }).length === 0) {
+                    vmEditAct.actOptions.proOrg.push(cate);
+                    vmEditAct.actOptions.proOrg.sort(function (a, b) { return a.Name > b.Name; });
+                }
+                
+            }
+        }
+        
+        if (list[index].Id > 0) {
+            vmEditAct.isModified = true;
+
+            list[index].set("IsVisible", false);
+            list[index].set("DataState", dataState.Deleted);
+
+            if (type == 'btnRemoveRelation') {
+                relationRemoved.push(list[index]);
+                list.splice(index, 1);
+            }
+        } else {
+            list.splice(index, 1);
+        }
+
+        if (type == 'btnRemoveRelation') {
+            var source = vmEditAct.GetSourceByCateId(objItem.CategoryId);
+            var item = vmEditAct.FindById(source, objItem.CrmId);
+            if (item != null) { item.selected = false; }
+        }
+    };
+
+    $('#edit-form-activity #txtName').bind('keyup', function () {
+        $(this).tooltip('destroy');
+    });
+
+    $('#source-status').on("blur", 'input[data-role=datepicker]', function (e) {
+        var index = $(e.target).closest("tr").index();
+
+        if ($(this).val().length == 0) {
+            $(this).tooltip('destroy');
+
+            setTimeout(function() {
+                actViewModel.updateStatus(index);
+            }, 50);
+
+            return;
+        }
+        var dt = $(this).data("kendoDatePicker").value();
+        if (dt == null) {
+            $(this).attr("title", kLg.msgDateInValid);
+            $(this).tooltip({ trigger: "manual" }).tooltip('show').attr("title", "");
+            return;
+        }
+
+        $(this).tooltip('destroy');
+
+        setTimeout(function () {
+            actViewModel.updateStatus(index);
+        }, 50);
+
+        return;
+    });
+
+    function isValidStatus() {
+        var listStatus = $('#source-status input[data-role=datepicker]'),
+            len = listStatus.length,
+            i = 0;
+        for (i; i < len; i++) {
+            if ($(listStatus[i]).val() == "") continue;
+            if ($(listStatus[i]).data("kendoDatePicker").value() == null) {
+                $(listStatus[i]).focus();
+                return false;
+            }
+        }
+
+        var listStatusTime = $('#source-status input[data-role=timepicker]'),
+            lenTime = listStatusTime.length,
+            j = 0;
+        for (j; j < lenTime; i++) {
+            if ($(listStatus[j]).val() == "") continue;
+            if ($(listStatus[j]).data("kendoTimePicker").value() == null) {
+                $(listStatus[j]).focus();
+                return false;
+            }
+        }
+        return true;
+    };
+
+    function validSubGoal() {
+        if (!actViewModel) return true;
+
+        var act = actViewModel.activity;
+        function tooltipx() {
+            var elem = $("div.goal-item")[0];
+            ShowToolTip2($(elem), kLg.msgRequiredAddLink, "right");
+
+            setTimeout(function () {
+                $(elem).tooltip("destroy");
+            }, 2000);
+        };
+
+        if (!act.Id) {
+            if (act.SubGoalId && act.StartDate == null) {
+                tooltipx();
+                return false;
+            }
+        } else {
+            if (act.SubGoalId && ((act.SubGoalId !== act.FisrtSubGoalId) || (act.IsDeleteAction != null)) && act.StartDate == null) {
+                tooltipx();
+                return false;
+            }
+        }
+
+        return true;
+    };
+
+    $('#txtStartDate').blur(function (e) {
+        if ($(this).val().length == 0) {
+            vmEditAct.sdate = true;
+            $(this).tooltip('destroy');
+            return;
+        }
+        var dt = $(this).data("kendoDatePicker").value();
+        if (dt == null) {
+            $(this).attr("title", kLg.msgDateInValid);
+            $(this).tooltip({ trigger: "manual" }).tooltip('show').attr("title", "");
+            vmEditAct.sdate = false;
+            return;
+        }
+        vmEditAct.sdate = true;
+        $(this).tooltip('destroy');
+        actViewModel.dateChange(null, e);
+    });
+
+    $('#txtDueDate').blur(function (e) {
+        if ($(this).val().length == 0) {
+            vmEditAct.edate = true;
+            $(this).tooltip('destroy');
+            return;
+        }
+        var dt = $(this).data("kendoDatePicker").value();
+        if (dt == null) {
+            $(this).attr("title", kLg.msgDateInValid);
+            $(this).tooltip({ trigger: "manual" }).tooltip('show').attr("title", "");
+            vmEditAct.edate = false;
+            return;
+        }
+        vmEditAct.edate = true;
+        $(this).tooltip('destroy');
+        actViewModel.dateChange(null, e);
+    });
+
+    $('#txtStartTime').blur(function (e) {
+        if ($(this).val().length == 0) {
+            vmEditAct.stime = true;
+            $(this).tooltip('destroy');
+            return;
+        }
+        var dt = $(this).data("kendoTimePicker").value();
+        if (dt == null) {
+            $(this).attr("title", kLg.msgDateInValid);
+            $(this).tooltip({ trigger: "manual" }).tooltip('show').attr("title", "");
+            vmEditAct.stime = false;
+            return;
+        }
+        vmEditAct.stime = true;
+        $(this).tooltip('destroy');
+        actViewModel.dateChange(null, e);
+    });
+
+    $('#txtDueTime').blur(function (e) {
+        if ($(this).val().length == 0) {
+            vmEditAct.etime = true;
+            $(this).tooltip('destroy');
+            return;
+        }
+        var dt = $(this).data("kendoTimePicker").value();
+        if (dt == null) {
+            $(this).attr("title", kLg.msgDateInValid);
+            $(this).tooltip({ trigger: "manual" }).tooltip('show').attr("title", "");
+            vmEditAct.etime = false;
+            return;
+        }
+        vmEditAct.etime = true;
+        $(this).tooltip('destroy');
+        actViewModel.dateChange(null, e);
+
+    });
+
+    function isValdRelationship() {
+        var rs = true;
+        var items = $('#source-relation input[data-role=autocomplete]').filter(function () {
+            return $(this).css('display') !== 'none';
+        });
+
+        var vItems = actViewModel.activity.CrmActivityRelationshipClients;
+
+        if (items.length > 0) {
+            var lists = $.grep(actViewModel.activity.get("CrmActivityRelationshipClients"), function (p) {
+                return p.DataState !== dataState.Deleted;
+            });
+            for (var i = 0; i < items.length; i++) {
+                var val = $(items[i]).val();
+                var x = val !== lists[i].CrmName;
+                if (val === "" || lists[i].CrmId === 0 || lists[i].CrmName != val) {
+                    $(items[i]).tooltip('destroy');
+                    var isPerson = (lists[i].TypeId === 1);
+                    $(items[i]).attr("title", isPerson ? kLg.crmPersonInvalid : kLg.crmOrganisationInvalid);
+                    $(items[i]).tooltip({ trigger: "manual", placement: "right" }).tooltip('show');
+                    $(items[i]).focus();
+                    rs = false;
+                } else {
+                    $(items[i]).tooltip('destroy');
+                }
+            }
+        }
+        return rs;
+    }
+
+    /// Nguyễn Hải Updated: 16/07/2015
+
+    $('#source-relation').on('focus', 'input[data-role=autocomplete]', function (e) {
+        var list = [];
+        var cateId = this.kendoBindingTarget.source.CategoryId;
+        var sources = vmEditAct.GetSourceByCateId(cateId);
+
+        if (vmEditAct.actOptions.IsEdit || (vmEditAct.actOptions.AddFromCrm != undefined)) {
+            list = actViewModel.activity.CrmActivityRelationshipClients;
+            for (var i = 0; i < list.length; i++) {
+                var items = list[i];
+                var categoryId = items.CategoryId;
+                if (categoryId === cateId) {
+                    var currItem = vmEditAct.FindById(sources, items.CrmId);
+                    if (currItem != null) {
+                        currItem.selected = true;
+                    }
+                }
+            }
+        }
+
+        if ($(this).closest("div[class='autosearch']").attr("isdefault") === "1") {
+            var positions = actViewModel.activity.CrmActivityRelationshipClients;
+            var pos;
+            for (var i = 0; i < positions.length; i++) {
+                if (positions[i].IsDefault === 1 && positions[i].DataState !== dataState.Deleted) {
+                    pos = positions[i];
+                }
+            }
+
+            if (pos != undefined && pos.CrmOrganisationId == null) {
+                var cate = { Id: fromCrm.Id, MIndex: 0, Mdf: 0, Name: fromCrm.Name, ParentId: 0, ParentIndex: 0, Type: 2 };
+                if ($.grep(sources, function (it) { return it.Id === cate.Id }).length === 0) {
+                    sources.push(cate);
+                }
+            }
+        };
+
+        var item = vmEditAct.FindById(sources, this.kendoBindingTarget.source.CrmId);
+        if (item != null) { item.selected = false; }
+        
+        var abc = vmEditAct.GetFilterSource(sources);
+        this.kendoBindingTarget.source.set("src", abc.sort(function (a, b) { return a.Name > b.Name; }));
+    });
+
+    $('#source-relation').on('blur', 'input[data-role=autocomplete]', function (e) {
+        var $itemRelation = $(e.currentTarget).closest('tr.itemRelation');
+        var isValid = vmEditAct.IsValidPersonForRelationShip(this);
+        var cateId = +$itemRelation.attr('data-categoryid');
+        var sources = vmEditAct.GetSourceByCateId(cateId);
+        var crmId = +$itemRelation.attr('data-crmid');
+        var item = vmEditAct.FindById(sources, crmId);
+        if (isValid) {
+            if (item != null) { item.selected = true; }
+            $(this).tooltip('destroy');
+        } else {
+            if (item != null) { item.selected = false; }
+            !!this.kendoBindingTarget && (this.kendoBindingTarget.source.set("CrmId", 0));
+            $(this).attr("title", (cateId == 1 ? kLg.crmPersonInvalid : kLg.crmOrganisationInvalid));
+            $(this).tooltip({ trigger: "manual", placement: "right" }).tooltip('show');
+        }
+        $(this).css('text-align-last', 'start');
+    });
+
+    vmEditAct.IsValidPersonForRelationShip = function (currTarget) {
+        if (typeof currTarget.kendoBindingTarget == 'object') {
+            var crmId = currTarget.kendoBindingTarget.source.CrmId;
+            var crmName = currTarget.kendoBindingTarget.source.CrmName;
+            var currVal = currTarget.value;
+            if (crmId === 0 || (crmName !== currVal)) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    vmEditAct.GetFilterSource = function (source) {
+        var res = vmCommon.pushApply([], source, null, function (item) { return item.selected != true; });
+        return res;
+    };
+
+    vmEditAct.GetSourceByCateId = function (cateId) {
+        return cateId === 1 ? vmEditAct.actOptions.proPerson : vmEditAct.actOptions.proOrg;
+    };
+
+    vmEditAct.FindById = function (source, id) {
+        return vmCommon.findByFunc(source, function (obj) { return obj.Id === id; });
+    };
+
+    $('#source-relation').on('keypress', 'input[data-role=autocomplete]', function (e) {
+        $(this).tooltip('destroy');
+    });
+
+    $('#source-relation').on('change', 'select[data-role=dropdownlist]', function (e) {
+        var idex = $('#source-relation select[data-role=dropdownlist]').index(this);
+        var elem = $('#source-relation input[data-role=autocomplete]')[idex];
+        $(elem).tooltip('destroy');
+    });
+
+    function removeCrmInRelationship(crmObj) {
+        var src = crmObj.TypeId === 1 ? vmEditAct.actOptions.proPerson : vmEditAct.actOptions.proOrg;
+
+        src = $.grep(src, function (item) {
+            return item.Id !== crmObj.Id;
+        });
+
+        if (crmObj.TypeId === 1) {
+            vmEditAct.actOptions.proPerson = src;
+        } else {
+            vmEditAct.actOptions.proOrg = src;
+        }
+    }
+
+    vmEditAct.rebindRelationshipIndex = function(lst) {
+        for (var i = 0, len = lst.length; i < len; i++) {
+            var item = lst[i];
+            if (item.DataState === dataState.Deleted)
+                continue;
+
+            if (item.Id) {
+                maxIndex = item.MIndex;
+            }
+
+            if (isChangePosition) {
+                item.MIndex = i;
+
+                if (item.Id) {
+                    item.DataState = dataState.Modified;
+                }
+            } else {
+                if (item.Id === 0) {
+                    item.MIndex = ++maxIndex;
+                }
+            }
+        }
+
+        return lst;
+    };
+
+    vmEditAct.showHideReminder = function (type) {
+        var elements = $('.reminder');
+        if (actViewModel.oldAcc.length === 0 || actViewModel.activity.Finish) {
+            type = 'none';
+        }
+        
+        if (actViewModel.activity.DueDate === null || actViewModel.activity.DueDate === undefined) {
+            type = 'none';
+        } else {
+            var d = new Date();
+            var duadate;
+            if (typeof actViewModel.activity.DueDate === "string") {
+                duadate = actViewModel.activity.DueDate.jsonToDate();
+            } else {
+                duadate = actViewModel.activity.DueDate;
+            }
+            if (!compareDate(d, duadate) || equalDate(d, duadate)) {
+                type = 'none';
+            } 
+        }
+
+        if (elements.length > 0) {
+            for (var i = 0; i < elements.length; i++) {
+                $(elements[i]).attr('style', 'display: ' + type);
+            }
+        }
+    }
+
+    $("#btnClose").on("mousedown", function (e) {
+        if (e.which == 1) // left mouse
+            setTimeout(function () { actViewModel.update(); }, 10);
+    });
+    
+    vmEditAct.checkActivityFileAssign = function () {
+        var url = "../Handlers/DFolderHandler.ashx?funcName=getoldassignedfile&projid=" + projectId + "&strid=" + strategyId;
+        var entry = {
+            assignidi: vmEditAct.theActivity.Id,
+            assignidu: null,
+            type: "crmactivity"
+        };
+        callAjax("xnxx", url, JSON.stringify(entry), function (res) {              
+            var isHasFile = res.Data.length > 0;
+            var $icon = $("#pop-edit-crm").parent().find("span[id~='iconEmpty']");
+            if ($icon) {
+                $icon.removeClass("icon-folder-white");
+                $icon.removeClass("icon-folder-full-white");
+                var iconCss = isHasFile ? "icon-folder-full-white" : "icon-folder-white";
+                $icon.addClass(iconCss);
+            }
+        }, AjaxConst.PostRequest);
+    };
+
+</script>

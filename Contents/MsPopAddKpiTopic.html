@@ -1,0 +1,147 @@
+﻿<div id="pop-add-kpitopic">
+    <form id="add-kpitopic-form" data-bind="events:{change: formChange}">
+        <div class="ms-modal-body" id="pop-add-kpi-topic">
+
+            <div class="form-group">
+                <label style="padding-top: 7px;" id="lblNameCategories">Name</label>
+                <p class="clear"></p>
+                <input class="modal-input txtInput w-98per" name="CategoryName" id="txtNameCategories" data-bind="value: kpiTopic.Name" tabindex="1" maxlength="100" />
+            </div>
+            <hr class="modal-market-hr" />
+
+        </div>
+
+        <div class="modal-market-footer">
+            <button type="button" class="ms-button" id="btnCloseCategories" data-bind="events:{click: updateTopic}" tabindex="3">
+                <span class="icon-16 icon-close margin-right6"></span>
+                <span id="lblCloseKpiCategories">Speichern und schliessen</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="loading" id="add-categori-loading"></div>
+<script type="text/javascript">
+
+    var popKpiTopicViewModel;
+
+    var vmPopKpiTopic = vmPopKpiTopic || {};
+    vmPopKpiTopic.IsModified = false;
+
+
+    vmPopKpiTopic.SetLang = function () {
+        $("#pop-add-kpitopic #lblNameCategories").text(kLg.PopName);
+        $("#pop-add-kpitopic #lblDescriptionCategories").text(kLg.Description);
+        $("#pop-add-kpitopic #lblCloseKpiCategories").text(kLg.lblClose);
+    };
+
+    //vmPopKpiTopic.dataService = function() {
+    //    var callAjaxCrm = function (divId, funcName, entryData, requestType, successCallBack) {
+    //        var url = "../Handlers/SettingHandler.ashx?funcName=" + funcName + "&projid=" + projectId + "&strid=" + strategyId + "&lang=" + language;
+    //        return callAjax(divId, url, entryData, successCallBack, requestType);
+    //    };
+
+    //    var callAjaxByPost = function (funcName, entryData, successFunc, loadingdiv) {
+    //        return callAjaxCrm(loadingdiv || "categories-loading", funcName, JSON.stringify(entryData), AjaxConst.PostRequest, successFunc);
+    //    };
+
+    //    var updateKpiTopic = function(entryData, successFunc) {
+    //        return callAjaxByPost("updatekpitopic", entryData, successFunc);
+    //    }
+
+    //    return {
+    //        updateKpiTopic: updateKpiTopic
+    //    }
+    //}();
+
+    vmPopKpiTopic.SetupValidate = function () {
+        $('#add-kpitopic-form').validate({
+            rules: {
+                CategoryName: {
+                    required: true
+                }
+            },
+            messages: {
+                CategoryName: {
+                    required: kLg.requiredName
+                }
+            }
+        });
+    };
+
+    popUpKpiTopic.bind("close", function (e) {
+
+        if (vmPopKpiTopic.IsModified === true) {
+            if (!confirm(kLg.saveConfirmQuestion)) {
+                popUpKpiTopic.destroy();
+                popUpKpiTopic = null;
+                $('#pop-setting').after('<div id="pop-add-categories-place"></div>');
+
+            } else {
+                if (!$('#add-kpitopic-form').valid()) {
+                    e.preventDefault();
+                    return;
+                };
+                popKpiTopicViewModel.updateUnit();
+                $('#pop-setting').after('<div id="pop-add-categories-place"></div>');
+            }
+        } else {
+            popUpKpiTopic.destroy();
+            popUpKpiTopic = null;
+            $('#pop-setting').after('<div id="pop-add-categories-place"></div>');
+
+        }
+    });
+
+
+
+    $(document).ready(function () {
+
+        var kpiTopic = { Id: 0, ProjectId: projectId }
+        popKpiTopicViewModel = kendo.observable({
+            kpiTopic: kpiTopic,
+            updateTopic: function () {
+                if (!$('#add-kpitopic-form').valid()) return;
+                var entryData = this.kpiTopic;
+                vmPopSetting.dataservice.updateKpiTopic(entryData, function (res) {
+                    if (res.value === vmPopSetting.enumsRoleConflict.nameExist) {
+                        vmPopSetting.ShowToolTip($("#pop-add-kpitopic #txtNameCategories"),
+                            kLg.msgExistKpiTopic,
+                            'top');
+                    } else {
+                        vmPopKpiTopic.IsModified = false;
+                        var topics = {
+                            Id: res.value,
+                            Name: entryData.Name,
+                            ProjectId: projectId,
+                            KpiIndexs: [{ Id: 0 }]
+                        }
+                        vmPopSetting.DataKpiTopics.KpiTopics.push(topics);
+                        vmPopSetting.binddlKpiUnit();
+                        vmPopSetting.checkInvalid();
+
+                        popUpKpiTopic.destroy();
+                        popUpKpiTopic = null;
+                        $('#pop-setting').after('<div id="pop-add-categories-place"></div>');
+                    }
+                });
+            },
+            formChange: function () {
+                vmPopKpiTopic.IsModified = true;
+            }
+
+        });
+
+        vmPopKpiTopic.SetupValidate();
+        vmPopKpiTopic.SetLang();
+        kendo.bind($('#pop-add-kpitopic'), popKpiTopicViewModel);
+    });
+
+    $('#pop-add-kpitopic').keydown(function (e) {
+        if (e.keyCode == 13) {
+            e.preventDefault();
+            return;
+        }
+    });
+
+</script>

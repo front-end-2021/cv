@@ -1,0 +1,889 @@
+﻿<!--//Author: SONPT
+//Start date: 2016-03-28
+
+//============Convention===========
+//:
+//mps: Multiple select
+//ddl: Dropdownlist
+//=================================-->
+<STYLE>
+    .k-numeric-wrap.k-expand-padding .k-input {
+        width: 99%;
+    }
+    .k-multiselect-wrap .k-input {
+       /* width: 25px !important;*/
+        background-color: white !important;
+        /*display: none;*/
+    }     
+    textarea {
+        resize: none;
+    }
+
+    #divtag .k-multiselect-wrap li[class~="k-button"] {
+        color: #2e2e2e;
+        border-color: #fafafa;
+        background-color: #fafafa;
+        border-radius: 30px;
+    }
+
+    #divtag .k-multiselect-wrap li[class~="k-button"]:hover {
+        color: #2e2e2e;
+        border-color: #EBEBEB;
+        background-color: #EBEBEB;
+        border-radius: 30px;
+    }
+
+    #divtag .k-multiselect.k-header.k-state-hover {
+        border-color: #a99f9a;
+        background-color: #FFFFFF;
+    }
+
+    #divtag .k-multiselect-wrap {
+        position: relative;
+        border-width: 0px;
+        border-style: solid;
+        border-radius: 0px !important; 
+        border-color: #C5C5C5;
+        background-color: #FFF;
+        min-height: 2.04em;
+    }
+
+     #divtag .k-widget {
+        border-color: #E7E7E7 !important;
+    }
+
+    #divtag .k-multiselect-wrap input {
+        border: 1px solid #FFFFFF !important;
+    }
+
+    .k-animation-container .k-state-focused {
+        border-width: 0;
+        border-color: #E7E7E7;
+        box-shadow: none;
+    }
+
+    #area-campaign .k-picker-wrap .k-select{
+        right: 0px !important;
+    }
+
+    #area-campaign .k-picker-wrap .k-select, .k-numeric-wrap .k-select {
+        border-style: solid;
+        border-width: 1px 1px 1px 1px !important;
+        border-color: inherit;
+        line-height: 23px;
+        height: 28px;
+    }
+    .k-picker-wrap {
+        border-width: 1px;
+        border-style: solid;
+        padding: 0 1.7em 0 0;
+    }
+
+    .k-input {
+        padding: 0;
+    }
+    #area-campaign .k-numeric-wrap, .k-picker-wrap {
+       border-style: none;
+    }
+
+    .modal-mass-iconplus span {
+        float: none;
+    }
+    .divStatusTag {
+        width: 200px;
+        float: right;
+    }
+    .divStatus {
+        width: 20px;
+        float: left;
+        margin-top: 25px;
+    }
+    .w265 {
+        width: 265px;
+    }
+    .tblStatusTag {
+        width: 100%;
+        margin-top: 20px;
+    }
+</style>
+<div class="loading" id="div-loading"></div>
+<div id="area-campaign" class="pop-wrapper">
+    <div class="modal-body ms-modal-body">
+
+        <div class="clear"></div>
+        <div class="modal-mass-iconplus" style="display: table;">
+            <button id="btnRelease" type="button" tabindex="6" data-bind="events: {click: sendmail}, disabled: noRightOrFisnish, attr:{class: classbtnRelease} ">
+                <span class="icon-20 icon-m-20 pull-left"></span>
+                <span class="margin-left4" id="lblSend">Release now</span>
+            </button>
+            <div style="display: table-cell;vertical-align: middle;width: 460px;">
+
+                <div class="k-input">
+                    <select id="ddlSendto"
+                            data-role="dropdownlist"
+                            data-text-field="text"
+                            data-value-field="value"
+                            data-bind="value: selectedSendTo, disabled: noRightOrFisnish, source: sendTosrc" tabindex="2"></select>
+                </div>
+                <div id="spnText" style="padding-left: 20px;"></div>
+            </div>
+        </div>
+        <div style="display: table;" class="w-100per">
+            <div style="display: table-row;">
+                <div style="display: table-cell; margin: 10px; width: 29%;">
+                    <label id="lblDay">Number of days</label>
+                    <div class="clear"></div>
+                    <input tabindex="1" data-bind="value:campaign.CampaignDay, events: {change: dayChange}, disabled: noRightOrFisnish" data-format="####.#########" data-decimal="16"
+                           data-decimals="16" maxlength="8" id="txtDay" name="txtDay" style="width: 165px;" data-value-update="keyup" onkeyup=" vmCampaign.activeModelChange() " onpaste="vmCampaign.activeModelChange()"
+                           data-role="numerictextbox" data-spinners="false" max="1000" min="0" /> <!--SONPT. Temporary Solution: data-format="#'###.#########" cause issue. Conflict MVVM numeric textbox-->
+
+                </div>
+                <div style="display: table-cell; margin: 5px; width: 18%;">
+                    <form id="frmtxtTime">
+                        <label id="lblTime">Time point</label>
+                        <div class="clear"></div>
+                        <input tabindex="2" data-bind="value:campaign.CampaignTime, disabled: noRightOrFisnish, events: {change: timeChange}" data-format="HH:mm"
+                               data-role="timepicker" data-spinners="false"
+                               id="txtTime" name="txtTime" class="input-append" style="width: 98%;" maxlength="5" />
+                    </form>
+                </div>
+                <div style="display: table-cell; margin: 5px; width: 50%;">
+                    <div style="margin-left: 15px;margin-right: 10px;">
+                        <label id="lblDescription">Description</label>
+                        <div class="clear"></div>
+                        <div class="input-append">
+                            <textarea id="txtDescription" class="eval-textarea" tabindex="3" name="txtDescription" data-bind="value: campaign.CampaignDescription, disabled: noRightOrFisnish" style="width: 100%; height: 70px;" onkeyup=" vmCampaign.activeModelChange() " draggable="false"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div style="display: table; width: 48%;">
+            <div style="display: table-cell; " id="divtag">
+                <label id="lblTag">Tag</label>
+                <div class="clear"></div>
+                <div class="k-input">
+                    <select id="msTag" data-role="multiselect"
+                            data-value-primitive="true"
+                             data-filter="contains"
+                            data-text-field="Name"
+                            data-value-field="Id"
+                            data-bind="value: campaign.Tags, source: allTags,events: {change: tagChange, filtering: multiSelectFiltering}, disabled: noRightOrFisnish"
+                            style="width: 295px; height: 100%;"></select>
+                </div>
+            </div>
+        </div>
+        <div style="display: table; margin-top: 20px;" class="w-100per">
+            <div style="display: table-cell;" id="divtag">
+                <label id="lblWei">Weiterverarbetung</label>
+                <div class="clear"></div>
+                <table class="tblStatusTag" id="tableStatusTag">
+                    <tr>
+                        <td>
+                            <div class="w265" id="divNotIsAccess">
+                                <div class="div-icon divStatus">
+                                    <span class="icon-32 status-active"></span>
+                                </div>
+                                <div class="divStatusTag">
+                                    <label id="lblTag">Tag</label>
+                                    <div class="clear"></div>
+                                    <div class="k-input">
+                                        <select id="msTagNotIsAccess" data-role="multiselect"
+                                                data-value-primitive="true"
+                                                 data-filter="contains"
+                                                data-text-field="Name"
+                                                data-value-field="Id"
+                                                data-bind="value: campaign.TagsNotIsAccess, source: allTags,events: {change: tagStatusChange, filtering: multiSelectFiltering}, disabled: noRightOrFisnish"
+                                                style="width: 100%; height: 100%;"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="w265" id="divTo60">
+                                <div class="div-icon divStatus">
+                                    <span class="icon-32 status-active5"></span>
+                                </div>
+                                <div class="divStatusTag">
+                                    <label id="lblTag">Tag</label>
+                                    <div class="clear"></div>
+                                    <div class="k-input">
+                                        <select id="msTagTo60" data-role="multiselect"
+                                                data-value-primitive="true"
+                                                 data-filter="contains"
+                                                data-text-field="Name"
+                                                data-value-field="Id"
+                                                data-bind="value: campaign.TagsTo60, source: allTags,events: {change: tagStatusChange, filtering: multiSelectFiltering}, disabled: noRightOrFisnish"
+                                                style="width: 100%; height: 100%;"></select>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="w265" id="divIsReadMail">
+                                <div class="div-icon divStatus">
+                                    <span class="icon-32 icon-mr"></span>
+                                </div>
+                                <div class="divStatusTag">
+                                    <label id="lblTag">Tag</label>
+                                    <div class="clear"></div>
+                                    <div class="k-input">
+                                        <select id="msTagIsReadMail" data-role="multiselect"
+                                                data-value-primitive="true"
+                                                 data-filter="contains"
+                                                data-text-field="Name"
+                                                data-value-field="Id"
+                                                data-bind="value: campaign.TagsIsReadMail, source: allTags,events: {change: tagStatusChange, filtering: multiSelectFiltering}, disabled: noRightOrFisnish"
+                                                style="width: 100%; height: 100%;"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="w265" id="divTo85">
+                                <div class="div-icon divStatus">
+                                    <span class="icon-32 status-active2"></span>
+                                </div>
+                                <div class="divStatusTag">
+                                    <label id="lblTag">Tag</label>
+                                    <div class="clear"></div>
+                                    <div class="k-input">
+                                        <select id="msTagTo85" data-role="multiselect"
+                                                data-value-primitive="true"
+                                                 data-filter="contains"
+                                                data-text-field="Name"
+                                                data-value-field="Id"
+                                                data-bind="value: campaign.TagsTo85, source: allTags,events: {change: tagStatusChange, filtering: multiSelectFiltering}, disabled: noRightOrFisnish"
+                                                style="width: 100%; height: 100%;"></select>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="w265" id="divTo10">
+                                <div class="div-icon divStatus">
+                                    <span class="icon-32 status-active1"></span>
+                                </div>
+                                <div class="divStatusTag">
+                                    <label id="lblTag">Tag</label>
+                                    <div class="clear"></div>
+                                    <div class="k-input">
+                                        <select id="msTagTo10" data-role="multiselect"
+                                                data-value-primitive="true"
+                                                 data-filter="contains"
+                                                data-text-field="Name"
+                                                data-value-field="Id"
+                                                data-bind="value: campaign.TagsTo10, source: allTags,events: {change: tagStatusChange, filtering: multiSelectFiltering}, disabled: noRightOrFisnish"
+                                                style="width: 100%; height: 100%;"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="w265" id="divTo100">
+                                <div class="div-icon divStatus">
+                                    <span class="icon-32 status-active4"></span>
+                                </div>
+                                <div class="divStatusTag">
+                                    <label id="lblTag">Tag</label>
+                                    <div class="clear"></div>
+                                    <div class="k-input">
+                                        <select id="msTagTo100" data-role="multiselect"
+                                                data-value-primitive="true"
+                                                 data-filter="contains"
+                                                data-text-field="Name"
+                                                data-value-field="Id"
+                                                data-bind="value: campaign.TagsTo100, source: allTags,events: {change: tagStatusChange, filtering: multiSelectFiltering}, disabled: noRightOrFisnish"
+                                                style="width: 100%; height: 100%;"></select>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="w265" id="divTo30">
+                                <div class="div-icon divStatus">
+                                    <span class="icon-32 status-active3"></span>
+                                </div>
+                                <div class="divStatusTag">
+                                    <label id="lblTag">Tag</label>
+                                    <div class="clear"></div>
+                                    <div class="k-input">
+                                        <select id="msTagTo30" data-role="multiselect"
+                                                data-value-primitive="true"
+                                                 data-filter="contains"
+                                                data-text-field="Name"
+                                                data-value-field="Id"
+                                                data-bind="value: campaign.TagsTo30, source: allTags,events: {change: tagStatusChange, filtering: multiSelectFiltering}, disabled: noRightOrFisnish"
+                                                style="width: 100%; height: 100%;"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+
+                    </tr>
+                </table>
+
+            </div>
+        </div>
+        <div style="display: table; margin-top: 20px;" class="w-100per">
+            <div style="display: table-row;">
+                <div style="display: table; width: 88%;">
+                    <div style="display: table-cell; " id="divtag">
+                        <label id="lblMonitor">Monitoring</label>
+                        <div class="clear"></div>
+                        <div class="k-input" style="width:272px">
+                            <select data-role="multiselect"
+                                    data-placeholder=""
+                                     data-filter="contains"
+                                    data-text-field="Name"
+                                    data-value-field="Id"
+                                    data-bind="value: oldAcc, source: accountSrc, events: {change: monitorChange,filtering: multiSelectFiltering}, disabled: noRightOrFisnish"
+                                    id="ddlTags"></select>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: table-cell; margin: 5px; width: 50%;">
+                    <div style="margin-left: 15px;margin-right: 10px;">
+                        <label id="lblMonitorDescription">Description</label>
+                        <div class="clear"></div>
+                        <div class="input-append">
+                            <textarea id="txtDescription" class="eval-textarea" tabindex="3" name="txtDescription" data-bind="value: campaign.MonitorDescription, disabled: noRightOrFisnish" style="width: 100%; height: 70px;" onkeyup=" vmCampaign.activeModelChange() " draggable="false"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+        <div class="modal-market-footer" >
+            <button id="btnUpdate" type="button" class="ms-button" tabindex="5" data-bind="events: {click: savecampaign}">
+                <span class="icon-20 icon-update"></span>
+                <span id="lblClose">Save</span>
+            </button>
+        </div>
+</div>
+
+<script type="text/javascript">
+    var vmCampaign = vmCampaign || {};
+    vmCampaign.Ultis = {};
+    vmCampaign.event = {};
+
+    var formH = 0;
+    var tableH = 0;
+
+    vmCrowdProjectView.pop.CampaignManager.IsModified = false;
+    //this is prototype function which is used in pop close event
+    vmCrowdProjectView.pop.CampaignManager.onOKFunc = function () {
+        //implement here
+        vmCampaign.viewModel.savecampaign();
+    };
+    //this is prototype function which is used in pop close event
+    vmCrowdProjectView.pop.CampaignManager.formValid = function () {
+        //implement here        
+        return true;
+    }
+    
+    vmCampaign.BindClosePopup = function () {
+        //Todo: move this inside showPopup of kendoPopup
+        vmCrowdProjectView.pop.CampaignManager.bind("close", function (e) {            
+            var pop = this;
+            if (pop.IsModified && !pop.needClose) {
+                e.preventDefault();
+                pConfirm(kLg.saveConfirmQuestion).then(function () {
+                    pop.needClose = true;
+                    if (pop.formValid())
+                        pop.onOKFunc();
+                    pop.destroyPop();
+                }, function () {
+                    pop.needClose = true;
+                    pop.destroyPop();
+                });
+            } else {
+                pop.destroyPop();
+            }
+        });
+    };
+
+    vmCampaign.dataservice = (function () {
+        var callAjaxQuestionFilter = function (divId, funcName, entryData, requestType, successCallBack) {
+            //var url = "../Handlers/CrmCrowdProjectViewHandler.ashx?funcName=" + funcName + "&projid=" + projectId + "&strid=" + strategyId + "&lang=" + language;
+            var url = "../Handlers/CrmCrowdProjectViewHandler.ashx?funcName=" + funcName + "&projid=" + projectId + "&strid=" + strategyId + "&cpid=" + vmCrowdProjectView.CrowdProjectId + "&lang=" + vmCampaign.currentLang;//+ "&strid=" + strategyId + "&lang=" + language;
+            return callAjax(divId, url, entryData, successCallBack, requestType);
+        };
+
+        var callAjaxByPost = function (funcName, entryData, successFunc) {
+            return callAjaxQuestionFilter('div-loading', funcName, JSON.stringify(entryData), AjaxConst.PostRequest, successFunc);
+        };
+
+        var savecampaign = function (entryDate, successFunc) {
+            callAjaxByPost("savecampaign", entryDate, successFunc);
+        };
+
+        var getcampaign = function (entryDate, successFunc) {
+            callAjaxByPost("getcampaign", entryDate, successFunc);
+        };
+       
+        return {            
+            savecampaign: savecampaign,
+            getcampaign: getcampaign
+        };
+    })();
+
+    vmCampaign.activeModelChange = function() {
+        vmCrowdProjectView.pop.CampaignManager.IsModified = true;
+    };    
+
+    vmCampaign.InitParam = function (res) {
+        var qs = new queryString(true);
+        vmCampaign.currentLang = qs.get('lang');//SONPT. no master page
+        vmCampaign.Role = res.value.Role;
+    };
+
+    vmCampaign.getTagHeight = function () {
+        return $("#area-campaign #divtag .k-multiselect-wrap:first").height();
+    };
+
+    vmCampaign.getTableTagHeight = function () {
+        return $("#area-campaign #tableStatusTag").height();
+    };
+
+    vmCampaign.SetupLanguage = function () {
+        $('#lblDay').text(kLg.lblDay);
+        $('#lblTime').text(kLg.lblTime);
+        $('#lblDescription').text(kLg.labelDes);
+        $('#lblMonitorDescription').text(kLg.textNote);
+        $('#lblTag').text(kLg.lblTag);
+        $('#lblSend').text(kLg.lblReleaseNow);
+        $('#lblClose').text(kLg.lblClose);
+        $('#lblWei').text(kLg.lblFurtherEdit);
+        $('#lblMonitor').text(kLg.lblMonitor);
+    };
+        
+    vmCampaign.SetupValidate = function () {
+        $.validator.addMethod("timeformat", function(value, element) {
+            return this.optional(element) || /^[0-2][0-9]:[0-5][0-9]$/i.test(value);
+        }, "");
+        $.validator.addMethod("valueBetween", function (value, element, options) {
+            return value >= options.min && value <= options.max;
+        }, "");
+        //SONPT. because Jquery validator & Kendo numeric conflict
+        $('#frmtxtTime').validate({
+            rules: {
+                txtDay: {                    
+                    valueBetween: { min: 0, max: 1000 }
+                    //,required: true,
+                    //maxlength: 100
+                },
+                txtTime: {                    
+                    timeformat: true
+                }
+            },
+            messages: {
+                txtDay: {                    
+                    valueBetween: ""
+                },
+                txtTime: {                    
+                    timeformat: kLg.validTime
+                }
+            }
+        });
+
+        //prevent Enter key submit form
+        $('form').on('submit', function (e) {
+            e.preventDefault();
+            $('#btnUpdate').trigger('click');
+        });
+    };
+
+    vmCampaign.DisableControl = function () {
+        var dayVal = $('#txtDay').val().replace(',','.');        
+        if (dayVal == '' || dayVal == null || dayVal == 0 || vmCommon.isFloat(parseFloat(dayVal)))
+            $('#txtTime').data("kendoTimePicker").enable(false);
+
+    };
+
+    vmCampaign.Ultis.statusTagsChange = function (camp) {
+        var model = vmCampaign.viewModel;
+        //Tags Not Is Access Change
+        $.each(camp.TagsNotIsAccess, function (i, value) {
+            if ($.inArray(value, model.oldTagsNotIsAccess) === -1) {
+                camp.StatusTagChange.push({ TagId: value, TypeId: 5, Status: 1 });
+            }
+        });
+        $.each(model.oldTagsNotIsAccess, function (i, value) {
+            if ($.inArray(value, camp.TagsNotIsAccess) === -1) {
+                camp.StatusTagChange.push({ TagId: value, TypeId: 5, Status: 2 });
+            }
+        });
+        //Tags Is Read Mail Change
+        $.each(camp.TagsIsReadMail, function (i, value) {
+            if ($.inArray(value, model.oldTagsIsReadMail) === -1) {
+                camp.StatusTagChange.push({ TagId: value, TypeId: 6, Status: 1 });
+            }
+        });
+        $.each(model.oldTagsIsReadMail, function (i, value) {
+            if ($.inArray(value, camp.TagsIsReadMail) === -1) {
+                camp.StatusTagChange.push({ TagId: value, TypeId: 6, Status: 2 });
+            }
+        });
+        //Tags To 10 Change
+        $.each(camp.TagsTo10, function (i, value) {
+            if ($.inArray(value, model.oldTagsTo10) === -1) {
+                camp.StatusTagChange.push({ TagId: value, TypeId: 7, Status: 1 });
+            }
+        });
+        $.each(model.oldTagsTo10, function (i, value) {
+            if ($.inArray(value, camp.TagsTo10) === -1) {
+                camp.StatusTagChange.push({ TagId: value, TypeId: 7, Status: 2 });
+            }
+        });
+        //Tags To 30 Change
+        $.each(camp.TagsTo30, function (i, value) {
+            if ($.inArray(value, model.oldTagsTo30) === -1) {
+                camp.StatusTagChange.push({ TagId: value, TypeId: 8, Status: 1 });
+            }
+        });
+        $.each(model.oldTagsTo30, function (i, value) {
+            if ($.inArray(value, camp.TagsTo30) === -1) {
+                camp.StatusTagChange.push({ TagId: value, TypeId: 8, Status: 2 });
+            }
+        });
+        //Tags To 60 Change
+        $.each(camp.TagsTo60, function (i, value) {
+            if ($.inArray(value, model.oldTagsTo60) === -1) {
+                camp.StatusTagChange.push({ TagId: value, TypeId: 9, Status: 1 });
+            }
+        });
+        $.each(model.oldTagsTo60, function (i, value) {
+            if ($.inArray(value, camp.TagsTo60) === -1) {
+                camp.StatusTagChange.push({ TagId: value, TypeId: 9, Status: 2 });
+            }
+        });
+        //Tags To 85 Change
+        $.each(camp.TagsTo85, function (i, value) {
+            if ($.inArray(value, model.oldTagsTo85) === -1) {
+                camp.StatusTagChange.push({ TagId: value, TypeId: 10, Status: 1 });
+            }
+        });
+        $.each(model.oldTagsTo85, function (i, value) {
+            if ($.inArray(value, camp.TagsTo85) === -1) {
+                camp.StatusTagChange.push({ TagId: value, TypeId: 10, Status: 2 });
+            }
+        });
+        //Tags To 100 Change
+        $.each(camp.TagsTo100, function (i, value) {
+            if ($.inArray(value, model.oldTagsTo100) === -1) {
+                camp.StatusTagChange.push({ TagId: value, TypeId: 11, Status: 1 });
+            }
+        });
+        $.each(model.oldTagsTo100, function (i, value) {
+            if ($.inArray(value, camp.TagsTo100) === -1) {
+                camp.StatusTagChange.push({ TagId: value, TypeId: 11, Status: 2 });
+            }
+        });
+    };
+
+    vmCampaign.Ultis.convertStatusCss = function (statusCss) {
+        switch (statusCss) {
+            case 'icon-32 status-active1':
+                return 7;
+            case 'icon-32 status-active2':
+                return 10;
+            case 'icon-32 status-active3':
+                return 8;
+            case 'icon-32 status-active4':
+                return 11;
+            case 'icon-32 status-active5':
+                return 9;
+            default:
+                return 5;
+        }
+    };
+
+    vmCampaign.Ultis.getPersonStatus = function (camp) {
+        var persons = vmCrowdProjectView.viewModel.persons;
+        if (persons !== null && persons !== undefined && persons.length > 0) {
+            for (var i = 0; i < persons.length; i++) {
+                var type = vmCampaign.Ultis.convertStatusCss(persons[i].StatusCss);
+                if (type === 6 && persons[i].IsReadMail) {
+                    type = 6;
+                }
+                camp.PersonStatus.push({ PersonId: persons[i].Id, TypeId: type, StatusId: persons[i].StatusId});
+            }
+        }
+    };
+
+    vmCampaign.Ultis.calculateCamp = function (camp) {
+        if (vmCommon.isInteger(camp.CampaignDay))
+        {
+            if (camp.CampaignDay == 0) {
+                camp.CampaignTime = null;
+            } else { // CampaignDay != 0
+                if (camp.CampaignTime != null) {                    
+                    if (typeof (camp.CampaignTime) == 'string') // type when get value from DB
+                        camp.CampaignTime = kendo.parseDate(camp.CampaignTime.toString().substring(0, 5), 'HH:mm');// convert change format "HH:mm:ss" to "HH:mm" & convert to type Date
+                    camp.CampaignTime = camp.CampaignTime.getHours() + ":" + camp.CampaignTime.getMinutes();
+                }
+                else // null
+                {
+                    camp.CampaignTime = '12:00'; //set default value
+                }
+            }            
+        }
+        else { //camp.CampaignDay is float 
+            if (camp.CampaignTime != null) {
+                if (typeof (camp.CampaignTime) == 'string') // type when get value from DB
+                    camp.CampaignTime = kendo.parseDate(camp.CampaignTime.toString().substring(0, 5), 'HH:mm');// convert change format "HH:mm:ss" to "HH:mm" & convert to type Date
+                camp.CampaignTime = camp.CampaignTime.getHours() + ":" + camp.CampaignTime.getMinutes();
+            }
+        }
+        
+    };
+
+    vmCampaign.getOldAcc = function (data)
+    {
+        var oldAcc = [];
+        var accs = data.Accounts;
+        for (i = 0; i < accs.length; i++) {
+            if ($.grep(data.Campaign.Monitor, function (it) { return it.Id === accs[i].Id; }).length > 0) {
+                oldAcc.push(accs[i]);
+            }
+        }
+        return oldAcc;
+    }
+
+    vmCampaign.Ultis.loadForm = function (res) {
+        var hasPerson = vmCrowdProjectView.viewModel.get('persons').length > 0;
+        vmCampaign.viewModel = kendo.observable({
+            isDisableBtnRelease: !(hasPerson && res.value.IsEnableBtnRelease),
+            classbtnRelease: (!(hasPerson && res.value.IsEnableBtnRelease)) || (res.value.Role < vmCommon.MemberRole.Edit) ? 'ms-button bg-disable' : 'ms-button',
+            allTags: res.value.AllTags,
+            campaign: res.value.Campaign,
+            accountSrc: res.value.Accounts,
+            oldAcc: vmCampaign.getOldAcc(res.value),
+            oldTagsNotIsAccess: res.value.Campaign.TagsNotIsAccess,
+            oldTagsIsReadMail: res.value.Campaign.TagsIsReadMail,
+            oldTagsTo10: res.value.Campaign.TagsTo10,
+            oldTagsTo30: res.value.Campaign.TagsTo30,
+            oldTagsTo60: res.value.Campaign.TagsTo60,
+            oldTagsTo85: res.value.Campaign.TagsTo85,
+            oldTagsTo100: res.value.Campaign.TagsTo100,
+            isDisable: res.value.Role < vmCommon.MemberRole.Edit,
+            role: res.value.Role,
+            resData: res.value,
+            noRightOrFisnish: res.value.IsFisnished || (res.value.Role < vmCommon.MemberRole.Edit),
+            //noRightOrFisnish: (res.value.Role < vmCommon.MemberRole.Edit),
+            //noRightOrFisnish: true,
+            selectedSendTo: { text: kLg.sendAll, value: vmCrmEnum.SENDEMAILTO.ALL },
+            sendTosrc: [{ text: kLg.sendAll, value: vmCrmEnum.SENDEMAILTO.ALL }, { text: kLg.notStarted, value: vmCrmEnum.SENDEMAILTO.NOTSTARTED }, { text: kLg.notFinish, value: vmCrmEnum.SENDEMAILTO.NOTFINISHED }],
+
+            multiSelectFiltering: function (e) {
+                var filter = e.filter;
+                if (filter) {
+                    filter.value = filter.value.replace(/\s\s+/g, ' ');
+                    if (filter.value.indexOf(' ') == 0) {
+                        filter.value = filter.value.slice(1);
+                    };
+                    e.sender.input.val(filter.value);
+                };
+
+            },
+
+            sendmail: function (e) {                
+                if (this.get('role').Role < vmCommon.MemberRole.Edit)
+                    return;
+                if ($("#btnRelease").attr("class") !== undefined && $("#btnRelease").attr("class").indexOf("bg-disable") !== -1)
+                    return;
+                
+                var sentTo = this.selectedSendTo.value;
+                var camp = this.campaign;
+                vmCampaign.Ultis.calculateCamp(camp);
+                pConfirm(kLg.ConfirmSendAllMail).then(function () {
+                    {
+                        if ((vmCrmFilterControl.NotNeedFilter || vmCrmFilterControl.LastId > 0) && (vmCrmFilterControl.Role > vmCommon.MemberRole.View)) {
+                            var item = vmCrowdProjectView.item.data;
+                            if (item.IsSendEmail) {
+                                var persons = vmCrowdProjectView.item.data.persons;
+                                var chargedPersons = [];
+                                //var arrItems = [];
+                                var mailCount = 0;
+                                var personIds = [];
+                                var personx = [];
+                                for (var i = 0; i < persons.length; i++) {
+                                    if (persons[i].IsHasSourcingEmail) {
+                                        chargedPersons.push(persons[i]);
+                                        personIds.push(persons[i].Id);
+                                        personx.push({ crmPersonId: persons[i].Id, statusId: persons[i].StatusId });
+
+                                        mailCount++;
+                                    }
+                                }
+                                if (mailCount > 0) {   
+                                    //var isSendPerNotAccessFrontEnd = $('#chkSendOnlyPerNotAccessFrontEnd').is(':checked');
+                                    //var entry = { peIds: personIds.join(), campaign: camp, IsModified: vmCrowdProjectView.pop.CampaignManager.IsModified, sentTo: sentTo };
+                                    var entry = { Persons: personx, campaign: camp, IsModified: vmCrowdProjectView.pop.CampaignManager.IsModified, sentTo: sentTo };
+                                    vmCrowdProjectView.dataservice.sendmailcrowdproject(entry, function (serData) {
+                                        switch (serData.value.ActionResult) {
+                                            case vmCrmEnum.ResultStatus.NOROLE:
+                                                pAlert(kLg.msgPermissionView);
+                                                break;
+                                            case vmCrmEnum.ResultStatus.ROLLBACK:
+                                                pAlert(kLg.lblUnsuccess);                                            
+                                            case vmCrmEnum.ResultStatus.CONFLICT:
+                                                pAlert(kLg.lblUnsuccess);
+                                                break;
+                                            case vmCrmEnum.ResultStatus.USING:                                                
+                                                //pAlert(kLg.msgMailSenderAreUsing);
+                                                break;
+                                            case vmCrmEnum.ResultStatus.SUCCESS:
+                                                vmCrowdProjectView.pop.CampaignManager.destroyPop();
+                                                switch (sentTo) {
+                                                    case vmCrmEnum.SENDEMAILTO.NOTSTARTED:
+                                                        chargedPersons = chargedPersons.filter(function (x) { return !x.IsAccess; })
+                                                        break;
+                                                    case vmCrmEnum.SENDEMAILTO.NOTFINISHED:
+                                                        chargedPersons = chargedPersons.filter(function (x) { return x.Percent < 100; })                                                        
+                                                        break;
+                                                    default:
+
+                                                }                                                                                                    
+
+                                                for (var j = 0; j < chargedPersons.length; j++) {                                                    
+                                                    vmCrowdProjectView.setFormat(chargedPersons[j]);
+                                                };
+                                                $('#btnSendAllMail').css('cursor', 'default');
+                                                break;
+                                        }
+                                    });
+
+                                }
+                            } else {
+
+                                void (0);
+                            }
+                        } else {
+                            void (0);
+                        }
+                    }
+                });
+
+            },
+            savecampaign: function (e) { //e.data.campaign = campaign
+                
+                if (this.get('role').Role < vmCommon.MemberRole.Edit)
+                    return;
+                if (this.get('isDisableBtnRelease').Role < vmCommon.MemberRole.Edit)
+                    return;
+
+                if (!vmCrowdProjectView.pop.CampaignManager.IsModified) {
+                    vmCrowdProjectView.pop.CampaignManager.destroyPop();
+                    return;
+                }
+                
+                if ($('#frmtxtTime').valid())
+                {                    
+                    var camp = this.campaign;
+                    vmCampaign.Ultis.calculateCamp(camp);
+                    vmCampaign.Ultis.statusTagsChange(camp);
+                    vmCampaign.Ultis.getPersonStatus(camp);
+                    camp.Monitor = vmCommon.pushApply([], this.oldAcc, function (item) { return { Id: item.Id }; });
+
+                    vmCampaign.dataservice.savecampaign(camp, function (res) {
+                        switch (res.value.ActionResult) {
+                            case vmCrmEnum.ResultStatus.NOROLE:
+                                pAlert(kLg.msgPermissionView);
+                                break;
+                            case vmCrmEnum.ResultStatus.USING:
+                                pAlert(kLg.msgActionConflict);
+                                break;
+                            case vmCrmEnum.ResultStatus.CONFLICT:
+                                pAlert(kLg.msgConflictData);
+                                break;
+                            case vmCrmEnum.ResultStatus.SUCCESS:
+                                vmCrowdProjectView.pop.CampaignManager.destroyPop();
+                                break;
+                            default:
+                                break;
+                        }
+                    });
+                }
+                
+            },
+            dayChange: function (e) {
+                var dayVal = e.data.campaign.CampaignDay;
+                var isDisableTime = this.get('role').Role < vmCommon.MemberRole.Edit || vmCommon.isFloat(dayVal) || dayVal == null || dayVal == 0;
+                $("#txtTime").data("kendoTimePicker").enable(!isDisableTime);
+                vmCampaign.activeModelChange();
+            },
+            timeChange: function (e) {
+                vmCampaign.activeModelChange();
+            },
+            tagChange: function (e) {
+                
+                setHeightPopUp(vmCrowdProjectView.pop.CampaignManager, formH + vmCampaign.getTagHeight());
+                vmCampaign.activeModelChange();
+            },
+            tagStatusChange: function (e) {
+                
+                setHeightPopUp(vmCrowdProjectView.pop.CampaignManager, tableH + vmCampaign.getTableTagHeight());
+                vmCampaign.activeModelChange();
+            },
+            monitorChange: function (e) {
+
+                var listAcc = vmCommon.deepCopy(this.get("oldAcc")).sort(SortByLastName);
+                this.set("oldAcc", listAcc);
+                vmCampaign.activeModelChange();
+            }
+        });
+
+        kendo.bind($("#area-campaign"), vmCampaign.viewModel);
+        
+        vmCampaign.SetupLanguage();
+        vmCampaign.BindClosePopup();
+        vmCampaign.DisableControl();
+        vmCampaign.SetupValidate();
+        vmCampaign.InitParam(res);        
+
+        limitedTabKey();// in common.js
+        $('#txtDay').focus();
+
+        formH = $("#area-campaign").height() - vmCampaign.getTagHeight();
+        tableH = $("#area-campaign").height() - vmCampaign.getTableTagHeight();
+    };
+
+    vmCampaign.Ultis.getCampaignCallback = function (res) {
+            switch (res.value.ActionResult) {
+                case vmCrmEnum.ResultStatus.NOROLE:
+                    pAlert(kLg.msgPermissionView);
+                    break;
+                    //Todo: SONPT. refactor all crmcrowdprojectviewhandler then add case USING, CONFLICT
+                case vmCrmEnum.ResultStatus.SUCCESS:
+                    vmCampaign.Ultis.loadForm(res);
+                    break;
+            }
+    };
+
+    //Pageload
+    $(document).ready(function () {
+        vmCampaign.dataservice.getcampaign(null, vmCampaign.Ultis.getCampaignCallback);
+
+    });
+
+</script>
+

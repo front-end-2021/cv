@@ -1,0 +1,465 @@
+﻿<style>
+    .menu-title, .item-title {
+        height: 30px;
+        background-color: #38baf8;
+        line-height: 28px;
+        padding-left: 5px;
+        color: white;
+        padding: 1px;
+    }
+
+        .menu-title a {
+            color: white;
+        }
+
+    .menu-content {
+        width: 96%;
+        float: right;
+        display: none;
+    }
+
+    .menu-place {
+        margin-top: 4px;
+        position: relative;
+    }
+
+    .menu-title:hover {
+        cursor: pointer;
+    }
+    .titleindex {white-space: pre; width: 540px; overflow: hidden; text-overflow: ellipsis; float: left;}
+
+    /*.cbx-index{}*/
+</style>
+
+<div id="pop-goal-index" class="pop-wrapper">
+    <form id="goalindexform" role="form" class="form-horizontal">
+        <div class="kmessage">
+            <span id="kmessage"></span>
+        </div>
+
+        <div class="modal-body ms-modal-body" style="height: 459px; overflow-x: hidden; overflow-y: scroll;padding-top: 0 !important;" id="div-goalindex">
+            <div class="root" id="root"></div>
+        </div>
+
+        <div class="modal-market-footer">
+            <button id="btnUpdateGoalIndex" type="button" class="ms-button" onclick="vmKpiGoalIndex.updateIndex()">
+                <span class="icon-20 icon-close"></span>
+                <span id="lblGoalIndexClose">Speichern und schliessen</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script type="text/html" id="indextemplate">
+    #for(var i = 0; i < data.length; i++){#
+    #var item = data[i]; #
+    <div class="menu-place" level="#:item.Level#" typeid="#:item.TypeId#" mid="#:item.Id#">
+
+        #if(item.IsLatest){#
+        <div class="item-title pointer" onclick="vmKpiGoalIndex.SelectSubTitle(this)">
+            <div style="width: 24px; height: 24px; float: left;margin-right: 10px;"></div>
+            <span style="float: left; width: #:94-item.Level#%; overflow: hidden; word-break: break-word; height: 28px;" class="titleindex" >#:item.Name || ""#</span>
+        </div>
+        #}else{#
+        <div class="menu-title pointer" onclick="vmKpiGoalIndex.openSubItem(this)" id="#:item.Level#m#:item.Id#">
+            <span class="arrow-panel-online icon-24 icon-left-block arrow-collapse" style="margin-top: 2px"></span>
+            <span style="float: left; width: #:94-item.Level#%; overflow: hidden; word-break: break-word; height: 28px;">#:item.Name || ""#</span>
+        </div>
+        #}#
+
+        #if(item.HasSelect){#
+        <input type="checkbox" class="pull-right cbx-index" style="position: absolute; right: 5px; top: 5px;" onchange="vmKpiGoalIndex.selectSubItem(this)" #if(item.IsSelect){#checked#}# #if(!item.IsSelectable){#disabled#}# #if(!item.IsSelectable){#islock#}# />
+        #}#
+        
+        <div class="clear"></div>
+        <div class="menu-content" id="#:item.Level#x#:item.Id#">
+        </div>
+        <div class="clear"></div>
+    </div>
+    #}#
+
+</script>
+
+<!-- ReSharper disable CoercedEqualsUsing -->
+<script type="text/javascript">
+    var vmKpiGoalIndex = {};
+    var vmKpiGoal = vmKpiGoal || {};
+    vmKpiGoalIndex.modelChanged = false;
+
+    var dColor = "#38baf8", //default color
+        mColor = "#2c9fd5"; //mask color
+
+    vmKpiGoalIndex.viewModel = undefined;
+
+    vmKpiGoalIndex.destroyPop = function () {
+        vmGoalAction.popKpiGoalIndex.destroy();
+        vmGoalAction.popKpiGoalIndex = null;
+        $(".body-content").after("<div id='popkpigoalindex'></div>");
+    };
+
+    vmGoalAction.popKpiGoalIndex.bind("close", function (e) {
+        if (vmKpiGoalIndex.modelChanged) {
+            if (confirm(kLg.saveConfirmQuestion)) {
+                vmKpiGoalIndex.updateIndex();
+            } else {
+                vmKpiGoalIndex.destroyPop();
+            }
+
+        } else {
+            vmKpiGoalIndex.destroyPop();
+        }
+
+    });
+
+    vmKpiGoalIndex.updateIndex = function () {
+        if (kpiIndex.LongLinkId == null && kpiIndex.GuidLinkId == null) {
+            vmKpiGoalIndex.message(kLg.InvalidData);
+            return;
+        }
+
+        var topics = vmGoalAction.kpiIndexOptions.kpiData.KpiGoalTopics;
+        var topic = vmCommon.findById(kpiIndex.KpiGoalTopicId, topics);
+
+        if (vmGoalAction.kpiIndexOptions.IsEdit) {
+            var index = vmCommon.findById(kpiIndex.Id, topic.KpiGoalIndexes);
+
+            if (index.Id > 0 && (index.LinkIds != kpiIndex.LinkIds)) {
+                index.DataState = dataState.Modified;
+            }
+
+            if (index.TypeId == 10 && index.GuidLinkId != kpiIndex.GuidLinkId) {
+                vmKpiGoal.addDeletedItems([{ GuidLinkId: index.GuidLinkId, TypeId: index.TypeId, KpiGoalIndexTimes: [] }], vmCommon.KpiGoalType.INDEX);
+            }
+
+            index.LongLinkId = kpiIndex.LongLinkId;
+            index.GuidLinkId = kpiIndex.GuidLinkId;
+            index.LinkIds = kpiIndex.LinkIds;
+
+            index.TypeId = kpiIndex.TypeId;
+            index.Name = kpiIndex.Name;
+
+            $("#indexname" + kpiIndex.Id).text(kpiIndex.Name);
+        } else {
+            vmKpiGoal.addNewGoalIndex(kpiIndex);
+        }
+
+        vmKpiGoalIndex.modelChanged = false;
+        vmGoalAction.popKpiGoalIndex.close();
+    };
+
+    vmKpiGoalIndex.SelectSubTitle = function (e) {
+        var parent = $(e).closest("div.menu-place");
+        var cbs = $(parent).children("input.cbx-index");
+
+        if (cbs.length === 0) return;
+        var cbx = cbs[0];
+        $(cbx).click();
+    };
+
+    vmKpiGoalIndex.selectSubItem = function (e) {
+        var flag = $(e).is(":checked");
+
+        var parent = $(e).closest("div.menu-place");
+        var pId = $(parent).attr("mid");
+        var pLevel = $(parent).attr("level");
+
+        if (pId == undefined || pLevel == undefined || isNaN(Number(pLevel))) return;
+
+        var item = vmCommon.findByFunc(settings, function (it) { return it.Id == pId && it.Level == pLevel; });
+        if (item == null) {
+            $(e).prop("checked", !flag);
+            return;
+        }
+
+        //change data
+        if (isNaN(Number(pId)))
+            kpiIndex.GuidLinkId = flag ? pId : null;
+        else 
+            kpiIndex.LongLinkId = flag ? pId : null;
+
+        kpiIndex.LinkIds = item.Ids;
+
+        kpiIndex.TypeId = flag ? item.TypeId : null;
+        kpiIndex.Name = flag ? item.Name : "";
+
+        $("#div-goalindex input.cbx-index:not([islock])").not(e).prop("checked", false);
+        $("#div-goalindex input.cbx-index:not([islock])").not(e).prop("disabled", false);
+
+        if (flag && !item.IsLatest) {
+            var contentId = item.Level + "x" + item.Id;
+            $("#" + contentId + " input.cbx-index:not([islock])").prop("checked", true);
+            $("#" + contentId + " input.cbx-index:not([islock])").prop("disabled", true);
+        }
+
+        vmKpiGoalIndex.mergeSelected();
+        vmKpiGoalIndex.autoColor();
+        vmKpiGoalIndex.modelChanged = true;
+    };
+
+    vmKpiGoalIndex.autoColor = function () {
+        for (var i = 0; i < settings.length; i++) {
+            var item = settings[i];
+            $("#" + item.Level + "m" + item.Id).css({ "background-color": item.IsPath ? mColor: dColor });
+        }
+
+        ///////////
+        //var item = vmCommon.findByFunc(settings, function (it) { return (it.Id == kpiIndex.LongLinkId || it.Id == kpiIndex.GuidLinkId) && it.TypeId == kpiIndex.TypeId; });
+
+        //var setColorForParent = function (pId, pLevel) {
+        //    if (pId == null || pLevel == null) return;
+        //    var pItem = vmCommon.findByFunc(settings, function (it) { return it.Id == pId && it.Level == pLevel; });
+        //    if (pItem == null) return;
+
+        //    var menuId = pLevel + "m" + pId;
+        //    $("#" + menuId).css({ "background-color": mColor });
+
+        //    var newParent = vmCommon.findByFunc(settings, function (it) { return it.Id == pItem.ParentId && it.Level == (pItem - 1); });
+
+        //    if (newParent != null) setColorForParent(newParent.Id, newParent.Level);
+        //};
+
+        //if (item == null) {
+        //    //remove color
+        //    $("#div-goalindex  div.menu-title").css({ "background-color": dColor });
+        //    return;
+        //} else {
+        //    var parentLevel = item.Level - 1, parentId = item.ParentId;
+        //    var parent = vmCommon.findByFunc(settings, function (it) { return it.Id == parentId && it.Level == parentLevel; });
+        //    if (parent == null) return;
+
+        //    setColorForParent(parentId, parentLevel);
+        //}
+    };
+
+    vmKpiGoalIndex.openSubItem = function (e) {
+
+        var parent = $(e).closest("div.menu-place");
+        var pId = $(parent).attr("mid");
+        var pLevel = $(parent).attr("level");
+
+        if (pId == undefined || pLevel == undefined || isNaN(Number(pLevel))) return;
+
+        pLevel = Number(pLevel);
+
+        var contentId = pLevel + "x" + pId;
+        var content = $("#" + contentId);
+
+        var dataCount = $(e).data("datacount");
+
+        if (dataCount != undefined) {
+
+            if ($(content).is(":visible")) {
+                $(content).hide(120);
+                vmKpiGoalIndex.toggleIcon(e, false);
+            } else {
+                $(content).show(dataCount > 0 ? 120 : 0);
+                vmKpiGoalIndex.toggleIcon(e, true);
+            }
+
+        } else {
+            var subs = vmKpiGoalIndex.getSubItems(pId, pLevel);
+            vmKpiGoalIndex.binding(contentId, subs, "indextemplate");
+
+            //bind color
+            for (var i = 0; i < subs.length; i++) {
+                var item = subs[i];
+                $("#" + item.Level + "m" + item.Id).css({ "background-color": item.IsPath ? mColor : dColor });
+            }
+
+            $(e).data("datacount", subs.length);
+            
+            var cbxs = $(e).next("input.cbx-index");
+            if (cbxs.length > 0) {
+                var cbx = cbxs[0];
+                var flag = $(cbx).is(":checked");
+
+                if (flag) {
+                    $("#" + contentId + " input.cbx-index").prop("checked", true);
+                    $("#" + contentId + " input.cbx-index").prop("disabled", true);
+                }
+            }
+
+            $(content).show(subs.length > 0 ? 120 : 0);
+            vmKpiGoalIndex.toggleIcon(e, true);
+        }
+    };
+
+    vmKpiGoalIndex.getSubItems = function (parentId, parentLevel) {
+        var subLevel = parentLevel + 1;
+        return $.grep(settings, function (it) { return it.ParentId == parentId && it.Level == subLevel; });
+    };
+
+    vmKpiGoalIndex.toggleIcon = function (elem, isOpen) {
+        var temp = $(elem).children("span.arrow-panel-online");
+        if (temp.length === 0) return;
+
+        var ico = temp[0];
+        if (isOpen) {
+            $(ico).removeClass("arrow-collapse").addClass("arrow-right-big");
+        } else {
+            $(ico).removeClass("arrow-right-big").addClass("arrow-collapse");
+        }
+    };
+
+    vmKpiGoalIndex.binding = function (divId, data, tempId) {
+        var templateContent = $("#" + tempId).html();
+        data = data || [];
+
+        var template = kendo.template(templateContent);
+        $("#" + divId).html(template(data));
+    };
+
+    vmKpiGoalIndex.setUpLanguage = function () {
+        $("#pop-goal-index #lblGoalIndexClose").text(kLg.lblClose);
+    };
+
+    vmKpiGoalIndex.mergeSelected = function () {
+        var i;
+        for (i = 0; i < settings.length; i++) {
+            settings[i].IsSelect = false;
+            settings[i].IsPath = false;
+        }
+
+        function markParent(parentId, parentLevel) {
+            if (parentId == undefined || parentLevel <= 0) return;
+
+            var parent = vmCommon.findByFunc(settings, function (it) { return it.Id == parentId && it.Level == parentLevel; });
+            if (parent == undefined) return;
+
+            //parent.HasSelect = false;
+            parent.IsPath = true;
+
+            markParent(parent.ParentId, parentLevel - 1);
+        };
+
+        function markChilds(parentId, parentLevel) {
+            var x, childLevel = parentLevel + 1;
+            var childs = $.grep(settings, function(it) {
+                return it.ParentId == parentId && it.Level == childLevel;
+            });
+
+            if (childs.length === 0) return;
+            for (x = 0; x < childs.length; x++) {
+                var child = childs[x];
+
+                //child.HasSelect = false;
+                child.IsSelect = true;
+
+                markChilds(child.Id, child.Level);
+            }
+
+        };
+
+        //itself
+        for (i = 0; i < settings.length; i++) {
+            var item = settings[i];
+            if (item.TypeId == kpiIndex.TypeId && (item.Id == kpiIndex.LongLinkId || item.Id == kpiIndex.GuidLinkId)) {
+                    item.IsSelect = true;
+
+                    //mark parent
+                    markParent(item.ParentId, item.Level - 1);
+
+                    //mark childs
+                    markChilds(item.Id, item.Level);
+                    break;
+            }
+            //if ((item.Id == kpiIndex.LongLinkId || item.Id == kpiIndex.GuidLinkId) && item.TypeId == kpiIndex.TypeId) {
+            //    item.IsSelect = true;
+
+            //    //mark parent
+            //    markParent(item.ParentId, item.Level - 1);
+
+            //    //mark childs
+            //    markChilds(item.Id, item.Level);
+            //    break;
+            //}
+        }
+    };
+
+    vmKpiGoalIndex.yolo = function () {
+        var topics = kd.KpiGoalTopics;
+        var topic = vmCommon.findById(kpiIndex.KpiGoalTopicId, topics);
+
+        if (topic == undefined) return;
+
+        if (topic.TypeId == vmCommon.KpiGoalTopicType.LandRegion || topic.TypeId == vmCommon.KpiGoalTopicType.Goal) return;
+
+        var indexes = topic.KpiGoalIndexes;
+        var otherIndexes = indexes.filter(t => t.Id != kpiIndex.Id);
+
+        function disableParent(source, parentId, parentLevel) {
+            if (parentId == undefined || parentLevel <= 0) return;
+
+            var parent = vmCommon.findByFunc(source, function (it) { return it.Id == parentId && it.TypeId == parentLevel; });
+            if (parent == undefined) return;
+
+            parent.IsSelectable = false;
+            disableParent(source, parent.ParentId, parentLevel - 1);
+        }
+
+        function disableChilds(source, parentId, parentLevel) {
+            var x, childLevel = parentLevel + 1;
+
+            var childs = $.grep(source, function (it) {
+                return it.ParentId == parentId && it.TypeId == childLevel;
+            });
+
+            if (childs.length === 0) return;
+
+            for (x = 0; x < childs.length; x++) {
+                var child = childs[x];
+
+                child.IsSelectable = false;
+
+                disableChilds(source, child.Id, child.TypeId);
+            }
+        }
+
+        for (var i = 0; i < otherIndexes.length; i++) {
+            var anotherIndex = otherIndexes[i];
+            var item = settings.find(t => t.Id == (anotherIndex.LongLinkId || t.Id == anotherIndex.GuidLinkId) && t.TypeId == anotherIndex.TypeId);
+            if (item == undefined) continue;
+
+            disableParent(settings, item.ParentId, item.TypeId - 1);
+            disableChilds(settings, item.Id, item.TypeId);
+        }
+    };
+
+    vmKpiGoalIndex.message = function (text, time) {
+        if (time) {
+            setTimeout(function () {
+                $("#pop-goal-index #kmessage").text("");
+            }, time);
+        }
+        
+        if (text == undefined) {
+            $("#pop-goal-index #kmessage").text("");
+            return;
+        }
+        
+        $("#pop-goal-index #kmessage").text(text || "");
+        return;
+    };
+
+    //READY
+    var settings = [], kpiIndex, kd;
+    $(function () {
+        kpiIndex = vmCommon.deepCopy(vmGoalAction.kpiIndexOptions.kpiIndex);
+        settings = vmCommon.deepCopy(vmGoalAction.kpiIndexOptions.kpiSetting);
+        kd = vmCommon.deepCopy(vmGoalAction.kpiIndexOptions.kpiData);
+
+        vmKpiGoalIndex.mergeSelected();
+        vmKpiGoalIndex.yolo();
+
+        var roots = $.grep(settings, function (it) { return it.Level === 1; });
+        vmKpiGoalIndex.binding("root", roots, "indextemplate");
+        
+        if (kpiIndex.LongLinkId != null || kpiIndex.GuidLinkId != null) {
+            vmKpiGoalIndex.autoColor();
+        }
+
+        vmKpiGoalIndex.setUpLanguage();
+    });
+
+</script>
+<!-- ReSharper restore CoercedEqualsUsing -->

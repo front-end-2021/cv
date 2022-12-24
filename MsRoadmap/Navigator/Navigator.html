@@ -1,0 +1,101 @@
+﻿<div class="goalactionnavigator-modal">
+    <transition name="modal">
+        <div class="modal-mask">
+            <div class="modal-wrapper">
+                <div id="pop-goalactionnavigator" class="modal-content popup-edit-board" style="width: 860px;height: 534px;background-color: white;margin: 0 auto;font-size: 14px;">
+
+                    <!--title-->
+                    <div class="modal-header">
+                        <slot name="header">
+                            <slot name="header">
+                                <h4 class="modal-title" name="header">{{Lang.lblNavigation}}</h4>
+                            </slot>
+                            <div>
+                                <span class="k-icon k-i-teilmark pointer" style="position: absolute;right: 35px;top: 11px;" @click="gotoActionPlan"></span>
+                            </div>
+                            <button type="button" class="close" @click="onClose">&times;</button>
+                        </slot>
+                    </div>
+                    <!--title-->
+
+                    <div class="modal-body" style="height: 498px;overflow: scroll;padding-bottom: 10px;padding-top:10px;">
+                        <slot name="body">
+                            <div>
+                                <b>{{data.Path}}</b>
+                            </div>
+
+                            <div class="clearx2"></div>
+
+                            <div>
+                                <div v-for="main in data.GoalActions" style="width:100%;display:inline-flex;">
+                                    <div style="width: 25%;">
+                                        <div class="gaitem">
+                                            <div class="ganame mainname pointer" :gaid="main.Id" typeid="1">
+                                                <span v-show="main.IsLink" style="float:right; margin-top:32px;" class="icon-20 white" v-bind:class="{'icon-url': !main.HasMasterLink, 'icon-url-red': main.HasMasterLink }"></span>
+                                                <p style="line-height: initial;">{{main.Name}}</p>
+                                            </div>
+
+                                            <div class="gadate">
+                                                <div style="width: 50%;padding-left: 3px;border-right: 0.5px solid #76838b;padding-top: 1px;">{{ main.Start|date }}</div>
+                                                <div style="width: 50%;padding-right: 3px;border-left: 0.5px solid #76838b;text-align: right;padding-top: 1px;">{{ main.End|date }}</div>
+                                            </div>
+
+                                            <div style="padding-left: 3px;padding-right: 3px;overflow: hidden;white-space: nowrap;">
+                                                <span style="float: left;width:49%;">{{showpercent(main.IsShowPercent, main.Percent, main.ApEvaluation)}}</span>
+                                                <span style="float: right;width:49%;text-align:right;">{{main.Status}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div style="width:75%;">
+                                        <div v-for="sub in main.Childs" :key="sub.Id" style="width:100%;display:inline-flex;">
+                                            <div style="width: 33%;">
+                                                <div class="gaitem">
+                                                    <div class="ganame subname pointer" :gaid="sub.Id" typeid="2">
+                                                        <span v-show="sub.IsLink" style="float:right; margin-top:32px;" class="icon-20 white" v-bind:class="{'icon-url': !sub.HasMasterLink, 'icon-url-red': sub.HasMasterLink }"></span>
+                                                        <p style="line-height: initial;">{{sub.Name}}</p>
+                                                    </div>
+
+                                                    <div class="gadate">
+                                                        <div style="width: 50%;padding-left: 3px;border-right: 0.5px solid #5e696d;padding-top: 1px;">{{sub.Start|date}}</div>
+                                                        <div style="width: 50%;padding-right: 3px;border-left: 0.5px solid #5e696d;text-align: right;padding-top: 1px;">{{sub.End|date}}</div>
+                                                    </div>
+
+                                                    <div style="padding-left: 3px;padding-right: 3px;overflow: hidden;white-space: nowrap;">
+                                                        <span style="float: left;width:49%;">{{showpercent(sub.IsShowPercent, sub.Percent, sub.ApEvaluation)}}</span>
+                                                        <span style="float: right;width:49%;text-align:right;">{{sub.Status}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div style="width:67%;">
+                                                <div v-for="action in sub.Childs" :key="action.Id" style="width: 50%;float:left;">
+                                                    <div class="gaitem">
+                                                        <div class="ganame actionname pointer" :gaid="action.Id" typeid="3">
+                                                            <span v-show="action.IsLink" style="float:right; margin-top:32px;" class="icon-20" v-bind:class="{'icon-url': !action.HasMasterLink, 'icon-url-red': action.HasMasterLink }"></span>
+                                                            <p style="line-height: initial;">{{action.Name}}</p>
+                                                        </div>
+
+                                                        <div class="gadate">
+                                                            <div style="width: 50%;padding-left: 3px;border-right: 0.5px solid #cbe9f8;padding-top: 1px;">{{action.Start|date}}</div>
+                                                            <div style="width: 50%;padding-right: 3px;border-left: 0.5px solid #cbe9f8;text-align: right;padding-top: 1px;">{{action.End|date}}</div>
+                                                        </div>
+
+                                                        <div style="padding-left: 3px;padding-right: 3px;overflow: hidden;white-space: nowrap;">
+                                                            <span style="float: left;width:49%;">{{showpercent(action.IsShowPercent, action.Percent, action.ApEvaluation, action.TodoPercent)}}</span>
+                                                            <span style="float: right;width:49%;text-align:right;">{{action.Status}}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </slot>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </transition>
+</div>

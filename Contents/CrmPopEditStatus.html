@@ -1,0 +1,585 @@
+﻿<style>
+    #picker {
+        margin-right: 5px;
+    }
+
+    div.k-colorpalette {
+        width: 200px !important;
+    }
+
+    .k-colorpicker .k-picker-wrap {
+        height: 29px;
+    }
+
+    .k-selected-color {
+        height: 29px !important;
+    }
+
+    .k-colorpicker {
+        width: 28px;
+    }
+
+        .k-colorpicker .k-select {
+            display: none;
+        }
+
+    #crowdoption .k-numerictextbox.qday{
+        padding-left: 0;
+    }
+
+    #crowdoption .k-numerictextbox.qday input.qday{
+        width: 55px !important;
+    }
+
+    #crowdoption .k-numerictextbox.qday span.k-i-warning{
+        right: 0 !important;
+    }
+
+    .type-enable{
+        color: initial !important;
+    }
+
+    #pop-crmstatus .k-timepicker .k-select {
+        width: 19px !important;
+    }
+</style>
+
+<div id="loading-crmstatus" class="loading"></div>
+<div id="pop-crmstatus" class="pop-wrapper">
+    <form id="fCrmStatusForm" role="form">
+        <div class="modal-body ms-modal-body" id="div-crmstatus">
+            <div class="form-group">
+                <label id="lblNameCategories">name</label>
+                <div class="clear"></div>
+                <input class="modal-input txtInput w-98per" name="CategoryName" id="txtNameCategories" tabindex="1" data-bind="value: statusDetail.Name" />
+            </div>
+            <hr class="modal-market-hr" />
+            <div class="form-group">
+                <label id="lblDescriptionCategories"></label>
+                <div class="clear"></div>
+                <textarea class="modal-textarea w-98per" id="txtDescriptionCategories" tabindex="2" data-bind="value: statusDetail.Description"></textarea>
+            </div>
+
+            <div class="form-group">
+                <div id="statusExtension" style="margin-top: 10px;">
+
+                    <div class="row" style="width: 98%;margin-left: 0" data-bind="attr:{ class: extClass.crowd }">
+                        <div>
+                            <input type="radio" value="true" name="rcrowd" data-bind="checked: isCrowd, events: {change: onSelectCrowd}, disabled: isUsed" />
+                            <label id="lblCrowdProject" style="margin-left: 4px">Crowd Project</label>
+                            <div class="clear"></div>
+                        </div>
+
+                        <div class="clear"></div>
+
+                        <div id="crowdoption" style="margin-bottom: 55px;margin-top: 5px;" data-bind="visible: isCrowd">
+                            <div>
+                                <div class="row type-enable" style="width: 98%;margin-left: 0;margin-bottom:6px;">
+                                    <div id="lblCPActivation" class="pull-left" style="width:40%">Crowd Projekt auslösen</div>
+                                    <div class="pull-left" style="width:20%">
+                                        <input id="cbxmanual" class="pull-left type-enable" type="checkbox" style="margin-right: 3px;" data-bind="checked: crowd.IsManualSend, events:{change: changeManual}"  />
+                                        <div id="lblManual" style="padding-top:1px;">Manuell</div>
+                                    </div>
+                                    <div class="pull-left" style="width:40%">
+                                        <input id="cbxauto" class="pull-left type-enable" type="checkbox" style="margin-right: 3px;" data-bind="checked: crowd.IsAutoSend, events:{change: changeAuto}" />
+                                        <div id="lblTimeControl" style="padding-top:1px;">Zeitgesteuert</div>
+                                    </div>
+                                </div>
+                                <div class="row" style="width: 98%;margin-left: 0;margin-bottom:12px;">
+                                    <div class="pull-left" style="width:60%;padding-top: 24px;">
+                                        <input type="checkbox" class="pull-left" style="margin-right: 3px;" data-bind="checked: crowd.IsUserSoftware, disabled: isUsed" />
+                                        <div id="lblUserSoftware" style="padding-top:1px;" class="pull-left">Formular wird durch User ausgeführt</div>
+                                    </div>
+
+                                    <div class="pull-left type-enable" style="width:40%">
+                                        <div class="pull-left" style="width: 40%">
+                                            <span id="lblDay">Tage</span>
+                                            <div class="clear" style="margin-bottom:3px"></div>
+                                            <input id="qday" class="modal-input qday" type="text" style="width:80%;" data-bind="value: crowd.QDay, events:{change: onChangeQDay}, enabled: enableQDay" data-format="#" data-role="numerictextbox" data-spinners="false" name="day" />
+                                        </div>
+                                        <div class="pull-left" style="width: 60%">
+                                            <span id="lblTimePoint">Zeitpunkt</span>
+                                            <div class="clear" style="margin-bottom:3px"></div>
+                                            <input id="qtime" class="modal-input qtime" type="text" style="width:98%;padding-left: 0;padding-right: 0;" data-bind="value: crowd.QTime, events:{change: onChangeQTime}, enabled: enableQTime" data-role="timepicker" data-format="HH:mm" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clear"></div>
+                            <div class="col-md-7" style="padding-left: 0;padding-right: 0">
+                                <div>
+                                    <select class="crm-drop pull-left w-100per" id="crowd-drop"
+                                            data-value-primitive="true"
+                                            data-role="dropdownlist"
+                                            data-text-field="Name"
+                                            data-value-field="Id"
+                                            data-bind="value: crowd.CrmId, source: crowdSrc, disabled: isWord"></select>
+
+                                    <div class="clear"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                        
+                    <div class="row" style="width: 98%;margin-left: 0">
+                        <div class="col-md-7" style="padding-left: 0;padding-right: 0">
+                            <div data-bind="attr:{class: extClass.word}">
+                                <input type="radio" value="true" name="rword" data-bind="checked: isWord, events: {change: onSelectWord}, disabled: isUsed" />
+                                <label id="lblWord" style="margin-left: 4px">Word Template</label>
+
+                                <div class="clear"></div>
+                                <select class="crm-drop pull-left w-100per" id="word-drop"
+                                        data-value-primitive="true"
+                                        data-role="dropdownlist"
+                                        data-text-field="Name"
+                                        data-value-field="Id"
+                                        data-bind="value: word.CrmId, source: wordSrc, enabled: isWord"></select>
+                            </div>
+                        </div>
+                        <div class="col-md-4" style="padding-left: 36px;padding-right: 0;padding-top: 30px;">
+                            <div>
+                                <input type="checkbox" data-bind="checked: statusCheck.CheckedState" /> <label id="lblStatusCheck" style="margin-left: 4px;">Status Check</label>
+                            </div>
+                            <br />
+                            <div style="margin-top: -4px;">
+                                <label id="lblStatusNote">Name Check</label><br />
+                                <input type="text" class="modal-input txtInput" data-bind="value: statusCheck.Note" maxlength="50" />
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                </div>
+        </div>
+            <div class="modal-market-footer">
+                <button id="btnUpdateCrmStatus" type="button" class="ms-button" data-bind="events:{click: update}">
+                    <span class="icon-20 icon-close"></span>
+                    <span id="lblCrmStatusClose">Speichern und schliessen</span>
+                </button>
+            </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    var vmCrmStatus = {};
+    var cmSetting = {};
+    var query = new queryString(true);
+    //var isStrategy = currentStratery.Type == 1;
+    var statusDetail = undefined;
+    var extensions = undefined;
+
+    vmCrmStatus.IsModified = false;
+    vmCrmStatus.statusModel = undefined;
+
+    vmCrmStatus.dataService = function () {
+        var callAjaxStatus = function (divId, funcName, entryData, requestType, successCallBack) {
+            var url = "../Handlers/CrmSettingHandler.ashx?funcName=" + funcName + "&projid=" + projectId + "&strid=" + strategyId + "&lang=" + language;
+            return callAjax(divId, url, entryData, successCallBack, requestType);
+        };
+
+        var callAjaxByPost = function (funcName, entryData, successFunc) {
+            return callAjaxStatus('activity-loading', funcName, JSON.stringify(entryData), AjaxConst.PostRequest, successFunc);
+        };
+
+        var addStatus = function (entryData, successFunc) {
+            callAjaxByPost("addcategories", entryData, successFunc);
+        }
+
+        var editStatus = function (entryData, successFunc) {
+            callAjaxByPost("updatecategories", entryData, successFunc);
+        }
+
+        return { addStatus: addStatus, editStatus: editStatus};
+    }();
+
+    vmCrmStatus.validForm = function () {
+        var flag = true;
+        var statusTemp = vmCrmStatus.statusModel.statusDetail;
+
+        if (flag && statusTemp.Name.trim().length === 0) {
+            flag = false;
+            ShowToolTip($("#txtNameCategories"), kLg.InvalidData, "top");
+            
+        };
+
+        var crowdTemp = vmCrmStatus.statusModel.crowd;
+        if (flag && crowdTemp.CrmId > 0) {
+
+            if (crowdTemp.QDay != null && crowdTemp.QTime == null) {
+                flag = false;
+                vmCommon.showTooltip2($("#qtime"), kLg.InvalidData, "top", 2500);
+            }
+
+            if (crowdTemp.QDay == null && crowdTemp.QTime != null) {
+                flag = false;
+                vmCommon.showTooltip2($("#qday"), kLg.InvalidData, "top", 2500);
+            }
+
+        }
+
+        return flag;
+    };
+
+    vmCrmStatus.destroyPop = function () {
+        vmCrmEnum.popEditStatus.destroy();
+        vmCrmEnum.popEditStatus = null;
+
+        $("#pop-setting-crm").after('<div id="pop-add-categories-place"></div>');
+    };
+
+    vmCrmEnum.popEditStatus.bind("close", function (e) {
+        if (vmCrmStatus.IsModified) {
+            if (confirm(kLg.saveConfirmQuestion)) {
+
+                if (vmCrmStatus.validForm()) {
+                    vmCrmStatus.statusModel.update();
+                } else {
+                    e.preventDefault();
+                }
+  
+            } else {
+                vmCrmStatus.destroyPop();
+            }
+
+        } else {
+            vmCrmStatus.destroyPop();
+        }
+    });
+
+    vmCrmStatus.autoHeight = function () {
+        var cOptionIsShow = $("#crowdoption").is(":visible");
+        vmCrmEnum.popEditStatus.wrapper.css({
+            height: 432 + (cOptionIsShow ? $("#crowdoption").height() : 0) + (cOptionIsShow ? 60 : 0)
+        });
+        //vmCrmEnum.popEditStatus.center();
+    };
+
+    vmCrmStatus.setupLanguage = function () {
+        $("#pop-crmstatus #lblNameCategories").text(kLg.labelCategories);
+        $("#pop-crmstatus #lblDescriptionCategories").text(kLg.Description);
+
+        $("#pop-crmstatus #lblCrowdProject").text(kLg.lblCrowdProject);
+        $("#pop-crmstatus #lblWord").text(kLg.lblWordTemplate);
+
+        $("#pop-crmstatus #lblStatusCheck").text(kLg.lblStatusCheck);
+        $("#pop-crmstatus #lblStatusNote").text(kLg.lblStatusName);
+
+        $("#pop-crmstatus #lblCPActivation").text(kLg.titleCPActivation);
+        $("#pop-crmstatus #lblManual").text(kLg.titleManual);
+        $("#pop-crmstatus #lblTimeControl").text(kLg.titleTimeControl);
+        $("#pop-crmstatus #lblUserSoftware").text(kLg.titleUserSoftware);
+        $("#pop-crmstatus #lblTimePoint").text(kLg.titleTimePoint);
+        $("#pop-crmstatus #lblDay").text(kLg.titleDays);
+
+        $("#pop-crmstatus #btnUpdateCrmStatus").text(kLg.lblClose);
+    };
+
+    function jsonDateToTimeSpan(datetime) {
+        if (Object.prototype.toString.call(datetime) === "[object Date]") {
+            var arr = [];
+            arr.push(datetime.getHours());
+            arr.push(datetime.getMinutes());
+            arr.push(datetime.getSeconds());
+            return arr.join(':');
+        } else {
+            return datetime;
+        }
+    };
+
+
+    $(function () {
+        cmSetting = vmCrmEnum;
+        statusDetail = vmCrmEnum.statusOptions.Status;
+        var extData = vmCrmEnum.statusOptions.ExtensionData;
+        
+        var crowds = extData.CrowdProjects;
+        var words = extData.Words;
+        var exts = extData.Extensions;
+
+        if ($.grep(exts, function (it) { return it.TypeId === vmCrmEnum.CrmCategoriesExtensionType.CrowdProject; }).length === 0) {
+            exts.push({ IsManualSend: false, QTime: null, QDay: null, IsAutoSend: false, IsUserSoftware: false, Id: 0, CrmCategoriesId: statusDetail.Id, TypeId: vmCrmEnum.CrmCategoriesExtensionType.CrowdProject, CrmId: 0, FirstCrmId: 0, DataState: dataState.Unchanged, IsUsed: false });
+        }
+
+        if ($.grep(exts, function (it) { return it.TypeId === vmCrmEnum.CrmCategoriesExtensionType.Word; }).length === 0) {
+            exts.push({ IsManualSend: false, QTime: null, QDay: null, IsAutoSend: false, IsUserSoftware: false, Id: 0, CrmCategoriesId: statusDetail.Id, TypeId: vmCrmEnum.CrmCategoriesExtensionType.Word, CrmId: 0, FirstCrmId: 0, DataState: dataState.Unchanged, IsUsed: false });
+        }
+
+        var crowd = $.grep(exts, function (it) { return it.TypeId === vmCrmEnum.CrmCategoriesExtensionType.CrowdProject; })[0];
+        //crowd.QDay = 0;
+
+        var word = $.grep(exts, function (it) { return it.TypeId === vmCrmEnum.CrmCategoriesExtensionType.Word; })[0];
+        var statusCheck = $.grep(exts, function (it) { return it.TypeId === vmCrmEnum.CrmCategoriesExtensionType.StatusCheck; })[0];
+
+        if (statusCheck.Id === 0) statusCheck.Note = "beendet";
+        var isUsed = crowd.IsUsed;
+
+        crowds.unshift({ Id: 0, Name: kLg.titleStatusSelectCP });
+        words.unshift({ Id: 0, Name: "" });
+
+        vmCrmStatus.statusModel = kendo.observable({
+            statusDetail: statusDetail,
+            isUsed: isUsed,
+
+            crowdSrc: crowds,
+            wordSrc: words,
+
+            crowd: crowd,
+            word: word,
+
+            statusCheck: statusCheck,
+            isWord: word.CrmId > 0,
+            isCrowd: crowd.CrmId > 0,
+            enableQDay: crowd.IsAutoSend && crowd.QTime == null,
+            enableQTime: crowd.IsAutoSend && crowd.QDay != null,
+            onChangeQDay: function () {
+                this.set("enableQTime", this.crowd.IsAutoSend && this.crowd.QDay != null);
+                if (this.crowd.DataState === dataState.Unchanged) this.crowd.set("DataState", dataState.Modified);
+            },
+            onChangeQTime: function (e) {
+                var str = $(e.sender.element).val();
+                this.set("enableQDay", this.crowd.IsAutoSend && this.crowd.QTime == null && str.length === 0);
+                if (this.crowd.DataState === dataState.Unchanged) this.crowd.set("DataState", dataState.Modified);
+            },
+
+            changeManual: function (e) {
+                $("#pop-crmstatus #qday").tooltip("destroy");
+                $("#pop-crmstatus #qtime").tooltip("destroy");
+
+                if (this.crowd.IsManualSend) {
+                    this.crowd.set("IsAutoSend", false);
+                    this.crowd.set("QDay", null);
+                    this.crowd.set("QTime", null);
+
+                    this.set("enableQDay", false);
+                    this.set("enableQTime", false);
+                }
+
+                $("#qtime").val("");
+
+                if (this.crowd.DataState === dataState.Unchanged) this.crowd.set("DataState", dataState.Modified);
+            },
+
+            changeAuto: function (e) {
+                $("#pop-crmstatus #qday").tooltip("destroy");
+                $("#pop-crmstatus #qtime").tooltip("destroy");
+
+                if (this.crowd.IsAutoSend) {
+                    this.crowd.set("IsManualSend", false);
+
+                    this.set("enableQDay", this.crowd.IsAutoSend && this.crowd.QTime == null);
+                    this.set("enableQTime", this.crowd.IsAutoSend && this.crowd.QDay != null);
+                } else {
+                    this.crowd.set("QDay", null);
+                    this.crowd.set("QTime", null);
+
+                    this.set("enableQDay", false);
+                    this.set("enableQTime", false);
+                }
+
+                if (this.crowd.DataState === dataState.Unchanged) this.crowd.set("DataState", dataState.Modified);
+            },
+            onSelectCrowd: function () {
+                $("#pop-crmstatus #qday").tooltip("destroy");
+                $("#pop-crmstatus #qtime").tooltip("destroy");
+
+                this.set("isWord", false);
+                this.word.set("CrmId", 0);
+
+                this.setVisible();
+                vmCrmStatus.autoHeight();
+            },
+            onSelectWord: function () {
+                $("#pop-crmstatus #qday").tooltip("destroy");
+                $("#pop-crmstatus #qtime").tooltip("destroy");
+
+                this.set("isCrowd", false);
+                this.crowd.set("CrmId", 0);
+
+                this.crowd.set("IsManualSend", false);
+                this.crowd.set("QDay", null);
+                this.crowd.set("QTime", null);
+                this.crowd.set("IsUserSoftware", false);
+                this.crowd.set("IsAutoSend", false);
+
+                this.setVisible();
+                vmCrmStatus.autoHeight();
+            },
+            //onChangeType: function (e) {
+            //    this.set("isWord", e.target.value === "true");
+
+            //    if (this.isWord) {
+            //        this.crowd.set("CrmId", 0);
+
+            //        this.crowd.set("IsManualSend", false);
+            //        this.crowd.set("QDay", null);
+            //        this.crowd.set("QTime", null);
+            //        this.crowd.set("IsUserSoftware", false);
+            //        this.crowd.set("IsAutoSend", false);
+
+            //    } else {
+            //        this.word.set("CrmId", 0);
+            //    }
+
+            //    this.setVisible();
+
+            //    vmCrmStatus.autoHeight();
+            //},
+            extClass: { crowd: "", word: "" },
+            setVisible: function () {
+                if (this.isUsed) {
+                    this.set("extClass", { crowd: "type-visible", word: "type-visible" });
+                } else {
+                    this.set("extClass", { crowd: this.isCrowd ? "" : "type-visible", word: this.isWord ? "" : "type-visible" });
+                }
+
+                //this.set("extClass", this.isUsed ? { crowd: "type-visible", word: "type-visible" } : this.isWord ? { crowd: "type-visible", word: "" } : { crowd: "", word: "type-visible" });
+            },
+            update: function () {
+                if (!vmCrmStatus.IsModified) {
+                    vmCrmEnum.popEditStatus.close();
+                    return;
+                }
+
+                if (!vmCrmStatus.validForm()) return;
+
+                var sts = this.statusDetail;
+                var exts = [];
+
+                var crowd = this.crowd;
+                crowd.QTime = jsonDateToTimeSpan(crowd.QTime);
+                if (crowd.DataState !== dataState.Unchanged) exts.push(crowd);
+
+                var word = this.word;
+                if (word.DataState !== dataState.Unchanged) exts.push(word);
+
+                var statusCheck = this.statusCheck;
+                statusCheck.CrmId = statusCheck.CheckedState ? 1 : 0;
+                exts.push(statusCheck);
+
+                sts.Extensions = exts;
+
+                //save data
+                function saveStatusCallBack(data) {
+                    $("#pop-crmstatus #txtNameCategories").tooltip('destroy');
+                    var state;
+                    if (sts.Id === 0) {
+                        state = data.ResultStatus;
+                    } else {
+                        state = data;
+                    }
+                    switch (state) {
+                        case vmCrmStatus.enumsRoleConflict.conflict:
+                            pAlert(kLg.msgConflickData).then(function () {
+                                vmCrmEnum.GetChildCategories(sts.ParentId);
+                            });
+                            break;
+                        case vmCrmStatus.enumsRoleConflict.using:
+                            pAlert(kLg.msgCategoryAreUsing).then(function () {
+                                vmCrmEnum.GetChildCategories(sts.ParentId);
+                            });
+                            break;
+                        case vmCrmStatus.enumsRoleConflict.nameExist:
+                            pAlert(kLg.msgNameIsExisted).then(function () {
+                                vmCrmEnum.GetChildCategories(sts.ParentId);
+                            });
+                            break;
+                        case vmCrmStatus.enumsRoleConflict.extensionIsUsing:
+                            pAlert(kLg.msgCrowdIsAccessed);
+                        default:
+                            vmCrmEnum.GetChildCategories(sts.ParentId);
+                            break;
+                    }
+                };
+                
+                if (vmCrmEnum.statusOptions.IsEdit) {
+                    vmCrmStatus.dataService.editStatus(sts, saveStatusCallBack);
+                } else {
+                    vmCrmStatus.dataService.addStatus(sts, saveStatusCallBack);
+                }
+
+                vmCrmStatus.IsModified = false;
+                vmCrmEnum.popEditStatus.close();
+
+            }
+        });
+
+        kendo.bind($("#pop-crmstatus"), vmCrmStatus.statusModel);
+
+        vmCrmStatus.statusModel.bind("change", function (e) {
+            vmCrmStatus.IsModified = true;
+
+            var data;
+
+            //update DataState for other properties
+            if (e.field === "crowd.IsUserSoftware") {
+                data = vmCrmStatus.statusModel.crowd;
+                if (data.DataState === dataState.Unchanged) data.set("DataState", dataState.Modified);
+                return;
+            }
+
+            if (e.field === "crowd.CrmId") {
+                data = vmCrmStatus.statusModel.crowd;
+            } else if (e.field === "word.CrmId") {
+                data = vmCrmStatus.statusModel.word;
+            } else if (e.field === "statusCheck.Note" || e.field === "statusCheck.CheckedState") {
+                data = vmCrmStatus.statusModel.statusCheck;
+            }
+
+            if (data == undefined) return;
+
+            if (data.TypeId === vmCrmEnum.CrmCategoriesExtensionType.CrowdProject || data.TypeId === vmCrmEnum.CrmCategoriesExtensionType.Word) {
+
+                if (data.CrmId === data.FirstCrmId) {
+                    data.set("DataState", dataState.Unchanged);
+                } else if (data.FirstCrmId > 0) {
+                    data.set("DataState", dataState.Modified);
+                } else {
+                    data.set("DataState", dataState.Added);
+                }
+
+            } else if (data.TypeId === vmCrmEnum.CrmCategoriesExtensionType.StatusCheck && data.Id > 0) {
+                data.set("DataState", dataState.Modified);
+            }
+
+        });
+
+        vmCrmStatus.statusModel.setVisible();
+        vmCrmStatus.IsModified = false;
+
+        vmCrmStatus.setupLanguage();
+
+        if (isUsed) {
+            var cdrop = $("#statusExtension #crowd-drop").data("kendoDropDownList");
+            cdrop.enable(false);
+
+            var wdrop = $("#statusExtension #word-drop").data("kendoDropDownList");
+            wdrop.enable(false);
+        }
+
+        vmCrmStatus.autoHeight();
+    });
+
+    vmCrmStatus.enumsRoleConflict = {
+        conflict: -1,
+        noRole: 0,
+        using: -2,
+        nameExist: -3,
+        extensionIsUsing: -8
+    };
+
+    $(".qtime").on("blur", function (e) {
+        var text = $(e.target).val();
+        var timepicker = $(e.target).data("kendoTimePicker");
+
+        if (text.length > 0 && timepicker._value == null) {
+            $(e.target).val("");
+        }
+    });
+
+    $("#txtNameCategories").on("keydown", function (e) {
+        $(e.currentTarget).tooltip("destroy");
+    });
+
+</script>

@@ -1,0 +1,453 @@
+﻿<style>
+    .menu-title, .item-title {
+        height: 30px;
+        background-color: #38baf8;
+        line-height: 28px;
+        padding-left: 5px;
+        color: white;
+        padding: 1px;
+    }
+
+        .menu-title a {
+            color: white;
+        }
+
+    .menu-content {
+        width: 96%;
+        float: right;
+        display: none;
+    }
+
+    .menu-place {
+        margin-top: 4px;
+        position: relative;
+    }
+
+    .menu-title:hover {
+        cursor: pointer;
+    }
+</style>
+
+<div id="pop-customer-journey-se" class="pop-wrapper">
+    <form id="fsubproduct" role="form" class="form-horizontal">
+        <div class="modal-body ms-modal-body" style="height: 443px; overflow-x: hidden; overflow-y: scroll;">
+            <div data-bind="source: groups" data-template="listSub"></div>
+        </div>
+        <div class="modal-market-footer">
+            <button type="button" class="ms-button" data-bind="events:{click: update}">
+                <span class="icon-20 icon-close"></span>
+                <span id="lblClose">Speichern und schliessen</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script type="text/html" id="listSub">
+    <div class="menu-place" data-bind="attr:{mtype: TypeId}">
+        <div class="#if(TypeId < 3){#menu-title#}else{#item-title#}#" data-bind="attr:{sid: ObjectId, mtype: TypeId}" onclick="vmCusJourneySe.openSubItem(this);">
+            <span class="arrow-panel-online icon-24 icon-left-block arrow-collapse" style="margin-top: 2px"></span>
+            <span data-bind="text:Name"></span>
+        </div>
+        <input type="checkbox" data-bind="checked: IsSelect, attr:{sid: ObjectId, mtype: TypeId}" class="pull-right" style="position: absolute; right: 5px; top: 5px;" />
+        <div class="clear"></div>
+        <div class="menu-content" data-bind="attr:{ccount: ChildCount}">
+        </div>
+        <div class="clear"></div>
+    </div>
+</script>
+
+<script type="text/html" id="listSub2">
+    #for(var i = 0; i< data.length; i++){#
+    #var item = data[i];#
+    <div class="menu-place" mtype="#:item.TypeId#">
+        <div class="#if(item.TypeId < 3){#menu-title#}else{#item-title#}#" sid="#:item.ObjectId#" mtype="#:item.TypeId#" onclick="vmCusJourneySe.openSubItem(this); ">
+            #if(item.TypeId < 3 && item.ChildCount > 0){#
+            <span class="arrow-panel-online icon-24 icon-left-block arrow-collapse" style="margin-top: 2px"></span>
+            #}else{#
+            <span style="margin-left: 10px"></span>
+            #}#
+            <span>#:item.Name#</span>
+        </div>
+        #if(item.IsSelect){#
+        <input type="checkbox" checked class="pull-right" style="position: absolute; right: 5px; top: 5px;" sid="#:item.ObjectId#" mtype="#:item.TypeId#" />
+        #}else{#
+        <input type="checkbox" class="pull-right" style="position: absolute; right: 5px; top: 5px;" sid="#:item.ObjectId#" mtype="#:item.TypeId#" />
+        #}#
+        <div class="clear"></div>
+        <div class="menu-content" ccount="#:item.ChildCount#">
+        </div>
+        <div class="clear"></div>
+    </div>
+    #}#
+</script>
+
+<script>
+    var vmCusJourneySe = {}, objSelect = {};
+    vmCusJourneySe.viewModel = undefined;
+    var groups = [], products = [], subProducts = [], bindSubSrc = [], checkSubSrc = [], isAutoCheck = false, callbackFunc = undefined;
+    vmCusJourneySe.modelChanged = false;
+
+    vmCommon.popSelectSubmarketProductSe.bind("close", function (e) {
+        if (vmCusJourneySe.modelChanged) {
+            if (confirm(kLg.saveConfirmQuestion)) {
+                vmCusJourneySe.updateSelect();
+            } else {
+                vmCusJourneySe.destroyPop();
+            }
+
+        } else {
+            vmCusJourneySe.destroyPop();
+        }
+    });
+
+    vmCusJourneySe.destroyPop = function () {
+        vmCommon.popSelectSubmarketProductSe.destroy();
+        vmCommon.popSelectSubmarketProductSe = null;
+        if (!$('#popSelectCustomerJourneySe').length)
+            $('#popSelectCustomerJourneySeHolder').after('<div id="popSelectCustomerJourneySe"></div>');
+    }
+
+    vmCusJourneySe.updateSelect = function () {
+        if (objSelect.LinkId === 0) {
+            vmJourneyAssignColunm.viewModel.set("LinkId", objSelect.LinkId);
+            vmJourneyAssignColunm.viewModel.set("LinkType", objSelect.LinkType);
+        } else {
+            if (vmCommon.popSelectSubProOptions.OldLinkId !== objSelect.LinkId) {
+                vmJourneyAssignColunm.viewModel.set("Name", objSelect.Data.Name);
+                vmJourneyAssignColunm.viewModel.set("Description", objSelect.Data.Description);
+                vmJourneyAssignColunm.viewModel.set("IsNew", objSelect.Data.IsNew);
+                var isSubProduct = objSelect.Data.ChildCount > 0;
+                vmJourneyAssignColunm.viewModel.set("IsProduct", true);
+                vmJourneyAssignColunm.viewModel.set("IsSubProduct", isSubProduct);
+                vmJourneyAssignColunm.viewModel.set("EnSubProducts", !isSubProduct);
+                vmJourneyAssignColunm.viewModel.set("IvSubProducts", isSubProduct);
+                vmJourneyAssignColunm.viewModel.set("LinkId", objSelect.LinkId);
+                vmJourneyAssignColunm.viewModel.set("LinkType", objSelect.LinkType);
+
+                vmJourneyAssignColunm.viewModel.set("SubProducts", getSubProducts(objSelect.Data.SubProducts));
+
+                $('#popCustomerJourneySeAssignColunm #cusJourneyName').tooltip('destroy');
+            }
+        }
+
+        if (typeof vmSubMarket !== 'undefined' && vmSubMarket) {
+            if (vmSubMarket.popSubClient != undefined) vmSubMarket.AdjustPopSubClientHeight();
+            else {
+                if (vmSubMarket.AdjustPopupHeight) vmSubMarket.AdjustPopupHeight();
+            }
+        };
+
+        function getSubProducts(lstCurrentSub) {
+            if (!lstCurrentSub) return [];
+            var listSubP = [];
+
+            for (var i = 0; i < lstCurrentSub.length; i++) {
+                var item = lstCurrentSub[i];
+                var addItem = {};
+                addItem.Id = item.Id;
+                addItem.Name = item.Name;
+                addItem.ProductId = item.ProductId;
+                addItem.Description = item.Description;
+                addItem.Mdf = item.Mdf;
+                addItem.SubmarketProductDocuments = item.SubmarketProductDocuments;
+                addItem.CreatedBy = item.CreatedBy;
+                addItem.CreatedDate = item.CreatedDate;
+                addItem.ModifiedBy = item.ModifiedBy;
+                addItem.ModifiedDate = item.ModifiedDate;
+                addItem.HasConnection = item.HasConnection;
+                addItem.RegionId = item.RegionId;
+                addItem.LinkId = item.LinkId;
+                addItem.LinkType = item.TypeId;
+                listSubP.push(addItem);
+            }
+            return listSubP;
+        }
+    }
+
+    vmCusJourneySe.checkExistNameSubProduct = function (lstSub, name) {
+        for (var k = 0; k < lstSub.length; k++) {
+            if (lstSub[k].Name === name)
+                return true;
+        }
+        return false;
+    }
+
+    function findProductGroup(id) {
+        var groups = vmSProduct.SMProductData.ProductGroupPros;
+        for (var k = 0; k < groups.length; k++) {
+            if (groups[k].Id == id)
+                return groups[k];
+        }
+        return null;
+    }
+
+    vmCusJourneySe.updateListSubClient = function (lstCurrentSub) {
+
+        var lstOldSub = subMarketModel.get("SubClients");
+
+        for (var y = 0; y < lstOldSub.length; y++) {
+            lstOldSub[y].set("DataState", dataState.Deleted);
+            lstOldSub[y].set("IsShow", false);
+        }
+        if (!lstCurrentSub) return lstOldSub;
+        for (var i = 0; i < lstCurrentSub.length; i++) {
+            var item = lstCurrentSub[i];
+            var addItem = {};
+            addItem.DataState = dataState.Added;
+            addItem.IsShow = true;
+            addItem.OrganisationId = item.OrganisationId;
+            addItem.Name = item.Name;
+            addItem.LinkId = item.LinkId;
+            addItem.LinkType = item.LinkType;
+            addItem.LinkType = item.TypeId;
+            addItem.TypeId = item.TypeId;
+            addItem.SubmarketProductDocuments = item.SubmarketProductDocuments;
+            addItem.Description = item.Description;
+            lstOldSub.push(addItem);
+        }
+        return lstOldSub;
+    };
+
+    vmCusJourneySe.updateListSub = function () {
+        if (typeof callbackFunc === 'function')
+            callbackFunc(checkSubSrc);
+    }
+
+    vmCusJourneySe.getChild = function (parentId, lst) {
+        var rs = [];
+        for (var i = 0; i < lst.length; i++) {
+            if (lst[i].ParentId === parentId) {
+                rs.push(lst[i]);
+            }
+        }
+
+        return vmCommon.sortBy(rs, "Index");
+    };
+
+    vmCusJourneySe.autoColor = function () {
+        if (groups.length === 0) return;
+
+        var dColor = "#38baf8", //default color
+            mColor = "#2c9fd5"; //mask color
+
+        for (var i = 0; i < groups.length; i++) {
+            var g = groups[i];
+            var gcolor = g.IsSelect ? mColor : dColor;
+
+            var proChilds = vmCusJourneySe.getChild(g.ObjectId, products);
+            if (proChilds.length > 0) {
+                if (gcolor === dColor) {
+                    if ($.grep(proChilds, function (it) { return it.IsSelect; }).length > 0) {
+                        gcolor = mColor;
+                    }
+                }
+
+                for (var j = 0; j < proChilds.length; j++) {
+                    var p = proChilds[j];
+                    var pcolor = p.IsSelect ? mColor : dColor;
+
+                    var subChilds = vmCusJourneySe.getChild(p.ObjectId, subProducts);
+
+                    if (pcolor === dColor && subChilds.length > 0) {
+                        if ($.grep(subChilds, function (it) { return it.IsSelect; }).length > 0) {
+                            pcolor = mColor;
+
+                            if (gcolor === dColor) {
+                                gcolor = mColor;
+                            }
+                        }
+                    }
+
+                    var pTitles = $("div.menu-title[sid='" + p.ObjectId + "'][mtype='2']");
+                    if (pTitles.length === 0) continue;
+
+                    var pTitle = pTitles[0];
+                    $(pTitle).css({ "background-color": pcolor });
+                }
+            }
+
+            var gTitles = $("div.menu-title[sid='" + g.ObjectId + "'][mtype='1']");
+            if (gTitles.length === 0) continue;
+
+            var gTitle = gTitles[0];
+            $(gTitle).css({ "background-color": gcolor });
+        }
+
+        return;
+    };
+
+    vmCusJourneySe.setLanguage = function () {
+        $("#pop-customer-journey-se #lblClose").text(kLg.lblClose);
+    };
+
+    vmCusJourneySe.openSubItem = function (e) {
+        var objectId = $(e).attr("sid"), typeId = $(e).attr("mtype");
+        if (objectId === undefined || typeId === undefined)
+            return;
+
+        objectId = Number(objectId);
+        typeId = Number(typeId);
+
+        if (typeId === 3)
+            return;
+
+        var panel = $(e).closest("div.menu-place").children("div.menu-content");
+
+        if (panel.length === 0) return;
+
+        if ($(e).hasClass("hasdata")) {
+            if ($(panel).is(":visible")) {
+                $(panel).hide(120);
+                vmCusJourneySe.toggleIcon(e, false);
+            } else {
+                $(panel).show(120);
+                vmCusJourneySe.toggleIcon(e, true);
+            }
+        } else {
+            var lst = typeId === 1 ? products : subProducts;
+            var data = vmCusJourneySe.getChild(objectId, lst);
+
+            var template = kendo.template($("#listSub2").html());
+            $(panel).html(template(data));
+            $(panel).show(120);
+            $(e).addClass("hasdata");
+
+            vmCusJourneySe.toggleIcon(e, true);
+        }
+
+        vmCusJourneySe.autoColor();
+    };
+
+    vmCusJourneySe.toggleIcon = function (elem, isOpen) {
+        var temp = $(elem).children("span.arrow-panel-online");
+        if (temp.length === 0) return;
+
+        var ico = temp[0];
+        if (isOpen) {
+            $(ico).removeClass("arrow-collapse").addClass("arrow-right-big");
+        } else {
+            $(ico).removeClass("arrow-right-big").addClass("arrow-collapse");
+        }
+    };
+
+    $("#pop-customer-journey-se").on("click", "input[type='checkbox']", function () {
+        if (isAutoCheck) return;
+
+        var objectId = $(this).attr("sid"),
+            typeId = $(this).attr("mtype");
+
+        if (objectId === undefined || typeId === undefined)
+            return;
+
+        objectId = Number(objectId);
+        typeId = Number(typeId);
+        var isChecked = $(this).is(":checked");
+
+        vmCusJourneySe.modelChanged = true;
+
+        objSelect.LinkId = isChecked ? objectId : 0;
+        objSelect.LinkType = typeId;
+
+        vmCusJourneySe.removeAllCheck(isChecked);
+
+        var lst = typeId === 1 ? groups : typeId === 2 ? products : typeId === 3 ? subProducts : [];
+
+        for (var i = 0; i < lst.length; i++) {
+            var item = lst[i];
+            if (item.ObjectId === objectId) {
+                objSelect.Data = item;
+                item.IsSelect = isChecked;
+                vmCommon.popSelectSubProOptions.ObjItem = item;
+                if ((item.Id == null && !item.IsSelect) || (item.Id != null && item.IsSelect)) {
+                    item.DataState = dataState.Unchanged;
+                } else {
+                    item.DataState = dataState.Modified;
+                }
+                break;
+            }
+        }
+
+        vmCusJourneySe.autoColor();
+
+    });
+
+    vmCusJourneySe.removeAllCheck = function (ischeck, isInit) {
+        $('#fsubproduct').find("input[type='checkbox']").prop("checked", false);
+        $('#fsubproduct').find("input[type='checkbox'][sid='" + objSelect.LinkId + "'][mtype='" + objSelect.LinkType + "']").prop("checked", ischeck);
+
+        for (var i = 0; i < groups.length; i++) {
+            if (groups.length === 0) return;
+            groups[i].IsSelect = false;
+        }
+        for (var j = 0; j < products.length; j++) {
+            if (products.length === 0) return;
+            products[j].IsSelect = false;
+        }
+        for (var k = 0; k < subProducts.length; k++) {
+            if (subProducts.length === 0) return;
+            subProducts[k].IsSelect = false;
+        }
+    };
+
+    vmCusJourneySe.mergeSelected = function () {
+        var objProduct = vmCommon.findByFunc(groups, function (it) { return it.ObjectId === objSelect.LinkId; });
+        if(objProduct != null) objProduct.IsSelect = true;
+
+        var journey = products.find(t => t.ObjectId === objSelect.LinkId);
+        if(journey != null) journey.IsSelect = true;
+
+        var subJourney = subProducts.find(t => t.ObjectId === objSelect.LinkId);
+        if(subJourney != null) subJourney.IsSelect = true;
+    };
+
+    $(function () {
+        callbackFunc = vmCommon.popSelectSubProOptions.CallbackFunc;
+
+        objSelect.LinkId = vmCommon.popSelectSubProOptions.OldLinkId;
+        objSelect.LinkType = vmCommon.popSelectSubProOptions.OldLinkType;
+
+        var url = "../Handlers/SettingHandler.ashx?funcName=smpGetDataSelectForCustomerJourney&projid=" + projectId;
+        callAjax(null, url, null, function (data) {
+            bindSubSrc = data;
+
+            var item;
+
+            for (var i = 0, l = bindSubSrc.length; i < l; i++) {
+                item = bindSubSrc[i];
+                if (item.TypeId === 1) {
+                    groups.push(item);
+                    continue;
+                }
+                if (item.TypeId === 2) {
+                    products.push(item);
+                    continue;
+                }
+                if (item.TypeId === 3) {
+                    subProducts.push(item);
+                    continue;
+                }
+            }
+
+            groups = vmCommon.sortBy(groups, "Index");
+
+            vmCusJourneySe.removeAllCheck(true);
+            vmCusJourneySe.mergeSelected();
+
+            vmCusJourneySe.viewModel = kendo.observable({
+                groups: groups,
+                update: function () {
+                    vmCusJourneySe.updateSelect();
+                    vmCusJourneySe.modelChanged = false;
+
+                    vmCommon.popSelectSubmarketProductSe.close();
+                }
+            });
+
+            kendo.bind($("#pop-customer-journey-se"), vmCusJourneySe.viewModel);
+
+            vmCusJourneySe.autoColor();
+
+            vmCusJourneySe.setLanguage();
+        }, AjaxConst.PostRequest);
+    });
+</script>

@@ -1,0 +1,571 @@
+﻿<script src="../Scripts/common.js"></script>
+<style type="text/css">
+    .k-current-page {
+        display: none;
+    }
+    .pager-link {
+        /*position: relative;*/
+        float: left;
+        padding: 6px 12px;
+        line-height: 1.88;
+        text-decoration: none;
+        color: #428bca;
+        background-color: #ffffff;
+        border: 1px solid #dddddd;
+        margin-left: -1px;
+    }
+
+    #trend .k-pager-wrap>.k-link {
+        float: left;
+        margin: 0 .08333em;
+        height: 27px;
+        line-height: 2em;
+        border-radius: 1.0833em;
+        cursor: pointer;
+        text-align: center;
+    }
+
+    
+
+    /*.pager-link:hover {
+        color: #2a6496;
+        background-color: #eeeeee;
+        border-color: #dddddd;
+    }*/
+
+
+    .selected {
+        color: #ffffff;
+        background-color: #428bca !important;
+        border-color: #428bca;
+        cursor: default;
+    }
+
+    #table-swot .k-pager-wrap {
+        border-color: #ffffff !important;
+        background-color: transparent;
+        padding: 0px;
+    }
+
+    #table-swot .k-pager-info.k-label {
+        display: none;
+    }
+
+    #table-swot .page-trend {
+        margin-right: 10px;
+        float: right !important;
+        display: inline-flex;
+    }
+
+    #page-trend > :nth-child(2) {
+        display: none;
+    }
+
+    #page-trend > .k-link:nth-last-of-type(2) {
+        display: none;
+    }
+
+    #table-swot .k-pager-wrap {
+        background-image: none, -webkit-linear-gradient(top, #FFFFFF 0%, #FFFFFF 100%);
+        background-image: none, -moz-linear-gradient(top, #FFFFFF 0%, #FFFFFF 100%);
+        background-image: none, -o-linear-gradient(top, #FFFFFF 0%, #FFFFFF 100%);
+        background-image: none, linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 100%);
+    }
+
+
+    #table-swot .k-pager-wrap .k-link {
+        -moz-border-radius: 0px;
+        -webkit-border-radius: 0px;
+        -o-border-radius: 0px;
+        border-radius: 0px;
+        -moz-border-radius-topleft: 4px;
+        -moz-border-radius-bottomleft: 4px;
+        -webkit-border-top-left-radius: 4px;
+        -webkit-border-bottom-left-radius: 4px;
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+        padding: 5px 7px;
+        margin-right: -2px;
+        border-color: #dddddd;
+        cursor: pointer !important;
+    }
+
+    
+    #page-trend > .k-link:last-of-type {
+        -moz-border-radius: 0px;
+        -webkit-border-radius: 0px;
+        -o-border-radius: 0px;
+        border-radius: 0px;
+        -moz-border-radius-topright: 4px;
+        -moz-border-radius-bottomright: 4px;
+        -webkit-border-top-right-radius: 4px;
+        -webkit-border-bottom-right-radius: 4px;
+        border-top-right-radius: 4px;
+        border-bottom-right-radius: 4px;
+        margin-right: 0px;
+        margin-left: -3px;
+    }
+
+    #table-swot .k-pager-wrap .k-link:hover {
+        background-image: none, -webkit-linear-gradient(top, #eeeeee 0%, #eeeeee 100%);
+        background-image: none, -moz-linear-gradient(top, #eeeeee 0%, #eeeeee 100%);
+        background-image: none, -o-linear-gradient(top, #eeeeee 0%, #eeeeee 100%);
+        background-image: none, linear-gradient(to bottom, #eeeeee 0%, #eeeeee 100%);
+        border-color: #dddddd;
+        border-width: 1px;
+        padding: 5px 7px;
+    }
+
+    #page-trend .k-link {
+        border-radius: 0px;
+        padding: 5px 7px;
+    }
+
+    #page-trend .k-pager-last {
+        border-top-right-radius: 4px;
+        border-bottom-right-radius: 4px;
+    }
+
+    #page-trend .k-pager-first {
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+    }
+
+    #table-swot .k-icon {
+        background-image: url(../Images/sprite.png);
+    }
+
+    #table-swot .k-state-disabled .k-icon:hover {
+        cursor: not-allowed !important;
+    }
+
+    #table-swot .k-pager-wrap .k-state-disabled:hover {
+        cursor: not-allowed !important;
+    }
+
+    #table-swot table th:hover {
+        cursor: pointer;
+    }
+
+    #page-trend .k-icon.k-i-seek-w {
+        position: relative;
+        display: inline-block;
+        overflow: hidden;
+        width: 1em;
+        height: 1.4em;
+        text-align: center;
+        vertical-align: middle;
+        background-image: none;
+        font: 16px/1 WebComponentsIcons;
+        speak: none;
+        font-variant: normal;
+        text-transform: none;
+        text-indent: 0;
+        -webkit-font-smoothing: antialiased;
+    }
+    #page-trend .k-icon.k-i-seek-e {
+        position: relative;
+        display: inline-block;
+        overflow: hidden;
+        width: 1em;
+        height: 1.4em;
+        text-align: center;
+        vertical-align: middle;
+        background-image: none;
+        font: 16px/1 WebComponentsIcons;
+        speak: none;
+        font-variant: normal;
+        text-transform: none;
+        text-indent: 0;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    #page-trend .k-i-seek-e:before {
+        content: "»" !important;
+        height: 23px !important;
+        color: #2A8FCD !important;
+    }
+
+    #page-trend .k-i-seek-w:before {
+        content: "«" !important;
+        height: 23px !important;
+        color: #2A8FCD !important;
+    }
+
+    #page-trend .k-link {
+        padding-top: 0 !important;
+    }
+
+    #page-trend .pager-link {
+        padding-top: 3px !important;
+        height: 23px;
+    }
+
+</style>
+<div style="min-width: 1450px;" class="posRelative" id="trend">
+    
+    
+    <div class="div-info-title">
+        <span>Trends</span>
+    </div>
+    <div class="div-table div-table-project">
+        <form>
+            <div id="table-swot">
+                <div class="pull-left">
+                    <div class="wrapper-range-slider">
+                        <div id="trend-loading" class="loading"></div>
+                        <div id="ranger-slider-evaluation">
+                            <input />
+                            <input />
+                        </div>
+                    </div>
+
+                    <div id="table-trend-dashboard" class="">
+                    </div>
+                    <div id="page-trend" class="page-trend">
+                    </div>
+                </div>
+
+                <p class="clear"></p>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="clear4px"></div>
+
+<script id="row-template-trend" type="text/html">
+    <table id="trend-table" class="tbgrid" width="1400px">
+        <thead>
+            <tr>
+                <th class="title bg-grey" columnname="ssName"><span id="lblChance">Chance/Risk</span></th>
+                <th class="title bg-grey" columnname="swName"><span id="lblTrend">Trend Name</span></th>
+                <th class="title bg-grey" columnname="smName"><span id="lblSubMarket">Sub Market</span></th>
+                <th class="title bg-grey" columnname="msName"><span id="lblMarket">Market</span></th>
+                <th class="title bg-grey" columnname="acFirstName"><span id="lblModifiedBy">Modified By</span></th>
+                <th class="title bg-grey" columnname="ssModifiedDate"><span id="lblDate">Date</span></th>
+                <th class="title bg-grey"><span id="lblMenu"></span></th>
+            </tr>
+        </thead>
+        <tbody id="body-trend">
+            #for(var i = 0; i < data.length; i++) {#
+            #   var item = data[i];#
+            <tr val="#:item.RadarId#">
+                <td class="#:ChoseColorPercent(item.Evaluation * 10)#"><span>#:item.ChanceName#</span>
+                    <div class="clear"></div>
+                    <a class="trend-detail" id="#:item.RadarId#">
+                        <span class="cursor-pointer labelDetail">DETAIL</span></a></td>
+                <td class="#:ChoseColorChroma(item.Evaluation * 10)#"><span>#:item.TrendName#</span></td>
+                <td class="#:ChoseColorChroma(item.Evaluation * 10)#"><span>#:item.SubMarket#</span></td>
+                <td class="#:ChoseColorChroma(item.Evaluation * 10)#"><span>#:item.Market#</span></td>
+                <td class="#:ChoseColorChroma(item.Evaluation * 10)#"><span>#:item.FirstName# #:item.LastName#</span></td>
+                <td class="#:ChoseColorChroma(item.Evaluation * 10)#"><span>#:kendo.toString(item.ModifiedDate.jsonToDate(),"d")#</span></td>
+                <td class="#:ChoseColorChroma(item.Evaluation * 10)#">
+                    <div class="posRelative">
+                        <span class="icon-16 icon-dropdow-dash" data-toggle="dropdown"></span>
+                        <ul aria-labelledby="btnGroupVerticalDrop1" role="menu" class="popup-menu dropdown-menu ms-popup-menu posAbsolute">
+                            <li class="cursor-pointer"><a class="dropdow-menu-li-a" onclick="vmTrendDashBoard.DeleteFromDashboard('#=item.RadarId#')"><span class="icon-24  icon-left-block icon-delete"></span>#=kLg.delFromRadas#</a></li>
+                            <li role="presentation" class="divider"></li>
+                            <li class="cursor-pointer">
+                                <a class="dropdow-menu-li-a" data-toggle="modal" data-target=".bs-example-modal-lg" onclick="vmTrendDashBoard.JumpToSwotPopUp('#=item.RadarId#',#=item.ProductId#)">
+                                    <span class="icon-24  icon-left-block icon-open"></span>#=kLg.jumpToSwot#
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+            #}#
+        </tbody>
+    </table>
+</script>
+
+<script type="text/html" id="tempTrendDetail">
+    <div style="width: 500px;word-wrap: break-word" class="goal-detail color-detail">
+        <div class="row-wrapper">
+            <div class="column-title pull-left">#=kLg.chance#/#=kLg.risk#</div>
+            <div class="column-info pull-left">#:data.ChanceName#</div>
+            <div class="clear"></div>
+        </div>
+
+        <div class="row-wrapper">
+            <div class="column-title pull-left">#=kLg.trend#</div>
+            <div class="column-info pull-left">#:data.TrendName#</div>
+            <div class="clear"></div>
+        </div>
+        <div class="row-wrapper">
+            <div class="column-title pull-left">#=kLg.labelDes#</div>
+            <div class="column-info pull-left content-break-word">#:data.Description#</div>
+            <div class="clear"></div>
+        </div>
+        <div class="row-wrapper">
+            <div class="column-title pull-left">#=kLg.labelEvaluationTrend#</div>
+            <div class="column-info pull-left">#:data.Evaluation#</div>
+            <div class="clear"></div>
+        </div>
+        <div class="row-wrapper">
+            <div class="column-title pull-left">#=kLg.Colector#</div>
+            <div class="column-info pull-left">#:data.FirstName# &nbsp #=LastName#</div>
+            <div class="clear"></div>
+        </div>
+        <div class="row-wrapper">
+            <div class="column-title pull-left">#=kLg.labelDate#</div>
+            <div class="column-info pull-left">#:kendo.toString(data.ModifiedDate.jsonToDate(),"d")#</div>
+            <div class="clear"></div>
+        </div>
+        <div class="row-wrapper">
+            <div class="column-title pull-left">#=kLg.LandTrend#</div>
+            <div class="column-info pull-left">#:data.Land#</div>
+            <div class="clear"></div>
+        </div>
+        <div class="row-wrapper">
+            <div class="column-title pull-left">#=kLg.newRegion#</div>
+            <div class="column-info pull-left">#:data.Region#</div>
+            <div class="clear"></div>
+        </div>
+        <div class="row-wrapper">
+            <div class="column-title pull-left">#=kLg.newMarketSegment#</div>
+            <div class="column-info pull-left">#:data.Market#</div>
+            <div class="clear"></div>
+        </div>
+        <div class="row-wrapper">
+            <div class="column-title pull-left">#=kLg.createNewSubmarket#</div>
+            <div class="column-info pull-left">#:data.SubMarket#</div>
+            <div class="clear"></div>       
+        </div>
+        <div class="row-wrapper">
+            <div class="column-title pull-left">#=kLg.filterLblProduct#</div>
+            <div class="column-info pull-left">#:data.Product#</div>
+            <div class="clear"></div>
+        </div>
+        <div class="row-wrapper">
+            <div class="column-title pull-left">#=kLg.createNewProductGroup#</div>
+            <div class="column-info pull-left">#:data.ProductGroup#</div>
+            <div class="clear"></div>
+        </div>
+    </div>
+</script>
+
+<script type="text/javascript">
+    var vmTrendDashBoard = vmTrendDashBoard || {};
+    vmTrendDashBoard.ListTrend = [];
+    vmTrendDashBoard.PageSize = 15;
+    vmTrendDashBoard.MinValue = -10;
+    vmTrendDashBoard.MaxValue = 10;
+    vmTrendDashBoard.SortConfig = {
+        MKey: "ssModifiedDate",
+        Value: "DESC"
+    };
+
+    vmTrendDashBoard.SetGrid = function (data) {
+        bindTemplate('table-trend-dashboard', 'row-template-trend', data);
+        vmTrendDashBoard.SetLanguage();
+        vmTrendDashBoard.setupSort(vmTrendDashBoard.SortConfig);
+        vmTrendDashBoard.regisSort();
+        vmCommon.setupMenuIcon('#trend span[data-toggle=dropdown]');
+    };
+
+    vmTrendDashBoard.DeleteFromDashboard = function (id) {
+        pConfirm(kLg.confirmRemoveRadar)
+            .then(function() {
+                var url = "../Handlers/DashboardHandler.ashx?funcName=deltrendfromdashboard&radarid=" + id + "&strid=" + strategyId;
+                callAjax('trend-loading', url, null, function(data) {
+                    var slider = $("#ranger-slider-evaluation").data("kendoRangeSlider");
+                    var arr = slider.value();
+                    var min = arr[0];
+                    var max = arr[1];
+                    vmTrendDashBoard.LoadTrendWithSlider(min, max, vmTrendDashBoard.SortConfig);
+                }, AjaxConst.GetRequest);
+            });
+    };
+
+    vmTrendDashBoard.SetSlider = function (min, max) {
+        var slider =  $("#ranger-slider-evaluation").kendoRangeSlider({
+            min: -10,
+            max: 10,
+            smallStep: 1,
+            largeStep: 5,
+            change: vmTrendDashBoard.SilderOnChange
+        }).data('kendoRangeSlider');
+        
+        slider.value([min, max]);
+    };
+
+    vmTrendDashBoard.SetLanguage = function () {
+        $("#lblChance").html(kLg.chance + '/' + kLg.risk);
+        $("#lblTrend").html(kLg.trend);
+        $("#lblSubMarket").html(htmlDecode(kLg.titleStackholderGroups));
+        $("#lblMarket").html(htmlDecode(kLg.lblMarktsegemente));
+        $("#lblModifiedBy").html(kLg.Colector);
+        $("#lblDate").html(kLg.labelDate);
+        $(".labelDetail").html(kLg.lblDetail);
+    };
+
+    vmTrendDashBoard.SilderOnChange = function (e) {
+        var arr = e.value.toString().split(',');
+        var min = arr[0];
+        var max = arr[1];
+        vmTrendDashBoard.MinValue = min;
+        vmTrendDashBoard.MaxValue = max;
+        vmTrendDashBoard.LoadTrendWithSlider(min, max, vmTrendDashBoard.SortConfig);
+    };
+
+    vmTrendDashBoard.LoadTrendWithSlider = function (min, max, config) {
+        
+        var url = "../Handlers/DashboardHandler.ashx?projid=" + projectId + "&funcName=gettrendfordashboardwithranger&min=" + min + "&max=" + max +
+            "&field=" + config.MKey + "&value=" + config.Value + "&strid=" + strategyId + "&firstcreat=" + vmDashboard.tab6FromFirstCreat;
+        if (typeof (msFilter) == "undefined") return; //if (typeof (vmFilter) == "undefined") return;
+        var dataFilter = msFilter.controlService.getQueryFilter(); //vmFilter.CreatFilterQuerry();
+        var dataEntry = {
+            FilterContainer: dataFilter,
+            StrQuerry: JSON.stringify(dataFilter), //JSON.stringify(vmFilter.DFilter),
+            Type: 0 //vmFilter.flagPage
+        };
+        callAjax('trend-loading', url, JSON.stringify(dataEntry), function (data) {
+            vmTrendDashBoard.ListTrend = data.value || [];
+            var dataSource = new kendo.data.DataSource(
+            {
+                data: vmTrendDashBoard.ListTrend,
+                pageSize: vmTrendDashBoard.PageSize
+            });
+            dataSource.read();
+            vmTrendDashBoard.SetGrid(dataSource.view());
+            vmTrendDashBoard.pager.destroy();
+
+            vmTrendDashBoard.setupPaging(dataSource);
+            vmTrendDashBoard.setupDetail();
+        }, AjaxConst.PostRequest);
+    };
+
+    vmTrendDashBoard.ResetSlider = function () {
+        var slider = $("#ranger-slider-evaluation").data("kendoRangeSlider");
+        slider.value([-10, 10]);
+    };
+
+    vmTrendDashBoard.FindTrend = function (id) {
+        for (var i = 0; i < vmTrendDashBoard.ListTrend.length; i++) {
+            if (vmTrendDashBoard.ListTrend[i].RadarId == id) {
+                return vmTrendDashBoard.ListTrend[i];
+            }
+        }
+        return null;
+    };
+
+    vmTrendDashBoard.JumpToSwotPopUp = function (subId, prodId) {
+        var obj = vmTrendDashBoard.FindTrend(subId);
+        var filtersearch = [{ TypeId: vmCommon.EnumFilterType.Market, ParentId: obj.MarketId, ChildId: 0 }];
+        var jsonObject = { LandType: 2, LandId: obj.LandId, RegionId: obj.RegionId, SubMarketId: obj.SubMarketId, ProductId: obj.ProductId, FilterValue: JSON.stringify(filtersearch) };
+        callUpdateFilterAndCheckOpenTab(jsonObject, "updatefiltercheck", "idTabSwotAnalyse");
+    };
+
+    vmTrendDashBoard.setupDetail = function () {
+        $('.trend-detail').bind('mouseenter', function () {
+            var e = $(this);
+            var id = $(this).attr('id');
+            e.unbind('mouseenter');
+            var trend = vmTrendDashBoard.FindTrend(id);
+            var template = kendo.template($('#tempTrendDetail').html());
+            e.popover({
+                html: true,
+                content: template(trend),
+                trigger: "hover",
+                title: htmlEscape(trend.ChanceName)
+            }).popover('show');
+
+        });
+    };
+    
+    vmTrendDashBoard.setupPaging = function (datasource) {
+        vmTrendDashBoard.pager = $("#page-trend").kendoPager({
+            dataSource: datasource,
+            buttonCount: 5,
+            change: function () {
+                vmTrendDashBoard.SetGrid(datasource.view());
+                vmTrendDashBoard.setupDetail();
+                vmTrendDashBoard.SetLanguage();
+            },
+            previousNext: true,
+            linkTemplate: '<li><a href="\\#" class="pager-link" data-#=ns#page="#=idx#">#=text#</a></li>',
+            selectTemplate: '<li><span class="pager-link selected">#=text#</span></li>'
+        }).data('kendoPager');
+
+    };
+
+    vmTrendDashBoard.setupSort = function (config) {
+        var direc = config.Value == 'DESC' ? 'icon-order-desc' : 'icon-order-asc';
+        $('#trend-table th .icon-16').remove();
+        $('#trend-table th[columnname=' + config.MKey + ']')
+            .attr('sortType', config.Value)
+            .append('<span class="icon-16  icon-right-block  ' + direc + '"></span>');
+        
+    };
+    
+    vmTrendDashBoard.regisSort = function () {
+        $('#trend-table th[columnname]').click(function () {
+            var columnName = $(this).attr('columnname'),
+                sortType = $(this).attr('sortType');
+            if (sortType) {
+                sortType = sortType == "ASC" ? "DESC" : "ASC";
+            } else {
+                sortType = "ASC";
+            }
+            vmTrendDashBoard.SortConfig.MKey = columnName;
+            vmTrendDashBoard.SortConfig.Value = sortType;
+            vmTrendDashBoard.LoadTrendWithSlider(vmTrendDashBoard.MinValue, vmTrendDashBoard.MaxValue, vmTrendDashBoard.SortConfig);
+        });
+    };
+
+    vmTrendDashBoard.getMinMaxValueByUser = function () {
+        var url = "../Handlers/DashboardHandler.ashx?projid=" + projectId + "&funcName=getconfigbyuser&strid=" + strategyId;
+        callAjax(null, url, null, function (data) {
+            vmTrendDashBoard.MinValue = data.value.min || -10;
+            vmTrendDashBoard.MaxValue = data.value.max || 10;
+            vmTrendDashBoard.SetSlider(parseInt(vmTrendDashBoard.MinValue), parseInt(vmTrendDashBoard.MaxValue));
+        },AjaxConst.PostRequest);
+    };
+
+    vmTrendDashBoard.loadFirstTime = function(dataEntry) {
+        var url = "../Handlers/DashboardHandler.ashx?projid=" + projectId + "&funcName=getfirstareaswot&strid=" + strategyId + "&firstcreat=" + vmDashboard.tab6FromFirstCreat;
+        callAjax('trend-loading', url, JSON.stringify(dataEntry), function (data) {
+            vmTrendDashBoard.ListTrend = data.value.trends || [];
+            vmTrendDashBoard.SortConfig = data.value.config;
+            var dataSource = new kendo.data.DataSource(
+                {
+                    data: vmTrendDashBoard.ListTrend,
+                    pageSize: vmTrendDashBoard.PageSize
+                });
+            dataSource.read();
+            vmTrendDashBoard.pager.destroy();
+            vmTrendDashBoard.SetGrid(dataSource.view());
+
+            vmTrendDashBoard.setupPaging(dataSource);
+            vmTrendDashBoard.setupDetail();
+        }, AjaxConst.PostRequest);
+    };
+
+    $(document).ready(function () {
+        vmTrendDashBoard.pager = $("#page-trend").kendoPager().data("kendoPager");
+        //vmFilter.deferred.promise().done(function () {
+        //    var dataEntry = {
+        //        StrQuerry: JSON.stringify(vmFilter.DFilter),
+        //        Type: vmFilter.flagPage,
+        //        FilterContainer: vmFilter.dataQuery
+        //    };
+        //    vmTrendDashBoard.regionId = vmFilter.DFilter[0].ChildValue;
+        //    vmTrendDashBoard.getMinMaxValueByUser();
+        //    vmTrendDashBoard.loadFirstTime(dataEntry);
+        //});
+        
+        var dataEntry = {
+            StrQuerry: JSON.stringify(msFilter.controlService.getQueryFilter()), //JSON.stringify(vmFilter.DFilter),
+            Type: 0, //vmFilter.flagPage,
+            FilterContainer: msFilter.controlService.getQueryFilter() //vmFilter.dataQuery
+        };
+        vmTrendDashBoard.regionId = 0; //vmFilter.DFilter[0].ChildValue;
+        vmTrendDashBoard.getMinMaxValueByUser();
+        vmTrendDashBoard.loadFirstTime(dataEntry);
+        
+    });
+
+    
+
+</script>

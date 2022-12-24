@@ -1,0 +1,343 @@
+﻿<script src="../Scripts/jquery.multiple.selectwithicon.js"></script>
+<style>
+    .ms-financegroup {
+        width: 100% !important;
+    }
+
+        .ms-financegroup .ms-panel-fix {
+            padding-bottom: 0;
+            padding-right: 0px;
+            padding-left: 0px;
+        }
+
+        .ms-financegroup table.table-submarkert tr td div.sub-label {
+            padding-right: 4px;
+        }
+
+        .ms-financegroup table.table-submarkert tr td input {
+            padding: 2px;
+        }
+
+    .ms-panel-fix {
+        padding: 0px;
+    }
+
+    
+    
+    .ddlStrategy {
+        margin-left: 7px;
+    }
+
+    #table-finance .k-numerictextbox .k-input {
+        width: 166px !important;
+        padding-right: 5px !important;
+    }
+    /*change Jquery multiple select css*/
+    .ms-drop{
+        overflow:visible !important;
+        margin-left:180px !important;
+        z-index:999999 !important;
+        position:relative;
+    }
+    .ms-parent{
+        width: 210px !important;
+    }
+    .ms-display {
+        width: 180px !important;
+    }
+
+    #tabswot .ms-panel-title {
+        position: absolute;
+        top: 99px;
+        left: 25px;
+        background-color: white !important;
+        padding: 0 4px;
+        z-index: 1;
+    }
+
+    /* multiselect */
+    .divtag .k-multiselect-wrap input[class~="k-input"] {
+        display: none !important;
+    }
+    .divtag .k-multiselect-wrap {
+        border-radius: 0px !important; 
+    }
+
+    .divtag .k-multiselect.k-header {
+        border-color: #E7E7E7 !important;
+    }
+
+    .k-animation-container .k-state-focused {
+        border-width: 0;
+        border-color: #E7E7E7;
+        box-shadow: none;
+    }
+
+    .divtag .k-multiselect-wrap li[class~="k-button"] {
+        color: #2e2e2e;
+        border-color: #fafafa;
+        background-color: #fafafa;
+        border-radius: 30px;
+        max-width: 99%;
+    }
+
+    .divtag .k-multiselect-wrap li[class~="k-button"]:hover {
+        color: #2e2e2e;
+        border-color: #EBEBEB;
+        background-color: #EBEBEB;
+        border-radius: 30px;
+        max-width: 99%;
+    }
+
+    .divtag .k-multiselect,
+    .divtag #ddlSubMarketResponsibilityPersons-list {
+        width: 393px !important;
+    }
+    /* multiselect */
+</style>
+<div class="tab-padding" id="tabswot">
+    <p id="lblFinanceGroup" class="ms-panel-title">Erwartete Ertrage/ Kosten</p>
+    <div class="ms-panel-new tab-padding" style="overflow-x: auto">
+        <div style="width: 100%;">
+            
+            <table class="table-submarkert" id="table-finance"></table>
+            <p class="clearx2"></p>
+
+            <div style="display:table;">
+                <div style="display:table-cell" class="td-v-align-top">
+
+                    <div style="display:table-cell;padding-top: 14px;">
+                        <span id="lblVolumeStrategy" style="margin-left: 8px;margin-right: 10px;">Volume Strategy</span>
+                    </div>
+                    <div style="display:table-cell">
+                        <select id="ddlStrategy" class="ddlStrategy" style="width: 250px;"></select>
+
+                    </div>
+                    <div id="divChooseResponsibilityPersons" style="display:table-cell;" class="td-v-align-top">
+                        <div style="display:table-cell" class="td-v-align-top">
+                            <span id="lblPerson" style="margin-left: 8px;margin-right: 10px;">Verantwortung</span>
+                        </div>
+                        <div style="display:table-cell" class="divtag">
+                            <!--<select id="ddlSubMarketResponsibilityPersons" class="w-100per" multiple data-text-field="AccountFullName" data-value-field="AccountId" tabindex="2" style="margin-left: 250px; display: none; overflow:visible;"
+                                        data-bind="source: listPerson, value: selectedPersons"></select>-->
+
+                            <select data-role="multiselect"
+                                    data-placeholder=""
+                                    data-text-field="AccountFullName"
+                                    data-value-field="AccountId"
+                                    data-bind="source: listPerson, value: selectedPersons, events:{change: onChange}, disabled: roleEdit"
+                                    id="ddlSubMarketResponsibilityPersons"></select>
+                            <!--<select id="ddlSubMarketResponsibilityPersons"></select>-->
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script id="prodFinance-temp" type="text/html">
+    <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        # for(var i = 0; i < data.length; i ++) { #
+        <td class="field_value" id="#= data[i].Id#" index="#=i#" field="Name">
+            <div class="sub-label noPaddingLeft">
+                <span title="#: data[i].Name#" class="w-160 textcenter" style="display: block !important;">#: data[i].Name#</span>
+            </div>
+        </td>
+        # } #
+    </tr>
+    <tr>
+        <td class="color-header"><span id="lblErtrage"></span></td>
+        <td class="color-header"><span id="lblLineareMethode"></span></td>
+        <td class="color-header"><span id="lblGeschatzterUmsatz">Geschatzter Umsatz</span></td>
+        # for(var i = 0; i < data.length; i ++) { #
+        <td class="field_value" id="#= data[i].Id#" index="#=i#" field="Income">
+            <input class="txtIncome txtNumber numeric-right text-right" value="#: data[i].Income#" />
+        </td>
+        # } #
+    </tr>
+    <tr>
+        <td class="color-header"><span id="lblCost"></span></td>
+        <td class="color-header"><span id="lblNicktLineare"></span></td>
+        <td class="color-header"><span id="lblVerkraftwarerVerlust"></span></td>
+        # for(var i = 0; i < data.length; i ++) { #
+        <td class="field_value" id="#= data[i].Id#" index="#=i#" field="Cost">
+            <input class="txtCost txtNumber numeric-right text-right" value="#: data[i].Cost#" />
+        </td>
+        # } #
+    </tr>
+
+
+</script>
+
+<script>
+    var vmVS = vmVS || {};
+    var ddlStrategy;
+
+    function callAjaxTabRevenueStrategy(divId, funcName, projectId, regionId, entryData, requestType, successCallBack) {
+        var url = "/Handlers/MsSubMarketEvalHandler.ashx?funcName=" + funcName + "&projid=" + projectId + "&strid=" + strategyId + "&regid=" + regionId;
+        callAjax(divId, url, entryData, successCallBack, requestType);//in common.js
+    }
+
+    function changeFinance(ee) {
+        var e = ee.sender.element[0];
+        var index = $(e).parents('td').attr('index');
+        var field = $(e).parents('td').attr('field');
+
+        if (checkMaxLength($(e).val(), 100) == false) {
+            alert(kLg.msgMaxLength100);
+
+            if (field == 'Income') {
+                $(e).val(vmVS.productFinances[index].Income);
+            }
+            if (field == 'Cost') {
+                $(e).val(vmVS.productFinances[index].Cost);
+            }
+
+            $(e).focus();
+            return;
+        }
+
+        if (field == 'Income') {
+            vmVS.productFinances[index].Income = $(e).val().trim();
+        }
+        if (field == 'Cost') {
+            vmVS.productFinances[index].Cost = $(e).val().trim();
+        }
+
+        saveFinance(vmVS.productFinances[index], index);
+    }
+
+    //SONPT. refactor.
+    function initNumericTextBox() {
+        var format = vmSProduct.SMProductData.CurrencyName.encodeDola();
+        $(".txtNumber").kendoNumericTextBox({
+            format: format + ' ' + "##,#",
+            spinners: false,
+            max: 999999999999,
+            change: changeFinance
+        });
+    }
+    //SONPT. 12-10-2015
+    function initResponsibilityPersonMultipleSelect(data) {
+            vmVS.Accounts = data.value.Accounts;
+            vmVS.SelectedAccounts = data.value.SelectedAccounts;
+
+            vmVS.viewModel = kendo.observable({
+                roleEdit: vmSME.curRole < vmCommon.MemberRole.Edit,
+                listPerson: vmVS.Accounts,
+                selectedPersons: vmVS.SelectedAccounts,
+                onChange: function () {
+                    callAjaxSaveSubmarketPersonResponbility(this.selectedPersons);
+                }
+            });            
+            kendo.bind($("#divChooseResponsibilityPersons"), vmVS.viewModel);                 
+    }
+
+    function callAjaxSaveSubmarketPersonResponbility(persons) {
+        var lst = vmCommon.pushApply([], persons, function (it) { return it.AccountId; });
+        var entryData = { selectedpersons: lst.join(",") };
+        var url = "../Handlers/MsSubMarketEvalHandler.ashx?funcName=savesubmarketpersonresponbility&projid=" + projectId + "&smpid=" + vmSME.subMarketProduct.Id + "&regid=" + vmSProduct.regId;
+        callAjax(null, url, JSON.stringify(entryData), function(data) {
+            //vmVS.SelectedAccounts = $('#ddlSubMarketResponsibilityPersons').multipleSelect('getSelects');
+            if (data.value.ActionResult == vmCrmEnum.ResultStatus.SUCCESS)
+                vmSME.subMarketProduct.Mdf = data.value.Mdf;
+        }, AjaxConst.PostRequest);
+    }
+    
+    function disableVolumeStrategyControls() {
+        $('.txtIncome').attr("disabled", "disabled");
+        $('.txtCost').attr("disabled", "disabled");
+        
+
+        //$('#ddlSubMarketResponsibilityPersons').multipleSelect("disable");
+        //$('#ddlSubMarketResponsibilityPersons').multipleSelect('setDisable', vmVS.Accounts.map(function (x) { return x.AccountId; }));
+        ddlStrategy.enable(false);
+    }
+
+    
+
+    function saveFinance(finance, index) {
+        var entryData = { ProjectId: vmSME.projectId, ProductFinance: finance };
+        callAjaxProductEvaluation('loadingProdEvaluation', "saveFinance", vmSME.projectId, vmSME.regionId, JSON.stringify(entryData), AjaxConst.PostRequest,
+            function (serData) {
+                //Check role
+                if (!checkRole(serData))
+                    return;
+
+                //Check conflict
+                if (serData.value.ActionResult == vmSME.actionResult.Conflict || serData.value.ActionResult == vmSME.actionResult.Deleted) {
+                    alert(kLg.msgConflictData);
+                    return;
+                }
+                var savedFinance = serData.value.ProductFinance;
+                vmVS.productFinances[index].Mdf = savedFinance.Mdf;
+                vmVS.productFinances[index].Income = savedFinance.Income;
+                vmVS.productFinances[index].Cost = savedFinance.Cost;
+            });
+    }
+
+    function setupLanguage() {        
+        $('#lblVolumeStrategy').text(kLg.lblVolumeStrategy);
+        $('#lblPerson').text(kLg.labelRes);
+        $('#lblErtrage').text(kLg.Ertrage);
+        $('#lblLineareMethode').text(kLg.LineareMethode);
+        $('#lblGeschatzterUmsatz').text(kLg.GeschatzterUmsatz);
+        $('#lblCost').text(kLg.Cost);
+        $('#lblNicktLineare').text(kLg.NicktLineare);
+        $('#lblVerkraftwarerVerlust').text(kLg.VerkraftwarerVerlust);
+        $('#lblFinanceGroup').text(kLg.lblFinanceGroup);
+    }
+
+    function loadStrategy() {
+        var lstStrategies = vmSME.strategyData;
+        //lstStrategies.unshift({ Name: kLg.btnSelectStrategy, Id: -1 });
+        $('#ddlStrategy').kendoDropDownList({
+            dataTextField: "Name",
+            dataValueField: "Id",
+            dataSource: lstStrategies,
+            change: vmSME.updateSubMarketProd,
+            autoBind: false
+        });
+        ddlStrategy = $("#ddlStrategy").data("kendoDropDownList");
+        if (ddlStrategy == null)
+            return;
+        
+        if (vmSME.subMarketProduct.StrategyId > 0)
+            ddlStrategy.value(vmSME.subMarketProduct.StrategyId);
+        else {
+            ddlStrategy.value(vmSME.strategyData[0].Id);
+            vmSME.subMarketProduct.StrategyId = vmSME.strategyData[0].Id;
+            //changeSubMarketProd();
+            //ddlStrategy.text(ddlStrategy.text());
+        }
+    }
+
+    //Pageload
+    $(document).ready(function () {
+        kendo.culture(vmCommon.getCultureLang());
+        var entryData = { SubMarketProductId: vmSME.subMarketProduct.Id, ProjectId: vmSME.projectId };
+        callAjaxTabRevenueStrategy('loadingProdEvaluation', "getVolumeStrategy", vmSME.projectId, vmSME.regionId, JSON.stringify(entryData), AjaxConst.PostRequest,
+            function (data) {
+                //Check role
+                if (!checkRole(data)) //useless, server don't send Role 
+                    return;
+                vmVS.productFinances = data.value.VolumeStrategys;
+
+                bindTemplate("table-finance", "prodFinance-temp", vmVS.productFinances);
+
+                
+                initNumericTextBox();
+                loadStrategy();
+                initResponsibilityPersonMultipleSelect(data);
+                setupLanguage();
+                
+                if (vmSME.curRole < vmCommon.MemberRole.Edit) {
+                    disableVolumeStrategyControls();
+                }
+            });
+    });
+</script>

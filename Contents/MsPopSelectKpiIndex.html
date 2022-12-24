@@ -1,0 +1,232 @@
+﻿<style>
+    .menu-title, .item-title {
+        height: 30px;
+        background-color: #38baf8;
+        line-height: 28px;
+        padding-left: 5px;
+        color: white;
+        padding: 1px;
+        cursor: pointer;
+    }
+
+        .menu-title a {
+            color: white;
+        }
+
+    .menu-content {
+        width: 96%;
+        float: right;
+        display: none;
+    }
+
+    .menu-place {
+        margin-top: 4px;
+        position: relative;
+    }
+
+    .kmessage {
+        height: 18px;
+        color: red;
+        margin-bottom: 2px;
+        /*padding-left: 14px;*/
+        padding-top: 2px;
+    }
+
+    .error {
+        color: red;
+    }
+</style>
+
+
+<div id="loading-index" class="loading"></div>
+
+<div id="pop-kpi-index" class="pop-wrapper">
+    <form id="fKpiIndexForm" role="form" class="form-horizontal">
+        <div class="modal-body ms-modal-body" style="height: 446px; overflow: auto; overflow-y: scroll; padding-left: 13px !important;" id="div-kpiindex">
+            <!--<div class="kmessage">
+                <span id="kmessage"></span>
+            </div>-->
+            <span class="error" id="kmessage"></span>
+            <div class="root" id="root"></div>
+        </div>
+
+        <div class="modal-market-footer">
+            <button id="btnUpdateKpiIndex" type="button" class="ms-button" onclick="vmKpiIndex.update(); ">
+                <span class="icon-20 icon-close"></span>
+                <span id="lblKpiIndexClose">Speichern und schliessen</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script type="text/html" id="indextemplate">
+    #for(var i = 0; i < data.length; i++){#
+    #var item = data[i]; #
+    <div class="menu-place" level="#:item.Level#" typeid="#:item.TypeId#" mid="#:item.Id#">
+
+        #if(item.IsLatest){#
+        <div class="item-title" onclick="vmKpiIndex.openSubItem(this)">
+            <div style="width: 24px; height: 24px; float: left;"></div>
+            <span>#:item.Name || ""#</span>
+        </div>
+        #}else{#
+        <div class="menu-title" onclick="vmKpiIndex.openSubItem(this)" id="#:item.Level#m#:item.Id#">
+            <span class="arrow-panel-online icon-24 icon-left-block arrow-collapse" style="margin-top: 2px"></span>
+            <span>#:item.Name || ""#</span>
+        </div>
+        #}#
+
+        #if(item.HasSelect){#
+            <!--<input type="checkbox" class="pull-right cbx-index" style="position: absolute; right: 5px; top: 5px;" onchange="vmKpiGoalIndex.selectSubItem(this)" #if(item.IsSelect){#checked#}# />-->
+        #}#
+        
+        <div class="clear"></div>
+        <div class="menu-content" id="#:item.Level#x#:item.Id#">
+        </div>
+        <div class="clear"></div>
+    </div>
+    #}#
+
+</script>
+
+<script type="text/javascript">
+    var vmKpiIndex = {};
+    vmKpiIndex.modelChanged = false;
+
+    var vmKpiAction = vmKpiAction || {};
+
+    vmKpiIndex.destroyPop = function () {
+        vmGoalAction.popKpiIndex.destroy();
+        vmGoalAction.popKpiIndex = null;
+        $(".body-content").after("<div id='pop-selectkpiindex'></div>");
+    };
+
+    vmGoalAction.popKpiIndex.bind("close", function (e) {
+        if (vmKpiIndex.modelChanged) {
+            vmKpiIndex.destroyPop();
+        } else {
+            vmKpiIndex.destroyPop();
+        }
+    });
+
+    vmKpiIndex.binding = function (divId, data, tempId) {
+        var templateContent = $("#" + tempId).html();
+        data = data || [];
+
+        var template = kendo.template(templateContent);
+        $("#" + divId).html(template(data));
+    };
+
+    vmKpiIndex.toggleIcon = function (elem, isOpen) {
+        var temp = $(elem).children("span.arrow-panel-online");
+        if (temp.length === 0) return;
+
+        var ico = temp[0];
+        if (isOpen) {
+            $(ico).removeClass("arrow-collapse").addClass("arrow-right-big");
+        } else {
+            $(ico).removeClass("arrow-right-big").addClass("arrow-collapse");
+        }
+    };
+
+    vmKpiIndex.isProcessing = false;
+    vmKpiIndex.openSubItem = function (e) {
+        var placeItem = $(e).closest("div.menu-place");
+
+        var id = Number($(placeItem).attr("mid"));
+        var level = Number($(placeItem).attr("level"));
+
+        if (isNaN(Number(id)) || isNaN(Number(level))) return;
+
+        var item = vmCommon.findByFunc(kpiIndexData, function (it) { return it.Id == id && it.Level == level });
+        if (item == null) return;
+
+        if (level === 1) {
+            var contentId = level + "x" + id;
+            var content = $("#" + contentId);
+
+            var dataCount = $(e).data("datacount");
+            if (dataCount != undefined) {
+
+                if ($(content).is(":visible")) {
+                    $(content).hide(120);
+                    vmKpiIndex.toggleIcon(e, false);
+                } else {
+                    $(content).show(dataCount > 0 ? 120 : 0);
+                    vmKpiIndex.toggleIcon(e, true);
+                }
+
+            } else {
+                var childs = $.grep(kpiIndexData, function (it) { return it.Level === (level + 1) && it.ParentId == id; });
+                vmKpiIndex.binding(contentId, childs, "indextemplate");
+
+                $(e).data("datacount", childs.length);
+                $(content).show(childs.length > 0 ? 120 : 0);
+                vmKpiIndex.toggleIcon(e, true);
+            }
+
+        } else if (level === 2) {
+            if (vmKpiIndex.isProcessing) return;
+            vmKpiIndex.isProcessing = true;
+
+            if (item.Id == kpiIndex.KpiIndexId) {
+                vmGoalAction.popKpiIndex.close();
+                return;
+            }
+
+            if (isNaN(Number(item.Id))) {
+                vmKpiIndex.isProcessing = false;
+                return;
+            }
+
+            if (selectedIndexes.indexOf(Number(item.Id)) > -1) {
+                $("#pop-kpi-index #kmessage").text(kLg.msgUsingKpiIndex.format(kLg.menuKpiIndex));
+                vmKpiIndex.isProcessing = false;
+                return;
+            }
+
+            var indexInfo = item.TheObject;
+
+            kpiIndex.TempId = item.TempId;
+            kpiIndex.KpiIndexId = indexInfo.KpiIndexId;
+            kpiIndex.KpiIndexName = indexInfo.KpiIndexName;
+
+            kpiIndex.KpiUnitId = indexInfo.KpiUnitId;
+            kpiIndex.KpiUnitName = indexInfo.KpiUnitName;
+
+            kpiIndex.KpiTimeId = indexInfo.KpiTimeId;
+            kpiIndex.KpiTimeName = indexInfo.KpiTimeName;
+
+            kpiIndex.IsAdjustment = indexInfo.IsAdjustment;
+
+            //if (vmKpiAction.kpiIndexOptions.isEdit)
+            //    vmKpiAction.changeActionIndex(kpiIndex);
+            //else
+            //    vmKpiAction.addActionIndex(kpiIndex);
+            vmKpiAction.kpiIndexOptions.cb(kpiIndex);
+            vmGoalAction.popKpiIndex.close();
+        }
+    };
+
+    vmKpiIndex.update = function() {
+        vmGoalAction.popKpiIndex.close();
+    };
+
+    vmKpiIndex.setupLanguage = function () {
+        $("#pop-kpi-index #lblKpiIndexClose").text(kLg.lblClose);
+    };
+
+    //READY
+    var kpiIndexData = [], kpiIndex, selectedIndexes = [];
+    $(function() {
+        kpiIndexData = vmCommon.deepCopy(vmKpiAction.kpiIndexOptions.KpiIndexData);
+        kpiIndex = vmCommon.deepCopy(vmKpiAction.kpiIndexOptions.index);
+        selectedIndexes = vmCommon.deepCopy(vmKpiAction.kpiIndexOptions.selectedIndexes);
+
+        var roots = kpiIndexData.filter(it => it.Level == 1);// $.grep(kpiIndexData, function (it) { return it.Level == 1; });
+        vmKpiIndex.binding("root", roots, "indextemplate");
+
+        vmKpiIndex.setupLanguage();
+    });
+
+</script>

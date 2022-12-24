@@ -1,0 +1,241 @@
+﻿<!--Popup TransferCRM-->
+<style>
+    #pop-transfer-responsibilityCRM .pop-tnsres-checkbox {
+        display: inline-block;
+        position: relative;
+        padding-left: 24px;
+        margin-bottom: 30px;
+        margin-right: 39px;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    #pop-transfer-responsibilityCRM .pop-tnsres-checkbox input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+    }
+
+    #pop-transfer-responsibilityCRM .pop-tnsres-checkbox input ~ .checkmark {
+        border: 1px solid #006398;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 16px;
+        height: 16px;
+    }
+
+    #pop-transfer-responsibilityCRM .pop-tnsres-checkbox > .chkbox-text,
+    #pop-transfer-responsibilityCRM .transfer-respons-user > .popup-lable {
+        color: #006398;
+    }
+
+    #pop-transfer-responsibilityCRM .pop-tnsres-checkbox input ~ .checkmark:after {
+        content: "";
+        display: none;
+        position: absolute;
+        left: 1px;
+        top: 1px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background-color: #006398;
+    }
+
+    #pop-transfer-responsibilityCRM .pop-tnsres-checkbox input:checked ~ .checkmark:after {
+        display: inline-block;
+    }
+
+    #pop-transfer-responsibilityCRM .transfer-respons-user {
+        display: flex;
+    }
+
+    #pop-transfer-responsibilityCRM .transfer-respons-user > *:first-child {
+        flex-grow: 0;
+        margin-right: 13px;
+        padding-top: 4px;
+    }
+
+    #pop-transfer-responsibilityCRM .transfer-respons-user > *:last-child {
+        flex-grow: 1;
+    }
+</style>
+<div id="pop-transfer-responsibilityCRM" style="display:flex; flex-direction: column; justify-content: space-between; height: 100%;">
+    <div class="modal-body ms-modal-body">
+        <p class="clear10px"></p>
+        <div>
+            <label class="pop-tnsres-checkbox" for="transferResponsCheckDone">
+                <span class="chkbox-text">Done-html</span>
+                <input type="checkbox" id="transferResponsCheckDone"
+                       name="transferResponsCheckDone" value="Done">
+                <span class="checkmark"></span>
+            </label>
+            <label class="pop-tnsres-checkbox" for="transferResponsCheckUnDone">
+                <span class="chkbox-text">UnDone-html</span>
+                <input type="checkbox" id="transferResponsCheckUnDone"
+                       name="transferResponsCheckUnDone" value="UnDone">
+                <span class="checkmark"></span>
+            </label>
+        </div>
+        <div>
+            <div class="transfer-respons-user">
+                <label class="popup-lable transferResponsLblName" style="margin-bottom: 10px;">Vollständiger Name: Admin</label>
+                <input id="transferResponsibilityUserSelection" />
+            </div>
+        </div>
+    </div>
+    <div class="popup-footer">
+        <button type="button" class="ms-button" onclick="vmTrnResponsibility.saveAndCloseCRM()">
+            <span class="icon-20 icon-close margin-right6"></span>
+            <span id="transferResponsBtnClose">Save and Close</span>
+        </button>
+    </div>
+</div>
+<script type="text/javascript">
+    var vmTrnResponsibility = {};
+
+    vmTrnResponsibility.updateResponsibilityCRM = function () {
+        if (vmProject && typeof vmProject.TransferResponsibilityDataCRM == 'function') {
+            vmProject.TransferResponsibilityDataCRM(vmTrnResponsibility.Data);
+        }
+    }
+
+    vmTrnResponsibility.destroyPopup = function () {
+        vmProject.PopupTransferResponsibilityCRM?.destroy();
+        vmProject.PopupTransferResponsibilityCRM = undefined;
+        $('#pop-add-project').after('<div id="pop-transferResponsibilityCRM"></div>');
+        setTimeout(function () {
+            //vmTrnResponsibility = undefined;
+            vmProject.StrategyMemberCurrent = undefined;
+        }, 1234);
+    }
+
+    vmTrnResponsibility.saveAndCloseCRM = function () {
+
+        vmTrnResponsibility.updateResponsibilityCRM();
+
+        vmTrnResponsibility.destroyPopup();
+    };
+
+    vmTrnResponsibility.bindClose = function () {
+        if (!vmProject)
+            return;
+        vmProject.PopupTransferResponsibilityCRM.bind("close", function (e) {
+            vmTrnResponsibility.updateResponsibilityCRM();
+
+            vmTrnResponsibility.destroyPopup();
+        });
+    };
+
+    vmTrnResponsibility.setLang = function () {
+        $('.transferResponsLblName').html(kLg.vtextResponsibility);
+        $('#transferResponsCheckDone').closest('.pop-tnsres-checkbox').find('.chkbox-text').text(kLg.Done);
+        $('#transferResponsCheckUnDone').closest('.pop-tnsres-checkbox').find('.chkbox-text').text(kLg.UnDone);
+        $('#transferResponsBtnClose').text(kLg.lblClose);
+    };
+
+    vmTrnResponsibility.initDataValue = function () {
+        var returnObj = {};
+
+        vmTrnResponsibility.Data = {
+            IsDone: 0, IsUnDone: 1, MemberId: -1, TMemberId: -1
+        }
+        if (vmProject.StrategyMemberCurrent) {
+            vmTrnResponsibility.Data.MemberId = vmProject.StrategyMemberCurrent.MemberId || -1;
+            if (vmProject.StrategyMemberCurrent.TransferResponsibility) {
+                vmTrnResponsibility.Data.IsDone = vmProject.StrategyMemberCurrent.TransferResponsibility.IsDone;
+                vmTrnResponsibility.Data.IsUnDone = vmProject.StrategyMemberCurrent.TransferResponsibility.IsUndone;
+                vmTrnResponsibility.Data.TMemberId = vmProject.StrategyMemberCurrent.TransferResponsibility.TMemberId;
+            }
+            returnObj.Accounts = vmProject.StrategyMemberCurrent.Accounts;
+            returnObj.Accounts.unshift({
+                MemberId: -1, MemberName: kLg.lableSelect, MemberEmail: ""
+            });
+            var idxOf = returnObj.Accounts.findIndex(acc => {
+                return acc.MemberId == vmTrnResponsibility.Data.MemberId;
+            });
+            if (idxOf > -1) {
+                returnObj.Accounts.splice(idxOf, 1);
+            }
+        }
+
+        if (vmTrnResponsibility.Data.IsDone) {
+            $('#transferResponsCheckDone').click();
+        }
+        if (vmTrnResponsibility.Data.IsUnDone) {
+            $('#transferResponsCheckUnDone').click();
+        }
+
+        // bind click
+        $('#transferResponsCheckDone').closest('.pop-tnsres-checkbox').on('mouseup', function (e) {
+            vmTrnResponsibility.Data.IsDone = vmTrnResponsibility.Data.IsDone == 0 ? 1 : 0;
+
+            if (!vmTrnResponsibility.Data.IsDone && !vmTrnResponsibility.Data.IsUnDone) {
+                vmTrnResponsibility.Data.IsUnDone = true;
+                $('#transferResponsCheckUnDone').click();
+            }
+        });
+        $('#transferResponsCheckUnDone').closest('.pop-tnsres-checkbox').on('mouseup', function (e) {
+            vmTrnResponsibility.Data.IsUnDone = vmTrnResponsibility.Data.IsUnDone == 0 ? 1 : 0;
+
+            if (!vmTrnResponsibility.Data.IsDone && !vmTrnResponsibility.Data.IsUnDone) {
+                vmTrnResponsibility.Data.IsDone = true;
+                $('#transferResponsCheckDone').click();
+            }
+        });
+
+        return returnObj;
+    }
+
+    $(document).ready(function () {
+        var dataInit = vmTrnResponsibility.initDataValue();
+
+        vmTrnResponsibility.bindClose();
+        vmTrnResponsibility.setLang();
+
+
+        var accounts = dataInit.Accounts || [];
+        var user = accounts.find(acc => {
+            return acc.MemberId == vmTrnResponsibility.Data.TMemberId;
+        });
+        if (user == undefined) {
+            if (accounts.length > 0) user = accounts[0];
+            else user = { MemberId: -1, MemberName: kLg.lableSelect };
+        }
+
+        $('#transferResponsibilityUserSelection').kendoDropDownList({
+            dataSource: accounts,
+            dataTextField: "MemberName",
+            dataValueField: "MemberId",
+            value: user.MemberId,
+            change: function (e) {
+                var value = this.value();
+
+                vmTrnResponsibility.Data.TMemberId = value;
+            },
+            filter: "contains",
+            filtering: function (e) {
+                var filter = e.filter;
+                if (filter) {
+                    if (filter.value != '') {
+                        filter.value = filter.value.replace(/\s\s+/g, ' ');
+                        if (filter.value.indexOf(' ') == 0) {
+                            filter.value = filter.value.slice(1);
+                        };
+                        e.sender.filterInput.val(filter.value);
+                    } else {
+                        // set value when clear filterring
+                        setTimeout(function () {
+                            var _val = $('#transferResponsibilityUserSelection').data('kendoDropDownList').value();
+                            $('#transferResponsibilityUserSelection').data('kendoDropDownList').value(_val);
+                        }, 123);
+                    }
+                }
+            }
+        });
+
+    });
+
+</script>

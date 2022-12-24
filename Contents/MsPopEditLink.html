@@ -1,0 +1,473 @@
+﻿<style>
+    .menu-title, .item-title {
+        height: 30px;
+        background-color: #38baf8;
+        line-height: 28px;
+        padding-left: 5px;
+        color: white;
+        padding: 1px;
+    }
+    .ms-head-1 {
+        white-space: pre;
+        width: 497px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        float: left;
+    }
+    .ms-head-2 {
+        white-space: pre;
+        width: 481px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        float: left;
+    }
+    .menu-title a {
+        color: white;
+    }
+
+    .menu-content {
+        width: 96%;
+        float: right;
+        display: none;
+    }
+
+    .menu-content-path {
+        width: 100% !important;
+    }
+
+    .menu-place {
+        margin-top: 4px;
+        position: relative;
+    }
+
+    .menu-place-path {
+        margin-bottom: 15px;
+    }
+
+    .menu-title:hover {
+        cursor: pointer;
+    }
+
+    .menu-path {
+        color: #888888;
+    }
+
+    .result {
+        background-color: #78BF52 !important;
+    }
+</style>
+
+<div id="pop-edit-link" class="pop-wrapper">
+    <form id="editlinkform" role="form" class="form-horizontal">
+        <div class="modal-body ms-modal-body" style="height: 445px; overflow-x: hidden; overflow-y: scroll;" id="div-editlink">
+            <div class="searchlink pull-right">
+                <input type="text" class="modal-input txtInput" id="txtsearchlink" style="width: 200px;" />
+                <button type="button" class="ms-button pull-right" style="margin: initial;margin-left: 4px;display: inline-flex;" onclick="vmEditLink.searchLink()">
+                    <span class="icon-20 icon-search margin-right6"></span>
+                    <span btitle="search" id="lblSearchLink">Search</span>
+                </button>
+            </div>
+            <div class="root" id="roota" style="margin-top: 40px;"></div>
+        </div>
+
+        <div class="modal-market-footer">
+            <button id="btnselectregion" type="button" class="ms-button" onclick="vmEditLink.update()">
+                <span class="icon-20 icon-close"></span>
+                <span id="lblClose">Speichern und schliessen</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script type="text/html" id="linktemplate">
+    #for(var i = 0; i < data.length; i++){#
+    #var item = data[i]; #
+    <div class="menu-place #if(item.IsLabel){# menu-place-path #}#" level="#:item.Level#" typeid="#:item.TypeId#" mid="#:item.Id#">
+
+        #if(item.IsLabel){#
+        <div class="menu-path" id="#:item.Level#m#:item.Id#" label>
+            <span>#:item.Name || ""#</span>
+        </div>
+        #}else if(item.IsLatest){#
+        <div class="item-title pointer #if(item.IsResult){# result #}#">
+            <div style="width: 24px; height: 24px; float: left;margin-right: 10px;"></div>
+            <span style="white-space: pre; width: 456px; overflow: hidden; text-overflow: ellipsis; float: left;">#:item.Name || ""#</span>
+        </div>
+        #}else{#
+        <div class="menu-title pointer #if(item.IsResult){# result #}#" onclick="vmEditLink.openSubItem(this)" id="#:item.Level#m#:item.Id#">
+            <span class="arrow-panel-online icon-24 icon-left-block arrow-collapse" style="margin-top: 2px"></span>
+            <span style=" white-space: pre; width: 482px; overflow: hidden; text-overflow: ellipsis;float:left" class="ms-head-#:item.TypeId#" >#:item.Name || ""#</span>
+        </div>
+        #}#
+
+        #if(item.HasSelect){#
+        <input type="checkbox"
+               class="pull-right cbx-index"
+               onchange="vmEditLink.selectLink(this)" id="#:item.Id#" typeid="#:item.TypeId#"
+               style="position: absolute; right: 5px; top: 5px;" #if(item.IsSelect){#checked#}# #if(!item.IsSelectable){#disabled#}# #if(!item.IsSelectable){#islock#}# />
+        #}#
+
+        <div class="clear"></div>
+        <div class="menu-content #if(item.IsLabel){# menu-content-path #}#" id="#:item.Level#x#:item.Id#">
+        </div>
+        <div class="clear"></div>
+    </div>
+    #}#
+
+</script>
+
+<script type="text/javascript">
+    var vmEditLink = {};
+    vmEditLink.modelChanged = false;
+
+    var dColor = "#38baf8", //default color
+        mColor = "#2c9fd5"; //mask color
+
+    vmEditLink.destroyPop = function () {
+        vmGoalAction.popEditLink.destroy();
+        vmGoalAction.popEditLink = null;
+        $(".navbar-collapse.collapse.block-nav").after("<div id='popEditLink'></div>");
+    };
+
+    vmGoalAction.popEditLink.bind("close", function (e) {
+        if (vmEditLink.isChange()) {
+            if (confirm(kLg.saveConfirmQuestion)) {
+                vmEditLink.update();
+            } else {
+                vmEditLink.destroyPop();
+            }
+        } else {
+            vmEditLink.destroyPop();
+        }
+    });
+
+    vmEditLink.dataservice = (function () {
+
+        var callAjaxGoalAction = function (funcName, entryData) {
+            var url = "../Handlers/MsGoalAction.ashx?funcName=" + funcName + "&projid=" + projectId + "&strid=" + strategyId + "&lang=" + kLg.language;
+
+            return callAjaxPromise(url, entryData);
+        }
+
+        var getExtendInfo = (entryData) => {
+            return callAjaxGoalAction('getmenulink_extend_info', entryData);
+        }
+
+        return {
+            getExtendInfo: getExtendInfo
+        };
+    })();
+
+    vmEditLink.filterData = function () {
+        var text = textSearch;
+        var tempData = [];
+
+        var getParent = function (parentId, parentLevel) {
+            var rs = [];
+            var parent = menuLinkData.find(t => t.Id == parentId && t.Level == parentLevel);
+            if (parent) {
+                rs.push(parent);
+                if (parent.ParentId) {
+                    getParent(parent.ParentId, parent.Level - 1).forEach(t => {
+                        if (rs.indexOf(t) == -1) rs.push(t);
+                    });
+                }
+            }
+
+            return rs;
+        };
+
+        if (text.length > 0) {
+            var items = menuLinkData.filter(t => t.TypeId > 0 && t.Name && t.HasSelect);
+            items.forEach(t => {
+                if (t.Name.toLowerCase().includes(text)) {
+                    t.IsResult = true;
+                    if (tempData.indexOf(t) == -1) tempData.push(t);
+                    getParent(t.ParentId, t.Level - 1).forEach(c => {
+                        if (tempData.indexOf(c) == -1) tempData.push(c);
+                    });
+                } else {
+                    t.IsResult = false;
+                }
+            });
+        } else {
+            tempData = menuLinkData.map(t => {
+                t.IsResult = false;
+                return t;
+            });
+        }
+
+        //mask path
+        var markParent = function (parentId, parentLevel) {
+            var parent = tempData.find(t => t.Id == parentId && t.Level == parentLevel);
+            if (parent) {
+                parent.IsPath = true;
+                if (parent.ParentId) markParent(parent.ParentId, parentLevel - 1);
+            }
+        };
+
+        tempData.forEach(t => {
+            t.IsPath = false;
+            t.IsLatest = tempData.filter(c => c.ParentId == t.Id && c.Level == t.Level + 1).length == 0;
+        });
+
+        tempData.filter(t => t.IsSelect).forEach(t => {
+            if (t.ParentId) markParent(t.ParentId, t.Level - 1);
+        });
+
+        return tempData;
+    };
+
+    vmEditLink.autoColor = function () {
+        for (var i = 0; i < menuLinkData.length; i++) {
+            var item = menuLinkData[i];
+            if (!item.IsLabel)
+                $("#" + item.Level + "m" + item.Id).css({ "background-color": item.IsPath ? mColor : dColor });
+        }
+    };
+
+    vmEditLink.getSubItems = function (parentId, parentLevel) {
+        var subLevel = parentLevel + 1;
+        var tempData = vmEditLink.filterData();
+        return $.grep(tempData, function (it) { return it.ParentId == parentId && it.Level == subLevel; });
+    };
+
+    vmEditLink.toggleIcon = function (elem, isOpen) {
+        var temp = $(elem).children("span.arrow-panel-online");
+        if (temp.length === 0) return;
+
+        var ico = temp[0];
+        if (isOpen) {
+            $(ico).removeClass("arrow-collapse").addClass("arrow-right-big");
+        } else {
+            $(ico).removeClass("arrow-right-big").addClass("arrow-collapse");
+        }
+    };
+
+    vmEditLink.selectLink = function (e) {
+        var flag = $(e).is(":checked");
+
+        if (flag == false) {
+            $(e).prop("checked", !flag);
+            return;
+        }
+
+        var linkid = $(e).attr("id");
+        var linktypeid = $(e).attr("typeid");
+
+        //valid
+        if (linkid == undefined || isNaN(Number(linktypeid))) {
+            $(e).prop("checked", !flag);
+            return;
+        }
+
+        linktypeid = Number(linktypeid);
+
+        //old item
+        var oldLinkId = link.LinkId;
+        var oldLinkTypeId = link.LinkTypeId;
+
+        var oldItem = menuLinkData.find(t => t.Id == oldLinkId && t.TypeId == oldLinkTypeId);
+        if (oldItem) {
+            oldItem.IsSelect = false;
+            $("#pop-edit-link #" + oldLinkId).prop("checked", false);
+        }
+
+        //new item
+        var item = menuLinkData.find(t => t.Id == linkid && t.TypeId == linktypeid);
+        if (item == null)
+            return;
+
+        item.IsSelect = true;
+
+        link.LinkId = linkid;
+        link.LinkTypeId = linktypeid;
+        link.LinkName = item.Name;
+        link.ApEvaluation = item.ApEvaluation;
+        link.KpiInfo = item.KpiInfo;
+        link.Path = item.Path;
+        link.Url = item.Url;
+        link.LinkDescription = item.Description;
+        link.RoleId = item.RoleId;
+        link.TodoPercent = item.TodoPercent;
+
+        if (link.Id > 0)
+            link.DataState = dataState.Modified;
+
+        vmEditLink.modelChanged = true;
+        vmEditLink.mergeSelected();
+        vmEditLink.autoColor();
+    };
+
+    vmEditLink.openSubItem = function (e) {
+        var parent = $(e).closest("div.menu-place");
+        var pId = $(parent).attr("mid");
+        var pLevel = $(parent).attr("level");
+
+        if (pId == undefined || pLevel == undefined || isNaN(Number(pLevel))) return;
+
+        pLevel = Number(pLevel);
+
+        var contentId = pLevel + "x" + pId;
+        var content = $("#" + contentId);
+
+        var dataCount = $(e).data("datacount");
+
+        if (dataCount != undefined) {
+
+            if ($(content).is(":visible")) {
+                $(content).hide(120);
+                vmEditLink.toggleIcon(e, false);
+            } else {
+                $(content).show(dataCount > 0 ? 120 : 0);
+                vmEditLink.toggleIcon(e, true);
+            }
+
+        } else {
+            var subs = vmEditLink.getSubItems(pId, pLevel);
+            vmCommon.binding(contentId, subs, "linktemplate");
+
+            $(e).data("datacount", subs.length);
+            $(content).show(subs.length > 0 ? 120 : 0);
+            vmEditLink.toggleIcon(e, true);
+        }
+
+        if ($(content).is(":visible")) vmEditLink.autoColor();
+    };
+
+    vmEditLink.mergeSelected = function () {
+        var markParent = function (parentId, parentLevel) {
+            var parent = menuLinkData.find(t => t.Id == parentId && t.Level == parentLevel);
+            if (parent) {
+                parent.IsPath = true;
+                if (parent.ParentId) markParent(parent.ParentId, parentLevel - 1);
+            }
+        };
+
+        menuLinkData.forEach(t => {
+            t.IsPath = false;
+        });
+
+        menuLinkData.forEach(t => {
+            if (t.IsSelect && t.ParentId) markParent(t.ParentId, t.Level - 1);
+        });
+    };
+
+    vmEditLink.setupLanguage = function () {
+        $("#pop-edit-link #lblSearchLink").text(kLg.btnSearchText);
+        $("#pop-edit-link #lblClose").text(kLg.lblClose);
+    };
+
+    var menuLinkData = [], link = {}, goalActionModel, textSearch = "";
+    $(function () {
+        vmEditLink.setupLanguage();
+
+        menuLinkData = vmGoalAction.linkOptions.MenuLinkData;
+        link = vmCommon.deepCopy(vmGoalAction.linkOptions.Link);
+        goalActionModel = vmGoalAction.linkOptions.goalActionModel;
+
+        //vmEditLink.mergeSelected();
+
+        var tempData = vmEditLink.filterData();
+        var roots = tempData.filter(t => t.Level == 1);
+        vmCommon.binding("roota", roots, "linktemplate");
+
+        $("div[label]").each(function () {
+            vmEditLink.openSubItem(this);
+        });
+
+        vmEditLink.autoColor();
+    });
+
+    vmEditLink.searchLink = function () {
+        textSearch = $("#txtsearchlink").val().trim().toLowerCase();
+
+        var tempData = vmEditLink.filterData();
+        var roots = tempData.filter(t => t.Level == 1);
+        vmCommon.binding("roota", roots, "linktemplate");
+
+        $("div[label]").each(function () {
+            vmEditLink.openSubItem(this);
+        });
+
+        vmEditLink.autoColor();
+    };
+
+    vmEditLink.isUpdating = false;
+    vmEditLink.update = function () {
+        if (!vmEditLink.isChange()) {
+            vmGoalAction.popEditLink?.close();
+            return;
+        }
+
+        if (vmEditLink.isUpdating) return; vmEditLink.isUpdating = true;
+
+        vmEditLink.dataservice.getExtendInfo({ GoalActionId: link.LinkId, GoalActionTypeId: link.LinkTypeId }).then(rsData => {
+
+            link.Url = rsData.value.url;
+            link.KpiInfo = rsData.value.kpiInfo;
+
+            if (vmGoalAction.linkOptions.IsEdit) {
+                var oldLink = vmCommon.deepCopy(vmGoalAction.linkOptions.Link);
+
+                var linkModel = vmGoalAction.linkOptions.Link;
+                linkModel.set("LinkId", link.LinkId);
+                linkModel.set("LinkTypeId", link.LinkTypeId);
+                linkModel.set("LinkName", link.LinkName);
+
+                linkModel.set("ApEvaluation", link.ApEvaluation);
+                linkModel.set("KpiInfo", link.KpiInfo);
+                linkModel.set("TodoPercent", link.TodoPercent);
+
+                linkModel.set("Path", link.Path);
+
+                linkModel.set("DataState", link.DataState);
+                linkModel.set("Url", link.Url);
+                linkModel.set("LinkDescription", link.Description);
+                linkModel.set("RoleId", link.RoleId);
+
+                $("#link-" + oldLink.LinkId + "-" + oldLink.Id).html(vmCommon.bindingContent("temp-kpiinfo", linkModel));
+                $("#link-" + oldLink.LinkId + "-" + oldLink.Id).attr("id", "link-" + linkModel.LinkId + "-" + linkModel.Id);
+
+            } else {
+                vmGoalAction.linkOptions.Link = link;
+
+                if (vmGoalAction.linkOptions.afterIndex != undefined) {
+                    vmGoalAction.linkOptions.goalActionModel.Links.splice(vmGoalAction.linkOptions.afterIndex + 1, 0, link);
+                } else {
+                    vmGoalAction.linkOptions.goalActionModel.Links.push(link);
+                }
+
+                //reindex
+                var links = vmGoalAction.linkOptions.goalActionModel.Links;
+                //var index = links.indexOf(link);
+                for (var i = 0; i < links.length; i++) {
+                    if (i == 0) continue;
+
+                    var temp = links[i];
+                    var previous = links[i - 1];
+
+                    if (temp.MIndex <= previous.MIndex) {
+                        temp.set("MIndex", previous.MIndex + 1);
+                        if (temp.Id > 0)
+                            temp.set("DataState", dataState.Modified);
+                    }
+                }
+            }
+
+            vmEditLink.isUpdating = false;
+            vmGoalAction.popEditLink?.close();
+        });
+    };
+
+    vmEditLink.isChange = function () {
+        return link.LinkId != vmGoalAction.linkOptions.Link.LinkId;
+    };
+
+    $("#pop-edit-link #txtsearchlink").on("keydown", function (e) {
+        if (e.keyCode == 13) {
+            vmEditLink.searchLink();
+            e.preventDefault();
+        }
+    });
+</script>

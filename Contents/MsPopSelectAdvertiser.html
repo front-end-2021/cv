@@ -1,0 +1,588 @@
+﻿<style>
+    .menu-title, .item-title {
+        height: 30px;
+        background-color: #38baf8;
+        line-height: 28px;
+        padding-left: 5px;
+        color: white;
+        padding: 1px;
+
+        display: inline-flex;
+        width: 100%;
+        overflow: hidden;
+    }
+
+        .menu-title a {
+            color: white;
+        }
+
+    .menu-content {
+        width: 96%;
+        float: right;
+        display: none;
+    }
+
+    .menu-place {
+        margin-top: 4px;
+        position: relative;
+    }
+
+    .menu-title:hover {
+        cursor: pointer;
+    }
+
+</style>
+
+
+<div id="loading-adv" class="loading"></div>
+
+<div id="pop-advertiser" class="pop-wrapper">
+    <form id="fAdvertiser" role="form" class="form-horizontal">
+        <div class="modal-body ms-modal-body" style="height: 446px; overflow: auto; overflow-y: scroll;" id="div-advertiser">
+            <div class="root" id="adroot"></div>
+        </div>
+
+        <div class="modal-market-footer">
+            <button id="btnUpdateAdvertiser" type="button" class="ms-button" onclick="vmAdvertiser.update()">
+                <span class="icon-20 icon-close"></span>
+                <span id="lblKpiAdvertiserClose">Speichern und schliessen</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script type="text/html" id="advtemplate">
+    #for(var i = 0; i < data.length; i++){#
+    #var item = data[i]; #
+    <div class="menu-place" level="#:item.Level#" typeid="#:item.TypeId#" mid="#:item.Id#">
+
+        #if(item.IsLatest){#
+        <div class="item-title">
+            <div style="width: 24px; height: 24px; float: left;"></div>
+            <span style="width: 90%;overflow: hidden;">#:item.Name || ""#</span> #if(item.TypeId == 2){#<span style="margin-left: 2px;">*</span>#}#
+        </div>
+        #}else{#
+        <div class="menu-title" onclick="vmAdvertiser.openSubItem(this)" id="#:item.TypeId#m#:item.Id#" style="">
+            <span class="arrow-panel-online icon-24 icon-left-block arrow-collapse" style="margin-top: 2px"></span>
+            <span style="width: 90%;overflow: hidden;">#:item.Name || ""#</span>
+        </div>
+        #}#
+
+        #if(item.HasSelect){#
+        <input type="checkbox" class="pull-right cbx-index" style="position: absolute; right: 5px; top: 5px;" 
+               onchange="vmAdvertiser.selectSubItem(this)" #if(item.IsSelect){#checked#}# level="#:item.Level#" 
+               typeid="#:item.TypeId#" mid="#:item.Id#"/>
+        #}#
+
+        <div class="clear"></div>
+        <div class="menu-content" id="#:item.TypeId#x#:item.Id#">
+        </div>
+        <div class="clear"></div>
+    </div>
+    #}#
+
+</script>
+
+<!-- ReSharper disable CoercedEqualsUsing -->
+<script type="text/javascript">
+    var vmAdvertiser = {};
+    var vmEditAction = vmEditAction || {};
+
+    vmAdvertiser.modelChanged = false;
+
+    vmAdvertiser.destroyPop = function () {
+        vmGoalAction.popAdvertiser.destroy();
+        vmGoalAction.popAdvertiser = null;
+        $(".body-content").after("<div id='popadvertiser'></div>");
+    };
+
+    vmGoalAction.popAdvertiser.bind("close", function (e) {
+        if (vmAdvertiser.modelChanged) {
+            if (confirm(kLg.saveConfirmQuestion)) {
+                vmAdvertiser.update();
+            } else {
+                vmAdvertiser.destroyPop();
+            }
+        } else {
+            vmAdvertiser.destroyPop();
+        }
+
+    });
+
+    vmAdvertiser.toggleIcon = function (elem, isOpen) {
+        var temp = $(elem).children("span.arrow-panel-online");
+        if (temp.length === 0) return;
+
+        var ico = temp[0];
+        if (isOpen) {
+            $(ico).removeClass("arrow-collapse").addClass("arrow-right-big");
+        } else {
+            $(ico).removeClass("arrow-right-big").addClass("arrow-collapse");
+        }
+    };
+
+    vmAdvertiser.update = function () {
+        if (viewModel.isMultipleAdvertiser) {
+            var listAcc = vmCommon.deepCopy(vmGoalAction.advertiserOptions.ActionAdvertisers);
+            listAcc.sort((a, b) => a.MIndex - b.MIndex);    // có vẻ thừa nhưng mặc kệ
+            const lstAdsing = viewModel.listActAdvertisingMaterial;
+            const lstA = [];
+            listAcc.forEach(a => {
+                var _p = lstAdsing.find(_asing => _asing.Id == a.ParentId);
+                if (_p) {
+                    a.ParentMIndex = _p.MIndex;
+                    lstA.push(a);
+                }
+            });
+            lstA.sort((a, b) => a.MIndex - b.MIndex).sort((a, b) => a.ParentMIndex - b.ParentMIndex);
+            lstA.forEach(a => { delete a.ParentMIndex; });
+            viewModel.action.set('ActionAdvertisers', lstA);
+            delete vmGoalAction.advertiserOptions.ActionAdvertisers;
+
+            vmEditAction.updateKpiActionData();
+            vmAdvertiser.modelChanged = false;
+            vmGoalAction.popAdvertiser.close();
+            return;
+        }
+        // #region Select single (Chuong trinh cu)
+        var status = vmAdvertiser.isChange(); 
+        if (status == 1) {
+            actionModel.set("Advertiser", Number(advertiserId));
+            actionModel.set("AdvertiserName", advertiserName);
+            actionModel.set("Formats", vmAdvertiser.formatService.get());
+            //update parent
+            var advertiser = adatas.find(t => t.Id == advertiserId && t.TypeId == 1);
+            if (advertiser && advertiser.ParentId != actionModel.AdvertisingMaterial)
+                actionModel.set("AdvertisingMaterial", Number(advertiser.ParentId));
+
+            viewModel.set("listActAdvertiser", vmEditAction.getAdvertiserSrc([actionModel.AdvertisingMaterial]));
+
+            vmEditAction.updateKpiActionData();
+
+            vmAdvertiser.modelChanged = false;
+            vmGoalAction.popAdvertiser.close();
+            
+            return;
+
+        } else if (status == 2) {
+            var newFormatIds = vmAdvertiser.formatService.get().filter(function (it) { return it.DataState != dataState.Deleted; }).map(function (it) { return it.KpiFormatId; });
+            var oldFormatIds = actionModel.Formats.filter(function (it) { return it.DataState != dataState.Deleted; }).map(function (it) { return it.KpiFormatId; });
+
+            var newIds = newFormatIds.filter(function (it) { return oldFormatIds.indexOf(it) == -1; });
+            var oldIds = oldFormatIds.filter(function (it) { return newFormatIds.indexOf(it) == -1; });
+
+            var kpiFormats = actionModel.KpiData.length ? actionModel.KpiData[0].KpiFormats : [];
+            var deletedItems = actionModel.KpiData.length ? actionModel.KpiData[0].DeletedItems : [];
+            
+            if (oldIds.length > 0) {
+                //delete in kpi format data
+                for (var i = 0; i < oldIds.length; i++) {
+                    var fid = oldIds[i];
+
+                    var kpiFormat = vmCommon.findByFunc(kpiFormats, function (it) { return it.Id == fid; });
+                    if (kpiFormat == null) continue;
+
+                    kpiFormat.KpiFormatItems.forEach(function (fi) {
+                        if (fi.Id > 0)
+                            deletedItems.push({ Id: fi.Id, Type: vmCommon.KpiGoalType.FORMATITEM });
+                    });
+
+                    var index = kpiFormats.indexOf(kpiFormat);
+                    if (index >= 0) kpiFormats.splice(index, 1);
+                }
+
+                if (newIds.length == 0) {
+                    actionModel.set("Formats", vmAdvertiser.formatService.get());
+
+                    vmAdvertiser.modelChanged = false;
+                    vmGoalAction.popAdvertiser.close();
+                    return;
+                }
+            }
+
+            if (newIds.length > 0) {
+                //TODO: request to server
+                //xxx: advertiserid
+                var xxx = advertiserId ? Number(advertiserId) : null;
+                if (xxx == null) return;
+
+                getFormatDataCallback = function () {
+                    var newId = vmAdvertiser.getNewFormatItemId(kpiFormats);
+                    var _formatItemId = newId.FormatItemId;
+                    var _valueItemId = newId.ValueItemId;
+
+                    var formatSrc = kpiFormatDataSource[xxx];
+
+                    for (var i = 0; i < newIds.length; i++) {
+                        var newid = newIds[i];
+                        var format = vmCommon.findByFunc(formatSrc, function (it) { return it.Id == newid; });
+                        if (format == null) continue;
+
+                        format.DataState = dataState.Added;
+                        format.KpiFormatItems.forEach(function (fitem) {
+                            fitem.Id = --_formatItemId;
+                            fitem.DataState = dataState.Added;
+
+                            fitem.ItemValues.forEach(function (vitem) {
+                                vitem.Id = --_valueItemId;
+                                vitem.DataState = dataState.Added;
+                            });
+                        });
+
+                        kpiFormats.push(format);
+                    }
+
+                    kpiFormats.sort(function (a, b) { return a.MIndex - b.MIndex; });
+
+                    actionModel.set("Formats", vmAdvertiser.formatService.get());
+                    vmAdvertiser.modelChanged = false;
+                    vmGoalAction.popAdvertiser.close();
+                    return;
+                };
+
+                var formatSrc = kpiFormatDataSource[xxx];
+                if (formatSrc) {
+                    getFormatDataCallback();
+                } else {
+                    vmEditAction.dataservice.getKpiFormatData({ advertiser: xxx }, function (res) {
+                        kpiFormatDataSource[xxx] = res.value;
+                        getFormatDataCallback();
+                    });
+                }
+            }
+        }
+        else {
+            vmAdvertiser.modelChanged = false;
+            vmGoalAction.popAdvertiser.close();
+        }
+        // #endregion select single advertiser
+    };
+
+    vmAdvertiser.getNewFormatItemId = function (kpiFormats) {
+        var _formatItemId = 0;
+        var _valueItemId = 0;
+
+        for (var i = 0; i < kpiFormats.length; i++) {
+            var format = kpiFormats[i];
+            var items = format.KpiFormatItems;
+
+            for (var j = 0; j < items.length; j++) {
+                var item = items[j];
+
+                if (item.Id < _formatItemId) _formatItemId = item.Id;
+
+                var values = item.ItemValues;
+
+                for (var k = 0; k < values.length; k++) {
+                    var itemValue = values[k];
+
+                    if (itemValue.Id < _valueItemId) _valueItemId = itemValue.Id;
+                }
+            }
+        }
+
+        return { FormatItemId: _formatItemId, ValueItemId: _valueItemId };
+    };
+
+    vmAdvertiser.isChange = function () {
+        //undefined: not change || multi adv, 1: advertiser change, 2: only format change
+        if (actionModel.Advertiser != advertiserId) {
+            status = 1;
+        } else {
+            var newFormatIds = vmAdvertiser.formatService.get().filter(function (it) { return it.DataState != dataState.Deleted; }).map(function (it) { return it.KpiFormatId; });
+            var oldFormatIds = actionModel.Formats.filter(function (it) { return it.DataState != dataState.Deleted; }).map(function (it) { return it.KpiFormatId; });
+
+            if (oldFormatIds.equals(newFormatIds) == false) status = 2;
+        }
+        return status;
+    };
+
+    vmAdvertiser.formatService = function () {
+        var formats = [];
+
+        var init = function (lst) {
+            formats = lst;
+        };
+
+        var add = function (formatId) {
+            var temp = vmCommon.findByFunc(formats, function (it) { return it.KpiFormatId == formatId; });
+
+            if (temp == null)
+                formats.push({ Id: 0, ActionId: null, KpiFormatId: formatId, DataState: dataState.Added });
+            else
+                if (temp.DataState == dataState.Deleted) temp.DataState = dataState.Unchanged;
+        };
+
+        var remove = function (formatId) {
+            if (formats.length == 0) return;
+
+            for (var i = formats.length - 1; i >= 0; i--) {
+                var temp = formats[i];
+                if (temp.KpiFormatId != formatId) continue;
+
+                if (temp.Id > 0) temp.DataState = dataState.Deleted;
+                else formats.splice(i, 1);
+            }
+        };
+
+        var clear = function () {
+            for (var i = formats.length - 1; i >= 0; i--) {
+                var temp = formats[i];
+
+                if (temp.Id > 0) temp.DataState = dataState.Deleted;
+                else formats.splice(i, 1);
+            }
+        };
+
+        var get = function () {
+            return formats;
+        };
+
+
+        return { init: init, add: add, remove: remove, clear: clear, get: get };
+    }();
+
+    vmAdvertiser.selectSubItem = function (e) {
+        var flag = $(e).is(":checked");
+
+        var divplace = $(e).closest("div.menu-place");
+        var divblock = $(e).closest("div.menu-place[level='1']");
+
+        var id = $(divplace).attr("mid");
+        var typeId = $(divplace).attr("typeid");
+        var level = $(divplace).attr("level");
+
+        if (id == undefined || typeId == undefined || level == undefined || isNaN(Number(id)) || isNaN(Number(typeId)) | isNaN(Number(level))) return;
+
+        id = Number(id);
+        typeId = Number(typeId);
+        level = Number(level);
+
+        var item = vmCommon.findByFunc(adatas, function (it) { return it.Id == id && it.Level == level && it.TypeId == typeId; });
+        if (item == null) {
+            $(e).prop("checked", !flag);
+            return;
+        }
+
+        var pitem = vmCommon.findByFunc(adatas, function (it) { return it.Id == item.ParentId && it.TypeId == 1 && it.Level == 1; });
+        if (pitem == null) {
+            $(e).prop("checked", !flag);
+            return;
+        }
+
+        // #region un-check all in other
+        if (!viewModel.isMultipleAdvertiser) {
+            $("#div-advertiser div.menu-place[level='1']").not(divblock).find("input.cbx-index").each(function () {
+                var mid = $(this).attr("mid");
+                var mtype = $(this).attr("typeid");
+                var mlevel = $(this).attr("level");
+
+                var mitem = vmCommon.findByFunc(adatas, function (it) { return it.Id == mid && it.TypeId == mtype && it.Level == mlevel; });
+                if (mitem == null) return;
+
+                if (mitem.TypeId == 3)
+                    vmAdvertiser.formatService.remove(mitem.Id);
+
+                $(this).prop("checked", false);
+                mitem.IsSelect = false;
+            });
+        }
+        // #endregion un-check all in other
+
+        var pcontentId = pitem.Level + "x" + pitem.Id;
+        var pcontent = $("#" + pcontentId);
+        if (pcontent.length === 0) return;
+
+        if (viewModel.isMultipleAdvertiser) {
+            const advId = parseInt(id);
+            const src = viewModel.listActAdvertiser;      // source
+            const value = vmGoalAction.advertiserOptions.ActionAdvertisers; // value
+            var i = -1,
+                _item = src.find(it => it.Id == advId);;
+            value.find((it, _i) => { if (it.Id == advId) { i = _i; return true; } });
+            if (flag) {     // Select
+                if (i < 0 && _item) {    // chưa có thì push vào
+                    value.push(_item);
+                }
+            } else {            // Remove
+                if (i > -1) {   // nếu có trong list thì remove
+                    value.splice(i, 1);
+                }
+            }
+            if (item) item.IsSelect = flag; // set data cho item checkbox
+        } else {
+            if (flag) {
+                if (typeId === 3) {
+                    var subpitem = vmCommon.findByFunc(adatas, function (it) { return it.Id == item.ParentId && it.TypeId == 2 && it.Level == 2; });
+                    if (subpitem == null) return;
+
+                    item.IsSelect = true;
+                    pitem.IsSelect = true;
+
+                    subpitem.IsSelect = true;
+                    $("input.cbx-index[mid='" + subpitem.Id + "'][typeid='" + subpitem.TypeId + "'][level='" + subpitem.Level + "']").prop("checked", true);
+
+
+                    kpiFormatId = item.Id;
+                    advertiserId = pitem.Id;
+                    advertiserName = pitem.Name;
+
+                    vmAdvertiser.formatService.add(item.Id);
+                }
+
+                if (typeId === 2) {
+                    item.IsSelect = true;
+                    pitem.IsSelect = true;
+
+                    kpiFormatId = null;
+                    advertiserId = item.Id;
+                    advertiserName = item.Name;
+                }
+
+            } else {
+                if (typeId === 3) {
+                    item.IsSelect = false;
+                    vmAdvertiser.formatService.remove(item.Id);
+                }
+
+                if (typeId === 2) {
+                    $.grep(adatas, function (it) { return it.ParentId == item.Id && it.TypeId == 3 && it.Level == 2; }).forEach(function (it) {
+                        if (it.IsSelect) {
+                            it.IsSelect = false;
+                            $("input:checkbox[mid='" + it.Id + "'][typeid='" + it.TypeId + "'][level='" + it.Level + "']").prop("checked", false);
+                        }
+                    });
+
+                    vmAdvertiser.formatService.clear();
+
+                    advertiserId = null;
+                    advertiserName = "";
+                }
+            }
+        }
+
+        
+        
+        //end
+        bgColorLevel1();
+        vmAdvertiser.modelChanged = true;
+
+        function bgColorLevel1() {
+            if (!viewModel.isMultipleAdvertiser && (typeId == 2 || typeId == 3)) {
+                for (var i = 0; i < adatas.length; i++) {
+                    var item = adatas[i];
+                    if (id != item.Id) {
+                        var elemId = item.TypeId + "m" + item.Id;
+                        $("#" + elemId).css({ 'background-color': '' });
+                    }
+                }
+            }
+            var mColor = "#2c9fd5"; //mask color
+            const $mTitle = divblock.children('.menu-title');
+            if (flag) {
+                $mTitle.css({ 'background-color': mColor });
+            } else if (viewModel.isMultipleAdvertiser || (!viewModel.isMultipleAdvertiser && typeId == 2)) {
+                $mTitle.css({ 'background-color': '' });
+            } else if (!viewModel.isMultipleAdvertiser && typeId == 3) {
+                $mTitle.css({ 'background-color': mColor });
+            }
+        }
+    };
+
+    vmAdvertiser.openSubItem = function (e) {
+        var divplace = $(e).closest("div.menu-place");
+        var id = $(divplace).attr("mid");
+        var typeId = $(divplace).attr("typeid");
+        var level = $(divplace).attr("level");
+
+        if (id == undefined || typeId == undefined || level == undefined || isNaN(Number(id)) || isNaN(Number(typeId)) | isNaN(Number(level))) return;
+
+        id = Number(id);
+        typeId = Number(typeId);
+        level = Number(level);
+
+        var item = vmCommon.findByFunc(adatas, function (it) { return it.Id == id && it.Level == level && it.TypeId == typeId; });
+        if (item == null) return;
+
+        var contentId = level + "x" + id;
+        var $content = $("#" + contentId);
+
+        if ($content.is(":visible")) {
+            $content.hide(120);
+            vmAdvertiser.toggleIcon(e, false);
+        } else {
+            $content.show(120);
+            vmAdvertiser.toggleIcon(e, true);
+        }
+    };
+
+    vmAdvertiser.binding = function (divId, data, tempId) {
+        var templateContent = $("#" + tempId).html();
+        data = data || [];
+
+        var template = kendo.template(templateContent);
+        $("#" + divId).html(template(data));
+    };
+
+    vmAdvertiser.setupLanguage = function() {
+        $("#pop-advertiser #lblKpiAdvertiserClose").text(kLg.lblClose);
+    };
+
+    var adatas = [], viewModel, actionModel, advertiserId, kpiFormatId, advertiserName, formats = [], kpiFormatDataSource;
+    $(function () {
+        adatas = vmGoalAction.advertiserOptions.Datas;
+        viewModel = vmGoalAction.advertiserOptions.viewModel;
+        vmGoalAction.advertiserOptions.ActionAdvertisers = vmCommon.deepCopy(viewModel.action.ActionAdvertisers) ?? [];
+        actionModel = vmGoalAction.advertiserOptions.actionModel;
+
+        kpiFormatDataSource = vmGoalAction.advertiserOptions.KpiFormatDataSource;
+
+        advertiserId = vmCommon.deepCopy(actionModel.Advertiser);        
+        advertiserName = vmCommon.deepCopy(actionModel.AdvertiserName);
+
+        vmAdvertiser.formatService.init(vmCommon.deepCopy(actionModel.Formats));
+
+        var roots = $.grep(adatas, function (it) { return it.Level === 1; });
+        vmAdvertiser.binding("adroot", roots, "advtemplate");
+
+        bindSubItemContent();
+
+        vmAdvertiser.setupLanguage();
+        bgLevel1();
+
+        function bgLevel1() {
+            if (adatas.length === 0) return;
+
+            var mColor = "#2c9fd5"; //mask color
+            for (var i = 0; i < adatas.length; i++) {
+                var item = adatas[i];
+                var elemId = item.TypeId + "m" + item.Id;
+                $("#" + elemId).css({ "background-color": item.IsSelect ? mColor : '' });
+            }
+        }
+        function bindSubItemContent() {
+            $('#adroot .menu-place').each(function () {
+                var divplace = $(this);
+                var id = $(divplace).attr("mid");
+                var typeId = $(divplace).attr("typeid");
+                var level = $(divplace).attr("level");
+
+                if (id == undefined || typeId == undefined || level == undefined || isNaN(Number(id)) || isNaN(Number(typeId)) | isNaN(Number(level))) return;
+                id = Number(id);
+                typeId = Number(typeId);
+                level = Number(level);
+                var item = vmCommon.findByFunc(adatas, function (it) { return it.Id == id && it.Level == level && it.TypeId == typeId; });
+                if (item == null) return;
+
+                var subs = $.grep(adatas, function (it) { return it.ParentId == id && it.Level == (level + 1); });
+                var contentId = level + "x" + id;
+                var $e = divplace.children(`#${typeId}m${id}.menu-title`).first();
+                vmAdvertiser.binding(contentId, subs, "advtemplate");
+                $e.data("datacount", subs.length);
+            });
+        }
+    });
+
+
+</script>
+<!-- ReSharper restore CoercedEqualsUsing -->

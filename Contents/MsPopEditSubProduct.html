@@ -1,0 +1,557 @@
+﻿<style>
+    .menu-title, .item-title {
+        height: 30px;
+        background-color: #38baf8;
+        line-height: 28px;
+        padding-left: 5px;
+        color: white;
+        padding: 1px;
+    }
+
+        .menu-title a {
+            color: white;
+        }
+
+    .menu-content {
+        width: 96%;
+        float: right;
+        display: none;
+    }
+
+    .menu-place {
+        margin-top: 4px;
+        position: relative;
+    }
+
+    .menu-title:hover {
+        cursor: pointer;
+    }
+</style>
+
+<div id="pop-subproduct" class="pop-wrapper">
+    <form id="fsubproduct" role="form" class="form-horizontal">
+        <div class="modal-body ms-modal-body" style="height: 443px; overflow-x: hidden; overflow-y: scroll;">
+            <div data-bind="source: groups" data-template="listSub"></div>
+        </div>
+        <div class="modal-market-footer">
+            <button type="button" class="ms-button" data-bind="events:{click: update}">
+                <span class="icon-20 icon-close"></span>
+                <span id="lblClose">Speichern und schliessen</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script type="text/html" id="listSub">
+    <div class="menu-place" data-bind="attr:{mtype: TypeId}">
+        <div class="#if(TypeId < 3){#menu-title#}else{#item-title#}#" data-bind="attr:{sid: ObjectId, mtype: TypeId}" onclick="vmSubProduct.openSubItem(this);">
+            <!--<span class="arrow-panel-online icon-24 icon-left-block arrow-collapse" style="margin-top: 2px"></span>-->
+            #if(TypeId < 3 && ChildCount > 0){#
+            <span class="arrow-panel-online icon-24 icon-left-block arrow-collapse" style="margin-top: 2px"></span>
+            #}else{#
+            <span style="margin-left: 10px"></span>
+            #}#
+            <h5 style=" overflow: hidden;
+                        word-break: break-word;
+                        white-space: nowrap;
+                        width: 91%;
+                        line-height: 30px;
+                        display: inline-block;
+                        margin: auto;">
+                <span data-bind="text:Name"></span>
+            </h5>
+        </div>
+        <input type="checkbox" data-bind="checked: IsSelect, attr:{sid: ObjectId, mtype: TypeId}" class="pull-right" style="position: absolute; right: 5px; top: 5px;" />
+        <div class="clear"></div>
+        <div class="menu-content" data-bind="attr:{ccount: ChildCount}">
+        </div>
+        <div class="clear"></div>
+    </div>
+</script>
+
+<script type="text/html" id="listSub2">
+    #for(var i = 0; i< data.length; i++){#
+    #var item = data[i];#
+    <div class="menu-place" mtype="#:item.TypeId#">
+        <div class="#if(item.TypeId < 3){#menu-title#}else{#item-title#}#" sid="#:item.ObjectId#" mtype="#:item.TypeId#" onclick="vmSubProduct.openSubItem(this); ">
+            #if(item.TypeId < 3 && item.ChildCount > 0){#
+            <span class="arrow-panel-online icon-24 icon-left-block arrow-collapse" style="margin-top: 2px"></span>
+            #}else{#
+            <span style="margin-left: 10px"></span>
+            #}#
+            
+            <h5 style=" overflow: hidden;
+                        word-break: break-word;
+                        white-space: nowrap;
+                        width: #if(item.TypeId < 3){#90%#}else{#94%#}#;
+                        line-height: 30px;
+                        display: inline-block;
+                        margin: auto;">
+                <span>#:item.Name#</span>
+            </h5>
+        </div>
+        #if(item.IsSelect){#
+        <input type="checkbox" checked class="pull-right" style="position: absolute; right: 5px; top: 5px;" sid="#:item.ObjectId#" mtype="#:item.TypeId#" />
+        #}else{#
+        <input type="checkbox" class="pull-right" style="position: absolute; right: 5px; top: 5px;" sid="#:item.ObjectId#" mtype="#:item.TypeId#" />
+        #}#
+
+        <div class="clear"></div>
+        <div class="menu-content" ccount="#:item.ChildCount#">
+        </div>
+        <div class="clear"></div>
+    </div>
+    #}#
+</script>
+
+<script>
+    var vmSubProduct = {}, vmEditAction = vmEditAction || {};
+    vmSubProduct.IsUpdate = false;
+    vmSubProduct.viewModel = undefined;
+    var groups = [], products = [], subProducts = [], isAutoCheck = false, rootType = 0;
+
+    vmGoalAction.popSubProduct.bind("close", function (e) {
+        if (!vmSubProduct.IsUpdate) vmSubProduct.viewModel.save();
+
+        vmGoalAction.popSubProduct.destroy();
+        vmGoalAction.popSubProduct = null;
+        $(".body-content").after("<div id='popActionFibu'></div>");
+        vmSubProduct.IsUpdate = false;
+    });
+
+    vmSubProduct.getChild = function (parentId, lst) {
+        var rs = [];
+        for (var i = 0; i < lst.length; i++) {
+            if (lst[i].ParentId === parentId) {
+                rs.push(lst[i]);
+            }
+        }
+
+        return vmCommon.sortBy(rs, "Index");
+    };
+
+    vmSubProduct.autoColor = function () {
+        if (groups.length === 0) return;
+
+        var dColor = "#38baf8", //default color
+            mColor = "#2c9fd5"; //mask color
+
+        for (var i = 0; i < groups.length; i++) {
+            var g = groups[i];
+            var gcolor = g.IsSelect ? mColor : dColor;
+
+            var proChilds = vmSubProduct.getChild(g.ObjectId, products);
+            if (proChilds.length > 0) {
+
+                if (gcolor === dColor) {
+                    if ($.grep(proChilds, function (it) { return it.IsSelect; }).length > 0) {
+                        gcolor = mColor;
+                    }
+                }
+
+                for (var j = 0; j < proChilds.length; j++) {
+                    var p = proChilds[j];
+                    var pcolor = p.IsSelect ? mColor : dColor;
+
+                    var subChilds = vmSubProduct.getChild(p.ObjectId, subProducts);
+
+                    if (pcolor === dColor && subChilds.length > 0) {
+                        if ($.grep(subChilds, function (it) { return it.IsSelect; }).length > 0) {
+                            pcolor = mColor;
+
+                            if (gcolor === dColor) {
+                                gcolor = mColor;
+                            }
+                        }
+                    }
+
+                    var pTitles = $("div.menu-title[sid='" + p.ObjectId + "'][mtype='2']");
+                    if (pTitles.length === 0) continue;
+
+                    var pTitle = pTitles[0];
+                    $(pTitle).css({ "background-color": pcolor });
+                }
+            }
+
+            var gTitles = $("div.menu-title[sid='" + g.ObjectId + "'][mtype='1']");
+            if (gTitles.length === 0) continue;
+
+            var gTitle = gTitles[0];
+            $(gTitle).css({ "background-color": gcolor });
+        }
+
+        return;
+    };
+
+    vmSubProduct.setLanguage = function() {
+        $("#pop-subproduct #lblClose").text(kLg.lblClose);
+    };
+
+    var goalActionModel = undefined;
+
+    var autoSubSrc = [], labeSubSrc = [];
+    $(function () {
+        goalActionModel = vmGoalAction.subOptions.gaModel;
+        rootType = vmGoalAction.subOptions.RootType;
+
+        switch (rootType) {
+            case vmGoalAction.subService.rootType.SubProduct:
+                autoSubSrc = goalActionModel.autoSubSrc;
+                labeSubSrc = goalActionModel.labeSubSrc;
+                break;
+            case vmGoalAction.subService.rootType.SubClient:
+                autoSubSrc = goalActionModel.autoClientSrc;
+                labeSubSrc = goalActionModel.labeClientSrc;
+                break;
+            case vmGoalAction.subService.rootType.CustomerJourney:
+                autoSubSrc = goalActionModel.autoCusSrc;
+                labeSubSrc = goalActionModel.labeCusSrc;
+                break;
+        }
+
+        //autoSubSrc = goalActionModel.autoSubSrc;
+        //labeSubSrc = goalActionModel.labeSubSrc;
+
+        var i = 0, item;
+        for (i = 0; i < autoSubSrc.length; i++) {
+            item = autoSubSrc[i];
+            if (item.TypeId === 1) {
+                groups.push(item);
+                continue;
+            }
+
+            if (item.TypeId === 2) {
+                products.push(item);
+                continue;
+            }
+
+            if (item.TypeId === 3) {
+                subProducts.push(item);
+                continue;
+            }
+        }
+
+        for (i = 0; i < labeSubSrc.length; i++) {
+            item = labeSubSrc[i];
+            if (item.TypeId === 1) {
+                groups.push(item);
+                continue;
+            }
+
+            if (item.TypeId === 2) {
+                products.push(item);
+                continue;
+            }
+
+            if (item.TypeId === 3) {
+                subProducts.push(item);
+                continue;
+            }
+        }
+
+        groups = vmCommon.sortBy(groups, "Index");
+
+        vmSubProduct.viewModel = kendo.observable({
+            groups: groups,
+            save: function () {
+                //vmSubProduct.updateListSub();
+
+                //sync
+                var syncType = rootType == vmGoalAction.subService.rootType.SubProduct ? vmCommon.KpiGoalTopicType.Product : rootType == vmGoalAction.subService.rootType.SubClient ? vmCommon.KpiGoalTopicType.Market : 0;
+                switch (vmGoalAction.subOptions.GoalActionType) {
+                    case 1:
+                        vmEditGoal.syncKpiService.init(goalActionModel, syncType);
+                        break;
+                    case 2:
+                        vmEditAction.syncKpiService.init(goalActionModel, syncType);
+                        break;
+                }
+
+                goalActionModel.setVisibleKpi();
+            },
+            update: function () {
+                vmSubProduct.IsUpdate = true;
+                this.save();
+                vmGoalAction.popSubProduct.close();
+            }
+        });
+
+        kendo.bind($("#pop-subproduct"), vmSubProduct.viewModel);
+        vmSubProduct.autoColor();
+
+        vmSubProduct.setLanguage();
+    });
+    vmSubProduct.updateListSub = function() {
+        switch (rootType) {
+            case vmGoalAction.subService.rootType.SubProduct:
+
+                //goalActionModel.set("autoSubSrc", autoSubSrc);
+                //goalActionModel.set("labeSubSrc", labeSubSrc);
+
+                //goalActionModel.set("isVisibleSelectedSub", labeSubSrc.length > 0);
+                break;
+            case vmGoalAction.subService.rootType.SubClient:
+
+                //goalActionModel.set("autoClientSrc", autoSubSrc);
+               // goalActionModel.set("labeClientSrc", labeSubSrc);
+
+                //goalActionModel.set("isVisibleSelectedClient", labeSubSrc.length > 0);
+                break;
+        }
+    }
+
+
+    vmSubProduct.openSubItem = function(e) {
+        var objectId = $(e).attr("sid"), typeId = $(e).attr("mtype");
+        if (objectId === undefined || typeId === undefined)
+            return;
+
+        objectId = Number(objectId);
+        typeId = Number(typeId);
+
+        if (typeId === 3)
+            return;
+
+        var panel = $(e).closest("div.menu-place").children("div.menu-content");
+
+        if (panel.length === 0) return;
+
+        if ($(e).hasClass("hasdata")) {
+            if ($(panel).is(":visible")) {
+                $(panel).hide(120);
+                vmSubProduct.toggleIcon(e, false);
+            } else {
+                $(panel).show(120);
+                vmSubProduct.toggleIcon(e, true);
+            }
+        } else {
+            var lst = typeId === 1 ? products : subProducts;
+            var data = vmSubProduct.getChild(objectId, lst);
+
+            var template = kendo.template($("#listSub2").html());
+            $(panel).html(template(data));
+            $(panel).show(120);
+            $(e).addClass("hasdata");
+
+            vmSubProduct.toggleIcon(e, true);
+        }
+
+        vmSubProduct.autoColor();
+    };
+
+    vmSubProduct.toggleIcon = function(elem, isOpen) {
+        var temp = $(elem).children("span.arrow-panel-online");
+        if (temp.length === 0) return;
+
+        var ico = temp[0];
+        if (isOpen) {
+            $(ico).removeClass("arrow-collapse").addClass("arrow-right-big");
+        } else {
+            $(ico).removeClass("arrow-right-big").addClass("arrow-collapse");
+        }
+    };
+
+    $("#pop-subproduct").on("click", "input[type='checkbox']", function () {
+        if (isAutoCheck) return;
+
+        var objectId = $(this).attr("sid"),
+            typeId = $(this).attr("mtype");
+
+        if (objectId === undefined || typeId === undefined)
+            return;
+
+        objectId = Number(objectId);
+        typeId = Number(typeId);
+
+        var lst = typeId === 1 ? groups : typeId === 2 ? products : typeId === 3 ? subProducts : [];
+
+        for (var i = 0; i < lst.length; i++) {
+            var item = lst[i];
+            if (item.ObjectId === objectId) {
+
+                item.IsSelect = $(this).is(":checked");
+
+                if ((item.Id == null && !item.IsSelect) || (item.Id != null && item.IsSelect)) {
+                    item.DataState = dataState.Unchanged;
+                } else {
+                    item.DataState = dataState.Modified;
+                }
+
+                var removeSrc = item.IsSelect ? autoSubSrc : labeSubSrc;
+                var insertSrc = item.IsSelect ? labeSubSrc : autoSubSrc;
+
+                var ahihi = undefined, index = -1;
+                for (var j = 0; j < removeSrc.length; j++) {
+                    if (removeSrc[j].ObjectId === objectId && removeSrc[j].TypeId === typeId) {
+                        ahihi = removeSrc[j];
+                        index = j;
+                        break;
+                    }
+                }
+
+                if (index !== -1 && ahihi != undefined) {
+                    insertSrc.push(ahihi);
+                    removeSrc.splice(index, 1);
+                }
+
+                switch (rootType) {
+                    case vmGoalAction.subService.rootType.SubProduct:
+                        goalActionModel.set("autoSubSrc", item.IsSelect ? removeSrc : insertSrc);
+                        goalActionModel.set("labeSubSrc", item.IsSelect ? insertSrc : removeSrc);
+                        break;
+                    case vmGoalAction.subService.rootType.SubClient:
+                        goalActionModel.set("autoClientSrc", item.IsSelect ? removeSrc : insertSrc);
+                        goalActionModel.set("labeClientSrc", item.IsSelect ? insertSrc : removeSrc);
+                        break;
+                    case vmGoalAction.subService.rootType.CustomerJourney:
+                        goalActionModel.set("autoCusSrc", item.IsSelect ? removeSrc : insertSrc);
+                        goalActionModel.set("labeCusSrc", item.IsSelect ? insertSrc : removeSrc);
+                        break;
+                }
+
+                vmGoalAction.subService.autoChange(item, rootType);
+                isAutoCheck = true;
+                vmSubProduct.autoCheck(item);
+                isAutoCheck = false;
+
+                //goalActionModel.set("isVisibleSelectedSub", labeSubSrc.length > 0);
+                switch (rootType) {
+                    case vmGoalAction.subService.rootType.SubProduct:
+                        goalActionModel.set("isVisibleSelectedSub", labeSubSrc.length > 0);
+                        break;
+                    case vmGoalAction.subService.rootType.SubClient:
+                        goalActionModel.set("isVisibleSelectedClient", labeSubSrc.length > 0 || goalActionModel.crmClientItem);
+                        break;
+                    case vmGoalAction.subService.rootType.CustomerJourney:
+                        goalActionModel.set("isVisibleSelectedCus", labeSubSrc.length > 0);
+                        break;
+                }
+                break;
+            }
+        }
+        //vmGoalAction.subService.groupSub();
+        switch (rootType) {
+            case vmGoalAction.subService.rootType.SubProduct:
+                vmGoalAction.subService.groupSub();
+                break;
+            case vmGoalAction.subService.rootType.SubClient:
+                vmGoalAction.subService.groupClient();
+                break;
+            case vmGoalAction.subService.rootType.CustomerJourney:
+                vmGoalAction.subService.groupCus();
+                break;
+            default:
+        }
+
+        vmSubProduct.autoColor();
+        vmGoalAction.autoSubHeight();
+    });
+
+    vmSubProduct.autoCheck = function (item) {
+        if (item == null) return;
+        
+        switch (item.TypeId) {
+            case 1:
+                vmSubProduct.autoCheckByGroup(item);
+                break;
+            case 2:
+                vmSubProduct.autoCheckByProduct(item);
+                break;
+            case 3:
+                vmSubProduct.autoCheckBySubProduct(item);
+                break;
+            default:
+        }
+    };
+
+
+    vmSubProduct.autoCheckByGroup = function (item) {
+        var elems = $("div.menu-title[sid='" + item.ObjectId + "'][mtype='" + item.TypeId + "']");
+        if (elems.length === 0) return;
+        
+        var elem = elems[0];
+        var panels = $(elem).closest("div.menu-place").children("div.menu-content");
+
+        if (panels.length === 0) return;
+
+        var panel = panels[0];
+        $(panel).find("input[type='checkbox']").prop("checked", item.IsSelect);
+    };
+
+    vmSubProduct.autoCheckByProduct = function (item) {
+        var elems = $("div.menu-title[sid='" + item.ObjectId + "'][mtype='" + item.TypeId + "']");
+        if (elems.length === 0) return;
+        
+        var elem = elems[0];
+
+        //for sub product
+        var panels = $(elem).closest("div.menu-place").children("div.menu-content");
+
+        if (panels.length === 0) return;
+
+        var panel = panels[0];
+        $(panel).find("input[type='checkbox']").prop("checked", item.IsSelect);
+
+        if (item.IsSelect) return;
+        //for product group
+        var gPanels = $(panel).closest("div.menu-place[mtype='1']").children("div.menu-content");
+        var gChecks = $(panel).closest("div.menu-place[mtype='1']").children("input[type='checkbox'][mtype='1']");
+
+        if (gPanels.length === 0 && gChecks.length === 0) return;
+
+        var gPanel = gPanels[0];
+        var gCheck = gChecks[0];
+
+        var childCount = $(gPanel).attr("ccount");
+        if (childCount) {
+            childCount = Number(childCount);
+        }
+
+        var checkCount = $(gPanel).find("input[type='checkbox'][mtype='2']:checked").length;
+        $(gCheck).prop("checked", childCount === checkCount);
+    };
+
+    vmSubProduct.autoCheckBySubProduct = function (item) {
+        if(item.IsSelect) return;
+
+        var elems = $("div.item-title[sid='" + item.ObjectId + "'][mtype='" + item.TypeId + "']");
+        if (elems.length === 0) return;
+        
+        var elem = elems[0];
+        
+        //for product
+        var proPanels = $(elem).closest("div.menu-place[mtype='2']").children("div.menu-content");
+        var proChecks = $(elem).closest("div.menu-place[mtype='2']").children("input[type='checkbox'][mtype='2']");
+
+        if (proPanels.length === 0 && proChecks.length === 0) return;
+
+        var pPanel = proPanels[0];
+        var pCheck = proChecks[0];
+
+        var childCount = $(pPanel).attr("ccount");
+        if (childCount) {
+            childCount = Number(childCount);
+        }
+
+        var checkCount = $(pPanel).find("input[type='checkbox'][mtype='3']:checked").length;
+        $(pCheck).prop("checked", childCount === checkCount);
+
+        //for product group
+        var gPanels = $(pPanel).closest("div.menu-place[mtype='1']").children("div.menu-content");
+        var gChecks = $(pPanel).closest("div.menu-place[mtype='1']").children("input[type='checkbox'][mtype='1']");
+
+        if (gPanels.length === 0 && gChecks.length === 0) return;
+
+        var gPanel = gPanels[0];
+        var gCheck = gChecks[0];
+
+        childCount = $(gPanel).attr("ccount");
+        if (childCount) {
+            childCount = Number(childCount);
+        }
+
+        checkCount = $(gPanel).find("input[type='checkbox'][mtype='2']:checked").length;
+        $(gCheck).prop("checked", childCount === checkCount);
+    };
+
+</script>

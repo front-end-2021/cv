@@ -1,0 +1,211 @@
+﻿<!-- Manh: -->
+<!-- edit document form -->
+<script id="popEditFileTemplate" type="text/html">
+    <div class="modal-body ms-modal-body" id="fEditFile">
+        <form>
+            <div class="form-group" id="url-form" style="display: none">
+                <label id="lblPopEditUrlFile">URL</label><span style="font-weight: bold">*</span>
+                <div class="clear"></div>
+                <input id="textFileUrl" name="textFileUrl" tabindex="1" class="modal-input txtInput w-100per-fix" value="#=htmlEscape(data.PhysicalName)#" />
+            </div>
+            <div class="form-group">
+                <label id="lblPopEditNameFile">Name</label><span style="font-weight: bold">*</span>
+                <div class="clear"></div>
+                <input id="textFileName" name="textFileName" tabindex="1" class="modal-input txtInput w-100per-fix" value="#=htmlEscape(data.Name)#" maxlength="250" />
+            </div>
+            <hr class="modal-market-hr">
+            <div class="form-group">
+                <label id="lblPopEditDesFile">Description</label>
+                <div class="clear"></div>
+                <textarea id="textFileDescription" tabindex="2" class="modal-textarea w-100per-fix">#if (data.Description != null){##=data.Description##}#</textarea>
+            </div>
+        </form>
+    </div>
+    <div class="modal-market-footer">
+        <button type="button" class="ms-button" tabindex="3" onclick="onCloseFile()"><span class="icon-16 icon-close margin-right6"></span><span>Schliessen</span></button>
+    </div>
+</script>
+<script type="text/javascript">
+    var isUrl = vmFile.FileEdit.Type == 8;
+    var isFile = vmFile.FileEdit.Type > 0 && vmFile.FileEdit.Type != 8;
+    var vmPopEditFile = {};
+    vmPopEditFile.isChange = false;
+
+    $(document).ready(function () {
+        bindTemplate("popEditFile", "popEditFileTemplate", vmFile.FileEdit);
+        if (isUrl) {
+            $('#url-form').show();
+        }
+        
+
+        onCheckChangeNonType();
+        setPopEditFileLanguage();
+
+        vmFile.popEditFile.bind("close", function (e) {
+            if (vmPopEditFile.isChange) {
+                if (!confirm(kLg.saveConfirmQuestion)) {
+                    vmFile.popEditFile.destroy();
+                    vmFile.popEditFile = null;
+                    $('div[class="navbar-collapse collapse block-nav"]').after('<div id="popEditFile"></div>');
+                } else {
+                    if (validEditFile()) {
+                        editDataFile();
+                        vmFile.popEditFile.destroy();
+                        vmFile.popEditFile = null;
+                        $('div[class="navbar-collapse collapse block-nav"]').after('<div id="popEditFile"></div>');
+                    } else {
+                        e.preventDefault();
+                    }
+                }
+
+            } else {
+                vmFile.popEditFile.destroy();
+                vmFile.popEditFile = null;
+                $('div[class="navbar-collapse collapse block-nav"]').after('<div id="popEditFile"></div>');
+            }
+
+        });
+
+        $('#textFileName').keydown(function (e) {
+            $(this).tooltip('destroy');
+            if (e.keyCode == 13) {
+                e.preventDefault();
+                return;
+            }
+            if (isFile) {
+                var specialCodeShirt = [56, 186, 188, 190, 222];
+                var specialCode = [111, 191, 220];
+                if ($.inArray(e.keyCode, specialCode) != -1) {
+                    $(this).attr('title', kLg.msgSpecialChar);
+                    $(this).tooltip({ placement: 'top', trigger: 'manual' }).tooltip('show');
+                    e.preventDefault();
+                    return;
+                }
+                if (e.shiftKey && $.inArray(e.keyCode, specialCodeShirt) != -1) {
+                    $(this).attr('title', kLg.msgSpecialChar);
+                    $(this).tooltip({ placement: 'top', trigger: 'manual' }).tooltip('show');
+                    e.preventDefault();
+                    return;
+                }
+            }
+
+        });
+
+        $('#textFileName').bind("paste", function (e) {
+            if (isFile) {
+                var clipboardValue;
+                var nAgt = navigator.userAgent;
+
+                if ((nAgt.indexOf("OPR")) != -1) {
+                    clipboardValue = e.originalEvent.clipboardData.getData('Text');
+                }
+                else if ((nAgt.indexOf("Chrome")) != -1) {
+                    clipboardValue = e.originalEvent.clipboardData.getData('Text');
+                }
+                else if ((nAgt.indexOf("Safari")) != -1) {
+                    clipboardValue = e.originalEvent.clipboardData.getData('Text');
+                }
+                else if ((nAgt.indexOf("Firefox")) != -1) {
+                    clipboardValue = e.originalEvent.clipboardData.getData('Text');
+                }
+                else {
+                    clipboardValue = window.clipboardData.getData("Text");
+                }
+
+                if (clipboardValue.indexOf('\\') >= 0 || clipboardValue.indexOf('/') >= 0 || clipboardValue.indexOf(':') >= 0 || clipboardValue.indexOf('*') >= 0 || clipboardValue.indexOf('?') >= 0 || clipboardValue.indexOf('"') >= 0 || clipboardValue.indexOf('<') >= 0 || clipboardValue.indexOf('>') >= 0 || clipboardValue.indexOf('|') >= 0) {
+                    $(this).attr('title', kLg.msgSpecialChar);
+                    $(this).tooltip({ placement: 'top', trigger: 'manual' }).tooltip('show');
+                    e.preventDefault();
+                    return;
+                }
+            }
+        });
+
+        limitedTabKey();
+    });
+
+    function editDataFile() {
+        var id = vmFile.FileEdit.Id;
+        var name = $("#fEditFile #textFileName").val().trim();
+        var url = $("#fEditFile #textFileUrl").val().trim();
+        var description = $("#fEditFile #textFileDescription").val();
+        var mdf = vmFile.FileEdit.Mdf;
+        var type = vmFile.FileEdit.Type;
+        var jsonObject = { Id: id, PhysicalName: url, Name: name, Description: description, Mdf: mdf, Type: type };
+        updateFile(jsonObject);
+    }
+
+    function onCloseFile() {
+        if (validEditFile()) {
+            editDataFile();
+            vmPopEditFile.isChange = false;
+            vmFile.popEditFile.close();
+        }
+    }
+
+
+    function onCheckChangeNonType() {
+        $("#fEditFile #textFileUrl").on("change keyup paste", function () {
+            vmPopEditFile.isChange = true;
+        });
+
+        $("#fEditFile #textFileName").on("change keyup paste", function () {
+            vmPopEditFile.isChange = true;
+        });
+
+        $("#fEditFile #textFileDescription").on("change keyup paste", function () {
+            vmPopEditFile.isChange = true;
+        });
+    }
+
+    function validEditFile() {
+        $('#textFileName').tooltip('destroy');
+        var textFileName = $('#textFileName').val().trim();
+        if (textFileName == null || textFileName == '') {
+            $('#textFileName').attr('title', isUrl ? kLg.requiredTextDisplay : kLg.requiredName);
+            $('#textFileName').tooltip({ placement: 'top', trigger: 'manual' }).tooltip('show');
+            $('#textFileName').focus();
+            return false;
+        } else {
+            if (textFileName.length > 250) {
+                $('#textFileName').attr('title', isUrl ? kLg.maxlenghTextDisplay : kLg.msgMaxlenghName);
+                $('#textFileName').tooltip({ placement: 'top', trigger: 'manual' }).tooltip('show');
+                $('#textFileName').focus();
+                return false;
+            }
+        }
+
+        if (isUrl) {
+            var textFileUrl = $('#textFileUrl').val().trim();
+            if (textFileUrl == null || textFileUrl == '') {
+                $('#textFileUrl').attr('title', kLg.requiredURL);
+                $('#textFileUrl').tooltip({ placement: 'top', trigger: 'manual' }).tooltip('show');
+                $('#textFileUrl').focus();
+                return false;
+            } else {
+                if (!textFileUrl.startWith("http://")) {
+                    if (!textFileUrl.startWith("https://")) {
+                        $('#textFileUrl').tooltip('destroy');
+                        $('#textFileUrl').attr("title", kLg.requiredProtocol);
+                        $('#textFileUrl').tooltip({ placement: 'top', trigger: 'manual' }).tooltip('show');
+                        $('#textFileUrl').focus();
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    function setPopEditFileLanguage() {
+        $('#lblPopEditUrlFile').text(kLg.lblUrl);
+        $("#lblPopEditNameFile").text(isUrl ? kLg.lblTextDisplay : kLg.PopName);
+        $("#lblPopEditDesFile").text(kLg.labelDes);
+        $("span.icon-close").next().text(kLg.lblClose);
+    }
+
+    String.prototype.startWith = function (needle) {
+        return (this.indexOf(needle) == 0);
+    };
+</script>

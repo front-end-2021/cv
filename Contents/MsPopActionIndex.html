@@ -1,0 +1,3738 @@
+﻿<style type="text/css">
+    #pop-kpi-action td {
+        height: 35px;
+        padding-left: 5px;
+        font-weight: normal;
+        border: 1px solid #e7e7e7;
+    }
+
+    #pop-kpi-action th {
+        color: white;
+        height: 35px;
+        padding-left: 5px;
+        background-color: #999999;
+        font-weight: normal;
+        padding-right: 5px;
+        text-align: center;
+        border-left: 1px solid white;
+        border-right: 1px solid white;
+    }
+
+    .time-close {
+        display: none;
+        position: absolute;
+        float: right;
+        right: 0;
+        top: 8px;
+    }
+
+    .topic-notify {
+        position: absolute;
+        left: 3px;
+        color: red;
+        margin-top: 10px;
+        font-size: 22px;
+    }
+
+    .index-notify {
+        position: absolute;
+        left: 3px;
+        color: red;
+        margin-top: -7px;
+        font-size: 22px;
+    }
+
+    #pop-kpi-action th:hover .time-close {
+        display: block;
+        position: absolute;
+        float: right;
+        right: 0;
+        top: 8px;
+    }
+
+    .overflow-hidden {
+        overflow: hidden;
+    }
+
+    .removeindex {
+        position: absolute;
+        display: none;
+    }
+
+    .indexrow:hover .removeindex {
+        position: absolute;
+        top: 7px;
+        right: 7px;
+        display: block !important;
+    }
+
+    .mindexrow:hover .removeindex {
+        position: absolute;
+        top: 7px;
+        right: 7px;
+        display: block !important;
+    }
+
+    #pop-kpi-action .sortable {
+        cursor: move;
+    }
+
+    #pop-kpi-action .ui-sortable-placeholder {
+        min-width: 110px;
+    }
+
+    #pop-kpi-action .ui-sortable-helper {
+        max-width: 92px !important;
+        width: 92px !important;
+        vertical-align: middle;
+    }
+
+    #pop-kpi-action .ui-sortable-helper .timename {
+        top: 7px;
+    }
+
+    .kpi-input {
+        height: 26px;
+        border-radius: 3px;
+        padding-left: 3px;
+        padding-right: 3px;
+    }
+
+    .kpi-invalid {
+        color: red !important;
+    }
+
+    .timeinput {
+        color: black;
+        width: 110px;
+        z-index: 100;
+        top: 1px;
+    }
+
+    .unit-left {
+        text-align: left;
+    }
+    .unit-right {
+        text-align: right;
+    }
+    .unit-center {
+        text-align: center;
+    }
+
+    /*expected*/
+    #pop-kpi-action .td-expected .k-numerictextbox .k-input {
+        width: 100px !important;
+        padding-right: 3px !important;
+        height: 22px !important;
+    }
+    #pop-kpi-action .td-expected .k-numerictextbox .k-numeric-wrap {
+        height: 28px !important;
+    }
+
+    /*ist*/
+    #pop-kpi-action .td-ist .k-numerictextbox .k-input {
+        width: 100px !important;
+        padding-right: 3px !important;
+        height: 22px !important;
+    }
+
+    /*master ist*/
+    #pop-kpi-action .td-istm .k-numerictextbox .k-input {
+        width: 100px !important;
+        padding-right: 3px !important;
+        height: 22px !important;
+    }
+
+
+    #pop-kpi-action .td-ist .k-numerictextbox .k-numeric-wrap {
+        height: 28px !important;
+    }
+
+    /*percent*/
+    #pop-kpi-action .td-percent .k-numerictextbox .k-input {
+        width: 70px !important;
+        padding-right: 3px !important;
+        height: 22px !important;
+    }
+
+    /*master implement percent*/
+    #pop-kpi-action .td-implement .k-numerictextbox .k-input {
+        width: 68px !important;
+        padding-right: 3px !important;
+        height: 22px !important;
+    }
+
+
+    #pop-kpi-action .td-percent .k-numerictextbox .k-numeric-wrap {
+        height: 28px !important;
+    }
+
+     /*indextime*/
+    #pop-kpi-action .td-indextime .k-numerictextbox .k-input {
+        width: 108px !important;
+        padding-right: 1px !important;
+        height: 22px !important;
+    }
+
+    /*master indextime*/
+    #pop-kpi-action .td-mindextime .k-numerictextbox .k-input {
+        width: 108px !important;
+        padding-right: 1px !important;
+        height: 22px !important;
+    }
+
+    #pop-kpi-action .td-indextime .k-numerictextbox .k-numeric-wrap {
+        height: 28px !important;
+    }
+
+    .formatcontent {
+        margin-left: 10px;margin-bottom: 10px;
+        position: relative;
+    }
+
+    .formatinput {
+        width: 450px !important;
+    }
+
+    .formatarea {
+        width: 450px;
+        height: 100px;
+        padding-left: 3px;
+    }
+
+    span.k-numerictextbox.formatinput {
+        width: 173px !important;
+        padding-left: 0 !important;
+    }
+
+    span.k-numerictextbox.formatinput input.k-input {
+        width: 164px !important;
+    }
+
+    /*.formatcontent input.formatinput {
+        width: 450px !important;
+    }
+
+    .formatcontent span.formatinput {
+        width: 462px !important;
+        padding-left: 0 !important;
+    }*/
+
+    .formatfile {
+        margin-bottom: 2px;
+    }
+
+    .crmlink {
+        margin-bottom: 5px;
+    }
+
+    .crmlink-item, .formatfile-item {
+        margin-right: 3px;
+        margin-top: 2px;
+        padding: 5px;
+        box-shadow: 0 2px 6px rgba(0,0,0,.2), 0 2px 3px rgba(0,0,0,.05);
+        padding-bottom: 5px;
+        display: inline-flex;
+    }
+
+    .goal-truncate {
+        height: 17px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: inline-block;
+        max-width: 373px;
+    }
+
+    .kmessage {
+        height: 18px;
+        color: red;
+        margin-bottom: 2px;
+        padding-left: 14px;
+        padding-top: 2px;
+    }
+    #pop-kpi-action span.k-datepicker.timeinput {
+        /*position: absolute;*/
+    }
+
+    .divaddformat {
+        padding-left: 10px;
+        margin-bottom: 20px;
+        margin-top: 20px;
+        height: 32px;
+    }
+
+    #tblkpiaction th {
+        background-clip: padding-box;
+        position: relative;
+    }
+
+    .topicicon {
+        border-right: none;
+        text-align: center;
+        padding-left: 0;
+    }
+
+    .topicinput {
+        color: #2e2e2e !important;
+        padding-left: 3px;
+        width: 297px !important;
+    }
+
+    #div.k-animation-container div.k-notification-wrap {
+        padding-top: 4px !important;
+    }
+    div.k-animation-container div.k-notification-wrap span.k-i-close {
+        display: none;
+    }
+    div.k-animation-container div.k-notification-wrap .k-i-note {
+        display: none;
+    }
+    div.k-animation-container div.k-notification-wrap .k-icon.k-i-info {
+        margin-top: -4px;
+    }
+    .k-widget.k-notification.k-notification-info {
+        background-color: #38baf8;
+        border-color: #38baf8;
+    }
+    div#hoand-k-notification-8290 {
+        display: inline-block;
+        padding-left: 3px;
+    }
+
+    #bodykpiaction td{
+        border-top: none;
+    }
+
+    td.nonborder-bottom {
+        border-bottom: none !important;
+    }
+
+    span.k-widget.k-datepicker.k-header.mtimeinput {
+        width: 106px;
+        float: left;
+    }
+
+        span.k-widget.k-datepicker.k-header.mtimeinput input.mtimeinput.k-input {
+            width: 104% !important;
+        }
+</style>
+
+<div id="loading-action" class="loading"></div>
+<div id="popkpiaction"></div>
+<div id="pop-kpi-action" class="pop-wrapper">
+    <form id="fKpiActionForm" role="form" class="form-horizontal">
+        <div class="kmessage">
+            <span id="kmessage"></span>
+        </div>
+        <div class="modal-body ms-modal-body" style="height: 420px; overflow: auto; overflow-y: scroll; padding-left: 13px !important; padding-top: 0 !important;" id="div-kpiaction">
+        </div>
+
+        <div class="modal-market-footer">
+            <button id="btnUpdateKpiAction" type="button" class="ms-button" onclick="vmKpiAction.update()">
+                <span class="icon-20 icon-close"></span>
+                <span id="lblKpiActionClose">Speichern und schliessen</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script id="temp-kpiaction" type="text/html">
+    #for(var x = 0; x < data.length; x++){#
+        #var kpiItem = data[x];#
+
+        #var times = kpiItem.KpiOutcomeTimes;#
+        #var indexes = kpiItem.KpiIndexes;#
+    <div id="adv-#:kpiItem.Id#">
+        #if(enableKpi){#
+        <div><span>#:kpiItem.AdvertiserName#</span></div>
+        <table style="margin-bottom: 20px; height: initial;" id="tblkpiaction">
+            <thead>
+                <tr>
+                    <th style="min-width: 26px; max-width: 26px; border-right: none; border-top-left-radius: 5px;">
+                        <input type="checkbox" #if(kpiItem.IsAll){# checked #}# id="cbxcalculateall" class="calculateall" onchange="vmKpiAction.events.changeCalculateAll(this)" #if(!vmKpiAction.dataService.hasRole()){#disabled#}# />
+                    </th>
+                    <th style="min-width: 290px; text-align: left;">
+                        #:kLg.menuKpiIndex#
+                    </th>
+                    <th style="min-width: 90px;max-width: 90px;">
+                        #:kLg.lblKpiUnit#
+                    </th>
+                    <th style="min-width: 80px;max-width: 80px;">
+                        #:kLg.lblKpiTimePeriod#
+                    </th>
+                    <th style="min-width: 114px;max-width: 114px;" id="sollCol">
+                        #:kLg.lblSoll#
+                    </th>
+
+                    #if(enableTime){#
+                    <th style="min-width: 80px;max-width: 80px;">+/-</th>
+                    <th style="min-width: 114px;max-width: 114px;" id="istCol">
+                        #:kLg.lblActual#
+                    </th>
+                    #}#
+
+                    #if(enableTime){#
+                    #for(var i = 0; i < times.length; i++){#
+                    #var time = times[i];#
+                    #=vmKpiAction.binding("newtimecolumn", time)#
+                    #}#
+                    #}#
+
+                    <th style="min-width: 35px; text-align: center;border-left: none; padding-left: 0; padding-right: 0; border-top-right-radius: 5px;">
+                        #if(enableTime && vmKpiAction.dataService.hasRole()){#
+                        <span class="icon-26 icon-kpi-add-white pointer" onclick="vmKpiAction.addTime()"></span>
+                        #}#
+                    </th>
+
+                </tr>
+            </thead>
+
+            <tbody id="bodykpiaction">
+                #for(var i = 0; i < indexes.length; i++){#
+                #var index = indexes[i];#
+                #=vmKpiAction.binding("newindexrow", index)#
+                #}#
+            </tbody>
+
+            #if(vmKpiAction.dataService.hasRole()){#
+            <tfoot>
+                <tr>
+                    <td class="dcmm" style="text-align: center; padding-left: 0;">
+                        <span class="icon-28 icon-kpi-add-gray pointer" onclick="vmKpiAction.selectKpiIndex()"></span>
+                    </td>
+                    <td class="addindex noborder" colspan="#:(timeNo + colNo - 1)#"></td>
+                </tr>
+            </tfoot>
+            #}#
+
+        </table>
+        #}#
+
+        <!-- kpi action master -->
+        #if(enableTime){#
+        #var mtimes = data.KpiMasterData.KpiMasterTimes;#
+        #var mtopics = data.KpiMasterData.KpiMasterTopics;#
+        <div class="kmessage" style="padding-left: 0;">
+            <span id="kmessagemaster"></span>
+        </div>
+        <table style="margin-bottom: 20px; height: initial;" id="tblkpimaster">
+            <thead>
+                <tr>
+                    <th style="border-right: none; min-width: 27px; max-width: 27px;"></th>
+                    <th style="border-left: none; min-width: 290px; text-align: left;max-width: 290px;">
+                        #:kLg.titleKpiGoalIndex#
+                    </th>
+                    <th style="min-width: 90px;max-width: 90px;">
+                        #:kLg.lblKpiUnit#
+                    </th>
+
+                    <th style="min-width: 80px;max-width: 80px;">
+                        <span class="icon-26 icon-cost-gray-kpi" style="margin-left: 18px;margin-bottom: 8px;float: left;"></span>
+                        <span style="float: right;margin-top: 8px;margin-right: 20px;">%</span>
+                    </th>
+
+                    <th style="min-width: 114px;max-width: 114px;">
+                        #:kLg.lblSoll#
+                    </th>
+                    <th style="min-width: 80px;max-width: 80px;" id="dbcgCol">
+                        <span>+/-</span>
+                    </th>
+                    <th style="min-width: 114px;max-width: 114px;" id="mistCol">
+                        #:kLg.lblActual#
+                    </th>
+
+                    #if(enableTime){#
+                    #for(var i = 0; i < mtimes.length; i++){#
+                    #var mtime = mtimes[i];#
+                    #=vmKpiAction.binding("newmastertimecolumn", mtime)#
+                    #}#
+                    #}#
+
+                    <th style="max-width: 37px;min-width: 37px; text-align: center; padding-left: 0; padding-right: 0;position: relative;">
+                        #if(enableTime && vmKpiAction.dataService.hasRole()){#
+                        <span class="icon-28 icon-kpi-add-white pointer" style="margin-top: 3px;" onclick="vmKpiAction.addMasterTime()"></span>
+                        #}#
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="bodykpimaster">
+                #for(var i = 0; i < mtopics.length; i++){#
+                #var mtopic = mtopics[i];#
+                #=vmKpiAction.binding("newmastertopicrow", mtopic)#
+
+                #var mindexes = mtopic.KpiMasterIndexes;#
+                #for(var j = 0; j < mindexes.length; j++){#
+                #var mindex = mindexes[j]; #
+                #=vmKpiAction.binding("newmasterindexrow", mindex)#
+                #}#
+
+                #=vmKpiAction.binding("addmasterindexrow", mtopic)#
+                #}#
+            </tbody>
+
+            #if(vmKpiAction.dataService.hasRole()){#
+            <tfoot>
+                <tr>
+                    <td class="add-kpi-goal-td" style="text-align: center; padding-left: 0;">
+                        <span class="icon-28 icon-kpi-add-blue pointer" onclick="vmKpiAction.openAddMasterTopic()"></span>
+                    </td>
+
+                    <td class="addmastertopicempty noborder" colspan="#:(mtimes.length + 7)#"></td>
+                </tr>
+            </tfoot>
+            #}#
+        </table>
+        #}#
+
+        <!-- end -->
+        #if(!enableTime){#
+        <div id="divformataction" style="padding-top: 10px; padding-bottom: 10px;">
+            #var formats = kpiItem.KpiFormats;#
+            #for(var i = 0; i < formats.length; i++){#
+            #var format = formats[i];#
+            <div style="width: 100%; margin-bottom: 3px;">
+                <div class="menu-item pointer" style="height: 28px;background-color: \#33a6dc; border-top-left-radius: 4px; border-top-right-radius: 4px; color: white; padding-top: 8px; padding-left: 5px;" onclick="vmKpiAction.toggleContent(this)">
+                    <span class="arrow-panel-online icon-24 icon-left-block arrow-collapse" style="margin-top: -2px"></span>
+                    <label class="pointer" style="width: 90%;height: 18px;overflow: hidden;">#:format.Name#</label>
+                </div>
+                <div id="divformatcontent" class="content-item hidden" style="border: 1px solid \#dddddd; padding-top: 6px;">
+                    #var items = format.KpiFormatItems;#
+
+                    #var isHasLink = vmCommon.findIndexByFunc(items, function(it) { return it.FTypeId == vmCommon.FormatType.CRMLINK;}) > -1;#
+                    #var isHasDocument = vmCommon.findIndexByFunc(items, function(it) { return it.FTypeId == vmCommon.FormatType.DOCUMENT;}) > -1;#
+
+                    #for(var j = 0;j < items.length;j++){#
+                    #var item = items[j];#
+                    #=vmKpiAction.renFormatItem(item)#
+                    #}#
+
+                    #if(vmKpiAction.dataService.hasRole()){#
+                    <div fid="#:format.Id#" class="divaddformat">
+                        <div fid="#:format.Id#" class="addformat posRelative #if(items.length == 5) {#hidden#}#">
+                            <span class="icon-32 cursor-pointer icon-add" data-toggle="dropdown"></span>
+                            <ul role="menu" class="dropdown-menu ms-popup-menu posAbsolute" style="left: 35px; top: -15px;">
+                                <li atype="addformatlink" fid="#:format.Id#" class="#if(isHasLink){#hidden#}#"><a class="dropdow-menu-li-a" style="width: inherit;" onclick="vmKpiAction.addFormat(#:format.Id#, vmCommon.FormatType.CRMLINK)"> <span class="icon-24  icon-left-block icon-add-region"></span><span style="margin-left: 10px;">#:kLg.lblCrmLink#</span></a></li>
+                                <li atype="addformatdivider" fid="#:format.Id#" role="presentation" class="divider icon-divider #if(isHasLink || isHasDocument){#hidden#}#"></li>
+                                <li atype="addformatdocument" fid="#:format.Id#" class="#if(isHasDocument){#hidden#}#"><a class="dropdow-menu-li-a" style="width: inherit;" onclick="vmKpiAction.addFormat(#:format.Id#, vmCommon.FormatType.DOCUMENT)"><span class="icon-24  icon-left-block icon-copy"></span><span style="margin-left: 10px;">#:kLg.lblDocument#</span></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    #}#
+                </div>
+            </div>
+            #}#
+        </div>
+        #}#
+
+    </div>
+    #}#
+</script>
+
+<!-- Master templates -->
+<script id="newmastertopicrow" type="text/x-kendo-template">
+    #var iconCls = vmKpiAction.getTopicIcon(data.TypeId); #
+    <tr class="topicrow td-hover" topicid="#:data.Id#">
+        <td class="add-kpi-goal-td topicicon noPadding">
+            <span class="valid-item topic-notify hidden" topicid="#:data.Id#">*</span>
+            <span id="topicicon#:data.Id#" class="icon-28 #:iconCls#"></span>
+        </td>
+        <td class="add-kpi-goal-td topicname noborder posRelative" colspan="#:(mtimeNo + 7)#">
+
+            <span id="topicname#:data.Id#" class="topicnamespan" topicid="#:data.Id#">#:data.Name || ''#</span>
+            <input id="topicinput#:data.Id#" class="txtInput topicinput hidden" value="#:data.Name#" topicid="#:data.Id#">
+
+            #if(vmKpiAction.dataService.hasRole()){#
+            <div class="ms-dropdow" style="position: absolute;right: 7px;top: 10px;">
+                <span class="icon-16 icon-dropdow pointer" data-toggle="dropdown"></span>
+                <ul aria-labelledby="btnGroupVerticalDrop1" role="menu" class="popup-menu dropdown-menu ms-popup-menu posAbsolute" style="left: auto; top: 15px; bottom: auto;right:3px;">
+                    <li><a class="dropdow-menu-li-a" onclick="vmKpiAction.openAddMasterTopic(#:data.Id#)"><span class="icon-24 icon-left-block icon-edit"></span>#:kLg.edit#</a></li>
+                    <li role="presentation" class="divider"></li>
+                    <li><a class="dropdow-menu-li-a" onclick="vmKpiAction.deleteTopic(#:data.Id#)"><span class="icon-24 icon-left-block icon-delete"></span>#:kLg.lblDelete#</a></li>
+                </ul>
+            </div>
+            #}#
+        </td>
+    </tr>
+</script>
+
+<script id="newmasterindexrow" type="text/x-kendo-template">
+    <tr class="mindexrow" topicid="#:data.KpiActionMasterTopicId#" indexid="#:data.Id#">
+        <td>
+            <span class="valid-item index-notify hidden" topicid="#:data.KpiActionMasterTopicId#" indexid="#:data.Id#">*</span>
+        </td>
+        <td class="posRelative indexhover" topicid="#:data.KpiActionMasterTopicId#" indexid="#:data.Id#">
+            <div style="height: 20px;overflow: hidden;padding-top: 2px;width: 270px;">
+                <span id="mindexname#:data.Id#" class="mindexname #if(data.IsFinish){#k-state-disabled k-state-disable-1#}#">#:data.Name || ''#</span>
+            </div>
+            #if(vmKpiAction.dataService.hasRole()){#
+            <span class="icon-20 icon-url pull-left pointer" style="position: absolute;top:7px;right:4px;" onclick="vmKpiAction.openSelectMasterIndex(#:data.Id#, #:data.KpiActionMasterTopicId#)"></span>
+            #}#
+        </td>
+        <td>
+            <select class="masterctrl" style="width:90px;max-width: 90px;overflow: hidden;" id="munit#:data.Id#" topicid="#:data.KpiActionMasterTopicId#" indexid="#:data.Id#"></select>
+        </td>
+        <td class="td-percent">
+            <input type="text" class="masterctrl txtInput kpi-input text-right" style="width:90%" topicid="#:data.KpiActionMasterTopicId#" indexid="#:data.Id#" ftype="percent" value="#:vmKpiAction.showNumber(data.KpiPercent)#" onchange="vmKpiAction.events.changeMasterIndexValue(this)" />
+        </td>
+        <td class="td-expected">
+            <input type="text" class="masterctrl txtInput kpi-input #:vmKpiAction.positionClass(data.KpiUnitId)#" style="width:90%" topicid="#:data.KpiActionMasterTopicId#" indexid="#:data.Id#" ftype="expected" value="#:vmKpiAction.showNumber(data.ExpectedValue)#" onchange="vmKpiAction.events.changeMasterIndexValue(this)" />
+        </td>
+        <td class="td-implement">
+            <input type="text" class="masterctrl txtInput kpi-input text-right" style="width:88%" topicid="#:data.KpiActionMasterTopicId#" indexid="#:data.Id#" ftype="implement" value="#:vmKpiAction.showNumber(data.ImplementPercent)#" />
+        </td>
+        <td class="td-istm" indexid="#:data.Id#" topicid="#:data.KpiActionMasterTopicId#">
+            <input type="text" class="masterctrl txtInput kpi-input #:vmKpiAction.positionClass(data.KpiUnitId)#" style="width:90%" topicid="#:data.KpiActionMasterTopicId#" indexid="#:data.Id#" value="#:vmKpiAction.showNumber(data.LstValue)#" ftype="ist" onchange="vmKpiAction.events.changeMasterIndexValue(this)" />
+        </td>
+
+        #for(var i = 0; i < data.KpiMasterIndexTimes.length; i++){#
+        #var indextime = data.KpiMasterIndexTimes[i]; #
+        <td class="td-mindextime">
+            <input type="text" class="masterctrl txtInput kpi-input #:vmKpiAction.positionClass(data.KpiUnitId)#" style="width:92%" id="mit#:indextime.Id#" value="#:vmKpiAction.showNumber(indextime.KpiValue)#" topicid="#:data.KpiActionMasterTopicId#" indexid="#:data.Id#" ftype="indextime" it="#:indextime.Id#" onchange="vmKpiAction.events.changeMasterIndexTime(this)" />
+        </td>
+        #}#
+
+        <td class="posRelative">
+            #if(vmKpiAction.dataService.hasRole()){#
+            <span class="icon-20 icon-close2 pointer removeindex posAbsolute" onclick="vmKpiAction.deleteMasterIndex(this)"></span>
+            #}#
+        </td>
+    </tr>
+
+</script>
+
+<script id="addmasterindexrow" type="text/x-kendo-template">
+    <tr topicid="#:data.Id#">
+        <td class="noPadding" style="text-align:center;">
+            #if(vmKpiAction.dataService.hasRole()){#
+            <span class="icon-28 icon-kpi-add-gray pointer" id="addfortopic#:data.Id#" onclick="vmKpiAction.addMasterIndex(this, #:data.Id#)"></span>
+            #}#
+        </td>
+        <td class="addmasterindexempty" colspan="#:(mtimeNo + 7)#"></td>
+    </tr>
+</script>
+
+<script id="newtimecolumn" type="text/x-kendo-template">
+    <th style="max-width: 120px;min-width: 120px;position: relative;" class="sortable timecolumn" timeid="#:data.Id#">
+        <div class="div-timename" timeid="#:data.Id#">
+            <span class="timename">#:kendo.toString(data.Name, "d" )#</span>
+        </div>
+        <input class="timeinput hidden" value="#:kendo.toString(data.Name, 'd')#" timeid="#:data.Id#" />
+        
+        #if(vmKpiAction.dataService.hasRole()){#
+        <span class="icon-20 icon-close time-close pointer" onclick="vmKpiAction.deleteTime(this);"></span>
+        #}#
+    </th>
+</script>
+
+<script id="newmastertimecolumn" type="text/x-kendo-template">
+    <th style="max-width: 120px;min-width: 120px;position: relative;" class="sortable mtimecolumn" timeid="#:data.Id#">
+        <div class="div-mtimename" timeid="#:data.Id#">
+            <span class="mtimename">#:kendo.toString(data.Name, "d" )#</span>
+        </div>
+        <input class="mtimeinput hidden" value="#:kendo.toString(data.Name, 'd')#" timeid="#:data.Id#" />
+
+        #if(vmKpiAction.dataService.hasRole()){#
+        <span class="icon-20 icon-close time-close pointer" onclick="vmKpiAction.deleteMasterTime(this)"></span>
+        #}#
+    </th>
+</script>
+
+<script id="newsubindexrow" type="text/x-kendo-template">
+    <tr class="indexrow" indexid="#:data.Id#" parentindexid="#:data.ParentId#">
+        <td class="nonborder-bottom"></td>
+        <td class="nonborder-bottom"></td>
+        <td class="nonborder-bottom"></td>
+        <td class="nonborder-bottom"></td>
+        <td class="nonborder-bottom"></td>
+        <td class="nonborder-bottom"></td>
+        <td class="td-ist nonborder-bottom" indexid="#:data.Id#"></td>
+
+        #var subIndexTimes = data.KpiIndexTimes;#
+        #for(var i = 0; i < subIndexTimes.length; i++){#
+        #var subIndexTime = subIndexTimes[i];#
+        <td class="td-indextime">
+            <input type="text" class="kpictrl txtInput kpi-input #:vmKpiAction.positionClass(data.KpiUnitId)#" style="width:92%" id="it#:subIndexTime.Id#" value="#:vmKpiAction.showNumber(subIndexTime.KpiValue)#" indexid="#:data.Id#" ftype="indextime" it="#:subIndexTime.Id#" onchange="vmKpiAction.events.changeIndexTime(this)" />
+        </td>
+        #}#
+        <td class="posRelative"></td>
+    </tr>
+</script>
+
+<script id="newindexrow" type="text/x-kendo-template">
+    #if(enableTime){#
+        #var subIndexes = data.SubIndexes;#
+        #for(var i = 0; i < subIndexes.length; i++){#
+            #var subIndex = subIndexes[i];#
+            #=vmKpiAction.binding("newsubindexrow", subIndex)#
+        #}#
+    #}#
+
+    <tr class="indexrow" indexid="#:data.Id#">
+        <td>
+            <input type="checkbox" class="calculateindex" id="cbxcalculate#:data.Id#" indexid="#:data.Id#"   #if(data.IsCalculate){# checked #}# style="margin-left: 7px;" onchange="vmKpiAction.events.changeCalculate(this)" #if(!vmKpiAction.dataService.hasRole()){#disabled#}# />
+        </td>
+        <td class="posRelative">
+            <div style="width:260px;overflow:hidden;">
+                <span id="indexname#:data.Id#">#:data.KpiIndexName || ''#</span>
+            </div>
+
+            #if(vmKpiAction.dataService.hasRole()){#
+            <span class="icon-20 icon-url pull-left pointer" style="position: absolute;top:7px;right:4px;" onclick="vmKpiAction.selectKpiIndex(#:data.Id#);"></span>
+            #}#
+        </td>
+        <td class="td-unit">
+            <span id="unitname#:data.Id#">#:data.KpiUnitName#</span>
+        </td>
+        <td class="td-time">
+            <span id="timename#:data.Id#">#:data.KpiTimeName#</span>
+        </td>
+        <td class="td-expected">
+            <input type="text" class="kpictrl txtInput kpi-input #:vmKpiAction.positionClass(data.KpiUnitId)#" style="width:90%" indexid="#:data.Id#" ftype="expected" 
+            value="#:vmKpiAction.showNumber(data.ExpectedValue)#" onchange="vmKpiAction.events.changeIndexValue(this)" />
+        </td>
+
+        #if(enableTime){#
+        <td class="td-percent">
+            <input type="text" class="kpictrl txtInput kpi-input text-right" style="width:90%" indexid="#:data.Id#" ftype="percent" 
+            value="#:vmKpiAction.showNumber(data.KpiPercent)#" />
+        </td>
+        <td class="td-ist" indexid="#:data.Id#">
+            <input type="text" class="kpictrl txtInput kpi-input #:vmKpiAction.positionClass(data.KpiUnitId)#" style="width:90%" indexid="#:data.Id#" ftype="ist" 
+            value="#:vmKpiAction.showNumber(data.LstValue)#" onchange="vmKpiAction.events.changeIndexValue(this)" />
+        </td>
+        #}#
+
+        #if(enableTime){#
+        #var indextimes = data.KpiIndexTimes;#
+        #for(var i = 0; i < indextimes.length; i++){#
+        #var indextime = indextimes[i];#
+        <td class="td-indextime">
+            <input type="text" class="kpictrl txtInput kpi-input #:vmKpiAction.positionClass(data.KpiUnitId)#" style="width:92%" id="it#:indextime.Id#" value="#:vmKpiAction.showNumber(indextime.KpiValue)#" indexid="#:data.Id#" ftype="indextime" it="#:indextime.Id#" onchange="vmKpiAction.events.changeIndexTime(this)" />
+        </td>
+        #}#
+        #}#
+
+        <td class="posRelative">
+            #if(vmKpiAction.dataService.hasRole()){#
+            <span class="icon-20 icon-close2 pointer removeindex posAbsolute" onclick="vmKpiAction.deleteActionIndex(this);"></span>
+            #}#
+        </td>
+    </tr>
+</script>
+
+<!-- ReSharper disable CoercedEqualsUsing -->
+<script type="text/javascript">
+    var vmKpiAction = {}, isChangePositionTime = false, isChangePositionMasterTime = false;
+    vmKpiAction.events = {};
+    vmKpiAction.modelChanged = false;
+    var _indexId = 0, _timeId = 0, _outcomeTimeId = 0, _timeIndex = 0, _kindex = 0;
+    var _mindexId = 0, _mtopicId = 0, _mindexTimeId = 0, _mtimeId = 0, _mtimeIndex = 0;
+    var currency = "";
+
+    vmKpiAction.destroyPop = function () {
+        if (vmGoalAction.popActionIndex == null) return;
+
+        vmGoalAction.popActionIndex.destroy();
+        vmGoalAction.popActionIndex = null;
+        $(".navbar-collapse.collapse.block-nav").after("<div id='popActionIndex'></div>");
+    };
+
+    vmGoalAction.popActionIndex.bind("close", function(e) {
+        if (vmKpiAction.modelChanged) {
+
+            if (confirm(kLg.saveConfirmQuestion)) {
+                if (vmKpiAction.update()) {
+                    vmKpiAction.destroyPop();
+                } else {
+                    e.preventDefault();
+                }
+            } else {
+                vmKpiAction.destroyPop();
+            }
+
+        } else {
+            vmKpiAction.destroyPop();
+        }
+    });
+
+    vmKpiAction.limitedKpiValue = function(value) {
+        var min = -999999999999;
+        var max = 999999999999;
+
+        if (value < min) return min;
+        if (value > max) return max;
+
+        return value;
+    };
+
+    vmKpiAction.getTopicIcon = function (typeId) {
+
+        switch (typeId) {
+            case vmCommon.KpiGoalTopicType.LandRegion:
+                return "icon-kpi-location";
+            case vmCommon.KpiGoalTopicType.Market:
+                return "icon-kpi-market";
+            case vmCommon.KpiGoalTopicType.Product:
+                return "icon-kpi-product";
+            case vmCommon.KpiGoalTopicType.Goal:
+                return "icon-kpi-goal";
+            default:
+                return "";
+        }
+
+    };
+
+    vmKpiAction.getSelectedIndex = function(expecteds) {
+        var indexes = kpi.KpiData.KpiIndexes;
+        var ids = indexes.map(function(it) { return it.KpiIndexId; });
+        return expecteds ? $.grep(ids, function (it) { return expecteds.indexOf(it) == -1; }): ids;
+    };
+
+    vmKpiAction.KpiIndexData = undefined;
+    vmKpiAction.selectKpiIndex = function(actionIndexId) {
+        var index = vmCommon.findById(actionIndexId, kpi.KpiData.KpiIndexes);
+
+        if (index == undefined) {
+            index = new SettingIndex();
+
+            var times = kpi.KpiData.KpiOutcomeTimes;
+            for (var i = 0; i < times.length; i++) {
+                var time = times[i];
+                index.KpiIndexTimes.push(new KpiOutcomeIndexTime(index.Id, time.Id));
+            }
+        }
+
+        vmKpiAction.kpiIndexOptions = {};
+        vmKpiAction.kpiIndexOptions.isEdit = actionIndexId != undefined;
+        vmKpiAction.kpiIndexOptions.actionIndex = index;
+        vmKpiAction.kpiIndexOptions.KpiData = kpi.KpiData;
+
+        vmKpiAction.kpiIndexOptions.selectedIndexes = vmKpiAction.getSelectedIndex(index.KpiIndexId ? [index.KpiIndexId] : []);
+
+        if (vmKpiAction.KpiIndexData) {
+            vmKpiAction.kpiIndexOptions.KpiIndexData = vmKpiAction.KpiIndexData;
+            vmKpiAction.openSelectKpiIndex();
+
+        } else {
+            vmGoalAction.dataservice.getTopicMenu(null, function(res) {
+                vmKpiAction.KpiIndexData = res.value;
+                vmKpiAction.kpiIndexOptions.KpiIndexData = vmKpiAction.KpiIndexData;
+
+                vmKpiAction.openSelectKpiIndex();
+            });
+        }
+    };
+
+    vmGoalAction.popKpiIndex = undefined;
+    vmKpiAction.openSelectKpiIndex = function() {
+        vmGoalAction.popKpiIndex = showPopup(vmGoalAction.popKpiIndex,
+            $("#pop-selectkpiindex"),
+            "../Contents/MsPopSelectKpiIndex.html",
+            {
+                title: kLg.titleSelectIndex.format(kLg.menuKpiIndex),
+                width: 650,
+                height: 525,
+                resizable: false
+            });
+    };
+
+    vmKpiAction.showNumber = function(number) {
+        return number == null ? "" : number;
+    };
+
+    vmKpiAction.toggleContent = function(e) {
+        var parent = $(e).parent();
+        var content = $(parent).children("div.content-item");
+
+        //toggle
+        $(content).toggleClass("hidden");
+        var isOpen = !$(content).hasClass("hidden");
+        
+        if (isOpen) {
+            $(e).children("span.arrow-panel-online").removeClass("arrow-collapse").addClass("arrow-right-big");
+        } else {
+            $(e).children("span.arrow-panel-online").removeClass("arrow-right-big").addClass("arrow-collapse");
+        }
+    };
+
+    vmKpiAction.renFormatItem = function(item) {
+        switch (item.FTypeId) {
+            case vmCommon.FormatType.FORMAT:
+                return renFormat(item);
+            case vmCommon.FormatType.COST:
+                return renCost(item);
+            case vmCommon.FormatType.DESCRIPTION:
+                return renDescription(item);
+            case vmCommon.FormatType.CRMLINK:
+                return renCrmLink(item);
+            case vmCommon.FormatType.DOCUMENT:
+                return renDocument(item);
+            default:
+                return "";
+        }
+    };
+
+    function renFormat(item) {
+        var ctrlId = vmCommon.newGuid();
+        var divStr = "<div class='formatcontent'>";
+        var enableStr = !vmKpiAction.dataService.hasRole() ? "disabled" : "";
+
+        divStr += "<label>" + item.Name + "</label>";
+        divStr += "<div class='clear'></div>";
+        divStr += "<input class='txtInput formatinput' fid='" + item.KpiFormatId + "' fi='" + item.Id + "' id='" + ctrlId + "' style='padding-left: 3px;' type='text' value='" + item.MValue + "' " + enableStr + " />";
+        divStr += "</div>";
+
+        setTimeout(function() {
+            $("#" + ctrlId).on("change", function (e) {
+                var formatItem = vmKpiAction.getFormatItem(item.KpiFormatId, vmCommon.FormatType.FORMAT);
+                if (formatItem == null) return;
+
+                formatItem.MValue = $(e.target).val();
+                if (formatItem.DataState === dataState.Unchanged) formatItem.DataState = dataState.Modified;
+
+            });
+        }, 50);
+
+        return divStr + "<div class='clear'></div>";
+    };
+
+    function renCost(item) {
+        var ctrlId = vmCommon.newGuid();
+        var divStr = "<div class='formatcontent'>";
+        divStr += "<label>" + item.Name + "</label>";
+        divStr += "<div class='clear'></div>";
+        divStr += "<input class='text-right txtInput formatinput' fi='"+item.Id+"' id='" + ctrlId + "' style='padding-right: 3px;' type='text' value='" + item.MValue + "' />";
+        divStr += "</div>";
+
+        setTimeout(function() {
+            var ctrl = $("#" + ctrlId).kendoNumericTextBox({
+                spinners: false,
+                format: currency.encodeDola() + " ##,#.00",
+                change: function (e) {
+                    var formatItem = vmKpiAction.getFormatItem(item.KpiFormatId, vmCommon.FormatType.COST);
+                    if (formatItem == null) return;
+
+                    var min = -999999999999;
+                    var max = 999999999999;
+                    var value = this.value();
+
+                    if (value < min) value = min;
+                    if (value > max) value = max;
+
+                    this.value(value);
+
+                    formatItem.MValue = this.value();
+                    if (formatItem.DataState === dataState.Unchanged) formatItem.DataState = dataState.Modified;
+                }
+            });
+
+            if(!vmKpiAction.dataService.hasRole() && ctrl) $(ctrl).data("kendoNumericTextBox").enable(false);
+
+        }, 50);
+
+        return divStr + "<div class='clear'></div>";
+    };
+
+    function renDescription(item) {
+        var ctrlId = vmCommon.newGuid();
+        var enableStr = !vmKpiAction.dataService.hasRole() ? "disabled" : "";
+
+        var divStr = "<div class='formatcontent'>";
+
+        divStr += "<label>" + item.Name + "</label>";
+        divStr += "<div class='clear'></div>";
+        divStr += "<textarea fid='" + item.KpiFormatId + "' fi='"+item.Id+"' id='" + ctrlId + "' class='formatarea eval-textarea' "+enableStr+">" + item.MValue + "</textarea>";
+        divStr += "</div>";
+
+        setTimeout(function() {
+            $("#" + ctrlId).on("change", function (e) {
+                var formatItem = vmKpiAction.getFormatItem(item.KpiFormatId, vmCommon.FormatType.DESCRIPTION);
+                if (formatItem == null) return;
+
+                formatItem.MValue = $(e.target).val();
+                if (formatItem.DataState === dataState.Unchanged) formatItem.DataState = dataState.Modified;
+            });
+        }, 50);
+
+        return divStr + "<div class='clear'></div>";
+    };
+
+    function renCrmLink(item) {
+        var divStr = "<div class='formatcontent'>";
+
+        divStr += "<label>" + item.Name + "</label>";
+        divStr += "<div class='clear'></div>";
+
+        divStr += "<div class='crmlink' fid='" + item.KpiFormatId + "' fi='"+item.Id+"'>";
+        var itemValues = $.grep(item.ItemValues, function(it) { return it.DataState !== dataState.Deleted; });
+        for (var i = 0; i < itemValues.length; i++) {
+            var itemValue = itemValues[i];
+            divStr += "<div class='crmlink-item' fid='" + item.KpiFormatId + "' fi='" + item.Id + "'><div class='pull-left'><a class='goal-truncate ms-link'>" + itemValue.Name + "</a></div>";
+            if (vmKpiAction.dataService.hasRole()) {
+                divStr += "<span class='icon-20 ms-icon-delete-gray' style='cursor: pointer;zoom: 85%;' fid='" + item.KpiFormatId + "' ivid='" + itemValue.Id + "' onclick='vmKpiAction.deleteCrmLink(this)'></span>";
+            }
+            divStr += "</div>";
+        }
+        divStr += "</div>";
+        if (vmKpiAction.dataService.hasRole()) {
+            divStr += "<div class='crmlink-add' fid='" + item.KpiFormatId + "' fi='" + item.Id + "'><span class='icon-32 cursor-pointer icon-add' fid='" + item.KpiFormatId + "' fi='"+item.Id+"' onclick='vmKpiAction.selectCrmLink(this)'></span></div>";
+        }
+
+        if (vmKpiAction.dataService.hasRole()) {
+            divStr += "<span class='icon-20 icon-close2 pointer posAbsolute' style='right:5px;top:2px;' fid='" + item.KpiFormatId + "' fi='"+item.Id+"' ft='" + vmCommon.FormatType.CRMLINK + "' onclick='vmKpiAction.deleteFormat(this)'></span>";
+        }
+        
+        divStr += "</div>";
+        
+        return divStr + "<div class='clear'></div>";
+    };
+
+    vmKpiAction.deleteFormat = function (e) {
+        if (!vmKpiAction.dataService.hasRole()) return;
+
+        var formatId = $(e).attr("fid");
+        var ftype = $(e).attr("ft");
+        var fid = $(e).attr("fi");
+
+        if (formatId == undefined || isNaN(Number(formatId)) || ftype == undefined || isNaN(Number(ftype)) || fid == undefined || isNaN(Number(fid))) return;
+
+        formatId = Number(formatId);
+        ftype = Number(ftype);
+        fid = Number(fid);
+
+        var format = vmCommon.findByFunc(kpi.KpiData.KpiFormats, function (it) { return it.Id == formatId; })
+        if (format == null) return;
+
+        var formatItems = format.KpiFormatItems;
+        var index = vmCommon.findIndexByFunc(formatItems, function(it) { return it.FTypeId == ftype && it.Id == fid; });
+
+        if (index > -1) {
+            vmKpiAction.addDeletedItems(formatItems.splice(index, 1), vmCommon.KpiGoalType.FORMATITEM);
+        }
+
+        $(e).closest("div.formatcontent").remove();
+        $("#divformataction div.addformat").removeClass("hidden");
+
+        vmKpiAction.bindFormatMenu(formatId);
+    };
+
+    vmKpiAction.addFormat = function(fid, ftype) {
+        if (!vmKpiAction.dataService.hasRole()) return;
+
+        if (ftype == undefined || isNaN(Number(ftype)) || fid == undefined || isNaN(Number(fid))) return;
+        if (kpiFormatTypes.length === 0) return;
+
+        var format = vmCommon.findByFunc(kpi.KpiData.KpiFormats, function (it) { return it.Id == fid; });
+        if (format == undefined) return;
+
+        var formatItems = format.KpiFormatItems;
+        if (vmCommon.findByFunc(formatItems, function(it) { return it.FTypeId == ftype; })) return;
+
+        var formatType = vmCommon.findByFunc(kpiFormatTypes, function(it) { return it.TypeId == ftype; });
+        if (formatType == null) return;
+
+        var newFormatItem = new KpiFormatItem();
+        newFormatItem.KpiFormatTypeId = formatType.Id;
+        newFormatItem.Name = formatType.Name;
+        newFormatItem.Description = formatType.Description;
+        newFormatItem.KpiFormatId = fid;
+        newFormatItem.FTypeId = ftype;
+
+        
+        formatItems.push(newFormatItem);
+
+        if (ftype == vmCommon.FormatType.CRMLINK) {
+            $("div.divaddformat[fid='" + fid + "']").before(renCrmLink(newFormatItem));
+
+
+        } else if (ftype == vmCommon.FormatType.DOCUMENT) {
+            $("div.divaddformat[fid='" + fid + "']").before(renDocument(newFormatItem));
+        }
+
+        vmKpiAction.bindFormatMenu(fid);
+    };
+
+    vmKpiAction.bindFormatMenu = function (fid) {
+        var format = vmCommon.findByFunc(kpi.KpiData.KpiFormats, function (it) { return it.Id == fid; });
+        if (format == undefined) return;
+
+        var formatItems = format.KpiFormatItems;
+        if (formatItems.length == 5) {
+            $("#divformataction div.addformat[fid='" + fid + "']").addClass("hidden");
+        } else {
+            $("#divformataction div.addformat[fid='" + fid + "']").removeClass("hidden");
+        }
+
+        var isHasLink = vmKpiAction.getFormatItem(fid, vmCommon.FormatType.CRMLINK) != null;
+        var isHasDocument = vmKpiAction.getFormatItem(fid, vmCommon.FormatType.DOCUMENT) != null;
+
+        if (isHasLink) {
+            $("#divformataction li[atype='addformatlink'][fid='" + fid + "']").addClass("hidden");
+        } else {
+            $("#divformataction li[atype='addformatlink'][fid='" + fid + "']").removeClass("hidden");
+        }
+
+        if (isHasDocument) {
+            $("#divformataction li[atype='addformatdocument'][fid='" + fid + "']").addClass("hidden");
+        } else {
+            $("#divformataction li[atype='addformatdocument'][fid='" + fid + "']").removeClass("hidden");
+        }
+
+        if (isHasLink || isHasDocument) {
+            $("#divformataction li[atype='addformatdivider'][fid='" + fid + "']").addClass("hidden");
+        } else {
+            $("#divformataction li[atype='addformatdivider'][fid='" + fid + "']").removeClass("hidden");
+        }
+    };
+
+    vmKpiAction.CrmData = undefined;
+    vmGoalAction.popCrmLink = undefined;
+
+    vmKpiAction.getFormatItem = function (formatId, type) {
+        var format = vmCommon.findByFunc(kpi.KpiData.KpiFormats, function (it) { return it.Id == formatId; });
+        if (format == null) return null;
+
+        var formatItems = format.KpiFormatItems;
+        return vmCommon.findByFunc(formatItems, function(it) { return it.FTypeId == type; });
+    };
+
+    vmKpiAction.formatDocumentStructure = function() {
+        var format = kpi.KpiData.KpiFormats[0];
+        if (!format.AdvertisingName || format.AdvertisingName.indexOf("/") > -1 || !format.AdvertiserName|| format.AdvertiserName.indexOf("/") > -1 || !format.Name|| format.Name.indexOf("/") > -1) return [];
+
+        return [format.AdvertisingName, format.AdvertiserName, format.Name];
+    };
+
+    vmKpiAction.deleteCrmLink = function (e) {
+        var formatId = $(e).attr("fid");
+        var itemvalueId = $(e).attr("ivid");
+
+        if (formatId == undefined || isNaN(Number(formatId))) return;
+        if (itemvalueId == undefined || isNaN(Number(itemvalueId))) return;
+
+        formatId = Number(formatId);
+        itemvalueId = Number(itemvalueId);
+
+        var crmLink = vmKpiAction.getFormatItem(formatId, vmCommon.FormatType.CRMLINK);
+        if (crmLink == null) return;
+
+
+        var itemValue = vmCommon.findById(itemvalueId, crmLink.ItemValues);
+        if (itemValue == undefined) return;
+
+        if (itemvalueId > 0) {
+            kpi.KpiData.DeletedItems.push({ Id: itemvalueId, Type: vmCommon.KpiGoalType.FORMATITEMVALUE });
+        }
+
+        var index = crmLink.ItemValues.indexOf(itemValue);
+        crmLink.ItemValues.splice(index, 1);
+
+        //delete ui
+        $(e).closest("div.crmlink-item").remove();
+    };
+
+    vmKpiAction.selectCrmLink = function (e) {
+        var formatId = $(e).attr("fid");
+        if (formatId == undefined || isNaN(Number(formatId))) return;
+        formatId = Number(formatId);
+
+        vmKpiAction.formatItemOptions = {};
+
+        var crmLink = vmKpiAction.getFormatItem(formatId, vmCommon.FormatType.CRMLINK);
+        if (crmLink == null) return;
+
+        if (crmLink.ItemValues == undefined)
+            crmLink.ItemValues = [];
+
+        if (crmLink.ItemValues.length >= 10) {
+            pAlert(kLg.msgLimitedCrmLink);
+            return;
+        }
+
+        vmKpiAction.formatItemOptions.selectedItems = crmLink.ItemValues.map(function(it) { return { Id: it.BId, Type: it.TypeId == 1 ? 2 : 3 }; });
+
+        vmKpiAction.formatItemOptions.crmLink = new KpiFormatItemValue();
+        vmKpiAction.formatItemOptions.crmLink.KpiFormatId = formatId;
+
+        vmKpiAction.formatItemOptions.callback = vmKpiAction.changeCrmLinkCallback;
+        if (vmKpiAction.CrmData == undefined) {
+            
+            vmGoalAction.dataservice.getOrganisationPerson(null, function(res) {
+                vmKpiAction.CrmData = res.value;
+                vmKpiAction.formatItemOptions.CrmData = vmKpiAction.CrmData;
+                vmKpiAction.openSelectCrmLink();
+            });
+
+        } else {
+            vmKpiAction.formatItemOptions.CrmData = vmKpiAction.CrmData;
+            vmKpiAction.openSelectCrmLink();
+        }
+    };
+
+    vmKpiAction.changeCrmLinkCallback = function (newCrmLink) {
+        var crmLink = vmKpiAction.getFormatItem(newCrmLink.KpiFormatId, vmCommon.FormatType.CRMLINK);
+        if (crmLink == null) return;
+
+        var content = $("div.crmlink[fi='" + crmLink.Id + "']");
+        crmLink.ItemValues.push(newCrmLink);
+
+        content.append("<div class='crmlink-item' fi='" + crmLink.Id + "'><div class='pull-left'><a class='goal-truncate ms-link'>" + newCrmLink.Name + "</a></div><span class='icon-20 ms-icon-delete-gray' style='cursor: pointer;zoom: 85%;' ivid='"+newCrmLink.Id+"' onclick='vmKpiAction.deleteCrmLink(this)'></span></div>");
+
+        //$(content).html("");
+
+        //var itemValues = $.grep(crmLink.ItemValues, function(it) { return it.DataState !== dataState.Deleted; });
+        //if (itemValues.length > 0) {
+        //    var itemValue = itemValues[0];
+        //    $(content).append("<div class='crmlink-item' fi='" + crmLink.Id + "'><div class='pull-left'><a class='goal-truncate ms-link'>" + itemValue.Name + "</a></div><span class='icon-20 ms-icon-delete-gray' style='cursor: pointer;zoom: 85%;' ivid='"+itemValue.Id+"' onclick='vmKpiAction.deleteCrmLink(this)'></span></div>");
+        //} else {
+        //    $(content).append("<div class='crmlink-add' fi='" + crmLink.Id + "'><span class='icon-32 cursor-pointer icon-add' fi='" + crmLink.Id + "' onclick='vmKpiAction.selectCrmLink()'></span></div>");
+        //}
+    };
+
+    vmKpiAction.openSelectCrmLink = function() {
+        
+        vmGoalAction.popCrmLink = showPopup(vmGoalAction.popCrmLink,
+            $("#pop-selectcrmlink"),
+            "../Contents/MsPopSelectCrmLink.html",
+            {
+                title: kLg.titleSelectCrmLink,
+                width: 650,
+                height: 525,
+                resizable: false
+            });
+    };
+
+    function renDocument(item) {
+        var rs = "<div class='formatcontent'>";
+
+        rs += "<label>" + item.Name + "</label>";
+        rs += "<div class='clear'></div>";
+
+        rs += "<div class='formatfile' fid='" + item.KpiFormatId + "' fi='"+item.Id+"'>";
+        for (var i = 0; i < item.ItemValues.length; i++) {
+            var itemValue = item.ItemValues[i];
+            if (itemValue.DataState === dataState.Deleted) continue;
+
+            rs += renFormatItemValue(itemValue);
+        }
+
+        rs += "</div>";
+
+        if (vmKpiAction.dataService.hasRole()) {
+            rs += "<input type='file' fid='" + item.KpiFormatId + "' fi='"+item.Id+"' name='txtFile"+item.Id+"' id='txtFile"+item.Id+"' style='display: none;' class='modal-input txtInput w-470' multiple>";
+            rs += "<button type='button' fid='" + item.KpiFormatId + "' class='ms-button button-upload' name='uploadFile' style='margin-right: 0;height: 19px;margin-top: 3px;float: initial;' onclick='vmKpiAction.upLoadFile(this);'><span class='icon-16 icon-upload' ></span><span>"+kLg.lblBrowse+"</span></button>";
+
+            rs += "<span class='icon-20 icon-close2 pointer posAbsolute' style='right:5px;top:2px;' fid='" + item.KpiFormatId + "' fi='" + item.Id + "' ft='" + vmCommon.FormatType.DOCUMENT + "' onclick='vmKpiAction.deleteFormat(this)'></span>";
+        }
+
+        rs += "</div>";
+        rs += "<div class='clear'></div>";
+
+        return rs;
+    };
+
+    function renFormatItemValue(itemValue) {
+        var rs = "";
+        rs += "<div class='formatfile-item' iv='" + itemValue.Id + "'>" +
+              "<div class='pull-left'>";
+        
+        if (itemValue.FileTypeId === vmCommon.FileType.Url) {
+            rs += "<a class='goal-truncate ms-link' onclick='vmKpiAction.copy2Clipboard(this)'>" + itemValue.Name + "</a>";
+        } else if (itemValue.FileTypeId === vmCommon.FileType.Path) {
+            rs += "<span class='goal-truncate ms-link' onclick='vmKpiAction.copy2Clipboard(this)'>" + itemValue.Name + "</span>";
+        } else {
+            rs += "<a class='goal-truncate ms-link' onclick='vmKpiAction.copy2Clipboard(this)'>" + itemValue.Name + "</a>";
+        }
+        rs += "</div>";
+
+        if (vmKpiAction.dataService.hasRole()) {
+            rs += "<span class='icon-20 ms-icon-delete-gray' style='cursor: pointer;zoom: 85%;' ivid='" + itemValue.Id + "' onclick='vmKpiAction.deleteFile(this)'></span>";
+        }
+
+        rs += "</div>";
+        
+        return rs;
+    };
+
+    vmKpiAction.validAttachFile = function (files, formatId) {
+        //var nSize = 0;
+        for (var i = 0; i < files.length; i++) {
+            if (files[i].size > (100 * 1024 * 1024)) {
+                pAlert(kLg.msgTotalFileOverLoad);
+                return false;
+            }
+        }
+
+        var formatItem = vmKpiAction.getFormatItem(formatId, vmCommon.FormatType.DOCUMENT);
+        var currentFiles = $.grep(formatItem.ItemValues, function(it) { return it.DataState !== dataState.Deleted; });
+
+        if ((files.length + currentFiles.length) > 10) {
+            pAlert(kLg.msgLimit10file);
+            return false;
+        }
+
+        return true;
+    };
+
+    vmKpiAction.upLoadFile = function (e) {
+        var formatId = $(e).attr("fid");
+        if (formatId == undefined || isNaN(Number(formatId))) return;
+
+        formatId = Number(formatId);
+
+        var format = vmCommon.findByFunc(kpi.KpiData.KpiFormats, function (it) { return it.Id == formatId; }); //kpiAction.KpiFormats[0];
+        if (format == null) return;
+
+        if (!format.AdvertisingName || !format.AdvertiserName) return;
+
+        //upload callback
+        function uploadCallback(savedFiles) {
+            var formatItem = vmKpiAction.getFormatItem(formatId, vmCommon.FormatType.DOCUMENT);
+
+            for (var i = 0; i < savedFiles.length; i++) {
+                var sfile = savedFiles[i];
+                var newItemValue = new KpiFormatItemValue();
+                newItemValue.Name = sfile.Name;
+                newItemValue.KpiFormatItemId = formatItem.Id;
+                newItemValue.BId = sfile.Id;
+                newItemValue.TypeId = 3;
+                newItemValue.KpiFormatId = formatId;
+
+                formatItem.ItemValues.push(newItemValue);
+                $("div.formatfile[fi='" + formatItem.Id + "']").append(renFormatItemValue(newItemValue));
+            }
+        };
+
+        //upload file
+        function upFile(files) {
+            if (files.length === 0 || !vmKpiAction.validAttachFile(files, formatId)) return false;
+
+            var cpdata = new FormData();
+            var count = 0;
+
+            for (var i = 0; i < files.length; i++) {
+                cpdata.append(files[i].name, files[i]);
+                count++;
+            }
+
+            cpdata.append("structure", vmKpiAction.formatDocumentStructure().join("/"));
+
+            var url = "../Handlers/DFolderHandler.ashx?funcName=uploadformatfile&projid=" + projectId + "&strid=" + strategyId;
+            vmCommon.sendFile(url, cpdata, function(res) {
+                var savedFiles = res.value;
+                uploadCallback(savedFiles);
+
+            }, "");
+
+            return true;
+        };
+
+        //upload url callback
+        function upUrl(dFolder) {
+            dFolder.Type = vmCommon.FileType.Url;
+            var url = "../Handlers/DFolderHandler.ashx?funcName=uploadformaturl&projid=" + projectId + "&strid=" + strategyId;
+            callAjax("", url, JSON.stringify({Url: dFolder, Paths: vmKpiAction.formatDocumentStructure().join("/")}), function(res) {
+                var savedFiles = res.value;
+                uploadCallback(savedFiles);
+
+            }, AjaxConst.PostRequest);
+
+            return true;
+        };
+
+        //upload path callback
+        function upPath(dFolder) {
+            dFolder.Type = vmCommon.FileType.Path;
+            var url = "../Handlers/DFolderHandler.ashx?funcName=uploadformaturl&projid=" + projectId + "&strid=" + strategyId;
+            callAjax("", url, JSON.stringify({Url: dFolder, Paths: vmKpiAction.formatDocumentStructure().join("/")}), function(res) {
+                var savedFiles = res.value;
+                uploadCallback(savedFiles);
+
+            }, AjaxConst.PostRequest);
+
+            return true;
+        };
+
+        vmFile.uploadOptions = {};
+        vmFile.uploadOptions.Func = new UploadFunc(upFile, upUrl, upPath);
+
+        vmFile.CurrentRole = vmGoalAction.kpiActionOptions.role;
+        showUploadFile();
+        return;
+    };
+
+    var _itemValueId = 0;
+    function KpiFormatItemValue() {
+        this.Id = --_itemValueId;
+        this.Name = "";
+        this.KpiFormatItemId = 0;
+        this.BId = null;
+        this.GId = null;
+        this.TypeId = 0;
+        this.DataState = dataState.Added;
+        this.FileTypeId = 0;
+        this.KpiFormatId = 0;
+
+        return this;
+    };
+
+    vmKpiAction.deleteFile = function(e) {
+        var itemValueId = $(e).attr("ivid");
+        if (itemValueId == undefined || isNaN(Number(itemValueId))) return;
+
+        itemValueId = Number(itemValueId);
+
+        var formatItem = vmKpiAction.getFormatItem(vmCommon.FormatType.DOCUMENT);
+        if (formatItem == null) return;
+
+        var itemValue = vmCommon.findById(itemValueId, formatItem.ItemValues);
+        if (itemValue == undefined) return;
+
+        if (itemValueId > 0) {
+            kpi.KpiData.DeletedItems.push({ Id: itemValueId, Type: vmCommon.KpiGoalType.FORMATITEMVALUE });
+        }
+
+        var index = formatItem.ItemValues.indexOf(itemValue);
+        formatItem.ItemValues.splice(index, 1);
+
+        //todo: delete ui
+        $(e).closest("div.formatfile-item").remove();
+    };
+
+    vmKpiAction.binding = function(tempId, data) {
+        var templateContent = $("#" + tempId).html();
+        data = data || {};
+
+        var template = kendo.template(templateContent);
+        return template(data);
+    };
+
+    vmKpiAction.events.changeCalculateAll = function (e) {
+        var flag = $(e).is(":checked");
+
+        var indexes = kpi.KpiData.KpiIndexes;
+        for (var i = 0; i < indexes.length; i++) {
+            var index = indexes[i];
+
+            $("#cbxcalculate" + index.Id).prop("checked", flag);
+            index.IsCalculate = flag;
+            if (index.DataState === dataState.Unchanged) index.DataState = dataState.Modified;
+        }
+        vmKpiAction.modelChanged = true;
+    };
+
+    vmKpiAction.events.changeCalculate = function (e) {
+        var indexId = $(e).attr("indexId");
+
+        if (indexId == undefined || isNaN(Number(indexId))) return;
+
+        indexId = Number(indexId);
+        var index = vmCommon.findById(indexId, kpi.KpiData.KpiIndexes);
+        if (index == undefined) return;
+
+        index.IsCalculate = $(e).is(":checked");
+        if (index.DataState === dataState.Unchanged) index.DataState = dataState.Modified;
+
+        vmKpiAction.reloadCalculateState();
+        vmKpiAction.modelChanged = true;
+    };
+
+    vmKpiAction.reloadCalculateState = function () {
+        $("#cbxcalculateall").prop("checked", vmKpiAction.isCalculateAll());
+    };
+
+    vmKpiAction.isCalculateAll = function () {
+        return kpi.KpiData.KpiIndexes.length > 0 && kpi.KpiData.KpiIndexes.every(function (it) { return it.IsCalculate; });
+    };
+
+    vmKpiAction.events.changeIndexValue = function (e) {
+        var indexId = $(e).attr("indexid");
+        var ftype = $(e).attr("ftype");
+
+        if (indexId == undefined || isNaN(Number(indexId))) return;
+
+        indexId = Number(indexId);
+        var index = vmCommon.findById(indexId, kpi.KpiData.KpiIndexes);
+        if (index == undefined) return;
+
+        var value = $(e).val().trim();
+        switch (ftype) {
+            case "expected":
+
+                index.ExpectedValue = vmKpiAction.limitedKpiValue(value.toNumber());
+                if (enableSI && index.IsKpiDefault) {
+                    index.LstValue = vmCommon.deepCopy(index.ExpectedValue);
+                    $("input.kpictrl[indexid='" + index.Id + "'][ftype='ist']").data("kendoNumericTextBox").value(index.LstValue);
+                }
+            //todo: recalculate percent
+            vmKpiAction.calculateImplement(index);
+            break;
+        case "ist":
+            index.LstValue = vmKpiAction.limitedKpiValue(value.toNumber());
+            //todo: recalculate percent
+            vmKpiAction.calculateImplement(index);
+            break;
+        }
+
+        if (index.DataState === dataState.Unchanged) index.DataState = dataState.Modified;
+
+        vmKpiAction.clearAlert();
+        vmKpiAction.modelChanged = true;
+    };
+
+    vmKpiAction.events.changeIndexTime = function (e) {
+        var indexId = $(e).attr("indexid");
+        var indexTimeId = $(e).attr("it");
+
+        if (indexId == undefined || indexTimeId == undefined || isNaN(Number(indexId)) || isNaN(Number(indexTimeId))) return;
+
+        indexId = Number(indexId);
+
+        //var isSub = false;
+        var index = kpi.KpiData.KpiIndexes.find(t => t.Id == indexId) || kpi.KpiData.KpiIndexes.map(t => t.SubIndexes).flatten().find(t => t.Id == indexId);
+        if (index == undefined) return;
+
+        var indextime = index.KpiIndexTimes.find(t => t.Id == indexTimeId);
+        if (indextime == undefined) return;
+
+        var kvalue = $(e).val().trim().toNumber();
+        indextime.KpiValue = vmKpiAction.limitedKpiValue(kvalue);
+        if (indextime.DataState === dataState.Unchanged) indextime.DataState = dataState.Modified;
+
+        vmKpiAction.calculateIndexFor(indexId);
+
+        vmKpiAction.clearAlert();
+        vmKpiAction.modelChanged = true;
+    };
+
+    vmKpiAction.addActionIndex = function (newIndex) {
+        var times = kpi.KpiData.KpiOutcomeTimes;
+
+        //add subindex
+        if (newIndex.IsAdjustment && times.length > 0) {
+            var newSubIndex = new SettingIndex();
+
+            newSubIndex.ParentId = kpiIndex.Id;
+            newSubIndex.KpiIndexId = newIndex.KpiIndexId;
+            newSubIndex.KpiUnitId = newIndex.KpiUnitId;
+            newSubIndex.KpiTimeId = newIndex.KpiTimeId;
+
+            for (var i = 0; i < times.length; i++) {
+                var time = times[i];
+                newSubIndex.KpiIndexTimes.push(new KpiOutcomeIndexTime(newSubIndex.Id, time.Id));
+            }
+
+            newIndex.SubIndexes.push(newSubIndex);
+        }
+
+        kpi.KpiData.KpiIndexes.push(newIndex);
+        $("#bodykpiaction").append(vmKpiAction.binding("newindexrow", newIndex));
+
+        vmKpiAction.bindIndexUnitFor(newIndex);
+
+        var subIndexes = newIndex.SubIndexes;
+        for (var i = 0; i < subIndexes.length; i++) {
+            var subIndex = subIndexes[i];
+            vmKpiAction.bindIndexUnitFor(subIndex);
+        }
+
+        vmKpiAction.calculateIndexFor(newIndex.Id);
+        vmKpiAction.reloadCalculateState();
+    };
+
+    vmKpiAction.changeActionIndex = function (newIndex) {
+        var times = kpi.KpiData.KpiOutcomeTimes;
+        var index = vmCommon.findById(newIndex.Id, kpi.KpiData.KpiIndexes);
+        if (index == undefined) return;
+
+        index.KpiIndexId = newIndex.KpiIndexId;
+        index.KpiIndexName = newIndex.KpiIndexName;
+
+        index.KpiTimeId = newIndex.KpiTimeId;
+        index.KpiTimeName = newIndex.KpiTimeName;
+
+        index.KpiUnitId = newIndex.KpiUnitId;
+        index.KpiUnitName = newIndex.KpiUnitName;
+
+        if (newIndex.IsAdjustment == false) {
+            vmKpiAction.addDeletedItems(index.SubIndexes, vmCommon.KpiGoalType.INDEX);
+            index.SubIndexes = [];
+
+        } else if (index.SubIndexes.length == 0 && times.length > 0) {
+            var newSubIndex = new SettingIndex();
+
+            newSubIndex.ParentId = index.Id;
+            newSubIndex.KpiIndexId = index.KpiIndexId;
+            newSubIndex.KpiUnitId = index.KpiUnitId;
+            newSubIndex.KpiTimeId = index.KpiTimeId;
+
+            for (var i = 0; i < times.length; i++) {
+                var time = times[i];
+                newSubIndex.KpiIndexTimes.push(new KpiOutcomeIndexTime(newSubIndex.Id, time.Id));
+            }
+
+            index.SubIndexes.push(newSubIndex);
+
+            index.ExpectedValue = null;
+            index.KpiPercent = null;
+            index.LstValue = null;
+        }
+
+        index.DefaultExpectedValue = null;
+        index.IsKpiDefault = false;
+        index.IsAdjustment = newIndex.IsAdjustment;
+
+        if (index.DataState == dataState.Unchanged) index.DataState = dataState.Modified;
+
+        //rebind
+        $("tr.indexrow[parentindexid='" + index.Id + "']").remove();
+        $("tr.indexrow[indexid='" + index.Id + "']").replaceWith(vmKpiAction.binding("newindexrow", index));
+
+        vmKpiAction.bindIndexUnitFor(index);
+        index.SubIndexes.forEach(t => {
+            vmKpiAction.bindIndexUnitFor(t);
+        });
+
+        vmKpiAction.calculateIndexFor(index.Id);
+    };
+
+    vmKpiAction.addDeletedItems = function(items, type) {
+        for (var i = 0; i < items.length; i++) {
+            var item = items[i];
+            if (item.Id <= 0) continue;
+
+            kpi.KpiData.DeletedItems.push({ Id: item.Id, Type: type });
+
+            if (type == vmCommon.KpiGoalType.INDEX) {
+                var indextimes = item.KpiIndexTimes;
+
+                vmKpiAction.addDeletedItems(indextimes, vmCommon.KpiGoalType.INDEXTIME);
+                vmKpiAction.addDeletedItems(item.SubIndexes, vmCommon.KpiGoalType.INDEX);
+            }
+        }
+    };
+
+    vmKpiAction.addDeletedMasterItems = function (items, type) {
+        for (var i = 0; i < items.length; i++) {
+            var item = items[i];
+            //if (item.Id <= 0) continue;
+
+            kpi.KpiMasterData.DeletedItems.push({ Id: item.Id, Type: type, Item: item });
+
+            if (type == vmCommon.KpiGoalType.TOPICMASTER) {
+                var indexes = item.KpiMasterIndexes;
+                vmKpiAction.addDeletedMasterItems(indexes, vmCommon.KpiGoalType.INDEXMASTER);
+            }
+
+            if (type == vmCommon.KpiGoalType.INDEXMASTER) {
+                var indextimes = item.KpiMasterIndexTimes;
+                vmKpiAction.addDeletedMasterItems(indextimes, vmCommon.KpiGoalType.INDEXTIMEMASTER);
+            }
+        }
+    };
+
+    vmKpiAction.deleteActionIndex = function(e) {
+        pConfirm(kLg.confirmDeleteItem).then(function() {
+
+            var indexId = $(e).closest("tr").attr("indexid");
+            if (indexId == undefined || isNaN(Number(indexId))) return;
+
+            var index = vmCommon.findById(indexId, kpi.KpiData.KpiIndexes);
+            if (index == undefined) return;
+
+            var i = vmCommon.findIndexByFunc(kpi.KpiData.KpiIndexes, function(it) { return it.Id == indexId; });
+            vmKpiAction.addDeletedItems(kpi.KpiData.KpiIndexes.splice(i, 1), vmCommon.KpiGoalType.INDEX);
+
+            vmKpiAction.clearAlert();
+            vmKpiAction.modelChanged = true;
+
+            timeNo -= 1;
+            //$(e).closest("tr").remove();
+            $("tr.indexrow[indexid='" + index.Id + "']").remove();
+            $("tr.indexrow[parentindexid='" + index.Id + "']").remove();
+
+
+            vmKpiAction.reloadCalculateState();
+        });
+
+    };
+
+    vmKpiAction.addTime = function () {
+        var newTime = new OutcomeTime();
+
+        //2: change data
+        kpi.KpiData.KpiOutcomeTimes.unshift(newTime);
+
+        //2. change UI
+        var th = vmKpiAction.binding("newtimecolumn", newTime);
+        $("#istCol").after(th);
+
+        var indexes = kpi.KpiData.KpiIndexes;
+        for (var i = 0; i < indexes.length; i++) {
+            var index = indexes[i];
+            var newIndexTime = new KpiOutcomeIndexTime(index.Id, newTime.Id);
+
+            var unit = vmCommon.findById(index.KpiUnitId, kpiUnits) || vmCommon.defaultUnit();
+            var orderFormat = unit.OrderId === 2 ? "{0} ##,#.00" : "##,#.00 {0}";
+
+            //2. change data
+            index.KpiIndexTimes.unshift(newIndexTime);
+
+            if (!index.IsKpiDefault && index.IsAdjustment && index.SubIndexes.length == 0) {
+                var newSubIndex = new SettingIndex();
+
+                newSubIndex.ParentId = index.Id;
+                newSubIndex.KpiIndexId = index.KpiIndexId;
+                newSubIndex.KpiUnitId = index.KpiUnitId;
+                newSubIndex.KpiTimeId = index.KpiTimeId;
+
+                index.SubIndexes.push(newSubIndex);
+
+                $("tr.indexrow[indexid='" + index.Id + "']").before(vmKpiAction.binding("newsubindexrow", newSubIndex));
+                vmKpiAction.bindIndexUnitFor(newSubIndex);
+
+                var expectedIndex = $("input.kpictrl[ftype='expected'][indexid='" + index.Id + "']");
+                if (expectedIndex.length > 0) $(expectedIndex).data("kendoNumericTextBox").enable(false);
+            }
+
+            //1. change UI
+            $("#div-kpiaction td.td-ist[indexid='" + index.Id + "']").after("<td class='td-indextime'><input type='text' class='kpictrl txtInput kpi-input " + vmKpiAction.positionClass(index.KpiUnitId) + "' style='width:90%' id='it" + newIndexTime.Id + "' value='" + vmKpiAction.showNumber(newIndexTime.KpiValue) + "' indexid='" + index.Id + "' ftype='indextime' it='" + newIndexTime.Id + "' onchange='vmKpiAction.events.changeIndexTime(this)' /></td>");
+            //expected
+            $("#it" + newIndexTime.Id).kendoNumericTextBox({
+                spinners: false,
+                format: orderFormat.format(unit.Symbol.encodeDola().encodeSymbol()),
+                //min: 0,
+                max: 999999999
+            });
+
+            var subIndexes = index.SubIndexes;
+            for (var j = 0; j < subIndexes.length; j++) {
+                var subIndex = subIndexes[j];
+                var newSubIndexTime = new KpiOutcomeIndexTime(subIndex.Id, newTime.Id);
+                newSubIndexTime.KpiValue = index.DefaultExpectedValue;
+
+                //2. change data
+                subIndex.KpiIndexTimes.unshift(newSubIndexTime);
+
+                //1. change UI
+                $("#div-kpiaction td.td-ist[indexid='" + subIndex.Id + "']").after("<td class='td-indextime'><input type='text' class='kpictrl txtInput kpi-input " + vmKpiAction.positionClass(subIndex.KpiUnitId) + "' style='width:90%' id='it" + newSubIndexTime.Id + "' value='" + vmKpiAction.showNumber(newSubIndexTime.KpiValue) + "' indexid='" + subIndex.Id + "' ftype='indextime' it='" + newSubIndexTime.Id + "' onchange='vmKpiAction.events.changeIndexTime(this)' /></td>");
+
+                if (unit) {
+                    var orderFormat = unit.OrderId === 2 ? "{0} ##,#.00" : "##,#.00 {0}";
+                    //expected
+                    $("#it" + newSubIndexTime.Id).kendoNumericTextBox({
+                        spinners: false,
+                        format: orderFormat.format(unit.Symbol.encodeDola().encodeSymbol()),
+                        //min: 0,
+                        max: 999999999
+                    });
+                }
+            }
+        }
+
+        //other
+        timeNo += 1;
+        $("td.addindex").attr("colspan", timeNo + colNo - 1);
+
+        //change width of popup
+        vmKpiAction.autoWidth();
+        vmKpiAction.validTime(newTime);
+        vmKpiAction.calculateIndex();
+        //vmKpiAction.toggleLstStatus();
+
+        vmKpiAction.modelChanged = true;
+        vmKpiAction.clearAlert();
+    };
+
+    vmKpiAction.deleteTime = function(e) {
+        pConfirm(kLg.confirmDeleteItem).then(function() {
+
+            var i;
+            var th = $(e).closest("th");
+            var thIndex = $(th).index();
+
+            vmKpiAction.addDeletedItems(kpi.KpiData.KpiOutcomeTimes.splice(thIndex - colNo, 1), vmCommon.KpiGoalType.TIME);
+
+            //2. change data
+            var indexes = kpi.KpiData.KpiIndexes;
+            for (i = 0; i < indexes.length; i++) {
+                var index = indexes[i];
+
+                vmKpiAction.addDeletedItems(index.KpiIndexTimes.splice(thIndex - colNo, 1), vmCommon.KpiGoalType.INDEXTIME);
+
+                if (kpi.KpiData.KpiOutcomeTimes.length == 0) {
+                    vmKpiAction.addDeletedItems(index.SubIndexes, vmCommon.KpiGoalType.INDEX);
+                    index.SubIndexes = [];
+
+                    $("tr.indexrow[parentindexid='" + index.Id + "']").remove();
+                } else {
+                    index.SubIndexes.forEach(sub => {
+                        vmKpiAction.addDeletedItems(sub.KpiIndexTimes.splice(thIndex - colNo, 1), vmCommon.KpiGoalType.INDEXTIME);
+                    });
+                }
+            }
+
+            //1. change UI
+            $(th).remove();
+            $("#div-kpiaction tr.indexrow").find("td:eq(" + thIndex + ")").remove();
+
+            //change width of popup
+            vmKpiAction.autoWidth();
+            vmKpiAction.validTime(null, true);
+            //vmKpiAction.toggleLstStatus();
+
+            //if (kpiAction.KpiOutcomeTimes.length > 0) {
+            vmKpiAction.calculateIndex();
+            //}
+
+            vmKpiAction.modelChanged = true;
+            vmKpiAction.clearAlert();
+        });
+
+    };
+
+    //vmKpiAction.toggleLstStatus = function() {
+    //    var times = kpiAction.KpiOutcomeTimes;
+
+    //    var flag = times.length > 0;
+    //    $("#div-kpiaction input[ftype='ist']").each(function() {
+    //        $(this).data("kendoNumericTextBox").enable(!flag);
+    //    });
+    //};
+
+    vmKpiAction.autoWidth = function() {
+        if (!enableTime) return;
+
+        var times = kpi.KpiData.KpiOutcomeTimes, fixWidth = 947;
+        var mtimes = kpi.KpiMasterData.KpiMasterTimes;
+
+        var max = times.length >= mtimes.length ? times.length : mtimes.length;
+
+        vmGoalAction.popActionIndex.wrapper.css({
+            width: fixWidth + (131 * (max <= 7 ? max : 7))
+        });
+
+        vmGoalAction.popActionIndex.center();
+    };
+
+    var beginIndex, endIndex, isChangePositionTime = false;
+    vmKpiAction.bindSortTime = function() {
+        $("#tblkpiaction").sortable({
+            axis: "x",
+            items: "th.sortable",
+            //cancel: ".cancel-mix",
+            helper: "clone",
+            cursor: "move",
+            revert: false,
+            opacity: 0.7,
+            tolerance: "pointer",
+            //containment: "parent",
+            start: function(event, ui) {
+                beginIndex = ui.item.index();
+            },
+            stop: function(event, ui) {
+                var i;
+                isChangePositionTime = true;
+                endIndex = ui.item.index();
+
+                if (beginIndex === endIndex) {
+                    return false;
+                }
+
+                //change UI
+                var rows = $("#tblkpiaction tbody tr.indexrow");
+                for (i = 0; i < rows.length; i++) {
+                    var row = rows[i];
+                    var tds = $(row).find("td");
+
+                    var srcItem = tds[beginIndex];
+                    var desItem = tds[endIndex];
+
+                    if (beginIndex > endIndex) {
+                        $(srcItem).insertBefore($(desItem));
+                    } else if (beginIndex < endIndex) {
+                        $(srcItem).insertAfter($(desItem));
+                    }
+                }
+
+                //change data
+                var times = kpi.KpiData.KpiOutcomeTimes;
+                var temp = times.splice(beginIndex - colNo, 1);
+                times.splice(endIndex - colNo, 0, temp[0]);
+
+                var indexes = kpi.KpiData.KpiIndexes;
+                for (i = 0; i < indexes.length; i++) {
+                    var index = indexes[i];
+                    var tempIndexTime = index.KpiIndexTimes.splice(beginIndex - colNo, 1);
+                    index.KpiIndexTimes.splice(endIndex - colNo, 0, tempIndexTime[0]);
+                }
+
+                return true;
+            }
+        });
+    };
+
+    vmKpiAction.bindSortMasterTime = function () {
+        $("#tblkpimaster").sortable({
+            axis: "x",
+            items: "th.sortable",
+            //cancel: ".cancel-mix",
+            helper: "clone",
+            cursor: "move",
+            revert: false,
+            opacity: 0.7,
+            tolerance: "pointer",
+            //containment: "parent",
+            start: function (event, ui) {
+                beginIndex = ui.item.index();
+            },
+            stop: function (event, ui) {
+                isChangePositionMasterTime = true;
+                endIndex = ui.item.index();
+
+                if (beginIndex === endIndex) {
+                    return false;
+                }
+
+                //change UI
+                var rows = $("#tblkpimaster tbody tr.mindexrow");
+                for (var i = 0; i < rows.length; i++) {
+                    var row = rows[i];
+                    var tds = $(row).find("td");
+
+                    var srcItem = tds[beginIndex];
+                    var desItem = tds[endIndex];
+
+                    if (beginIndex > endIndex) {
+                        $(srcItem).insertBefore($(desItem));
+                    } else if (beginIndex < endIndex) {
+                        $(srcItem).insertAfter($(desItem));
+                    }
+                }
+
+                //change data
+                var mtimes = kpi.KpiMasterData.KpiMasterTimes;
+                var temp = mtimes.splice(beginIndex - 7, 1);
+                mtimes.splice(endIndex - 7, 0, temp[0]);
+
+                var mtopics = kpi.KpiMasterData.KpiMasterTopics;
+                for (var i = 0; i < mtopics.length; i++) {
+                    var mtopic = mtopics[i];
+                    var mindexes = mtopic.KpiMasterIndexes;
+
+                    for (var j = 0; j < mindexes.length; j++) {
+                        var mindex = mindexes[j];
+                        var tempIndexTime = mindex.KpiMasterIndexTimes.splice(beginIndex - 7, 1);
+                        mindex.KpiMasterIndexTimes.splice(endIndex - 7, 0, tempIndexTime[0]);
+                    }
+                }
+
+                return true;
+            }
+        });
+    };
+
+    vmKpiAction.limitWithOther = function (datas, indexes) {
+        var i, j;
+
+        function disableParent(source, parentId, parentLevel) {
+            if (parentId == undefined || parentLevel <= 0) return;
+
+            var parent = vmCommon.findByFunc(source, function (it) { return it.Id == parentId && it.Level == parentLevel; });
+            if (parent == undefined) return;
+
+            parent.IsSelectable = false;
+            disableParent(source, parent.ParentId, parentLevel - 1);
+        };
+
+        function disableChilds(source, parentId, parentLevel) {
+            var x, childLevel = parentLevel + 1;
+
+            var childs = $.grep(source, function (it) {
+                return it.ParentId == parentId && it.Level == childLevel;
+            });
+
+            if (childs.length === 0) return;
+
+            for (x = 0; x < childs.length; x++) {
+                var child = childs[x];
+
+                child.IsSelectable = false;
+
+                disableChilds(source, child.Id, child.Level);
+            }
+        };
+
+        var temps = vmCommon.deepCopy(datas);
+        for (j = 0; j < indexes.length; j++) {
+
+            var index = indexes[j];
+            //if(index.TypeId == gindex.TypeId && index.LinkIds == gindex.LinkIds) continue;
+
+            var data = vmCommon.findByFunc(temps, function (it) { return it.Ids == index.LinkIds && it.TypeId == index.TypeId; });
+            if (data == null) continue;
+
+            data.IsSelectable = false;
+
+            //disable select for parent
+            disableParent(temps, data.ParentId, data.Level - 1);
+
+            //disable select for childs
+            disableChilds(temps, data.Id, data.Level);
+        }
+
+        return temps;
+    };
+
+    //AnhNN Requirement..
+    vmKpiAction.checkDivideKpiPercent = function (arr, typeCal) {
+        if (!arr || arr.length <= 1) return false;
+        var count = arr.length;
+        var compareCount = 0;
+        var totalPer = 0;
+        var p = Math.floor((100 / (count - 1)) * 100) / 100;
+
+        for (var i = 0; i < count; i++) {
+            if (arr[i].KpiPercent == p) {
+                compareCount++;
+            }
+
+            totalPer += arr[i].KpiPercent;
+        }
+        if (totalPer > 99.999 && totalPer < 100.009) totalPer = 100;
+        //1 new + 1 last        
+        var param = 0;
+        switch (typeCal) {
+            case vmKpiAction.typeCal.Add:
+                param = 2;
+                break;
+            case vmKpiAction.typeCal.Update:
+            case vmKpiAction.typeCal.ValidBeforeUpdate:
+                param = 0;
+                break;
+            default:
+                param = 2;
+                break;
+        }
+        return totalPer == 100 && compareCount >= (count - param);
+    };
+
+    vmKpiAction.checkDivideKpiPercentByDelete = function (arr) {
+        if (!arr || arr.length <= 1) return false;
+
+        var tmpArr = [];
+        for (var i = 0; i < arr.length; i++) {
+            if (i == arr.length - 1) {
+                tmpArr.push(arr[i]);
+                var tmpI = vmCommon.deepCopy(arr[i]);
+                tmpI.KpiPercent = 0;
+                tmpArr.push(tmpI);
+            }
+            else {
+                tmpArr.push(arr[i]);
+            }
+        }
+
+        return vmKpiAction.checkDivideKpiPercent(tmpArr);
+    };
+
+    vmKpiAction.reCalculatePercent = function (count) {
+        if (!count || isNaN(count)) return [];
+        var arr = [];
+        var p = Math.floor((100 / count) * 100) / 100;
+        if (100 % count == 0) {
+            for (var i = 0; i < count; i++) {
+                arr.push(p);
+            }
+        }
+        else {
+            var o = 100 % count;
+            for (var i = 0; i < count; i++) {
+                if (i != (count - 1)) {
+                    arr.push(p);
+                }
+                else
+                    arr.push(100 - p * (count - 1));
+            }
+        }
+
+        return arr;
+    };
+
+    vmKpiAction.typeCal = { Add: 1, Update: 2, ValidBeforeUpdate: 3 };
+    vmKpiAction.calIndexesPercent = function (topicId, indexes, typeCal) {
+        if (!topicId || !indexes || indexes.length == 0 || indexes.length == 1) return;
+
+        var count = indexes.length;
+        var per = vmKpiAction.reCalculatePercent(count);
+        var tempIndexes = [];
+        for (var i = 0; i < count; i++) {
+            if (i != (count - 1)) {
+                tempIndexes.push(indexes[i]);
+            }
+        }
+
+        var isper = vmCommon.findByFunc(tempIndexes, function (it) { return it.KpiPercent != null; }) == null;
+
+        isper = isper || vmKpiAction.checkDivideKpiPercent(indexes, typeCal);
+
+        if (per.length == count && isper) {
+            for (var i = 0; i < count; i++) {
+                indexes[i].KpiPercent = per[i];
+                if (indexes[i].DataState === dataState.Unchanged) indexes[i].DataState = dataState.Modified;
+                var percentInput = $("input.masterctrl[ftype='percent'][topicid='" + topicId + "'][indexid='" + indexes[i].Id + "']").data("kendoNumericTextBox");
+                if (percentInput) percentInput.value(indexes[i].KpiPercent);
+            }
+        }
+    };
+
+    vmKpiAction.deleteMasterIndex = function (e) {
+        pConfirm(kLg.confirmDeleteItem).then(function () {
+            var topicId = $(e).closest("tr").attr("topicid");
+            var indexId = $(e).closest("tr").attr("indexid");
+
+            var topic = vmCommon.findById(topicId, kpi.KpiMasterData.KpiMasterTopics);
+            if (topic == undefined) return;
+
+            var flag = vmKpiAction.checkDivideKpiPercentByDelete(topic.KpiMasterIndexes);
+
+            var i = vmCommon.findIndexByFunc(topic.KpiMasterIndexes, function (it) { return it.Id == indexId; });
+            vmKpiAction.addDeletedMasterItems(topic.KpiMasterIndexes.splice(i, 1), vmCommon.KpiGoalType.INDEXMASTER);
+            $(e).closest("tr").remove();
+
+            //disable auto increase percent
+            var increaseIndex = vmKpiAction.autoIncrease.indexOf(Number(topicId));
+            if (increaseIndex >= 0) vmKpiAction.autoIncrease.splice(increaseIndex, 1);
+
+            if (flag) {
+                vmKpiAction.calIndexesPercentByDelete(topic.Id, topic.KpiMasterIndexes);
+            }
+            else {
+                vmKpiAction.calIndexesPercent(topic.Id, topic.KpiMasterIndexes);
+            }
+
+            vmKpiAction.modelChanged = true;
+            vmKpiAction.clearAlert();
+        });
+    };
+
+    vmKpiAction.calIndexesPercentByDelete = function (topicId, indexes) {
+        if (!topicId || !indexes || indexes.length == 0) return;
+
+        var count = indexes.length;
+        var per = vmKpiAction.reCalculatePercent(count);
+
+        if (per.length == count) {
+            for (var i = 0; i < count; i++) {
+                indexes[i].KpiPercent = per[i];
+                if (indexes[i].DataState === dataState.Unchanged) indexes[i].DataState = dataState.Modified;
+                var percentInput = $("input.masterctrl[ftype='percent'][topicid='" + topicId + "'][indexid='" + indexes[i].Id + "']").data("kendoNumericTextBox");
+                if (percentInput) percentInput.value(indexes[i].KpiPercent);
+            }
+        }
+    };
+
+    vmKpiAction.deleteMasterTime = function (e) {
+        pConfirm(kLg.confirmDeleteItem).then(
+            function () {
+                var th = $(e).closest("th");
+                var mtimeIndex = $(th).index();
+
+                //2. change data
+                vmKpiAction.addDeletedMasterItems(kpi.KpiMasterData.KpiMasterTimes.splice(mtimeIndex - 7, 1), vmCommon.KpiGoalType.TIMEMASTER);
+
+                var mtopics = kpi.KpiMasterData.KpiMasterTopics;
+                for (var i = 0; i < mtopics.length; i++) {
+                    var mtopic = mtopics[i];
+                    var mindexes = mtopic.KpiMasterIndexes;
+
+                    for (var j = 0; j < mindexes.length; j++) {
+                        vmKpiAction.addDeletedMasterItems(mindexes[j].KpiMasterIndexTimes.splice(mtimeIndex - 7, 1), vmCommon.KpiGoalType.INDEXTIMEMASTER);
+                    }
+                }
+
+                //1. change UI
+                $(th).remove();
+                $("#div-kpiaction tr.mindexrow").find("td:eq(" + mtimeIndex + ")").remove();
+
+                mtimeNo -= 1;
+
+                $("#div-kpiaction td.topicname").attr("colspan", mtimeNo + 7);
+                $("#div-kpiaction td.addmastertopicempty").attr("colspan", mtimeNo + 7);
+                $("#div-kpiaction td.addmasterindexempty").attr("colspan", mtimeNo + 7);
+
+                vmKpiAction.autoWidth();
+
+                //vmKpiGoal.toggleLstStatus();
+                //vmKpiGoal.validTime(null, true);
+                vmKpiAction.validMasterTime(null, true);
+
+                //if (kpiData.KpiGoalTimes.length > 0) {
+                //vmKpiGoal.reCalculateIndex();
+                //}
+
+                vmKpiAction.modelChanged = true;
+                vmKpiAction.clearAlert();
+            });
+    };
+
+    vmKpiAction.events.changeMasterIndexValue = function (e) {
+        var topicId = $(e).attr("topicid");
+        var indexId = $(e).attr("indexId");
+
+        if ((topicId == undefined || indexId == undefined) || (isNaN(Number(topicId)) || isNaN(Number(indexId)))) return;
+
+        topicId = Number(topicId);
+        indexId = Number(indexId);
+
+        var mtopic = vmCommon.findById(topicId, kpi.KpiMasterData.KpiMasterTopics);
+        if (mtopic == null) return;
+
+        var mindex = vmCommon.findById(indexId, mtopic.KpiMasterIndexes);
+        if (mindex == null) return;
+
+        var value = $(e).val().trim();
+        switch ($(e).attr("ftype")) {
+            case "percent":
+                var pvalue = value.toNumber();
+                if (pvalue && !isNaN(Number(pvalue))) {
+                    if (Number(pvalue) < 0) {
+                        pvalue = 0;
+                        $(e).val(0);
+                    }
+
+                    else if (Number(pvalue) > 100) {
+                        pvalue = 100;
+                        $(e).val(100);
+                    }
+                }
+
+                mindex.KpiPercent = pvalue;
+
+                //disable auto increase percent
+                var increaseIndex = vmKpiAction.autoIncrease.indexOf(Number(topicId));
+                if (increaseIndex >= 0) vmKpiAction.autoIncrease.splice(increaseIndex, 1);
+                break;
+            case "expected":
+                mindex.ExpectedValue = vmKpiAction.limitedKpiValue(value.toNumber());
+                vmKpiAction.reCalculateMasterImplement(mindex);
+                break;
+            case "ist":
+                mindex.LstValue = vmKpiAction.limitedKpiValue(value.toNumber());
+                vmKpiAction.reCalculateMasterImplement(mindex);
+                break;
+        }
+
+        if (mindex.DataState === dataState.Unchanged) mindex.DataState = dataState.Modified;
+        vmKpiAction.modelChanged = true;
+    };
+
+    vmKpiAction.addMasterTime = function () {
+        var i, j;
+        var newMasterTime = new KpiMasterTime();
+
+        //2. change data (kpiAction)
+        kpi.KpiMasterData.KpiMasterTimes.unshift(newMasterTime);
+        //1. change UI
+        var th = vmKpiAction.binding("newmastertimecolumn", newMasterTime);
+        $("#mistCol").after(th);
+
+        var mtopics = kpi.KpiMasterData.KpiMasterTopics;
+        for (i = 0; i < mtopics.length; i++) {
+            var mtopic = mtopics[i];
+            var mindexes = mtopic.KpiMasterIndexes;
+
+            for (j = 0; j < mindexes.length; j++) {
+                var mindex = mindexes[j];
+                var mindextime = new KpiMasterIndexTime(mindex.Id, newMasterTime.Id);
+                mindex.KpiMasterIndexTimes.unshift(mindextime);
+
+                $("#div-kpiaction td.td-istm[topicid='" + mtopic.Id + "'][indexid='" + mindex.Id + "']")
+                    .after("<td class='td-mindextime'><input type='text' id='mit" + mindextime.Id + "' class='masterctrl txtInput kpi-input " + vmKpiAction.positionClass(mindex.KpiUnitId) + "' style='width:90%' topicid='" + mtopic.Id + "' indexid='" + mindex.Id + "' ftype='indextime' onchange='vmKpiAction.events.changeMasterIndexTime(this);' it='" + mindextime.Id + "' /></td>");
+
+                var unit = vmCommon.findById(mindex.KpiUnitId, kpiUnits) || vmCommon.defaultUnit();
+                if (unit) {
+                    var orderFormat = unit.OrderId === 2 ? "{0} ##,#.00" : "##,#.00 {0}";
+                    //expected
+                    $("#mit" + mindextime.Id).kendoNumericTextBox({
+                        spinners: false,
+                        format: orderFormat.format(unit.Symbol.encodeDola().encodeSymbol()),
+                        //min: 0,
+                        max: 999999999
+                    });
+                }
+            }
+        }
+
+        mtimeNo += 1;
+        $("#div-kpiaction td.topicname").attr("colspan", mtimeNo + 7);
+        $("#div-kpiaction td.addmastertopicempty").attr("colspan", mtimeNo + 7);
+        $("#div-kpiaction td.addmasterindexempty").attr("colspan", mtimeNo + 7);
+
+        //vmKpiAction.autoWidth();
+        vmKpiAction.autoWidth();
+
+        vmKpiAction.validMasterTime(newMasterTime);
+        vmKpiAction.reCalculateMasterIndex();
+
+        vmKpiAction.modelChanged = true;
+        vmKpiAction.clearAlert();
+    };
+
+    vmKpiAction.autoIncrease = [];
+    vmKpiAction.addNewMasterIndex = function (newMasterIndex) {
+        var mtopic = vmCommon.findById(newMasterIndex.KpiActionMasterTopicId, kpi.KpiMasterData.KpiMasterTopics);
+        if (mtopic == undefined) return;
+        if (mtopic.KpiMasterIndexes.length === 0 && vmKpiAction.autoIncrease.indexOf(mtopic.Id) === - 1) vmKpiAction.autoIncrease.push(mtopic.Id);
+
+        mtopic.KpiMasterIndexes.push(newMasterIndex);
+        $("#addfortopic" + mtopic.Id).closest("tr").before(vmKpiAction.binding("newmasterindexrow", newMasterIndex));
+
+        vmKpiAction.bindingUnitDropDown(newMasterIndex);
+        vmKpiAction.bindMasterIndexUnitFor(newMasterIndex);
+
+        var mindexes = mtopic.KpiMasterIndexes;
+        var count = mindexes.length;
+
+        if (vmKpiAction.autoIncrease.indexOf(mtopic.Id) >= 0) {
+            //recalculate percent
+            //var mindexes = mtopic.KpiMasterIndexes;
+            //var count = mindexes.length;
+
+            var per = Math.floor((100 / mindexes.length) * 100) / 100;
+            for (i = 0; i < mindexes.length; i++) {
+                mindexes[i].KpiPercent = per;
+
+                if (count > 1 && i === count - 1) {
+                    mindexes[i].KpiPercent = 100 - per * (count - 1);
+                }
+
+                var percentInput = $("input.masterctrl[ftype='percent'][topicid='" + mtopic.Id + "'][indexid='" + mindexes[i].Id + "']").data("kendoNumericTextBox");
+                if (percentInput) percentInput.value(mindexes[i].KpiPercent);
+            }
+        }
+
+        vmKpiAction.calIndexesPercent(mtopic.Id, mindexes);
+
+        vmKpiAction.modelChanged = true;
+        vmKpiAction.clearAlert();
+    };
+
+    vmKpiAction.addMasterIndex = function (e, mtopicId) {
+        vmKpiAction.openSelectMasterIndex(undefined, mtopicId);
+    };
+
+    vmKpiAction.openSelectMasterIndex = function (mindexId, mtopicId) {
+        var mtopics = kpi.KpiMasterData.KpiMasterTopics;
+        var mtopic = mtopicId ? vmCommon.findById(mtopicId, mtopics) : new KpiMasterTopic();
+        if (mtopic == null) return;
+
+        var selectedIndexes = [];
+
+        function selectGoalIndexCallBack() {
+            vmGoalAction.kpiMasterIndexOptions = { IsEdit: true };
+
+            var mindex = vmCommon.findById(mindexId, mtopic.KpiMasterIndexes);
+            if (mindex == null) {
+                vmGoalAction.kpiMasterIndexOptions = { IsEdit: false };
+                mindex = new KpiMasterIndex(mtopic.Id);
+                var unit = kpiUnits.first() || vmCommon.defaultUnit();
+
+                mindex.KpiUnitId = unit.Id;
+
+                var times = kpi.KpiMasterData.KpiMasterTimes;
+                for (i = 0; i < times.length; i++) {
+                    var time = times[i];
+                    mindex.KpiMasterIndexTimes.push(new KpiMasterIndexTime(mindex.Id, time.Id));
+                }
+            }
+
+            vmGoalAction.kpiMasterIndexOptions.kpiMasterIndex = mindex;
+            vmGoalAction.kpiMasterIndexOptions.kpiData = kpi.KpiMasterData;
+
+            var title = "";
+            var src;
+            switch (mtopic.TypeId) {
+                case vmCommon.KpiGoalTopicType.LandRegion:
+                    src = kpiMasterSettings.LandRegions;
+                    title = vmCommon.languageKpi(kLg.vtextRegion);
+                    break;
+                case vmCommon.KpiGoalTopicType.Market:
+                    src = kpiMasterSettings.Markets;
+                    title = vmCommon.languageKpi(kLg.titleStackholderGroups);
+                    break;
+                case vmCommon.KpiGoalTopicType.Product:
+                    src = kpiMasterSettings.Products;
+                    title = vmCommon.languageKpi(kLg.filterLblProduct);
+                    break;
+                case vmCommon.KpiGoalTopicType.Goal:
+                    src = kpiMasterSettings.Goals;
+                    title = kLg.titleGoalIndex;
+                    break;
+            }
+
+            vmGoalAction.kpiMasterIndexOptions.kpiSetting = vmKpiAction.limitWithOther(src, selectedIndexes);
+
+            vmGoalAction.showPopMasterIndex(title);
+        }
+
+        if (mtopic.TypeId == vmCommon.KpiGoalTopicType.Goal && actionModel.GoalId && actionModel.GoalId != vmCommon.emptyGuid) {
+            //TODO: request to server
+            vmGoalAction.dataservice.getSelectedMasterIndex({ subGoalId: actionModel.GoalId, topicTypeId: mtopic.TypeId }, function (res) {
+                selectedIndexes = res.value;
+                selectGoalIndexCallBack();
+            });
+
+        } else {
+            selectGoalIndexCallBack();
+        }
+    };
+
+    vmGoalAction.popKpiMasterIndex = undefined;
+    vmGoalAction.showPopMasterIndex = function (title) {
+        vmGoalAction.popKpiMasterIndex = showPopup(vmGoalAction.popKpiMasterIndex,
+            $("#popkpigoalindex"),
+            "../Contents/msPopSelectMasterIndex.html",
+            {
+                title: title,
+                width: 650,
+                height: 550,
+                resizable: false
+            }
+        );
+    };
+
+    vmKpiAction.deleteTopic = function (topicid) {
+        pConfirm(kLg.confirmDeleteItem).then(
+            function () {
+                var i = vmCommon.findIndexByFunc(kpi.KpiMasterData.KpiMasterTopics, function (it) { return it.Id == topicid });
+                if (i < 0) return;
+
+                vmKpiAction.addDeletedMasterItems(kpi.KpiMasterData.KpiMasterTopics.splice(i, 1), vmCommon.KpiGoalType.TOPICMASTER);
+                $("*[topicid='" + topicid + "']").remove();
+
+                vmKpiAction.modelChanged = true;
+            });
+    };
+
+    vmKpiAction.addTopic = function (kpiTopic) {
+        if (kpiTopic == undefined) return;
+
+        //1. UI
+        var topicRow = vmKpiAction.binding("newmastertopicrow", kpiTopic) +
+            vmKpiAction.binding("addmasterindexrow", kpiTopic);
+
+        $("#bodykpimaster").append(topicRow);
+        vmKpiAction.clearAlert();
+    };
+
+    vmKpiAction.getTopicName = function () {
+        var mtopics = kpi.KpiMasterData.KpiMasterTopics;
+        var rs = {};
+
+        rs[vmCommon.KpiGoalTopicType.LandRegion] = $.grep(mtopics, function (it) { return it.TypeId === vmCommon.KpiGoalTopicType.LandRegion; }).map(function (it) { return it.Name; });
+        rs[vmCommon.KpiGoalTopicType.Market] = $.grep(mtopics, function (it) { return it.TypeId === vmCommon.KpiGoalTopicType.Market; }).map(function (it) { return it.Name; });
+        rs[vmCommon.KpiGoalTopicType.Product] = $.grep(mtopics, function (it) { return it.TypeId === vmCommon.KpiGoalTopicType.Product; }).map(function (it) { return it.Name; });
+        rs[vmCommon.KpiGoalTopicType.Goal] = $.grep(mtopics, function (it) { return it.TypeId === vmCommon.KpiGoalTopicType.Goal; }).map(function (it) { return it.Name; });
+
+        return rs;
+    };
+
+    vmKpiAction.openAddMasterTopic = function (mtopicId) {
+        var isEdit = mtopicId != undefined;
+        var mtopics = kpi.KpiMasterData.KpiMasterTopics, existedTopics = mtopics.map(t => t.TypeId);
+
+        var mtopic;
+
+        if (isEdit) {
+            mtopic = vmCommon.findById(mtopicId, mtopics);
+            if (mtopic == null)
+                return;
+        } else if (selectableTopics.includes(vmCommon.KpiGoalTopicType.Goal) && !existedTopics.includes(vmCommon.KpiGoalTopicType.Goal)) {
+            mtopic = new KpiMasterTopic();
+            mtopic.TypeId = vmCommon.KpiGoalTopicType.Goal;
+            mtopic.Name = kLg.textMastergoal;
+        } else
+            return;
+
+        vmGoalAction.kpiTopicOptions = {};
+        vmGoalAction.kpiTopicOptions.IsEdit = isEdit;
+        vmGoalAction.kpiTopicOptions.selectableTopics = [mtopic.TypeId];
+
+        var topicNames = vmKpiAction.getTopicName();
+
+        if (isEdit) {
+            var indexName = topicNames[mtopic.TypeId].indexOf(mtopic.Name);
+            if (indexName > -1) topicNames[mtopic.TypeId].splice(indexName, 1);
+        }
+
+        vmGoalAction.kpiTopicOptions.kpiTopic = mtopic;
+        vmGoalAction.kpiTopicOptions.kpiData = kpi.KpiMasterData;
+        vmGoalAction.kpiTopicOptions.topicNames = topicNames;
+
+        vmGoalAction.showPopMasterTopic();
+    };
+
+    vmGoalAction.popKpiMasterTopic = undefined;
+    vmGoalAction.showPopMasterTopic = function () {
+        var titles = {};
+        titles[vmCommon.KpiGoalTopicType.LandRegion] = kLg.newLand + '/' + kLg.vtextRegion;
+        titles[vmCommon.KpiGoalTopicType.Market] = kLg.titleStackholderGroups;
+        titles[vmCommon.KpiGoalTopicType.Product] = kLg.filterLblProduct;
+        titles[vmCommon.KpiGoalTopicType.Goal] = kLg.textMastergoal;
+
+        vmGoalAction.popKpiMasterTopic = showPopup(vmGoalAction.popKpiMasterTopic,
+            $("#popkpigoaltopic"),
+            "../Contents/MsPopKpiMasterTopic.html",
+            {
+                title: titles[vmGoalAction.kpiTopicOptions.kpiTopic.TypeId],
+                height: 290,
+                width: 600,
+                resizable: false
+            }
+        );
+    };
+    
+    vmKpiAction.abc = function (kpi) {
+        if (kpi == null) return;
+
+        var i, j, k;
+        var kpiData = kpi.KpiData, kpiMasterData = kpi.KpiMasterData;
+
+        for (var x = 0; x < kpiData.length; x++) {
+            var kpiItem = kpiData[x];
+
+            //time
+            kpiItem.KpiOutcomeTimes = kpiItem.KpiOutcomeTimes || [];
+            for (i = 0; i < kpiItem.KpiOutcomeTimes.length; i++) {
+                var time = kpiItem.KpiOutcomeTimes[i];
+
+                if (time.Name && typeof (time.Name) == "string") {
+                    time.Name = time.Name.toDate();
+                }
+
+                if (_timeId > time.Id) _timeId = vmCommon.deepCopy(time.Id);
+                if (_timeIndex < time.MIndex) _timeIndex = vmCommon.deepCopy(time.MIndex);
+            }
+
+            //kpi
+            kpiItem.KpiIndexes = kpiItem.KpiIndexes || [];
+            for (i = 0; i < kpiItem.KpiIndexes.length; i++) {
+                var index = kpiItem.KpiIndexes[i];
+                if (_indexId > index.Id) _indexId = vmCommon.deepCopy(index.Id);
+
+                //_kindex
+                if (_kindex < index.MIndex) _kindex = vmCommon.deepCopy(index.MIndex);
+
+                for (j = 0; j < index.KpiIndexTimes.length; j++) {
+                    var indextime = index.KpiIndexTimes[j];
+                    if (_outcomeTimeId > indextime.Id) _outcomeTimeId = vmCommon.deepCopy(indextime.Id);
+                }
+
+                for (var k = 0; k < index.SubIndexes.length; k++) {
+                    var subIndex = index.SubIndexes[k];
+                    if (_indexId > subIndex.Id) _indexId = vmCommon.deepCopy(subIndex.Id);
+
+                    for (h = 0; h < subIndex.KpiIndexTimes.length; h++) {
+                        var subindextime = subIndex.KpiIndexTimes[h];
+                        if (_outcomeTimeId > subindextime.Id) _outcomeTimeId = vmCommon.deepCopy(subindextime.Id);
+                    }
+                }
+            }
+
+            //format item value
+            kpiItem.KpiFormats = kpiItem.KpiFormats || [];
+            var formats = kpiItem.KpiFormats;
+            for (i = 0; i < formats.length; i++) {
+                var format = formats[i];
+                var formatItems = format.KpiFormatItems;
+                for (j = 0; j < formatItems.length; j++) {
+                    var item = formatItems[j];
+                    var itemvalues = item.ItemValues;
+                    for (k = 0; k < itemvalues.length; k++) {
+                        var itemvalue = itemvalues[k];
+                        if (_itemValueId > itemvalue.Id) _itemValueId = vmCommon.deepCopy(itemvalue.Id);
+                    }
+                }
+            }
+        }
+        
+
+        //master
+        kpiMasterData.KpiMasterTimes = kpiMasterData.KpiMasterTimes || [];
+        for (i = 0; i < kpiMasterData.KpiMasterTimes.length; i++) {
+            var time = kpiMasterData.KpiMasterTimes[i];
+
+            if (time.Name && typeof (time.Name) == "string") {
+                time.Name = time.Name.toDate();
+            }
+
+            if (_mtimeId > time.Id) _mtimeId = vmCommon.deepCopy(time.Id);
+            if (_mtimeIndex < time.MIndex) _mtimeIndex = vmCommon.deepCopy(time.MIndex);
+        }
+
+        kpiMasterData.KpiMasterTopics = kpiMasterData.KpiMasterTopics || [];
+        for (var i = 0; i < kpiMasterData.KpiMasterTopics.length; i++) {
+            var topicItem = kpiMasterData.KpiMasterTopics[i];
+            if (_mtopicId > topicItem.Id) _mtopicId = vmCommon.deepCopy(topicItem.Id);
+
+            for (var j = 0; j < topicItem.KpiMasterIndexes.length; j++) {
+                var indexItem = topicItem.KpiMasterIndexes[j];
+                if (_mindexId > indexItem.Id) _mindexId = vmCommon.deepCopy(indexItem.Id);
+
+                for (var k = 0; k < indexItem.KpiMasterIndexTimes.length; k++) {
+                    var indexTimeItem = indexItem.KpiMasterIndexTimes[k];
+                    if (_mindexTimeId > indexTimeItem.Id) _mindexTimeId = vmCommon.deepCopy(indexTimeItem.Id);
+                }
+            }
+        }
+    };
+
+    vmKpiAction.positionClass = function(unitId) {
+        var unit = vmCommon.findById(unitId, kpiUnits) || vmCommon.defaultUnit();
+        if (unit == null) return "";
+
+        var pclass = "";
+        switch (unit.PositionId) {
+        case 1:
+            pclass = "unit-left";
+            break;
+        case 3:
+            pclass = "unit-center";
+            break;
+        case 2:
+            pclass = "unit-right";
+            break;
+        }
+
+        return pclass;
+    };
+
+    vmKpiAction.events.changeMasterIndexTime = function (e) {
+
+        var topicId = $(e).attr("topicid");
+        var indexId = $(e).attr("indexId");
+        var indexTimeId = $(e).attr("it");
+
+        if (topicId == undefined || indexId == undefined || indexTimeId == undefined || isNaN(Number(topicId)) || isNaN(Number(indexId)) || isNaN(Number(indexTimeId))) return;
+
+        topicId = Number(topicId);
+        indexId = Number(indexId);
+        indexTimeId = Number(indexTimeId);
+
+        var mtopics = kpi.KpiMasterData.KpiMasterTopics;
+        var mtopic = vmCommon.findById(topicId, mtopics);
+
+        var mindex = vmCommon.findById(indexId, mtopic.KpiMasterIndexes);
+        var mindextime = vmCommon.findById(indexTimeId, mindex.KpiMasterIndexTimes);
+
+        var value = $(e).val().trim();
+
+        mindextime.KpiValue = vmKpiAction.limitedKpiValue(value.toNumber());
+        if (mindextime.DataState === dataState.Unchanged) mindextime.DataState = dataState.Modified;
+
+        vmKpiAction.reCalculateMasterIndexFor(topicId, indexId);
+        vmKpiAction.modelChanged = true;
+    };
+
+    vmKpiAction.reCalculateMasterIndexFor = function (topicid, indexid) {
+        if (topicid == null || indexid == null || isNaN(Number(topicid)) || isNaN(Number(indexid))) return;
+
+        var mtopicid = Number(topicid);
+        var mindexid = Number(indexid);
+
+        var mtimes = kpi.KpiMasterData.KpiMasterTimes;
+
+        var mtopic = vmCommon.findById(mtopicid, kpi.KpiMasterData.KpiMasterTopics);
+        if (mtopic == null) return;
+
+        var mindex = vmCommon.findById(mindexid, mtopic.KpiMasterIndexes);
+        var newLstValue = null;
+
+        var validTimes = $.grep(mtimes, function (it) { return !it.isInvalid; });
+        var orderTimes = vmKpiAction.orderTime(validTimes);
+
+        for (var i = 0; i < orderTimes.length; i++) {
+            var time = orderTimes[i];
+            var mindextime = vmCommon.findByFunc(mindex.KpiMasterIndexTimes, function (it) { return it.KpiActionMasterIndexId === mindex.Id && it.KpiActionMasterTimeId === time.Id; });
+
+            if (mindextime.KpiValue != null) {
+                newLstValue = mindextime.KpiValue;
+
+                break;
+            };
+        }
+
+        mindex.LstValue = newLstValue;
+        vmKpiAction.reCalculateMasterImplement(mindex);
+
+        $("input.masterctrl[topicid='" + mtopic.Id + "'][indexid='" + mindex.Id + "'][ftype='ist']").data("kendoNumericTextBox").value(newLstValue);
+    };
+
+    vmKpiAction.reCalculateMasterImplement = function(mindex) {
+        if (mindex.ExpectedValue == null || mindex.ExpectedValue === 0) {
+            mindex.ImplementPercent = null;
+        } else if (mindex.LstValue == null) {
+            mindex.ImplementPercent = null;
+        } else {
+            mindex.ImplementPercent = Number(((Number(mindex.LstValue) / Number(mindex.ExpectedValue))*100).toFixed(2));
+        }
+
+        if (mindex.DataState === dataState.Unchanged) mindex.DataState = dataState.Modified;
+        $("input.masterctrl[topicid='" + mindex.KpiActionMasterTopicId + "'][indexid='" + mindex.Id + "'][ftype='implement']").data("kendoNumericTextBox").value(mindex.ImplementPercent);
+    };
+
+    vmKpiAction.bindIndexUnitFor = function (kpiIndex) {
+        var unit = vmCommon.findById(kpiIndex.KpiUnitId, kpiUnits) || vmCommon.defaultUnit(); //for test: vmCommon.randomInt(kpiUnits.length)
+        if (unit == null) return;
+        var orderFormat = unit.OrderId === 2 ? "{0} ##,#.00" : "##,#.00 {0}";
+        //expected, ist
+        var expected = $("input.kpictrl[ftype='expected'][indexid='" + kpiIndex.Id + "']").kendoNumericTextBox({
+            spinners: false,
+            format: orderFormat.format(unit.Symbol.encodeDola().encodeSymbol()),
+            //min: 0,
+            max: 999999999999
+        });
+        if (expected.length > 0 && !kpiIndex.IsKpiDefault && kpiIndex.IsAdjustment) $(expected).data("kendoNumericTextBox").enable(false);
+
+        $("input.kpictrl[ftype='indextime'][indexid='" + kpiIndex.Id + "']").kendoNumericTextBox({
+            spinners: false,
+            format: orderFormat.format(unit.Symbol.encodeDola().encodeSymbol()),
+            //min: 0,
+            max: 999999999999
+        });
+
+        var ist = $("input.kpictrl[ftype='ist'][indexid='" + kpiIndex.Id + "']").kendoNumericTextBox({
+            spinners: false,
+            format: orderFormat.format(unit.Symbol.encodeDola().encodeSymbol()),
+            //min: 0,
+            max: 999999999999
+        });
+        if(ist.length > 0) $(ist).data("kendoNumericTextBox").enable(false);
+
+        //percent
+        var per = $("input.kpictrl[ftype='percent'][indexid='" + kpiIndex.Id + "']").kendoNumericTextBox({
+            spinners: false,
+            format: "##,#.00 \\\%"
+            //min: -999999999999,
+            //max: 999999999999999
+        });
+        if (per.length > 0) $(per).data("kendoNumericTextBox").enable(false);
+
+        //set-role
+        if (!vmKpiAction.dataService.hasRole()) {
+            $("#pop-kpi-action input.kpictrl[indexid='" + kpiIndex.Id + "']").each(function() {
+                $(this).data("kendoNumericTextBox").enable(false);
+            });
+        }
+    };
+
+    vmKpiAction.bindIndexUnit = function() {
+
+        var indexes = kpi.KpiData.KpiIndexes;
+        for (var i = 0; i < indexes.length; i++) {
+            var index = indexes[i];
+            vmKpiAction.bindIndexUnitFor(index);
+
+            var subIndexes = index.SubIndexes;
+            subIndexes.forEach(t => {
+                vmKpiAction.bindIndexUnitFor(t);
+            });
+        }
+
+    };
+
+    vmKpiAction.bindMasterIndexUnit = function () {
+        var mtopics = kpi.KpiMasterData.KpiMasterTopics;
+        for (var i = 0; i < mtopics.length; i++) {
+            var mtopic = mtopics[i];
+            var mindexes = mtopic.KpiMasterIndexes;
+
+            for (var j = 0; j < mindexes.length; j++) {
+                vmKpiAction.bindMasterIndexUnitFor(mindexes[j]);
+            }
+        }
+    };
+
+    vmKpiAction.bindMasterIndexUnitFor = function (kpiMasterIndex) {
+        var unit = vmCommon.findById(kpiMasterIndex.KpiUnitId, kpiUnits) || vmCommon.defaultUnit();
+        if (unit == null) return;
+
+        //percent
+        $("input.masterctrl[ftype='percent'][indexid='" + kpiMasterIndex.Id + "']").kendoNumericTextBox({
+            spinners: false,
+            format: "##,#.00 \\\%",
+            min: 0,
+            max: 100
+            //,change: function() {
+            //    console.log(this.value());
+            //}
+        });
+
+        //implement
+        var imp = $("input.masterctrl[ftype='implement'][indexid='" + kpiMasterIndex.Id + "']").kendoNumericTextBox({
+            spinners: false,
+            format: "##,#.00 \\\%"
+            //min: -999999999999,
+            //max: 999999999999
+        });
+        if (imp && imp.length > 0) $(imp).data("kendoNumericTextBox").enable(false);
+
+        var orderFormat = unit.OrderId === 2 ? "{0} ##,#.00" : "##,#.00 {0}";
+        //expected
+        $("input.masterctrl[ftype='expected'][indexid='" + kpiMasterIndex.Id + "']" + ", " + "input.masterctrl[ftype='indextime'][indexid='" + kpiMasterIndex.Id + "']").kendoNumericTextBox({
+            spinners: false,
+            format: orderFormat.format(unit.Symbol.encodeDola().encodeSymbol()),
+            //min: 0,
+            max: 999999999999
+        });
+
+        var ist = $("input.masterctrl[ftype='ist'][indexid='" + kpiMasterIndex.Id + "']").kendoNumericTextBox({
+            spinners: false,
+            format: orderFormat.format(unit.Symbol.encodeDola().encodeSymbol()),
+            //min: 0,
+            max: 999999999999
+        });
+        if (ist && ist.length > 0)  $(ist).data("kendoNumericTextBox").enable(false);
+
+        //set-role
+        if (!vmKpiAction.dataService.hasRole()) {
+            $("#pop-kpi-action input.masterctrl[indexid='" + kpiMasterIndex.Id + "']").each(function () {
+                $(this).data("kendoNumericTextBox").enable(false);
+            });
+        }
+    };
+
+    vmKpiAction.getMaxTime = function(times) {
+
+        var maxTime = null;
+        if (times.length > 0) {
+            maxTime = vmCommon.deepCopy(times[0]);
+            maxTime.index = 0;
+
+            for (var i = 1; i < times.length; i++) {
+                var time = vmCommon.deepCopy(times[i]);
+                if (vmCommon.compareDate2(new Date(maxTime.Name), new Date(time.Name)) === -1) {
+                    maxTime = time;
+                    maxTime.index = i;
+                }
+            }
+        }
+
+        return maxTime;
+    };
+
+    vmKpiAction.orderTime = function(times) {
+        var newArr = [];
+
+        var temps = vmCommon.deepCopy(times);
+        if (temps.length > 1) {
+            while (temps.length > 0) {
+                var maxTime = vmKpiAction.getMaxTime(temps);
+                newArr.push(maxTime);
+
+                temps.splice(maxTime.index, 1);
+            }
+
+        } else if (temps.length === 1) {
+            newArr.push(temps[0]);
+        }
+
+        return newArr;
+    };
+
+    vmKpiAction.calculateImplement = function (index) {         
+
+        if (index.ExpectedValue == null || index.ExpectedValue == 0) {
+            index.KpiPercent = null;
+        } else if (index.LstValue == null) {
+            index.KpiPercent = null;
+        } else {
+            index.KpiPercent = Number(((Number(index.LstValue) / Number(index.ExpectedValue)) * 100).toFixed(2));
+        }
+
+        if (index.DataState === dataState.Unchanged) index.DataState = dataState.Modified;
+
+        if (enableTime) {
+            $("input.kpictrl[indexid='" + index.Id + "'][ftype='percent']").data("kendoNumericTextBox").value(index.KpiPercent);
+        }
+    };
+
+    vmKpiAction.calculateIndex = function () {
+        var indexes = kpi.KpiData.KpiIndexes;
+        for (var i = 0; i < indexes.length; i++) {
+            var index = indexes[i];
+            if (enableSI && index.IsKpiDefault) continue;
+
+            vmKpiAction.calculateIndexFor(index.Id);
+        }
+    };
+
+    vmKpiAction.calculateIndexFor = function (indexid) {
+        var times = kpi.KpiData.KpiOutcomeTimes;
+
+        var index = vmCommon.findById(indexid, kpi.KpiData.KpiIndexes) || kpi.KpiData.KpiIndexes.map(t => t.SubIndexes).flatten().find(t => t.Id == indexid);
+        if (index == undefined) return;
+
+        if (enableSI && index.IsKpiDefault) return;
+
+        if (index.ParentId == null) {
+            if (!index.IsKpiDefault && index.IsAdjustment) {
+                var expectedValues = index.SubIndexes.map(t => t.KpiIndexTimes).flatten().filter(t => t.KpiValue != null).map(t => t.KpiValue);
+                index.ExpectedValue = expectedValues.length > 0 ? expectedValues.reduce((a, b) => a + b) : null;
+
+                var lstValues = index.KpiIndexTimes.filter(t => t.KpiValue != null).map(t => t.KpiValue);
+                index.LstValue = lstValues.length > 0 ? lstValues.reduce((a, b) => a + b) : null;
+            } else {
+                var newLstValue = null;
+                var validTimes = $.grep(times, function (it) { return !it.isInvalid; });
+                var orderTimes = vmKpiAction.orderTime(validTimes);
+
+                for (var i = 0; i < orderTimes.length; i++) {
+                    var time = orderTimes[i];
+                    var indextime = vmCommon.findByFunc(index.KpiIndexTimes, function (it) { return it.KpiActionIndexId === index.Id && it.KpiOutcomeTimeId === time.Id; });
+
+                    if (indextime.KpiValue != null) {
+                        newLstValue = indextime.KpiValue;
+
+                        break;
+                    }
+                }
+
+                index.LstValue = newLstValue;
+            }
+
+            var expectedElement = $("input.kpictrl[indexid='" + index.Id + "'][ftype='expected']");
+            if (expectedElement.length > 0)
+                $("input.kpictrl[indexid='" + index.Id + "'][ftype='expected']").data("kendoNumericTextBox").value(index.ExpectedValue);
+
+            var lstElement = $("input.kpictrl[indexid='" + index.Id + "'][ftype='ist']");
+            if (lstElement.length > 0)
+                $("input.kpictrl[indexid='" + index.Id + "'][ftype='ist']").data("kendoNumericTextBox").value(index.LstValue);
+
+            vmKpiAction.calculateImplement(index);
+        }  
+         else {
+            var parentIndex = kpi.KpiData.KpiIndexes.find(t => t.Id == index.ParentId);
+            if (parentIndex == undefined) return;
+
+            parentIndex.ExpectedValue = index.KpiIndexTimes.map(t => t.KpiValue).reduce((a, b) => a + b);
+            var expectedElement = $("input.kpictrl[indexid='" + parentIndex.Id + "'][ftype='expected']");
+            if (expectedElement.length > 0)
+                $("input.kpictrl[indexid='" + parentIndex.Id + "'][ftype='expected']").data("kendoNumericTextBox").value(parentIndex.ExpectedValue);
+            vmKpiAction.calculateImplement(parentIndex);
+        }
+        
+    };
+
+    vmKpiAction.validKpiData = function() {
+        vmKpiAction.clearAlert();
+
+        var flag = true, i;
+        //1. valid times
+        var times = kpi.KpiData.KpiOutcomeTimes;
+        var timeNames = [];
+
+        for (i = 0; i < times.length; i++) {
+            var time = times[i];
+            if (timeNames.indexOf(kendo.toString(time.Name, "d")) >= 0) {
+                flag = false;
+                break;
+            }
+
+            timeNames.push(kendo.toString(time.Name, "d"));
+        }
+
+        if (!flag) {
+            vmKpiAction.message(kLg.msgExistKpiTime);
+            return false;
+        }
+
+        return true;
+    };
+
+    vmKpiAction.validKpiDataMaster = function () {
+        vmKpiAction.clearAlertMaster();
+
+        var flag = true, i, j;
+
+        //1. valid times
+        var times = kpi.KpiMasterData.KpiMasterTimes;
+        var timeNames = [];
+
+        for (i = 0; i < times.length; i++) {
+            var time = times[i];
+            if (timeNames.indexOf(kendo.toString(time.Name, "d")) >= 0) {
+                flag = false;
+                break;
+            }
+
+            timeNames.push(kendo.toString(time.Name, "d"));
+        }
+
+        if (!flag) {
+            //message
+            vmKpiAction.messageMaster(kLg.msgExistKpiTime);
+            return false;
+        }
+
+        var topics = kpi.KpiMasterData.KpiMasterTopics;
+        var invalidLinks = [], emptyPercents = [], invalidPercents = [];
+
+        //2. valid links
+        for (i = 0; i < topics.length; i++) {
+            var topic = topics[i];
+            var indexes = topic.KpiMasterIndexes;
+
+            var totalPercent = 0;
+            for (j = 0; j < indexes.length; j++) {
+                var index = indexes[j];
+
+                if (index.GuidLinkId == null && index.LongLinkId == null) invalidLinks.push(index.Id);
+                if (index.KpiPercent == null) {
+                    emptyPercents.push(index.Id);
+                } else {
+                    totalPercent += Number(index.KpiPercent);
+                }
+
+            }
+
+            if (indexes.length > 0 && (totalPercent <= 99.999 || totalPercent >= 100.009)) {
+                invalidPercents.push(topic.Id);
+            }
+
+            if (invalidLinks.length > 0) {
+                for (i = 0; i < invalidLinks.length; i++) {
+                    $("span.index-notify[indexid='" + invalidLinks[i] + "']").removeClass("hidden");
+                }
+
+                //message
+                vmKpiAction.messageMaster(kLg.msgCrmLinkRequired);
+                return false;
+            }
+
+            if (emptyPercents.length > 0) {
+                for (i = 0; i < emptyPercents.length; i++) {
+                    $("span.index-notify[indexid='" + emptyPercents[i] + "']").removeClass("hidden");
+                }
+
+                //message
+                vmKpiAction.messageMaster(kLg.msgPercentRequired);
+                return false;
+            }
+
+            if (invalidPercents.length > 0) {
+                for (i = 0; i < invalidPercents.length; i++) {
+                    $("span.topic-notify[topicid='" + invalidPercents[i] + "']").removeClass("hidden");
+                }
+
+                //message
+                vmKpiAction.messageMaster(kLg.msgFibuInvalidPercent);
+                return false;
+            }
+        }
+
+        return true;
+    };
+
+    vmKpiAction.update = function () {
+        if (!vmKpiAction.dataService.hasRole()) {
+            vmKpiAction.modelChanged = false;
+            vmGoalAction.popActionIndex.close();
+            return true;
+        }
+        
+        if (!vmKpiAction.validKpiData() || !vmKpiAction.validKpiDataMaster()) return false;
+
+        var i;
+        var times = kpi.KpiData.KpiOutcomeTimes;
+        for (i = 0; i < times.length; i++) {
+            times[i].Name = changeHourOfDate(times[i].Name);
+        }
+
+        var mtimes = kpi.KpiMasterData.KpiMasterTimes;
+        for (i = 0; i < mtimes.length; i++) {
+            mtimes[i].Name = changeHourOfDate(mtimes[i].Name);
+        }
+
+        if (isChangePositionTime) {
+            for (i = 0; i < times.length; i++) {
+                times[i].MIndex = times.length - i;
+
+                if (times[i].DataState === dataState.Unchanged) times[i].DataState = dataState.Modified;
+            }
+        }
+
+        if (isChangePositionMasterTime) {
+            for (i = 0; i < mtimes.length; i++) {
+                mtimes[i].MIndex = mtimes.length - i;
+
+                if (mtimes[i].DataState === dataState.Unchanged) mtimes[i].DataState = dataState.Modified;
+            }
+        }
+
+        actionModel.set("KpiData", kpi.KpiData);
+        actionModel.set("KpiMasterData", kpi.KpiMasterData);
+
+        if (vmGoalAction.kpiActionOptions.callback && typeof vmGoalAction.kpiActionOptions.callback === "function") {
+            vmGoalAction.kpiActionOptions.callback(kpi);
+        }
+
+        vmKpiAction.modelChanged = false;
+        vmGoalAction.popActionIndex.close();
+        return true;
+    };
+
+    vmKpiAction.setupLanguage = function() {
+        $("#pop-kpi-action #lblKpiActionClose").text(kLg.lblClose);
+    };
+
+    vmKpiAction.bindingUnitDropDown = function (kpiMasterIndex) {
+
+        var drop = $("#munit" + kpiMasterIndex.Id).kendoDropDownList({
+            filter: "contains",
+            dataTextField: "Name",
+            dataValueField: "Id",
+            dataSource: kpiUnits,
+            value: kpiMasterIndex.KpiUnitId,
+            select: vmKpiAction.events.selectUnit
+        });
+
+        if (drop && drop.length > 0) $(drop).data("kendoDropDownList").enable(vmKpiAction.dataService.hasRole());
+    };
+
+    vmKpiAction.events.selectUnit = function (e) {
+
+        var selectedItem = e.dataItem;
+        var topicId = $(e.sender.element).attr("topicid");
+        var indexId = $(e.sender.element).attr("indexid");
+
+        if ((topicId == undefined || indexId == undefined) || (isNaN(Number(topicId)) || isNaN(Number(indexId)))) return;
+
+        topicId = Number(topicId);
+        indexId = Number(indexId);
+
+        var mtopic = vmCommon.findById(topicId, kpi.KpiMasterData.KpiMasterTopics);
+        var mindex = vmCommon.findById(indexId, mtopic.KpiMasterIndexes);
+
+        mindex.KpiUnitId = selectedItem.Id;
+
+        $(e.sender.element).closest("tr").find("input.kpi-input").each(function () {
+
+            var isExpected = $(this).closest("td").is(".td-percent,.td-implement");
+            if (!isExpected) {
+                $(this).removeClass("unit-left");
+                $(this).removeClass("unit-center");
+                $(this).removeClass("unit-right");
+
+                $(this).addClass(vmKpiAction.positionClass(mindex.KpiUnitId));
+            }
+        });
+
+        //change unit format
+        setTimeout(function () {
+            var unit = vmCommon.findById(mindex.KpiUnitId, kpiUnits) || vmCommon.defaultUnit();
+
+            if (unit) {
+                //var orderFormat = unit.OrderId === 1 ? "{0} #" : "# {0}";
+                var orderFormat = unit.OrderId === 2 ? "{0} ##,#.00" : "##,#.00 {0}";
+
+                $("input.masterctrl[ftype='expected'][indexid='" + mindex.Id + "']" + ", " + "input.masterctrl[ftype='ist'][indexid='" + mindex.Id + "']" + ", " + "input.masterctrl[ftype='indextime'][indexid='" + mindex.Id + "']").each(function () {
+                    var abx = $(this).data("kendoNumericTextBox");
+                    abx.setOptions({ format: orderFormat.format(unit.Symbol.encodeDola().encodeSymbol()) });
+                    abx.value(abx.value());
+
+                    if (mindex.DataState === dataState.Unchanged) mindex.DataState = dataState.Modified;
+                });
+            }
+
+        }, 50);
+
+        vmKpiAction.modelChanged = true;
+    };
+
+    vmKpiAction.dataService = function() {
+        var krole;
+
+        var setRole = function(role) {
+            if (krole == undefined && typeof role == "number") krole = role;
+        };
+
+        var hasRole = function() {
+            return krole == undefined ? false : krole > vmCommon.MemberRole.View;
+        };
+
+        return { setRole: setRole, hasRole: hasRole };
+    }();
+
+    var selectableTopics = [];
+    var kpiUnits = [], settings = undefined, kpiFormatTypes = [], kpiMasterSettings = undefined;
+    //kpiMasterSetting = { LandRegions: [], Markets: [], Products: [], Goals: [], KpiUnits: [] };
+    var enableSI = false, enableTime = false, kpiAction, actionModel, colNo = 0, timeNo = 0, mtimeNo = 0, enableKpi = false, kpiMaster, kpi = {};
+    //READY
+    $(function () {
+        vmKpiAction.dataService.setRole(vmGoalAction.kpiActionOptions.role);
+
+        enableSI = vmGoalAction.kpiActionOptions.enableSI;
+        enableTime = vmGoalAction.kpiActionOptions.enableOutcomeTime;
+        enableKpi = vmGoalAction.kpiActionOptions.enableOutcome;
+
+        actionModel = vmGoalAction.kpiActionOptions.actionModel;
+        currency = vmGoalAction.kpiActionOptions.currency;
+
+        colNo = enableTime ? 7 : 6;
+        kpi.KpiData = vmCommon.deepCopy(actionModel.KpiData);
+        kpi.KpiMasterData = vmCommon.deepCopy(actionModel.KpiMasterData);
+
+        //kpiAction = vmCommon.deepCopy(actionModel.KpiData);
+        //kpiMaster = vmCommon.deepCopy(actionModel.KpiMasterData);
+        vmKpiAction.abc(kpi);
+        //binding
+        settings = vmCommon.deepCopy(vmGoalAction.kpiActionOptions.Settings);
+
+        selectableTopics = vmGoalAction.kpiActionOptions.selectableTopics || [];
+        kpiUnits = settings.KpiUnits;
+        kpiFormatTypes = settings.KpiFormatTypes || [];
+        kpiMasterSettings = settings.KpiMasterSettings;
+
+        timeNo = enableTime ? kpi.KpiData.KpiOutcomeTimes.length : 0;
+        mtimeNo = enableTime ? kpi.KpiMasterData.KpiMasterTimes.length : 0;
+
+        bindTemplate("div-kpiaction", "temp-kpiaction", kpi);
+        vmKpiAction.bindIndexUnit();
+        vmKpiAction.bindMasterIndexUnit();
+
+        //binding dropdownlist for unit seletor
+        var mtopics = kpi.KpiMasterData.KpiMasterTopics;
+        for (var i = 0; i < mtopics.length; i++) {
+            var mtopic = mtopics[i];
+            for (var j = 0; j < mtopic.KpiMasterIndexes.length; j++) {
+                var mindex = mtopic.KpiMasterIndexes[j];
+                vmKpiAction.bindingUnitDropDown(mindex);
+            }
+        }
+
+        //vmKpiAction.toggleLstStatus();
+
+        if (vmKpiAction.dataService.hasRole()) {
+            vmKpiAction.bindSortTime();
+            vmKpiAction.bindSortMasterTime();
+        }
+
+        vmKpiAction.autoWidth();
+
+        vmKpiAction.setupLanguage();
+
+        vmKpiAction.reloadCalculateState();
+    });
+
+    //ENTITY
+
+    function OutcomeTime() {
+        this.Id = --_timeId;
+        this.Name = new Date();
+        this.MIndex = ++_timeIndex;
+        this.ActionId = null;
+        this.IsAuto = false;
+
+        this.DataState = dataState.Added;
+
+        return this;
+    };
+
+    function SettingIndex() {
+        this.Id = --_indexId;
+        this.KpiIndexId = null;
+        this.KpiIndexName = "";
+
+        this.KpiUnitId = null;
+        this.KpiUnitName = "";
+
+        this.KpiTimeId = null;
+        this.KpiTimeName = "";
+
+        this.MIndex = ++_kindex;
+        this.ActionId = null;
+        this.ExpectedValue = null;
+        this.LstValue = null;
+        this.KpiPercent = null;
+
+        this.DataState = dataState.Added;
+        this.KpiIndexTimes = [];
+        this.IsCalculate = true;
+        this.IsKpiDefault = false;
+
+        this.SubIndexes = [];
+        this.ParentId = null;
+        this.IsAdjustment = false;
+        this.DefaultExpectedValue = null;
+
+        return this;
+    };
+
+    function KpiOutcomeIndexTime(indexId, timeId) {
+        this.Id = --_outcomeTimeId;
+        this.KpiActionIndexId = indexId;
+        this.KpiOutcomeTimeId = timeId;
+        this.KpiValue = null;
+
+        this.DataState = dataState.Added;
+
+        return this;
+    };
+
+    function KpiSettingData() {
+        this.AccountId = 0;
+        this.ProjectId = 0;
+        this.CategoryId = null;
+        this.ActionId = null;
+
+        this.KpiIndexes = [];
+        this.KpiFormats = [];
+        this.KpiOutcomeTimes = [];
+        this.KpiMasterTimes = [];
+        this.KpiMasterTopics = [];
+
+        this.DeletedItems = [];
+        this.DataState = dataState.Added;
+
+        return this;
+    };
+
+    function KpiFormatItem() {
+        this.Id = 0;
+        this.KpiFormatTypeId = 0;
+        this.KpiFormatId = 0;
+        this.ActionId = null;
+        this.MValue = "";
+        this.MIndex = 0;
+        this.Name = "";
+        this.Description = "";
+        this.FTypeId = 0;
+        this.ItemValues = [];
+        this.DataState = dataState.Added;
+
+        return this;
+    };
+
+    //MASTER
+    function KpiMasterTopic() {
+        this.Id = --_mtopicId;
+        this.Name = "";
+        this.ActionId = null;
+
+        this.TypeId = vmCommon.KpiGoalTopicType.LandRegion;
+        this.Description = "";
+        this.MIndex = 0;
+
+        this.DataState = dataState.Added;
+        this.KpiMasterIndexes = [];
+
+        return this;
+    };
+
+    function KpiMasterTime() {
+        this.Id = --_mtimeId;
+        this.Name = new Date();
+        this.MIndex = 0;
+        this.ActionId = null;
+
+        this.DataState = dataState.Added;
+
+        return this;
+    };
+
+    function KpiMasterIndex(mtopicId) {
+        this.Id = --_mindexId;
+        this.Name = "";
+        this.LongLinkId = null;
+        this.GuidLinkId = null;
+
+        this.LinkIds = "";
+
+        this.KpiUnitId = 0;
+        this.KpiPercent = 0;
+        this.ImplementPercent = null;
+        this.ExpectedValue = null;
+        this.LstValue = null;
+        this.TypeId = 0;
+
+        this.KpiActionMasterTopicId = mtopicId || 0;
+        this.MIndex = 0;
+
+        this.DataState = dataState.Added;
+        this.KpiMasterIndexTimes = [];
+
+        return this;
+    };
+
+    function KpiMasterIndexTime(mindexId, mtimeId) {
+        this.Id = --_mindexTimeId;
+        this.KpiActionMasterIndexId = mindexId;
+        this.KpiActionMasterTimeId = mtimeId;
+
+        this.KpiValue = null;
+        this.DataState = dataState.Added;
+
+        return this;
+    };
+
+    vmKpiAction.clearAlert = function() {
+        vmKpiAction.message();
+    };
+
+    vmKpiAction.message = function (text, time) {
+        if (time) {
+            setTimeout(function() {
+                $("#pop-kpi-action #kmessage").text("");
+            }, time);
+        }
+
+        if (text == undefined) {
+            $("#pop-kpi-action #kmessage").text("");
+            return;
+        }
+
+        $("#pop-kpi-action #kmessage").text(text);
+        return;
+    };
+
+    vmKpiAction.clearAlertMaster = function () {
+        vmKpiAction.message();
+    };
+    vmKpiAction.messageMaster = function (text, time) {
+        if (time) {
+            setTimeout(function () {
+                $("#pop-kpi-action #kmessagemaster").text("");
+            }, time);
+        }
+
+        if (text == undefined) {
+            $("#pop-kpi-action #kmessagemaster").text("");
+            return;
+        }
+
+        $("#pop-kpi-action #kmessagemaster").text(text);
+        return;
+    };
+
+    vmKpiAction.validMasterTime = function (intime, isloop) {
+        var mtimes = kpi.KpiMasterData.KpiMasterTimes;
+
+        var flag = true, i;
+        if (intime) {
+            if (mtimes.length === 1) {
+                intime.isInvalid = false;
+                $("th.mtimecolumn[timeid='" + intime.Id + "']").removeClass("kpi-invalid");
+
+                return true;
+            }
+
+            for (i = 0; i < mtimes.length; i++) {
+                var mtime = mtimes[i];
+                if (mtime.Id === intime.Id) continue;
+
+                if (vmCommon.compareDate2(intime.Name, mtime.Name) === 0) {
+                    flag = false;
+                    break;
+                }
+            }
+
+            intime.isInvalid = !flag;
+            if (flag) {
+                $("th.mtimecolumn[timeid='" + intime.Id + "']").removeClass("kpi-invalid");
+            } else {
+                $("th.mtimecolumn[timeid='" + intime.Id + "']").addClass("kpi-invalid");
+            }
+        }
+
+        //valid other times
+        if (isloop) {
+            var inTimes = $.grep(mtimes, function (it) { return it.isInvalid && (intime == undefined || it.Id !== intime.Id); });
+            for (i = 0; i < inTimes.length; i++) {
+                vmKpiAction.validMasterTime(inTimes[i]);
+            }
+        }
+
+        return flag;
+    };
+
+    vmKpiAction.validTime = function(intime, isloop) {
+
+        var times = kpi.KpiData.KpiOutcomeTimes;
+
+        var flag = true, i;
+        if (intime) {
+            if (times.length === 1) {
+                intime.isInvalid = false;
+                $("th.timecolumn[timeid='" + intime.Id + "']").removeClass("kpi-invalid");
+
+                return true;
+            }
+
+            for (i = 0; i < times.length; i++) {
+                var time = times[i];
+                if (time.Id === intime.Id) continue;
+
+                if (vmCommon.compareDate2(intime.Name, time.Name) === 0) {
+                    flag = false;
+                    break;
+                }
+            }
+
+            intime.isInvalid = !flag;
+            if (flag) {
+                $("th.timecolumn[timeid='" + intime.Id + "']").removeClass("kpi-invalid");
+            } else {
+                $("th.timecolumn[timeid='" + intime.Id + "']").addClass("kpi-invalid");
+            }
+        }
+
+        //valid other times
+        if (isloop) {
+            var inTimes = $.grep(times, function(it) { return it.isInvalid && (intime == undefined || it.Id !== intime.Id); });
+            for (i = 0; i < inTimes.length; i++) {
+                vmKpiAction.validTime(inTimes[i]);
+            }
+        }
+
+        return flag;
+    };
+
+    vmKpiAction.reCalculateMasterIndex = function () {
+        var mtopics = kpi.KpiMasterData.KpiMasterTopics;
+        var mtimes = kpi.KpiMasterData.KpiMasterTimes;
+
+        var validTimes = $.grep(mtimes, function (it) { return !it.isInvalid; });
+        var orderTimes = vmKpiAction.orderTime(validTimes);
+
+        for (var i = 0; i < mtopics.length; i++) {
+            var mtopic = mtopics[i];
+            var mindexes = mtopic.KpiMasterIndexes;
+
+            for (var j = 0; j < mindexes.length; j++) {
+                var mindex = mindexes[j];
+                var newLstValue = null;
+
+                for (var k = 0; k < orderTimes.length; k++) {
+                    var mtime = orderTimes[k];
+                    var mindextime = vmCommon.findByFunc(mindex.KpiMasterIndexTimes, function (it) { return it.KpiActionMasterIndexId === mindex.Id && it.KpiActionMasterTimeId === mtime.Id; });
+
+                    if (mindextime.KpiValue) {
+                        newLstValue = mindextime.KpiValue;
+
+                        break;
+                    };
+                }
+
+                mindex.LstValue = newLstValue;
+                vmKpiAction.reCalculateMasterImplement(mindex);
+
+                $("input.masterctrl[topicid='" + mtopic.Id + "'][indexid='" + mindex.Id + "'][ftype='ist']").data("kendoNumericTextBox").value(newLstValue);
+            }
+        }
+    };
+
+    $("#div-kpiaction").on("dblclick", "div.div-mtimename", function (e) {
+        if (!vmKpiAction.dataService.hasRole()) return;
+
+        var mdivTimeSpan = e.currentTarget;
+        $(mdivTimeSpan).addClass("hidden");
+
+        var timeId = $(mdivTimeSpan).attr("timeid");
+        if (timeId == undefined || isNaN(Number(timeId))) return;
+
+        timeId = Number(timeId);
+        var mtime = vmCommon.findById(timeId, kpi.KpiMasterData.KpiMasterTimes);
+
+        var mtimeInput = $(mdivTimeSpan).closest("th").find("input.mtimeinput");
+        mtimeInput.removeClass("hidden");
+
+        if ($(mtimeInput).data("isPicker")) {
+
+            var datepicker = $(mtimeInput).data("kendoDatePicker");
+            $(datepicker.wrapper).show();
+
+        } else {
+            $(mtimeInput).kendoDatePicker({
+                weekNumber: true,
+                value: mtime.Name,
+                change: function () {
+                    //alert("2");
+                }
+            });
+
+            $(mtimeInput).data("isPicker", true);
+        }
+
+        $(mtimeInput).focus();
+
+    });
+
+    $("#div-kpiaction").on("blur", "input.mtimeinput", function (e) {
+        if (!vmKpiAction.dataService.hasRole()) return;
+
+        var mtimeInput = e.currentTarget;
+        var timeId = $(mtimeInput).attr("timeid");
+        if (timeId == undefined || isNaN(Number(timeId))) return;
+
+        timeId = Number(timeId);
+        var mtime = vmCommon.findById(timeId, kpi.KpiMasterData.KpiMasterTimes);
+
+        var datepicker = $(mtimeInput).data("kendoDatePicker");
+        if (datepicker._value == null) {
+            datepicker.value(mtime.Name);
+            //datepicker.trigger("change");
+        } else {
+            mtime.Name = datepicker._value;
+            if (mtime.DataState === dataState.Unchanged) mtime.DataState = dataState.Modified;
+        }
+
+        vmKpiAction.validMasterTime(mtime, true);
+        //vmKpiAction.calculateIndex();
+        vmKpiAction.reCalculateMasterIndex();
+
+        var mtimeSpan = $(mtimeInput).closest("th").find("span.mtimename");
+        $(mtimeSpan).text(mtime.Name ? kendo.toString(mtime.Name, "d") : "");
+
+        $(datepicker.wrapper).hide();
+
+        $(mtimeInput).addClass("hidden");
+        $(mtimeSpan).closest("div.div-mtimename").removeClass("hidden");
+    });
+
+    $("#div-kpiaction").on("dblclick", "div.div-timename", function(e) {
+        if (!vmKpiAction.dataService.hasRole()) return;
+
+        var divTimeSpan = e.currentTarget;
+        $(divTimeSpan).addClass("hidden");
+
+        var timeId = $(divTimeSpan).attr("timeid");
+        if (timeId == undefined || isNaN(Number(timeId))) return;
+
+        timeId = Number(timeId);
+        var time = vmCommon.findById(timeId, kpi.KpiData.KpiOutcomeTimes);
+
+        var timeInput = $(divTimeSpan).closest("th").find("input.timeinput");
+        timeInput.removeClass("hidden");
+
+        if ($(timeInput).data("isPicker")) {
+
+            var datepicker = $(timeInput).data("kendoDatePicker");
+            $(datepicker.wrapper).show();
+
+        } else {
+            $(timeInput).kendoDatePicker({
+                weekNumber: true,
+                value: time.Name,
+                change: function() {
+                    //alert("2");
+                }
+            });
+
+            $(timeInput).data("isPicker", true);
+        }
+
+        $(timeInput).focus();
+
+    });
+
+    $("#div-kpiaction").on("blur", "input.timeinput", function(e) {
+        if (!vmKpiAction.dataService.hasRole()) return;
+
+        var timeInput = e.currentTarget;
+        var timeId = $(timeInput).attr("timeid");
+        if (timeId == undefined || isNaN(Number(timeId))) return;
+
+        timeId = Number(timeId);
+        var time = vmCommon.findById(timeId, kpi.KpiData.KpiOutcomeTimes);
+
+        var datepicker = $(timeInput).data("kendoDatePicker");
+        if (datepicker._value == null) {
+            datepicker.value(time.Name);
+        } else {
+            time.Name = datepicker._value;
+            if (time.DataState === dataState.Unchanged) time.DataState = dataState.Modified;
+        }
+
+        vmKpiAction.validTime(time, true);
+        vmKpiAction.calculateIndex();
+
+        var timeSpan = $(timeInput).closest("th").find("span.timename");
+        $(timeSpan).text(time.Name ? kendo.toString(time.Name, "d") : "");
+
+        $(datepicker.wrapper).hide();
+
+        $(timeInput).addClass("hidden");
+        $(timeSpan).closest("div.div-timename").removeClass("hidden");
+    });
+
+    vmKpiAction.copy2Clipboard = function (e) {
+        if (!e) return;
+        var text = $(e).text() || $(e).html();
+        if (text.length <= 0) return;
+        
+        text = vmCommon.cutQuotaSymbol(text);
+        if (text.length <= 0) return;
+
+        vmCommon.coppyToClipboard(text);
+
+        vmCommon.showNotification(e, kLg.msgCopyClipBoardSucc , 750, -65);
+    };
+
+    //topicnamespan
+    $("#div-kpiaction").on("dblclick", "span.topicnamespan", function (e) {
+        if (!vmKpiAction.dataService.hasRole()) return;
+
+        var topicSpan = e.currentTarget;
+        var topicId = $(topicSpan).attr("topicid");
+
+        if (topicId == undefined || isNaN(Number(topicId))) return;
+
+        var topicInput = $("input.topicinput[topicid='" + topicId + "']");
+
+        $(topicSpan).addClass("hidden");
+        $(topicInput).removeClass("hidden");
+        $(topicInput).focus();
+    });
+
+    $("#div-kpiaction").on("blur", "input.topicinput", function (e) {
+        if (!vmKpiAction.dataService.hasRole()) return;
+
+        var topicInput = e.currentTarget;
+        var topicId = $(topicInput).attr("topicid");
+
+        if (topicId == undefined || isNaN(Number(topicId))) return;
+
+        var topicSpan = $("span.topicnamespan[topicid='" + topicId + "']");
+
+        var mtopics = kpi.KpiMasterData.KpiMasterTopics;
+        var mtopic = vmCommon.findById(topicId, mtopics);
+
+        if (mtopic) {
+            //update
+            var otherNames = $.grep(vmKpiAction.getTopicName()[mtopic.TypeId], function (it) { return it != mtopic.Name; });
+            var newName = $(topicInput).val().trim();
+
+            if (newName.length === 0) {
+                $(topicInput).val(mtopic.Name);
+            }
+            else if (otherNames.indexOf(newName) > -1) {
+                $(topicInput).val(mtopic.Name);
+                vmKpiAction.message(kLg.msgTopicNameExisted, 2000);
+            }
+            else if (newName != mtopic.Name) {
+                mtopic.Name = newName;
+                $(topicSpan).text(newName);
+
+                if (mtopic.DataState === dataState.Unchanged) mtopic.DataState = dataState.Modified;
+                vmKpiAction.modelChanged = true;
+            }
+        }
+
+        $(topicInput).addClass("hidden");
+        $(topicSpan).removeClass("hidden");
+    });
+</script>
+<!-- END -->

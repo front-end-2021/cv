@@ -1,0 +1,40 @@
+﻿<div class="dnb-calendar dnb-relative">
+    <div class="dnb-absolute dnb_calendar_view" style="top:0" 
+         v-bind:style="{left: StylePosition.Left }">
+        <div class="today-line" v-bind:style="[TodayLine]"></div>
+
+        <div class="dnb-flex dnb-flex-col dnb-relative rm-overhiddenx disable--select" 
+             v-bind:style="{width: DisplayUI.ViewWidth, height: ViewHeight}">
+
+            <div class="dnb-years dnb-flex">
+                <div class="dnb-year text-center"
+                     v-for="year in DisplayUI.Years"
+                     v-bind:style="{ minWidth:year.FlexGrow + 'px' }">
+                    <span>{{ year.FullYear }}</span>
+                </div>
+            </div>
+
+            <div class="dnb-months dnb-relative dnb-flex dnb-100h"
+                 style="margin-left: 0">
+                <span class="dnb-month text-center"
+                      v-bind:style="{ minWidth: month.Width, maxWidth: month.Width }"
+                      v-for="month in DisplayUI.Months">
+                    <!--month in months-->
+                    {{ month.Name }}
+                </span>
+            </div>
+
+            <div class="dnb-weeks dnb-flex dnb-absolute dnb_width_ref"
+                 v-bind:style="{
+                    height: WeekHeight
+                 }"
+                 style="top: 70px; left: 0;">
+                <div class="dnb-week text-center"
+                     v-for="week in DisplayUI.Weeks">
+                    <div>{{ week }}</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

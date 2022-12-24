@@ -1,0 +1,138 @@
+.stratcate-w200 {
+    overflow: hidden;
+    height: 20px;
+    width: 190px;
+    float: left;
+}
+
+.stratcate-w86per {
+    overflow: hidden;
+    height: 20px;
+    width: 87%;
+}
+
+#kpitableview th { background-clip: padding-box; }
+
+.view-unit {
+    width: 90px !important;
+    max-width: 90px !important;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.msfilterpanel {
+    position: relative;
+    width: 100%;
+    padding: 0px 0px 0px 3px;
+    margin-bottom: 10px;
+    margin-top: -1px;
+}
+
+.msfilterpanel .button-search { margin-bottom: 0 !important; }
+
+.msfilterlist {
+    margin: 0 auto;
+    border: 1px solid #e7e7e7;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.table-filter td { padding: 10px 25px 10px 10px !important; }
+
+#timerange { padding-top: 10px; }
+#timerange span.k-datepicker.dateitem { margin-left: 10px; }
+
+.startend {
+    /*color: #70ccf8;*/
+    font-family: Lato;
+    font-size: 14px !important;
+    font-weight: bold;
+}
+
+#timerange span.startend:hover { text-decoration: none; }
+
+.filter-dropdown > .dropdow-menu-filter {
+    top: 35px;
+    right: 4px;
+    min-height: 43px;
+    width: 330px;
+}
+
+.open > .filter-dropdown { display: block; }
+.redirectfilter { font-style:italic; }
+
+.ic-filterbar-hidding { transform: rotate(-90deg); margin-top: 5px; margin-left: -3px; margin-right: 3px; }
+.checkbox-inline > label {
+  display: block;
+  position: relative;
+  padding-left: 24px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.checkbox-inline > label input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmarkd {
+  position: absolute; box-sizing: border-box;
+  top: 2px; left: 0;
+  height: 15px; width: 15px;
+  background-color: #f7f7f7; border-radius: 3px;
+  border: 1px solid #767676;
+}
+
+.checkbox-inline > label input:checked ~ .checkmarkd {
+    width: 15px; height: 15px;
+  background-color: #38baf8;border:none;
+}
+
+.checkmarkd:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.checkbox-inline > label input:checked ~ .checkmarkd:after {
+  display: block;
+}
+
+.checkbox-inline > label .checkmarkd:after {
+  left: 5px;
+  top: 2px;
+  width: 5px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  -webkit-transform: rotate(45deg); -ms-transform: rotate(45deg); transform: rotate(45deg);
+}
+
+#timerange span.startend, #timerange span.startend:hover { color: #2e2e2e !important; font-weight: 400; }
+#timerange .timefor div > .pull-left:nth-child(2) { margin-left: 12px !important}
+#timerange .timefor div > .pull-left:nth-child(2) .k-widget.k-datepicker.k-header.pull-left.dateitem.fstart
+    { width: 120px !important }
+
+#timerange .timefor div > .pull-left:nth-child(3) .k-widget.k-datepicker.k-header.pull-left.dateitem.fend 
+    { width: 120px !important }
+#timerange .timefor .k-picker-wrap .k-input {background-color: #f7f7f7; height: 22px; }
+#timerange .k-picker-wrap.k-state-default > span.k-select {min-width: 27px; }
+.txtToggleFilterbar {text-align: left;}
+
+.timefor .k-datepicker{
+    padding: 0 !important;
+}
+.dnb-kpi-av-tmp-head {display: flex; align-items: center; background-color: #999997; padding: 3px; font-size: 16px; color: white; margin-left: 1px;}
+.timefor .k-datepicker input.k-input{
+    height: 23px !important;
+}
+.dnb-ac-kpidata-tlp > span {display: inline-block; word-break: break-word;max-height: 33px;overflow: hidden;}

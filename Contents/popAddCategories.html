@@ -1,0 +1,714 @@
+﻿<style>
+    #picker {
+        margin-right: 5px;
+    }
+/*
+    div.k-colorpalette {
+        width: 200px !important;
+    }*/
+
+    .k-colorpicker .k-picker-wrap {
+        height: 29px;
+    }
+
+    .k-selected-color {
+        height: 29px !important;
+    }
+
+    .k-colorpicker {
+        width: 28px;
+    }
+
+    .k-colorpicker .k-select { display: none; }
+    .dnb-hidecompcontrol {margin-bottom: -22px;}
+    .dnb-hidecompcontrol > #divComControl {opacity:0;max-height:0;}
+</style>
+<form id="add-categoris-form">
+    <div class="ms-modal-body" id="pop-add-categories">
+
+        <div class="form-group">
+            <label id="lblNameCategories"></label>
+            <p class="clear"></p>
+            <input class="modal-input txtInput w-98per" name="CategoryName" id="txtNameCategories" tabindex="1"/>
+        </div>
+        <hr class="modal-market-hr"/>
+        <div class="form-group">
+            <div>
+                <div class="dnb-hidecompcontrol" style="display: flex; justify-content: space-between;">
+                    <div id="divComControl" style="margin-bottom: 10px">
+                        <input type="checkbox" id="chkComControl" /><span style="margin-left: 7px;" id="lblComControl">ComControl</span>
+                    </div>
+
+                    <div id="pickColor" style="margin-top: -6px">
+                        <input id="picker" name="picker" data-bind="value: vmPopCategory.CategoryDetail.Extension2" type="color" style="height: 30px; width: 30px;" />
+                    </div>
+                </div>
+                
+
+                <div id="divAddrControl" style="padding-bottom: 18px; padding-top: 10px;">
+                    <input type="checkbox" id="chkAddrControl" style="margin-top: 3px; float: left;"/><span style="margin-left: 7px;" id="lblAddrControl">Abteilung</span>
+                </div>
+
+                <label id="lblDescriptionCategories" style="float: left"></label>
+                <div id="divTagSalution" style="margin-left: 150px;">
+                    <table style="font-weight: bold; color: #A4A4A4;">
+                        <tr>
+                            <td rowspan="2"><span id="txtTagAnr"></span></td>
+                            <td><input type="checkbox" id="chkTagFirstName" style="margin-left: 15px;"/><span style="margin-left: 15px;" id="txtFirstName"></span></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" id="chkTagLastName" style="margin-left: 15px;"/><span style="margin-left: 15px;" id="txtLastName"></span></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <p class="clear"></p>
+            <textarea class="modal-textarea w-98per" id="txtDescriptionCategories" tabindex="2"></textarea>
+
+            <div id="statusExtension" class="hidden" style="margin-bottom: 38px; margin-top: 10px;">
+                <div class="row" style="width: 98%;margin-left: 0">
+                    <div class="col-md-7" style="padding-left: 0;padding-right: 0">
+                        <div data-bind="attr:{class: extClass.crowd}">
+                            <input type="radio" value="false" name="rdextension" data-bind="checked: isWord, events: {change: onChangeType}, disabled: isUsed"/>
+                            <label id="lblCrowdProject" style="margin-left: 4px">CrowdProject</label>
+
+                            <div class="clear"></div>
+                            <select class="crm-drop pull-left w-100per" id="crowd-drop"
+                                    data-value-primitive="true"
+                                    data-role="dropdownlist"
+                                    data-text-field="Name"
+                                    data-value-field="Id"
+                                    data-bind="value: crowd.CrmId, source: crowdSrc, disabled: isWord"></select>
+                        </div>
+                        <p class="clear"></p>
+
+                        <div data-bind="attr:{class: extClass.word}">
+                            <input type="radio" value="true" name="rdextension" data-bind="checked: isWord, events: {change: onChangeType}, disabled: isUsed"/>
+                            <label id="lblWord" style="margin-left: 4px">WordTemplate</label>
+
+                            <div class="clear"></div>
+                            <select class="crm-drop pull-left w-100per" id="word-drop"
+                                    data-value-primitive="true"
+                                    data-role="dropdownlist"
+                                    data-text-field="Name"
+                                    data-value-field="Id"
+                                    data-bind="value: word.CrmId, source: wordSrc, enabled: isWord"></select>
+                        </div>
+                    </div>
+                    <div class="col-md-4" style="padding-left: 36px;padding-right: 0;padding-top: 30px;">
+                        <div>
+                            <input type="checkbox" data-bind="checked: statusCheck.CheckedState" /> <label id="lblStatusCheck" style="margin-left: 4px;">Status Check</label>
+                        </div>
+                        <br/>
+                        <div style="margin-top: -4px;">
+                            <label id="lblStatusNote">Name Check</label><br />
+                            <input type="text" class="modal-input txtInput" data-bind="value: statusCheck.Note" maxlength="50" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="modal-market-footer">
+        <button type="button" class="ms-button" id="btnCloseCategories" onclick="vmPopCategory.ClosePopUp()" tabindex="3">
+            <span class="icon-16 icon-close margin-right6"></span>
+        </button>
+    </div>
+</form>
+
+<div class="loading" id="add-categori-loading"></div>
+<script type="text/javascript">
+    var vmPopCategory = vmPopCategory || {};
+    vmPopCategory.CategoryDetail = {};
+    vmPopCategory.CategoryDetail.Id = 0;
+    vmPopCategory.IsModified = false;
+
+    $("#picker").kendoColorPicker({
+        buttons: false,
+        columns: 9,
+        tileSize: 25,
+        palette: colorPaletteAction,
+        open: function (e) {
+
+        },
+        change: function (e) {
+            vmPopCategory.CategoryDetail.Extension2 = e.value;
+            vmPopCategory.IsModified = true;
+        }
+    });
+
+    vmPopCategory.ClosePopUp = function () {
+
+        $("#pop-add-categories #txtNameCategories").tooltip('destroy');
+        $("#pop-add-categories #txtNameCategories").removeAttr('title');
+        if (!$('#add-categoris-form').valid()) return;
+        vmPopCategory.CategoryDetail.Name = $("#pop-add-categories #txtNameCategories").val().trim();
+        
+        if (vmPopCategory.IsModified == true) {
+            vmPopCategory.IsModified = false;
+            vmPopCategory.UpdateCategories();
+            popUpCategories.close();
+        } else {
+            popUpCategories.close();
+        }
+
+    };
+
+    vmPopCategory.enumsRoleConflict = {
+        conflict: -1,
+        noRole: 0,
+        using: -2,
+        nameExist: -3,
+        extensionIsUsing: -8
+    };
+
+    vmPopCategory.BindClosePopup = function () {
+
+        popUpCategories.bind("close", function (e) {
+          var  setting = isStrategy ? '#pop-setting' : '#pop-setting-crm';
+            if (vmPopCategory.IsModified) {
+                if (!confirm(kLg.saveConfirmQuestion)) {
+
+                    popUpCategories.destroy();
+                    popUpCategories = null;
+                    
+                    $(setting).after('<div id="pop-add-categories-place"></div>');
+                } else {
+                    //Task 5169 Setting alert message
+                    if (!$('#add-categoris-form').valid()) {
+                        e.preventDefault();
+                    } else {
+                        vmPopCategory.UpdateCategories();
+                        popUpCategories.destroy();
+                        popUpCategories = null;
+                        $(setting).after('<div id="pop-add-categories-place"></div>');
+                    }
+                    
+                }
+            } else {
+
+                popUpCategories.destroy();
+                popUpCategories = null;
+                $(setting).after('<div id="pop-add-categories-place"></div>');
+            }
+
+        });
+    };
+
+    vmPopCategory.setExtensionSalution = function () {
+        var value = "";
+        if ($('#chkTagFirstName').prop('checked') === true && $('#chkTagLastName').prop('checked') === true) {
+            value = "3"; // All Check
+        } else if ($('#chkTagFirstName').prop('checked') === true && $('#chkTagLastName').prop('checked') === false) {
+            value = "1"; // Check Tag FirstName
+        } else if ($('#chkTagFirstName').prop('checked') === false && $('#chkTagLastName').prop('checked') === true) {
+            value = "2"; // Check Tag LastName 
+        }
+        return value;
+    }
+
+    vmPopCategory.setExtensionStatus = function () {
+        var value = $('#dropdownCP').val();
+        return value;
+    }
+
+    var firstExtensionId;
+    vmPopCategory.UpdateCategories = function () {
+
+        if (!$('#add-categoris-form').valid()) return;
+        var funcName = "updatecategories";
+        if (vmPopCategory.CategoryDetail.Id === 0)
+            funcName = "addcategories";
+        var handler = (vmPopCategory.CategoryDetail.ParentType > 1) ? "CrmSettingHandler.ashx" : "SettingHandler.ashx";
+        
+        var url = "../Handlers/" + handler + "?funcName=" + funcName + "&projid=" + projectId;
+        vmPopCategory.CategoryDetail.Name = $("#pop-add-categories #txtNameCategories").val().trim();
+
+        if (vmPopCategory.CategoryDetail.Type === 3 && vmPopCategory.CategoryDetail.ParentType === 1) {
+            if (popUpCategories && typeof popUpCategories.NonArchive == 'boolean') {
+                vmPopCategory.CategoryDetail.NonArchive = popUpCategories.NonArchive;
+            } else
+                vmPopCategory.CategoryDetail.NonArchive = false;
+        }
+
+        vmPopCategory.CategoryDetail.Description = $("#pop-add-categories #txtDescriptionCategories").val();
+
+        if (vmPopCategory.CategoryDetail.Type === vmCrmEnum.PersonSetting.Salutation) {
+            vmPopCategory.CategoryDetail.Extension = vmPopCategory.setExtensionSalution();
+        }
+
+        var ptype = vmPopCategory.CategoryDetail.ParentType;
+        var ctype = vmPopCategory.CategoryDetail.Type;
+        var isPerAddr = ptype == vmCrmEnum.SettingType.Person && ctype == vmCrmEnum.PersonSetting.Address;
+        if (isPerAddr) {
+            vmPopCategory.CategoryDetail.AddrControl = $('#pop-add-categories #chkAddrControl').prop('checked');            
+        }
+        if (vmPopCategory.CategoryDetail.Type === 1 && vmPopCategory.CategoryDetail.ParentType === 1) {
+            vmPopCategory.CategoryDetail.Extension2 = $("#picker").data("kendoColorPicker").value();
+        }
+
+        if (vmPopCategory.CategoryDetail.Type === 2 && vmPopCategory.CategoryDetail.ParentType === 1) {
+            vmPopCategory.CategoryDetail.ComControl = $('#pop-add-categories #chkComControl').prop('checked');
+            vmPopCategory.CategoryDetail.Extension2 = $("#picker").data("kendoColorPicker").value();
+        }
+        else if (vmPopCategory.CategoryDetail.Type === vmCrmEnum.ActivitieSetting.Status && vmPopCategory.CategoryDetail.ParentType === 4) {
+            var exts = [];
+
+            var crowd = vmPopCategory.statusModel.crowd;
+            if (crowd.DataState !== dataState.Unchanged) exts.push(crowd);
+
+            var word = vmPopCategory.statusModel.word;
+            if (word.DataState !== dataState.Unchanged) exts.push(word);
+
+            var statusCheck = vmPopCategory.statusModel.statusCheck;
+            statusCheck.CrmId = statusCheck.CheckedState ? 1 : 0;
+            exts.push(statusCheck);
+
+            vmPopCategory.CategoryDetail.Extensions = exts;
+        }
+        //save comcontrol advertiser
+        if (vmPopCategory.CategoryDetail.Type === 11 && vmPopCategory.CategoryDetail.ParentType === 1) {
+            vmPopCategory.CategoryDetail.ComControl = $('#pop-add-categories #chkComControl').prop('checked');
+        }
+
+        callAjax('add-categori-loading', url, JSON.stringify(vmPopCategory.CategoryDetail), function (data) {
+            $("#pop-add-categories #txtNameCategories").tooltip('destroy');
+            var state;
+            if (vmPopCategory.CategoryDetail.Id === 0) {
+                state = data.ResultStatus;
+            } else {
+                state = data;
+            }
+            switch (state) {
+                case vmPopCategory.enumsRoleConflict.conflict:
+                    pAlert(kLg.msgConflickData).then(function () {
+                        vmPopCategory.redirectCategories(isStrategy);                      
+                    });
+                    break;
+                case vmPopCategory.enumsRoleConflict.using:
+                    pAlert(kLg.msgCategoryAreUsing).then(function () {
+                        vmPopCategory.redirectCategories(isStrategy);                   
+                    });
+                    break;
+                case vmPopCategory.enumsRoleConflict.nameExist:
+                    pAlert(kLg.msgNameIsExisted).then(function () {
+                        vmPopCategory.redirectCategories(isStrategy);                    
+                    });
+                    break;
+                case vmPopCategory.enumsRoleConflict.extensionIsUsing:
+                    pAlert(kLg.msgCrowdIsAccessed);
+                default:
+                    vmPopCategory.redirectCategories(isStrategy);
+                    break;
+            }
+
+        }, AjaxConst.PostRequest);
+    };
+
+    vmPopCategory.redirectCategories = function (isStrategy) {
+        if (isStrategy) {
+            if (vmPopCategory.CategoryDetail.Type < vmPopSetting.enumsType.categoryKpiIndex) {
+
+                if (vmPopCategory.CategoryDetail.Type === vmPopSetting.enumsType.categoryAdvertiser) {
+                    vmPopSetting.GetChildCategories(vmPopSetting.ParentId);
+                } else {
+                    vmPopSetting.GetCategories(vmPopCategory.CategoryDetail.Type);
+                    if (vmPopCategory.CategoryDetail.Type == vmPopSetting.enumsType.categoryAction) {
+                        var isTeamboardPage = vmCommon.checkCurrentPage(vmCommon.enumPage.TeamBoard);
+                        if (isTeamboardPage)
+                            vmCommon.Mediator.publish('RELOAD_BOARDLINE_COLUMN');
+                    }
+                }
+            } else {
+                vmPopSetting.GetSubCategories(vmPopCategory.CategoryDetail.Type);
+            }
+        } else {
+            if (vmPopCategory.CategoryDetail.ParentType === vmCrmEnum.SettingType.Activities && vmPopCategory.CategoryDetail.Type === vmCrmEnum.ActivitieSetting.Status) {
+                vmCrmEnum.GetChildCategories(vmPopCategory.CategoryDetail.ParentId);
+            } else {
+                vmCrmEnum.GetCategories(vmPopCategory.CategoryDetail.ParentType, vmPopCategory.CategoryDetail.Type, true);
+            }
+        }
+    };
+
+    vmPopCategory.SetLang = function () {
+        $("#pop-add-categories #lblNameCategories").text(kLg.labelCategories);
+        $("#pop-add-categories #lblDescriptionCategories").text(kLg.Description);
+        $("#add-categoris-form #btnCloseCategories").html('<span class="icon-16 icon-close margin-right6"></span>' + kLg.lblClose);
+        $("#pop-add-categories #txtTagAnr").text("<Anr>");
+        $("#pop-add-categories #txtFirstName").text(kLg.firstName);
+        $("#pop-add-categories #txtLastName").text(kLg.lastName);
+
+        $("#pop-add-categories #lblCrowdProject").text(kLg.lblCrowdProject);
+        $("#pop-add-categories #lblWord").text(kLg.lblWordTemplate);
+
+        $("#pop-add-categories #lblStatusCheck").text(kLg.lblStatusCheck);
+        $("#pop-add-categories #lblStatusNote").text(kLg.lblStatusName);
+        $("#pop-add-categories #lblAddrControl").text(kLg.Department);
+
+    };
+    //check Currency Special Character
+    //Task 5092
+    jQuery.validator.addMethod("pattern", function (value, element) {
+        return this.optional(element) || /^[^<>'"|]+$/.test(value);
+    }, kLg.msgMaxlenghNameCurrencySpecialCharacter);
+
+    vmPopCategory.SetupValidate = function () {
+        var maxLengthCharacter = 100;
+        switch (true) {
+            case vmPopCategory.CategoryDetail.Type === 4 && vmPopCategory.CategoryDetail.ParentType === 1:
+                maxLengthCharacter = 3;
+                break;
+            case vmPopCategory.CategoryDetail.Type === 5 && vmPopCategory.CategoryDetail.ParentType === 1:
+                maxLengthCharacter = 50;
+                break;
+        }
+        $('#add-categoris-form').validate({
+                rules: {
+                    CategoryName: {
+                        required: true,
+                        maxlength: maxLengthCharacter,
+                        pattern: true
+                    }
+                },
+                messages: {
+                    CategoryName: {
+                        required: kLg.requiredName,
+                        maxlength: kLg.msgMaxlenghName
+                    }
+                }
+            });
+    };
+    $("#pop-add-categories #txtNameCategories").on('keydown', function (e) {
+        if (e.keyCode == 9 || e.keyCode == 13) {
+            e.preventDefault();
+            return;
+        }
+    });
+    vmPopCategory.ValidateName = function (name) {
+        if (vmPopCategory.CategoryDetail.Type == 4) {
+            if (name.length > 3) {
+                $("#pop-add-categories #txtNameCategories").attr('title', kLg.msgMaxlenghNameCurrency);
+                $("#pop-add-categories #txtNameCategories").tooltip('show');
+                return false;
+            }
+        }
+        return true;
+    };
+    
+    vmPopCategory.CheckExtensionSalution = function(extension) {
+        switch (extension) {
+        case "1":
+            $('#chkTagFirstName').prop('checked', true);
+            $('#chkTagLastName').prop('checked', false);
+            break;
+        case "2":
+            $('#chkTagFirstName').prop('checked', false);
+            $('#chkTagLastName').prop('checked', true);
+            break;
+        case "3":
+            $('#chkTagFirstName').prop('checked', true);
+            $('#chkTagLastName').prop('checked', true);
+            break;
+        default:
+            $('#chkTagFirstName').prop('checked', false);
+            $('#chkTagLastName').prop('checked', false);
+            break;
+        }
+    }
+
+    vmPopCategory.dataservice = (function () {
+        var callAjaxAddCate = function (divId, funcName, entryData, requestType, successCallBack) {
+            var url = "../Handlers/CrmSettingHandler.ashx?funcName=" + funcName + "&projid=" + projectId + "&strid=" + strategyId;
+            return callAjax(divId, url, entryData, successCallBack, requestType);
+        };
+
+        var callAjaxByPost = function (funcName, entryData, successFunc) {
+            return callAjaxAddCate('loading-crmfilter', funcName, JSON.stringify(entryData), AjaxConst.PostRequest, successFunc);
+        };
+
+        var getprojectbyprojectforstatus = function (entryData, successFunc) {
+            callAjaxByPost("getprojectbyprojectforstatus", entryData, successFunc);
+        };
+
+        //getstatusextension
+        var getCategoriesExtensions = function (entryData, successFunc) {
+            callAjaxByPost("getstatusextension", entryData, successFunc);
+        };
+
+        return {
+            getprojectbyprojectforstatus: getprojectbyprojectforstatus,
+            getCategoriesExtensions: getCategoriesExtensions
+        };
+    })();
+    
+    vmPopCategory.loadProjectListTemplate = function (res) {
+        var lstCrowd = res.value;
+        var isUsed = $.grep(lstCrowd, function(it) { return it.IsUsed === true; }).length > 0;
+
+        lstCrowd.unshift({ Id: null, Name: "" });
+
+        $("#dropdownCP").kendoDropDownList({
+            dataTextField: "Name",
+            dataValueField: "Id",
+            //value: 319263,
+            dataSource: lstCrowd,
+            enable: !isUsed
+        });
+    };
+
+    vmPopCategory.AdjustPopupHeight = function () {
+        var fix = 0;
+        if ($("#pop-add-categories-place #statusExtension").is(":visible"))
+            fix = $("#pop-add-categories-place #statusExtension").height() - 35;
+
+        if ($("#pop-add-categories-place #divComControl").is(":visible")) {
+            fix += $("#pop-add-categories-place #divComControl").height() + 2;
+        } 
+        setHeightPopUpFix(popUpCategories, 295 + fix);
+    };
+
+    vmPopCategory.statusModel = undefined;
+    vmPopCategory.loadStatusExtensionCallBack = function (res) {
+
+        var crowds = res.value.CrowdProjects;
+        var words = res.value.Words;
+        var exts = res.value.Extensions;
+
+        if ($.grep(exts, function(it) { return it.TypeId === vmCrmEnum.CrmCategoriesExtensionType.CrowdProject; }).length === 0) {
+            exts.push({ Id: 0, CrmCategoriesId: vmPopCategory.CategoryDetail.Id, TypeId: vmCrmEnum.CrmCategoriesExtensionType.CrowdProject, CrmId: 0, FirstCrmId: 0, DataState: dataState.Unchanged, IsUsed: false });
+        }
+
+        if ($.grep(exts, function (it) { return it.TypeId === vmCrmEnum.CrmCategoriesExtensionType.Word; }).length === 0) {
+            exts.push({ Id: 0, CrmCategoriesId: vmPopCategory.CategoryDetail.Id, TypeId: vmCrmEnum.CrmCategoriesExtensionType.Word, CrmId: 0, FirstCrmId: 0, DataState: dataState.Unchanged, IsUsed: false });
+        }
+
+        var crowd = $.grep(exts, function (it) { return it.TypeId === vmCrmEnum.CrmCategoriesExtensionType.CrowdProject; })[0];
+        var word = $.grep(exts, function (it) { return it.TypeId === vmCrmEnum.CrmCategoriesExtensionType.Word; })[0];
+        var statusCheck = $.grep(exts, function (it) { return it.TypeId === vmCrmEnum.CrmCategoriesExtensionType.StatusCheck; })[0];
+
+        if (statusCheck.Id === 0) statusCheck.Note = "beendet";
+        var isUsed = crowd.IsUsed;
+
+        crowds.unshift({ Id: 0, Name: "" });
+        words.unshift({ Id: 0, Name: "" });
+
+        vmPopCategory.statusModel = kendo.observable({
+            isUsed: isUsed,
+
+            crowdSrc: crowds,
+            wordSrc: words,
+
+            crowd: crowd,
+            word: word,
+
+            statusCheck: statusCheck,
+
+            isWord: word.CrmId > 0,
+            onChangeType: function(e) {
+                this.set("isWord", e.target.value === "true");
+
+                if (this.isWord) {
+                    this.crowd.set("CrmId", 0);
+
+                } else {
+                    this.word.set("CrmId", 0);
+                }
+
+                this.setVisible();
+            },
+            extClass: { crowd: "", word: "" },
+            setVisible: function () {
+                this.set("extClass", this.isUsed ? { crowd: "type-visible", word: "type-visible" } : this.isWord ? { crowd: "type-visible", word: "" } : { crowd: "", word: "type-visible" });
+            }
+        });
+
+        vmPopCategory.statusModel.bind("change", function (e) {
+            vmPopCategory.IsModified = true;
+
+            var data;
+            if (e.field === "crowd.CrmId") {
+                data = vmPopCategory.statusModel.crowd;
+            }else if (e.field === "word.CrmId") {
+                data = vmPopCategory.statusModel.word;
+            } else if (e.field === "statusCheck.Note" || e.field === "statusCheck.CheckedState") {
+                data = vmPopCategory.statusModel.statusCheck;
+            }
+
+            if (data == undefined) return;
+
+            if (data.TypeId === vmCrmEnum.CrmCategoriesExtensionType.CrowdProject || data.TypeId === vmCrmEnum.CrmCategoriesExtensionType.Word) {
+
+                if (data.CrmId === data.FirstCrmId) {
+                    data.set("DataState", dataState.Unchanged);
+                } else if (data.FirstCrmId > 0) {
+                    data.set("DataState", dataState.Modified);
+                } else {
+                    data.set("DataState", dataState.Added);
+                }
+
+            } else if (data.TypeId === vmCrmEnum.CrmCategoriesExtensionType.StatusCheck && data.Id > 0) {
+                data.set("DataState", dataState.Modified);
+            }
+
+        });
+
+        kendo.bind($("#statusExtension"), vmPopCategory.statusModel);
+        vmPopCategory.statusModel.setVisible();
+        vmPopCategory.IsModified = false;
+
+        if (isUsed) {
+            var cdrop = $("#statusExtension #crowd-drop").data("kendoDropDownList");
+            cdrop.enable(false);
+
+            var wdrop = $("#statusExtension #word-drop").data("kendoDropDownList");
+            wdrop.enable(false);
+        }
+
+        $("#statusExtension").removeClass("hidden");
+        
+    };
+
+    var cmSetting = {};
+    var getCategory = {};
+    var query = new queryString(true);
+    var isStrategy = currentStratery.Type == 1;
+    $(document).ready(function () {
+
+        $('#divTagSalution').hide();
+        $('#pop-add-categories #pickColor').hide();
+        //$('#pop-add-categories #divRolloutView').hide();
+        $('#pop-add-categories #divAddrControl').hide();
+        $('#pop-add-categories-place').removeAttr('style');
+       cmSetting = isStrategy ? vmPopSetting : vmCrmEnum;
+        if (popUpCategories) {
+            popUpCategories.title(cmSetting.tmpTitle);
+        }
+
+        if (typeof cmSetting != "undefined") {
+            vmPopCategory.CategoryDetail.Id = cmSetting.tmpId;
+            //thêm mới
+            vmPopCategory.CategoryDetail.ParentType = cmSetting.tmpParentType;
+            vmPopCategory.CategoryDetail.Type = cmSetting.tmpType;
+            vmPopCategory.CategoryDetail.Mdf = cmSetting.tmpMdf;
+
+            vmPopCategory.CategoryDetail.ParentId = cmSetting.tmpParentId;            
+
+            $("#pop-add-categories #txtNameCategories").val(cmSetting.tmpName);
+            $("#pop-add-categories #txtDescriptionCategories").val(cmSetting.tmpDes);
+
+            if (cmSetting === vmCrmEnum && cmSetting.tmpType === vmCrmEnum.PersonSetting.Salutation && vmPopCategory.CategoryDetail.ParentType === 3) {
+                $('#divTagSalution').show();
+                $('#pop-add-categories-place').attr('style', 'height: 106% !important;');
+                vmPopCategory.CategoryDetail.Extension = cmSetting.tmpExtension;
+                vmPopCategory.CheckExtensionSalution(vmPopCategory.CategoryDetail.Extension);
+            } else if (cmSetting === vmCrmEnum && vmPopCategory.CategoryDetail.ParentType === vmCrmEnum.SettingType.Activities && cmSetting.tmpType === vmCrmEnum.ActivitieSetting.Status) {
+                //vmPopCategory.dataservice.getprojectbyprojectforstatus({ statusId: vmPopCategory.CategoryDetail.Id }, vmPopCategory.loadProjectListTemplate);
+                vmPopCategory.dataservice.getCategoriesExtensions({ CategoryId: vmPopCategory.CategoryDetail.Id, Type: vmCrmEnum.ActivitieSetting.Status, ParentType: vmCrmEnum.SettingType.Activities }, vmPopCategory.loadStatusExtensionCallBack);
+
+                if (cmSetting.tmpExtension !== undefined && cmSetting.tmpExtension !== null && cmSetting.tmpExtension !== "") {
+                    $("#dropdownCP").val(cmSetting.tmpExtension);
+                    firstExtensionId = cmSetting.tmpExtension;
+                }
+
+                $('#pop-add-categories-place').attr('style', 'height: 120% !important;');
+            }
+            if ((vmPopCategory.CategoryDetail.Type === 2 || vmPopCategory.CategoryDetail.Type === 1) && vmPopCategory.CategoryDetail.ParentType === 1) {
+                if (vmPopCategory.CategoryDetail.Type === 2) {
+                    $('#pop-add-categories #divComControl').parent().removeClass('dnb-hidecompcontrol');
+                    $('#pop-add-categories #chkComControl').prop('checked');
+
+                    if (cmSetting.tmpExtension == "1") {
+                        $('#pop-add-categories #chkComControl').prop('checked', true);
+                    } else {
+                        $('#pop-add-categories #chkComControl').prop('checked', false);
+                    }
+                }
+                $('#pop-add-categories #pickColor').show();
+
+                var colorpicker = $("#picker").data("kendoColorPicker");
+                if (cmSetting.colorExtension !== null && cmSetting.colorExtension !== "") {                    
+                    // set picker value
+                    colorpicker.value(cmSetting.colorExtension);
+                } else {
+                    colorpicker.value("#b8c92e");
+                }
+            }
+            if ((vmPopCategory.CategoryDetail.Type === 11 || vmPopCategory.CategoryDetail.Type === 1) && vmPopCategory.CategoryDetail.ParentType === 1) {
+                if (vmPopCategory.CategoryDetail.Type === 11) {
+                    $('#pop-add-categories #divComControl').parent().removeClass('dnb-hidecompcontrol');
+                    $('#pop-add-categories').css({ 'height': '238px' })
+                    if (cmSetting.tmpExtension == "1") {
+                        $('#pop-add-categories #chkComControl').prop('checked', true);
+                    } else {
+                        if (cmSetting.tmpExtension == "0") {
+                            $('#pop-add-categories #chkComControl').prop('checked', false);
+                        } else {
+                            //default
+                            $('#pop-add-categories #chkComControl').prop('checked', true);
+                        }
+                    }
+                }
+            }
+
+            //Address Control
+            var ptype = vmPopCategory.CategoryDetail.ParentType;
+            var ctype = vmPopCategory.CategoryDetail.Type;
+            var isPerAddr = ptype == vmCrmEnum.SettingType.Person && ctype == vmCrmEnum.PersonSetting.Address;
+            if (isPerAddr) {
+                $('#pop-add-categories #divAddrControl').show();
+                setTimeout(function () {
+                    setHeightPopUpFix(popUpCategories, 342);
+                }, 69);
+
+                vmPopCategory.CategoryDetail.AddrControl = cmSetting.tmpAddrControl;
+                if (cmSetting.tmpAddrControl) {
+                    $('#pop-add-categories #chkAddrControl').prop('checked', true);
+                }
+                else {
+                    $('#pop-add-categories #chkAddrControl').prop('checked', false);
+                }
+            }
+            //<!--
+        }
+        $("#pop-add-categories #txtNameCategories").on("change keyup paste", function () {
+            vmPopCategory.IsModified = true;
+        });
+
+        $("#pop-add-categories #txtDescriptionCategories").on("change keyup paste", function () {
+            vmPopCategory.IsModified = true;
+        });
+        $("#pop-add-categories #chkTagFirstName").on("change", function () {
+            vmPopCategory.IsModified = true;
+        });
+        $("#pop-add-categories #chkTagLastName").on("change", function () {
+            vmPopCategory.IsModified = true;
+        });
+        $("#pop-add-categories #dropdownCP").on("change", function () {
+            vmPopCategory.IsModified = true;
+        });
+
+        $("#pop-add-categories #chkComControl").on("change", function () {
+            vmPopCategory.IsModified = true;
+        });
+
+        //$("#pop-add-categories #chkRolloutView").on("change", function () {
+        //    vmPopCategory.IsModified = true;
+        //});
+
+        $("#pop-add-categories #chkAddrControl").on("change", function () {
+            vmPopCategory.IsModified = true;
+        });
+
+        vmPopCategory.AdjustPopupHeight();
+
+        vmPopCategory.SetLang();
+        vmPopCategory.BindClosePopup();
+        vmPopCategory.SetupValidate();
+        limitedTabKey();
+    });
+
+</script>

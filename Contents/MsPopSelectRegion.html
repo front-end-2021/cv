@@ -1,0 +1,347 @@
+﻿<style>
+    .menu-title, .item-title {
+        height: 30px;
+        background-color: #38baf8;
+        line-height: 28px;
+        padding-left: 5px;
+        color: white;
+        padding: 1px;
+    }
+
+        .menu-title a {
+            color: white;
+        }
+
+    .menu-content {
+        width: 96%;
+        float: right;
+        display: none;
+    }
+
+    .menu-place {
+        margin-top: 4px;
+        position: relative;
+    }
+
+    .menu-title:hover {
+        cursor: pointer;
+    }
+</style>
+
+<div id="pop-select-region" class="pop-wrapper">
+    <form id="selectregionform" role="form" class="form-horizontal">
+        <div class="modal-body ms-modal-body" style="height: 443px; overflow-x: hidden; overflow-y: scroll;" id="div-selectregion">
+            <div style="height: 20px;">
+                <input type="checkbox" id="cbxAll" class="pull-left" onchange="vmSelectRegion.selectAll(this)" /> <span id="lblAllRegion" class="pull-left" style="margin-top: 1px; margin-left: 3px;font-weight: bold;"></span>
+            </div>
+            <div class="root" id="root"></div>
+        </div>
+
+        <div class="modal-market-footer">
+            <button id="btnselectregion" type="button" class="ms-button" onclick="vmSelectRegion.update()">
+                <span class="icon-20 icon-close"></span>
+                <span id="lblSelectRegionClose">Speichern und schliessen</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script type="text/html" id="indextemplate">
+    #for(var i = 0; i < data.length; i++){#
+    #var item = data[i]; #
+    <div class="menu-place" level="#:item.Level#" typeid="#:item.TypeId#" mid="#:item.Id#">
+
+        #if(item.IsLatest){#
+        <div class="item-title pointer">
+            <div style="width: 24px; height: 24px; float: left;margin-right: 10px;"></div>
+            <span>#:item.Name || ""#</span>
+        </div>
+        #}else{#
+        <div class="menu-title pointer" onclick="vmSelectRegion.openSubItem(this)" id="#:item.Level#m#:item.Id#">
+            <span class="arrow-panel-online icon-24 icon-left-block arrow-collapse" style="margin-top: 2px"></span>
+            <span>#:item.Name || ""#</span>
+        </div>
+        #}#
+
+        #if(item.HasSelect){#
+        <input type="checkbox" class="pull-right cbx-index" style="position: absolute; right: 5px; top: 5px;" onchange="vmSelectRegion.selectSubItem(this)" #if(item.IsSelect){#checked#}# #if(!item.IsSelectable){#disabled#}# #if(!item.IsSelectable){#islock#}# />
+        #}#
+
+        <div class="clear"></div>
+        <div class="menu-content" id="#:item.Level#x#:item.Id#">
+        </div>
+        <div class="clear"></div>
+    </div>
+    #}#
+
+</script>
+
+<script type="text/javascript">
+    vmSelectRegion = {};
+    vmSelectRegion.modelChanged = false;
+
+    var dColor = "#38baf8", //default color
+        mColor = "#2c9fd5"; //mask color
+
+    vmSelectRegion.destroyPop = function () {
+        vmGoalAction.popSelectRegion.destroy();
+        vmGoalAction.popSelectRegion = null;
+        $(".body-content").after("<div id='popActionFibu'></div>");
+    };
+
+    vmGoalAction.popSelectRegion.bind("close", function (e) {
+        if (vmSelectRegion.modelChanged) {
+            if (confirm(kLg.saveConfirmQuestion)) {
+                vmSelectRegion.update();
+            } else {
+                vmSelectRegion.destroyPop();
+            }
+        } else {
+            vmSelectRegion.destroyPop();
+        }
+
+    });
+
+    vmSelectRegion.autoColor = function () {
+        for (var i = 0; i < settings.length; i++) {
+            var item = settings[i];
+            $("#" + item.Level + "m" + item.Id).css({ "background-color": item.IsPath ? mColor : dColor });
+        }
+    };
+
+    vmSelectRegion.toggleIcon = function (elem, isOpen) {
+        var temp = $(elem).children("span.arrow-panel-online");
+        if (temp.length === 0) return;
+
+        var ico = temp[0];
+        if (isOpen) {
+            $(ico).removeClass("arrow-collapse").addClass("arrow-right-big");
+        } else {
+            $(ico).removeClass("arrow-right-big").addClass("arrow-collapse");
+        }
+    };
+
+    vmSelectRegion.selectAll = function (e) {
+        var flag = $(e).is(":checked");
+
+        var src = flag ? autoRegions : selectedRegions;
+        var des = flag ? selectedRegions : autoRegions;
+
+        if (src.length == 0) return;
+        for (var i = src.length - 1; i >= 0; i--) {
+            var item = src[i];
+            item.IsSelect = flag;
+            if (item.Id > 0) item.DataState = flag ? dataState.Modified : dataState.Deleted;
+
+            src.splice(i, 1);
+            des.push(item);
+        }
+
+        $("#pop-select-region input.cbx-index").each(function () {
+            $(this).prop("checked", flag);
+        });
+
+        vmSelectRegion.mergeSelected();
+        vmSelectRegion.autoColor();
+        vmSelectRegion.modelChanged = true;
+    };
+
+    vmSelectRegion.selectSubItem = function (e) {
+        var flag = $(e).is(":checked");
+
+        var parent = $(e).closest("div.menu-place");
+        var pId = $(parent).attr("mid");
+        var pLevel = $(parent).attr("level");
+
+        if (pId == undefined || pLevel == undefined || isNaN(Number(pLevel))) return;
+
+        var item = vmCommon.findByFunc(settings, function (it) { return it.Id == pId && it.Level == pLevel; });
+        if (item == null) {
+            $(e).prop("checked", !flag);
+            return;
+        }
+
+        var src = flag ? autoRegions : selectedRegions;
+        var des = flag ? selectedRegions : autoRegions;
+
+        var selectedRegion = vmCommon.findByFunc(src, function (it) { return it.ObjectId == item.Id; });
+        if (selectedRegion == null) return;
+
+        selectedRegion.IsCheck = false;
+
+        if (flag) {
+            if (selectedRegion.Id > 0) selectedRegion.DataState = dataState.Modified;
+        } else {
+            if (selectedRegion.Id > 0) selectedRegion.DataState = dataState.Deleted;
+        }
+
+        var index = src.indexOf(selectedRegion);
+        if (index > -1) src.splice(index, 1);
+
+        des.push(selectedRegion);
+
+        vmSelectRegion.mergeSelected();
+        vmSelectRegion.autoColor();
+        vmSelectRegion.setAllRegionState();
+
+        vmSelectRegion.modelChanged = true;
+    };
+
+    vmSelectRegion.openSubItem = function (e) {
+        var parent = $(e).closest("div.menu-place");
+        var pId = $(parent).attr("mid");
+        var pLevel = $(parent).attr("level");
+
+        if (pId == undefined || pLevel == undefined || isNaN(Number(pLevel))) return;
+
+        pLevel = Number(pLevel);
+
+        var contentId = pLevel + "x" + pId;
+        var content = $("#" + contentId);
+
+        var dataCount = $(e).data("datacount");
+
+        if (dataCount != undefined) {
+
+            if ($(content).is(":visible")) {
+                $(content).hide(120);
+                vmSelectRegion.toggleIcon(e, false);
+            } else {
+                $(content).show(dataCount > 0 ? 120 : 0);
+                vmSelectRegion.toggleIcon(e, true);
+            }
+
+        } else {
+            var subs = vmSelectRegion.getSubItems(pId, pLevel);
+            vmCommon.binding(contentId, subs, "indextemplate");
+
+            $(e).data("datacount", subs.length);
+
+            var cbxs = $(e).next("input.cbx-index");
+            if (cbxs.length > 0) {
+                var cbx = cbxs[0];
+                var flag = $(cbx).is(":checked");
+
+                if (flag) {
+                    $("#" + contentId + " input.cbx-index").prop("checked", true);
+                    $("#" + contentId + " input.cbx-index").prop("disabled", true);
+                }
+            }
+
+            $(content).show(subs.length > 0 ? 120 : 0);
+            vmSelectRegion.toggleIcon(e, true);
+        }
+    };
+
+    vmSelectRegion.getSubItems = function (parentId, parentLevel) {
+        var subLevel = parentLevel + 1;
+        return $.grep(settings, function (it) { return it.ParentId == parentId && it.Level == subLevel; });
+    };
+
+    vmSelectRegion.update = function () {
+        if (!vmSelectRegion.modelChanged) {
+            vmGoalAction.popSelectRegion.close();
+        };
+
+        viewModel.set("labeRegionSrc", selectedRegions);
+        viewModel.set("autoRegionSrc", autoRegions);
+
+        switch (vmGoalAction.selectRegionOptions.GoalActionType) {
+            case 1:
+                vmEditGoal.syncKpiService.init(viewModel, vmCommon.KpiGoalTopicType.LandRegion);
+                break;
+            case 2:
+                vmEditAction.syncKpiService.init(viewModel, vmCommon.KpiGoalTopicType.LandRegion);
+                break;
+        }
+
+        viewModel.setVisibleKpi();
+        viewModel.set("isVisibleSelectedRegion", viewModel.labeRegionSrc.length > 0);
+        vmSelectRegion.modelChanged = false;
+        vmGoalAction.popSelectRegion.close();
+    };
+
+    vmSelectRegion.setUpLanguage = function () {
+        $("#pop-select-region #lblSelectRegionClose").text(kLg.lblClose);
+        $("#pop-select-region #lblAllRegion").text(kLg.filterLabelFibuAllSelect);
+    };
+
+    vmSelectRegion.setAllRegionState = function () {
+        $("#pop-select-region #cbxAll").prop("checked", autoRegions.length == 0);
+    };
+
+    vmSelectRegion.mergeSelected = function () {
+        //if (selectedRegions.length == 0) return;
+
+        for (i = 0; i < settings.length; i++) {
+            settings[i].IsSelect = false;
+            settings[i].IsPath = false;
+        }
+
+        function markParent(parentId, parentLevel) {
+            if (parentId == undefined || parentLevel <= 0) return;
+
+            var parent = vmCommon.findByFunc(settings, function (it) { return it.Id == parentId && it.Level == parentLevel; });
+            if (parent == undefined) return;
+
+            parent.IsPath = true;
+
+            markParent(parent.ParentId, parentLevel - 1);
+        };
+
+        function markChilds(parentId, parentLevel) {
+            var x, childLevel = parentLevel + 1;
+            var childs = $.grep(settings, function (it) {
+                return it.ParentId == parentId && it.Level == childLevel;
+            });
+
+            if (childs.length === 0) return;
+            for (x = 0; x < childs.length; x++) {
+                var child = childs[x];
+
+                child.IsSelect = true;
+
+                markChilds(child.Id, child.Level);
+            }
+
+        };
+
+        for (var i = 0; i < selectedRegions.length; i++) {
+            var selectedRegion = selectedRegions[i];
+
+            for (var j = 0; j < settings.length; j++) {
+                var item = settings[j];
+
+                if (item.Id == selectedRegion.ObjectId && item.TypeId == 2) {
+                    item.IsSelect = true;
+
+                    markParent(item.ParentId, item.Level - 1);
+                    markChilds(item.Id, item.Level);
+                }
+            }
+        }
+    };
+
+    var settings = [], selectedRegions = [], autoRegions = [], viewModel;
+    $(function () {
+        settings = vmCommon.deepCopy(vmGoalAction.selectRegionOptions.menuData).map(function (it) {
+            if (it.Level == 1) { it.HasSelect = false; it.Selectable = false; }
+
+            return it;
+        });
+
+        viewModel = vmGoalAction.selectRegionOptions.viewModel;
+
+        selectedRegions = vmCommon.deepCopy(vmGoalAction.selectRegionOptions.selectedRegions);
+        autoRegions = vmCommon.deepCopy(vmGoalAction.selectRegionOptions.autoRegions);
+
+        vmSelectRegion.mergeSelected();
+
+        var roots = $.grep(settings, function (it) { return it.Level === 1; });
+        vmCommon.binding("root", roots, "indextemplate");
+        vmSelectRegion.setAllRegionState();
+
+        vmSelectRegion.autoColor();
+        vmSelectRegion.setUpLanguage();
+    });
+</script>

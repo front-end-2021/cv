@@ -1,0 +1,267 @@
+﻿<div id="popsubproduct">
+    <div class="modal-body ms-modal-body template">
+        <div id="add-categoris-form">
+            <div class="form-group">
+                <label id="lblName">Name</label>
+                <div class="clear"></div>
+                <input class="modal-input txtInput w-100per" id="edit-name" tabindex="1" maxlength="100" data-bind="value: Name, events: {change: changeName}" style=" max-width: 436px; padding-right: 37px;" />
+                <span class="icon-16 icon-dropdow btnApplySubProSe" data-bind="events: {click: linkProductSe}"></span>
+            </div>
+            <hr class="modal-market-hr" />
+            <div class="form-group">
+                <label id="lblDescription">a</label>
+                <p class="clear"></p>
+                <textarea class="modal-textarea w-100per" id="edit-des" tabindex="2" data-bind="value: Description"></textarea>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 40px;">
+                <label id="lblDocument">Dokument</label>
+                <div class="clear"></div>
+                <div data-template="spdocument-template" data-bind="source: SubmarketProductDocuments"></div>
+                <div class="clear"></div>
+                <button type="button" class="ms-button smp-button-upload" id="smpUploadFile" name="smpUploadFile" data-bind="events: {click: uploadDocumentItem}">
+                    <span class="icon-16 icon-upload"></span><span id="lblBrowseDocument">Durchsuchen...</span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+    <div class="modal-market-footer">
+        <button type="button" class="ms-button" tabindex="3" data-bind="events:{click: closeSubproduct}">
+            <span class="icon-16 icon-close margin-right6"></span>
+            <span id="lblClose">Close</span>
+        </button>
+    </div>
+</div>
+
+<script id="spdocument-template" type="text/x-kendo-template">
+    <div class="document-item pull-left">
+        <div class="pull-left">
+            <a class="item-document-truncate ms-link" data-bind="text: FolderFileName, events: {click: downloadDocument}"></a>
+        </div>
+        <span class="icon-20 ms-icon-delete-gray" data-bind="events: {click: deleteDocumentItem}"></span>
+    </div>
+</script>
+
+
+<script type="text/javascript">
+        var vmEditSubsProduct = vmEditSubsProduct || {};
+        vmEditSubsProduct.isChange = false;
+    vmEditSubsProduct.FlagIsSavedOverAll = false;
+
+        vmEditSubsProduct.setUpLanguage = function () {
+            $("#popsubproduct #lblName").text(kLg.PopName);
+            $("#popsubproduct #lblDescription").text(kLg.labelDes);
+            $("#popsubproduct #lblClose").text(kLg.lblClose);
+            $("#popsubproduct #lblBrowseDocument").text(kLg.lblBrowse);
+            $("#popsubproduct #lblDocument").text(kLg.lblDocument);
+        };
+
+        $(document).ready(function () {
+
+            vmEditSubsProduct.objmodel = kendo.observable({
+                LinkId: vmMarketSegment.SubProduct.LinkId,
+                LinkType: vmMarketSegment.SubProduct.LinkType,
+                Name: vmMarketSegment.SubProduct.Name,
+                Description: vmMarketSegment.SubProduct.Description,
+                SubmarketProductDocuments: vmMarketSegment.SubProduct.SubmarketProductDocuments,
+                uploadDocumentItem: function (e) {
+                    var item = e.data;
+                    var role = vmSProduct.SMProductData.Role;
+                    vmCommon.showUploadDocument(function (savedFiles) {
+                        var dataDocs = vmEditSubsProduct.objmodel.get("SubmarketProductDocuments");
+                        for (var i = 0; i < savedFiles.length; i++) {
+                            var baseDoc = vmCommon.deepCopy(vmCommon.defaultDocument);
+                            baseDoc.Type = item.Type;
+                            baseDoc.FolderFileId = savedFiles[i].Id;
+                            baseDoc.LinkId = item.Id;
+                            baseDoc.LinkType = item.Level;
+                            baseDoc.FolderFileName = savedFiles[i].Name;
+                            baseDoc.PhysicalName = savedFiles[i].PhysicalName;
+                            baseDoc.FileTypeId = savedFiles[i].Type;
+
+                            dataDocs.push(baseDoc);
+                        }
+                        vmEditSubsProduct.objmodel.set("SubmarketProductDocuments", dataDocs);
+
+                    }, role);
+                },
+                deleteDocumentItem: function (e) {
+                    var docItem = e.data;
+                    var dataDocs = vmEditSubsProduct.objmodel.get("SubmarketProductDocuments");
+                    var newDocs = [];
+                    vmCommon.findAllByFunc(newDocs, dataDocs, function (item) { return item.FolderFileId !== docItem.FolderFileId; });
+                    vmEditSubsProduct.objmodel.set("SubmarketProductDocuments", newDocs);
+                },
+                closeSubproduct: function () {
+                    if (!vmEditSubsProduct.saveEditSubsProduct()) return;
+                    vmEditSubsProduct.isChange = false;
+                    vmMarketSegment.popSubClient.close();
+                    if (vmMarketSegment) vmMarketSegment.AdjustHeight();
+                },
+                linkProductSe: function (e) {
+                    vmMarketSegment.showSelectSubProSe(vmCommon.enumType.SubProduct, e.data.LinkId, e.data.LinkType);
+                },
+                changeName: function (e) {
+                    vmEditSubsProduct.objmodel.set("LinkId", 0);
+                },
+                downloadDocument: function (e) {
+                    var docItem = e.data;
+                    if (/^http(s)?:\/\//ig.test(docItem.PhysicalName)) {
+                        vmCommon.CopyTitleToClipboard(docItem.PhysicalName, e.target);
+                    } else
+                        vmCommon.ClickToDownAndCopy("../FileUpload/" + docItem.PhysicalName,
+                            docItem.FolderFileName,
+                            docItem.FileTypeId,
+                            e.target
+                        );
+                }
+            });
+
+            kendo.bind($("#popsubproduct"), vmEditSubsProduct.objmodel);
+
+            vmEditSubsProduct.setUpLanguage();
+
+            vmMarketSegment.popSubClient.bind("close", function (e) {
+                if (vmEditSubsProduct.isChange) {
+                    if (!window.confirm(kLg.saveConfirmQuestion)) {
+                        vmEditSubsProduct.destroyForm();
+                    } else {
+                        e.preventDefault();
+                        vmEditSubsProduct.saveEditSubsProduct();
+                        if (!vmEditSubsProduct.saveEditSubsProduct()) {
+                            return;
+                        };
+                        vmEditSubsProduct.destroyForm();
+                    }
+                } else {
+                    vmEditSubsProduct.destroyForm();
+                }
+            });
+
+            //bindTemplate("cat-load", "change-name-template", [{ Id: 1 }]);
+
+            //$("#edit-name").val(vmEditSubsProduct.SubProductName);
+            //$("#edit-des").val(vmEditSubsProduct.SubProductDescription);
+
+            //$(".template button").bind("click", function () {
+            //    saveEditSubsProduct();
+            //});
+
+            $("#popsubproduct #edit-name").bind("mouseout", function () {
+                if (vmMarketSegment.isExistedName(vmMarketSegment.SubProduct.MIndex, vmEditSubsProduct.objmodel.get("Name")))
+                    vmCommon.showToolTipById("edit-name", kLg.msgNameIsExisted, "top");
+            });
+
+            $("#popsubproduct #edit-name").bind("change keyup paste", function () {
+                $('#edit-name').tooltip('destroy');
+                vmEditSubsProduct.isChange = true;
+            });
+
+            $("#popsubproduct #edit-des").bind("change keyup paste", function () {
+                vmEditSubsProduct.isChange = true;
+            });
+
+    });
+
+    vmEditSubsProduct.destroyForm = function () {
+        vmMarketSegment.popSubClient.destroy();
+        vmMarketSegment.popSubClient = null;
+        $(".body-content").append("<div id='editsubproductname'></div>");
+    }
+
+
+
+    vmEditSubsProduct.saveEditSubsProduct = function () {
+
+        var name = vmEditSubsProduct.objmodel.get("Name");
+        var description = vmEditSubsProduct.objmodel.get("Description");
+        var linkId = vmEditSubsProduct.objmodel.get("LinkId");
+        var linktype = vmEditSubsProduct.objmodel.get("LinkType");
+        description = description ? description : "";
+            if (name == null
+                || name === ""
+                || name.trim().length < 1) {
+                vmCommon.showToolTipById("edit-name", kLg.requiredName, "top");
+                return false;
+            }
+
+            if (name.trim().length > 100) {
+                vmCommon.showToolTipById("edit-name", kLg.msgMaxLength100, "top");
+                return false;
+        }
+
+        var docs = vmEditSubsProduct.objmodel.get("SubmarketProductDocuments");
+        if (!vmMarketSegment.isExistedName(vmMarketSegment.SubProduct.MIndex, name)) {
+            if (vmMarketSegment.IsSubProductEdit) {
+                vmMarketSegment.SubProduct.set("Name", name);
+                vmMarketSegment.SubProduct.set("Description", description);
+                vmMarketSegment.SubProduct.set("SubmarketProductDocuments", docs);
+                vmMarketSegment.SubProduct.set("LinkId", linkId);
+                vmMarketSegment.SubProduct.set("LinkType", linktype);
+            } else {
+                var sources = vmMarketSegment.viewModel.get("SubProducts");
+                sources.push({ Id: -1, Name: name, Description: description, SubmarketProductDocuments: docs, LinkId: linkId, LinkType: linktype });
+                sources = vmMarketSegment.updateSubproductPosition(sources);
+                var tempSource = vmCommon.deepCopy(sources);
+                vmMarketSegment.viewModel.set("SubProducts", tempSource);
+                vmMarketSegment.viewModel.set("EnSubProducts", false);
+                setupSubProductDragDropAble();
+                //bindSwitchSpanToInputSubsProduct(updateSubNameCallback, "sub-product-name", removeAllHover, addAllHover, 100);
+            }
+        } else {
+            vmCommon.showToolTipById("edit-name", kLg.msgNameIsExisted, "top");
+            return false;
+        }
+
+       
+
+            ////Update
+            //if (vmEditSubsProduct.excuteUpdate ) {
+            //    if (!vmMarketSegment.isExistedName(vmEditSubsProduct.MIndex, name)) {
+            //        vmMarketSegment.SubProduct.set("Name", name);
+            //        //vmMarketSegment.excuteUpdate(vmEditSubsProduct.MIndex, name, description);
+            //        vmEditSubsProduct.isChange = false;
+            //        vmEditSubsProduct.close();
+            //        return true;
+            //    } else {
+            //        vmMarketSegment.showTooltipById("edit-name", kLg.msgNameIsExisted, "top");
+            //        return false;
+            //    }
+
+
+            //}
+
+            ////Insert
+            //if (vmEditSubsProduct.excuteInsert ) {
+            //    if (!vmMarketSegment.isExistedName(vmEditSubsProduct.MIndex, name)) {
+            //        //vmEditSubsProduct.excuteInsert(name, description);
+            //        vmEditSubsProduct.isChange = false;
+            //        vmEditSubsProduct.close();
+            //        return true;
+            //    } else {
+            //        vmMarketSegment.showTooltipById("edit-name", kLg.msgNameIsExisted, "top");
+            //        return false;
+            //    }
+            //}
+
+            return true;
+        }
+
+    </script>
+
+    <style>
+        .template {
+            height: 290px;
+            overflow-x: hidden;
+        }
+
+            .template .hoand-footer-button {
+                margin: 5px 0 0 0;
+            }
+
+        .hoand-input {
+            padding: 0;
+            margin-top: 15px;
+        }
+    </style>

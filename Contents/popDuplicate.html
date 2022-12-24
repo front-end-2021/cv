@@ -1,0 +1,205 @@
+﻿<style>
+    .crm-div {
+        width: 33%;
+        margin-right: 10px;
+    }
+
+    .tbgrid th, .tbgrid td {
+        height: 30px;
+        padding: 0 8px 0 20px;
+    }
+</style>
+
+<div id="popduplicate">
+    <form id="fduplicate">
+        <div class="modal-body ms-modal-body" style="height: 320px;overflow-y: scroll;">
+            <div style="padding-right: 7px;">
+                <div style="float: right;">
+                    <select class="crm-drop" 
+                            data-value-primitive="true"
+                            data-role="dropdownlist"
+                            data-text-field="Name"
+                            data-value-field="Id"
+                            data-bind="value: src.OverWriteTypeId, source: overWriteSrc"></select>
+                </div>
+            </div>
+            <div class="clear"></div>
+            <div style="margin: 0 auto; display: -webkit-box;">
+
+                <div class="crm-div" data-bind="visible: isShowOrg">
+                    <div><label id="lblOrganiastion">Organisation</label></div>
+                    <div class="crm-data">
+                        <table class="tbgrid modal-table modal-mass-tb-status">
+                            <thead>
+                                <tr>
+                                    <th class="title bg-grey"></th>
+                                    <th class="title bg-grey" style="width: 5px"></th>
+                                </tr>
+                            </thead>
+                            <tbody data-bind="source: src.Orgs" data-template="crm-temp"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="crm-div" data-bind="visible: isShowPer">
+                    <div>
+                        <label id="lblPerson">Person</label>
+                    </div>
+                    <div class="crm-data">
+                        <table class="tbgrid modal-table modal-mass-tb-status">
+                            <thead>
+                                <tr>
+                                    <th class="title bg-grey"></th>
+                                    <th class="title bg-grey" style="width: 5px"></th>
+                                </tr>
+                            </thead>
+                            <tbody data-bind="source: src.Pers" data-template="crm-temp"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="crm-div" data-bind="visible: isShowAct">
+                    <div>
+                        <label id="lblActivity">Aktivität</label>
+                    </div>
+                    <div class="crm-data">
+                        <table class="tbgrid modal-table modal-mass-tb-status">
+                            <thead>
+                                <tr>
+                                    <th class="title bg-grey"></th>
+                                </tr>
+                            </thead>
+                            <tbody data-bind="source: src.Acts" data-template="crm-temp-nocheck"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="modal-market-footer">
+            <button id="btnClose" type="button" tabindex="2" class="ms-button pull-right" data-bind="events:{click: close}">
+                <span class="icon-20 icon-close"></span>
+                <span id="lblClose">Schließen</span>
+            </button>
+            <button id="btnSave" type="button" tabindex="2" class="ms-button" data-bind="events:{click: update}">
+                <span class="icon-20 icon-update"></span>
+                <span id="lblSave">Speichern</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script type="text/html" id="crm-temp">
+    <tr>
+        <td>
+            <div>
+                <span data-bind="text: Name"></span>
+            </div>
+        </td>
+        <td>
+            <div>
+                <input type="checkbox" data-bind="checked: IsOverride" />
+            </div>
+        </td>
+    </tr>
+</script>
+
+<script type="text/html" id="crm-temp-nocheck">
+    <tr>
+        <td>
+            <div>
+                <span data-bind="text: Name"></span>
+            </div>
+        </td>
+    </tr>
+</script>
+
+<script type="text/javascript">
+    orgImport = orgImport || {};
+    var dupModel = undefined;
+    var isConfirm = false;
+    var overWriteSrc = [{ Id: vmCommon.enumOverWriteType.OverWrite, Name: kLg.titleOverWrite }, { Id: vmCommon.enumOverWriteType.AddAllData, Name: kLg.titleAddAllData }];
+
+    orgImport.popDuplicate.bind("close", function (e) {
+        if (!isConfirm) {
+            ynConfirm("Möchten Sie die Datei importieren?").then(
+                function () {
+                    dupModel.update();
+                },
+                function () {
+                    dupModel.close();
+                }
+            );
+
+            e.preventDefault();
+        } else {
+            orgImport.popDuplicate.destroy();
+            orgImport.popDuplicate = null;
+            $("div[class='admin-content']").after("<div id='pop-duplicate'></div>");
+        }
+    });
+
+    adjustPopup = function () {
+        var width = 0;
+        var items = $("div.crm-div:visible");
+        var ratio = 32.5;
+
+        switch (items.length) {
+            case 1:
+                ratio = 100;
+                break;
+            case 2:
+                ratio = 49;
+                break;
+        }
+
+        items.each(function () {
+            width += $(this).width() + 10;
+        });
+
+        resizePopUp(orgImport.popDuplicate, { width: width });
+
+        items.each(function () {
+            $(this).css({ "width": ratio + "%" });
+        });
+    };
+
+    $(function () {
+        var data = orgImport.options;
+
+        dupModel = kendo.observable({
+            isShowOrg: data.Orgs.length > 0,
+            isShowPer: data.Pers.length > 0,
+            isShowAct: data.Acts.length > 0,
+            src: data,
+            overWriteSrc: overWriteSrc,
+
+            update: function () {
+                isConfirm = true;
+                orgImport.dataservice.saveImport(this.src, function (res) {
+                    var msg;
+                    switch (res.value) {
+                        case -1:
+                            msg = "Confict";
+                            break;
+                        default:
+                            msg = "Erfolgreich importiert";
+                            break;
+                    }
+                    pAlert(msg);
+                });
+
+                orgImport.popDuplicate.close();
+            },
+            close: function () {
+                isConfirm = true;
+                orgImport.dataservice.cancelImport({ Key: this.src.Key });
+                orgImport.popDuplicate.close();
+            }
+        });
+
+        kendo.bind($("#popduplicate"), dupModel);
+        adjustPopup();
+    });
+
+</script>

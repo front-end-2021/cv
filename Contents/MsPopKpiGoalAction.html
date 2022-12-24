@@ -1,0 +1,420 @@
+﻿<style type="text/css">
+    #pop-kpigoalaction .mastermain {
+        border-bottom: 1px solid #c5bebe;
+        background-color: #76838b;
+        color: white;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        width: 100%;
+        display: inline-flex;
+    }
+
+    #pop-kpigoalaction .mastersub {
+        background-color: #5e696d;
+        color: white;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        width: 100%;
+        display: inline-flex;
+    }
+
+    #pop-kpigoalaction .gaitem {
+        border-radius: 4px;
+        width: 94%;
+        height: 96px;
+        margin-bottom: 5px;
+    }
+        #pop-kpigoalaction .gaitem .ganame {
+            height: 54px;
+            overflow: hidden;
+            word-break: break-word;
+            padding: 3px 3px 0 3px;
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+        }
+
+        #pop-kpigoalaction .gaitem .mainname {
+            background-color: #76838b;
+            color: white;
+        }
+        #pop-kpigoalaction .gaitem .subname {
+            background-color: #5e696d;
+            color: white;
+        }
+        #pop-kpigoalaction .gaitem .actionname {
+            background-color: #cbe9f8;
+        }
+
+        #pop-kpigoalaction .gaitem .gadate {
+            height: 20px;
+            display: inline-flex;
+            width: 100%;
+            background-color: #27a6e2;
+            color: white;
+            border-bottom-left-radius: 3px;
+            border-bottom-right-radius: 3px;
+        }
+</style>
+
+<div id="pop-kpigoalaction" class="pop-wrapper" style="overflow-y: scroll;">
+    <form id="fKpiGoalActionForm" role="form" class="form-horizontal">
+        <div class="modal-body ms-modal-body" style="overflow: auto;padding: 0 !important;" id="gacontent">
+        </div>
+    </form>
+</div>
+
+<script id="gatemplate" type="text/html">
+    <div class="mastermain pointer" onclick="vmKpiGa.moveTo(this)">
+        <div style="width: 12%;padding-left: 5px;">#:kLg.labelMainGoalName#</div>
+        <div style="width: 86%;word-wrap: break-word;overflow: hidden;">#:data.MasterMainGoalName || ""#</div>
+    </div>
+    <div class="clear"></div>
+    <div class="mastersub pointer" onclick="vmKpiGa.moveTo(this);">
+        <div style="width: 12%;padding-left: 5px;">#:kLg.labelSubGoalName#</div>
+        <div style="width: 86%;word-wrap: break-word;overflow: hidden;">#:data.MasterSubGoalName || ""#</div>
+    </div>
+    <div class="clear"></div>
+    <div style="float:right;">
+        <label style="font-weight:100;padding: 10px 8px 0 5px; margin-bottom:0">
+            <input type="checkbox" name="cbxShowHidden" style="vertical-align: bottom;" id="cbxShowHidden">
+            <span style="font-size:12px;">#: kLg.labelShowHidden #</span>
+        </label>
+        <label id="popKpiCheckShowAll" style="font-weight:100;float:right; padding: 10px 8px 0 5px; margin-bottom:0">
+            <input type="checkbox" checked name="checkShowAll" style="vertical-align: bottom;" id="cbxShowAll">
+            <span style="font-size:12px;">#: kLg.labelShowall #</span>
+        </label>
+    </div>
+    #var blocks = data.Blocks;#
+    #for(var i = 0; i < blocks.length; i++){#
+    #var block = blocks[i];#
+    <div style="padding: 10px 15px 0 15px;">
+        <div>
+            <b>#:block.Path#</b>
+        </div>
+        <div class="clearx2"></div>
+        <div>
+            #var maingoals = block.GoalActions;#
+            #for(m = 0; m < maingoals.length; m++){#
+            #var main = maingoals[m];#
+            <div class="main-block" style="width:100%;display:inline-flex;">
+
+                <div style="width: 25%;">
+                    <div class="gaitem goalitem" visibility="#:main.Visibility ? 1 : 0#">
+                        <div class="ganame mainname pointer" gaid="#:main.Id#" typeid="#:main.GoalActionTypeId#">
+                            <span>#:main.Name || ""#</span>
+                        </div>
+
+                        <div class="gadate">
+                            <div style="width: 50%;padding-left: 3px;border-right: 0.5px solid \#76838b;padding-top: 1px;">#:vmKpiGa.toStringDate(main.Start) || ""#</div>
+                            <div style="width: 50%;padding-right: 3px;border-left: 0.5px solid \#76838b;text-align: right;padding-top: 1px;">#:vmKpiGa.toStringDate(main.End) || ""#</div>
+                        </div>
+
+                        <div style="padding-left: 3px;padding-right: 3px;overflow: hidden;white-space: nowrap;">
+                            <span style="float: left;width:49%;">#: main.IsShowPercent ? vmCommon.toString(main.Percent) + "%" : ""#</span>
+                            <span style="float: right;width:49%;text-align:right;" title="#:vmKpiGa.ToToolstrip(main.StatusDate, main.StatusDescription)#">#:main.Status#</span>
+                        </div>
+                    </div>
+                </div>
+
+                #var subs = main.Childs;#
+                <div style="width:75%;">
+                    #for(var s = 0; s < subs.length; s++){#
+                    #var sub = subs[s];#
+                    <div style="width:100%;display:inline-flex;">
+                        <div style="width: 33%;">
+                            <div class="gaitem goalitem" visibility="#:sub.Visibility ? 1 : 0#">
+                                <div class="ganame subname pointer" gaid="#:sub.Id#" typeid="#:sub.GoalActionTypeId#">
+                                    <span>#:sub.Name || ""#</span>
+                                </div>
+
+                                <div class="gadate">
+                                    <div style="width: 50%;padding-left: 3px;border-right: 0.5px solid \#5e696d;padding-top: 1px;">#:vmKpiGa.toStringDate(sub.Start) || ""#</div>
+                                    <div style="width: 50%;padding-right: 3px;border-left: 0.5px solid \#5e696d;text-align: right;padding-top: 1px;">#:vmKpiGa.toStringDate(sub.End) || ""#</div>
+                                </div>
+
+                                <div style="padding-left: 3px;padding-right: 3px;overflow: hidden;white-space: nowrap;">
+                                    <span style="float: left;width:49%;">#: sub.IsShowPercent ? vmCommon.toString(sub.Percent) + "%" : ""#</span>
+                                    <span style="float: right;width:49%;text-align:right;" title="#:vmKpiGa.ToToolstrip(sub.StatusDate, sub.StatusDescription)#">#:sub.Status#</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        #var actions = sub.Childs;#
+                        <div style="width:67%;">
+                            #for(var a = 0; a < actions.length; a++){#
+                            #var action = actions[a];#
+                            <div style="width: 50%;float:left;" class="#:!action.IsShowPercent ?'act-percent-isn-show': ''#">
+                                <div class="gaitem actionitem #:!action.IsConnect ?'action-context': ''#" visibility="#:action.Visibility ? 1 : 0#">
+                                    <div class="ganame actionname pointer" gaid="#:action.Id#" typeid="#:action.GoalActionTypeId#">
+                                        <span>#:action.Name || ""#</span>
+                                    </div>
+
+                                    <div class="gadate">
+                                        <div style="width: 50%;padding-left: 3px;border-right: 0.5px solid \#cbe9f8;padding-top: 1px;">#:vmKpiGa.toStringDate(action.Start) || ""#</div>
+                                        <div style="width: 50%;padding-right: 3px;border-left: 0.5px solid \#cbe9f8;text-align: right;padding-top: 1px;">#:vmKpiGa.toStringDate(action.End) || ""#</div>
+                                    </div>
+
+                                    <div style="padding-left: 3px;padding-right: 3px;overflow: hidden;white-space: nowrap;">
+                                        <span style="float: left;width:49%;">#: action.IsShowPercent ? vmCommon.toString(action.Percent) + "%" : action.TodoPercent != null ? Math.round(action.TodoPercent, 2) + "%" : "" #</span>
+                                        <span style="float: right;width:49%;text-align:right;" title="#:vmKpiGa.ToToolstrip(action.StatusDate, action.StatusDescription)#">#:action.Status#</span>
+                                    </div>
+                                </div>
+                            </div>
+                            #}#
+                        </div>
+                    </div>
+                    #}#
+                </div>
+            </div>
+            #}#
+
+        </div>
+    </div>
+
+    <div class="clear"></div>
+    #}#
+</script>
+
+<script type="text/javascript">
+    var vmKpiGa = {}; var areaid; var kpiData;
+    vmKpiGa.toStringDate = function (date) {
+        var temp = (date && typeof (date) == "string") ? date.toDate() : date;
+        return kendo.toString(temp, "d");
+    };
+
+    vmKpiGa.ToToolstrip = function (date, des) {
+        if (date != undefined) {
+            return vmKpiGa.toStringDate(date) + " " + des;
+        } else {
+            return des;
+        }
+    };
+
+    vmGoalAction.popKpiGoalAction.bind("close", function (e) {
+        //vmGoalAction.kpRegionService.close(areaid);
+        //MsaApp.kpiRegionService().clear();
+        MsaApp.kpiRegionService().clear()
+    });
+
+    vmKpiGa.collapse = function () {
+        //vmGoalAction.kpRegionService.collapse(areaid);
+        MsaApp.kpiRegionService().collapse();
+    };
+
+    vmKpiGa.moveTo = function (e) {
+        var isMain = $(e).hasClass("mastermain");
+
+        var gaInfo = [kpiDataX.MasterMainGoalId];// { mainGoalId: kpiDataX.MasterMainGoalId };
+        if (!isMain)
+            gaInfo.push(kpiDataX.MasterSubGoalId);
+        
+        MsaApp.redirectTo(gaInfo, areaid);
+    };
+
+    vmKpiGa.findGa = function (gaid, typeid) {
+        var blocks = kpiDataX.Blocks;
+        for (var i = 0; i < blocks.length; i++) {
+            var block = blocks[i];
+            var mains = block.GoalActions;
+
+            for (var m = 0; m < mains.length; m++) {
+                var main = mains[m];
+
+                if (typeid == vmCommon.GoalActionContentType.MainGoal && main.Id == gaid) return main;
+
+                var subs = main.Childs;
+                for (var s = 0; s < subs.length; s++) {
+                    var sub = subs[s];
+
+                    if (typeid == vmCommon.GoalActionContentType.SubGoal && sub.Id == gaid) return sub;
+
+                    var actions = sub.Childs;
+                    for (var a = 0; a < actions.length; a++) {
+                        var action = actions[a];
+
+                        if (typeid == vmCommon.GoalActionContentType.Action && action.Id == gaid) return action;
+                    }
+                }
+            }
+        }
+        return null;
+    };
+
+    vmKpiGa.getGaInfo = function (gaid, typeid) {
+        var rs = [];
+
+        var blocks = kpiDataX.Blocks;
+        for (var i = 0; i < blocks.length; i++) {
+            var block = blocks[i];
+            var mains = block.GoalActions;
+
+            for (var m = 0; m < mains.length; m++) {
+                var main = mains[m];
+
+                if (typeid == vmCommon.GoalActionContentType.MainGoal && main.Id == gaid) {
+                    rs.push(main.Id);
+                    return rs;
+                };
+
+                var subs = main.Childs;
+                for (var s = 0; s < subs.length; s++) {
+                    var sub = subs[s];
+
+                    if (typeid == vmCommon.GoalActionContentType.SubGoal && sub.Id == gaid) {
+                        rs.push(main.Id);
+                        rs.push(sub.Id);
+                        return rs;
+                    };
+
+                    var actions = sub.Childs;
+                    for (var a = 0; a < actions.length; a++) {
+                        var action = actions[a];
+
+                        if (typeid == vmCommon.GoalActionContentType.Action && action.Id == gaid) {
+                            rs.push(main.Id);
+                            rs.push(sub.Id);
+                            rs.push(action.Id);
+                            return rs;
+                        };
+                    }
+                }
+            }
+        }
+
+        return null;
+    };
+
+    vmKpiGa.showHideGa = function () {
+        var isShowAll = $("#pop-kpigoalaction #cbxShowAll").prop("checked");
+        var isShowHidden = $("#pop-kpigoalaction #cbxShowHidden").prop("checked");
+
+        if (isShowHidden) {
+            //show goal
+            $("#pop-kpigoalaction .goalitem[visibility=0]").removeClass("visibility-hidden");
+
+            if (isShowAll) {
+                //show all action
+                $("#pop-kpigoalaction .actionitem").removeClass("hidden");
+            } else {
+                //show all action except context action
+                $("#pop-kpigoalaction .actionitem:not(.action-context)").removeClass("hidden");
+
+                //hide context action
+                $("#pop-kpigoalaction .actionitem.action-context").addClass("hidden");
+            }
+
+        } else {
+            //hide goal
+            $("#pop-kpigoalaction .goalitem[visibility=0]").addClass("visibility-hidden");
+            //hide action
+            $("#pop-kpigoalaction .actionitem[visibility=0]").addClass("hidden");
+
+            if (isShowAll) {
+                //show all action except in-visibility action
+                $("#pop-kpigoalaction .actionitem:not([visibility=0])").removeClass("hidden");
+            } else {
+                //hide
+                $("#pop-kpigoalaction .actionitem.action-context").addClass("hidden");
+            }
+        }
+
+        //show/hide mainblock
+        $("#pop-kpigoalaction .main-block").each(function () {
+            var goalItems = $(this).find(".goalitem:not(.visibility-hidden)");
+            var actionItems = $(this).find(".actionitem:not(.hidden)");
+
+            if (goalItems.length > 0 || actionItems.length > 0)
+                $(this).show();
+            else
+                $(this).hide();
+        });
+    };
+
+    //ready    
+    $(function () {
+        areaid = vmGoalAction.kpiGaOptions.AreaId;
+        var s = "margin-top: 3px;";
+        var $kWindowActions = $("#popkpigoalaction_wnd_title").next();
+        if ($kWindowActions.children('.pull-left.oncollapsekr').length < 1) {
+            $kWindowActions.prepend('<a role="button" href="javascript:vmKpiGa.collapse();" class="pull-left oncollapsekr" style="' + s + '"><span role="presentation" class="icon-20 arrow-left-white"></span></a>');
+        };            
+
+        kpiDataX = vmGoalAction.kpiGaOptions.Data;
+        bindTemplate("gacontent", "gatemplate", kpiDataX);
+
+        $("#pop-kpigoalaction #cbxShowHidden").prop("checked", vmGoalAction.kpRegionOptions.isShowHidden);
+        $("#pop-kpigoalaction #cbxShowAll").prop("checked", vmGoalAction.kpRegionOptions.isShowAll);
+
+        $("#pop-kpigoalaction #cbxShowAll").click(function () {
+            vmGoalAction.kpRegionOptions.isShowAll = $(this).prop("checked");
+            vmKpiGa.showHideGa();
+        });
+        $("#pop-kpigoalaction #cbxShowHidden").click(function () {
+            vmGoalAction.kpRegionOptions.isShowHidden = $(this).prop("checked");
+            vmKpiGa.showHideGa();
+        });
+
+        vmKpiGa.showHideGa();
+    });
+
+    var krTimeOutClick;
+    //click
+    $("#pop-kpigoalaction").on("click", ".ganame", function (e) {
+        krTimeOutClick = setTimeout(function () {
+            if (krTimeOutClick == undefined) return;
+
+            //TODO: move to element
+            var gaid = $(e.currentTarget).attr("gaid");
+            var typeid = $(e.currentTarget).attr("typeid");
+
+            if (gaid == undefined && typeid == undefined && isNaN(Number(typeid))) return;
+
+            typeid = Number(typeid);
+            var ga = vmKpiGa.findGa(gaid, typeid);
+
+            if (ga == null) return;
+            var areaId = ga.ThemaId || ga.SubMarketProductId;
+
+            var gainfo = vmKpiGa.getGaInfo(gaid, typeid);
+            //alert("goto");
+            //redirect
+            //todo:
+            //vmGoalAction.kpRegionService.redirect(ga, typeid, areaid);
+            MsaApp.redirectTo(gainfo, areaId, true);
+
+        }, 550);
+    });
+
+    //double click
+    $("#pop-kpigoalaction").on("dblclick", ".ganame", function (e) {
+        krTimeOutClick = undefined;
+        //TODO: edit element
+        var gaid = $(e.currentTarget).attr("gaid");
+        var typeid = $(e.currentTarget).attr("typeid");
+
+        if (gaid == undefined && typeid == undefined && isNaN(Number(typeid))) return;
+
+        typeid = Number(typeid);
+        var ga = vmKpiGa.findGa(gaid, typeid);
+
+        if (ga == null) return;
+
+        //edit
+        //todo:
+        if (typeid == vmCommon.GoalActionContentType.Action) {
+            var info = {
+                actionId: ga.Id,
+                subMarketProductId: ga.SubMarketProductId,
+                independencyId: ga.ThemaId,
+                parentId: ga.ParentId,
+                title: kLg.titlepEditMainGoalNew1 + kLg.labelActionName + kLg.titlepEditMainGoalNew2,
+                isEdit: true
+            };
+
+            vmGoalAction.openPopUpAction2(info);
+        } else {
+            vmGoalAction.kpRegionService.edit(ga, typeid, areaid);
+        }
+    });
+
+</script>

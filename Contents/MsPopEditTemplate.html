@@ -1,0 +1,120 @@
+﻿<style>
+    .w-100per {
+        width: 98% !important;
+    }
+</style>
+<div id="pop-edit-ms-temp">
+    <div class="modal-body ms-modal-body">
+        <form>
+            <div class="form-group">           
+                <label id="lblEvalTempNamePopEditTemplate">Template name </label>
+                <div class="clear"></div>
+                <input id="txtTempName" name="txtTempName" class="modal-input txtInput w-100per" data-bind="value: data.Name" />
+            </div>
+        </form>
+    </div>
+    <div class="modal-market-footer">        
+        <button type="button" class="ms-button" data-bind="click: close"><span class="icon-16 icon-close margin-right6"></span><span id="textCancelButtonPopEditTemplate">Cancel</span></button>
+        <button type="button" class="ms-button" id="btnSaveTemplateMs" data-bind="click: save"><span class="icon-16 icon-update margin-right6"></span><span id="textUpdateButtonPopEditTemplate">OK</span></button>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function() {
+        var viewModel = kendo.observable({
+            data: vmMSRE.templateData,
+            save: function (e) {
+                var txtTempName = $('#pop-edit-ms-temp #txtTempName');
+                var tempName = txtTempName.val().trim();
+                txtTempName.tooltip('destroy');
+                if (tempName.length == 0) {
+                    txtTempName.attr('title', kLg.msgRequiredTempName);
+                    txtTempName.tooltip({ placement: 'top', trigger: 'manual' }).tooltip('show');
+                    txtTempName.focus();
+                    return;
+                }
+                if (vmMSRE.regionEvaluations.length == 0) {
+                    txtTempName.attr('title', kLg.msgRequiredElement);
+                    txtTempName.tooltip({ placement: 'top', trigger: 'manual' }).tooltip('show');
+                    txtTempName.focus();
+                    return;
+                }
+                if ($('#btnSaveTemplateMs').prop("disabled")) return;
+                dwp("pop-edit-ms-temp");
+
+                //var theValue = vmCommon.pushApply([], vmMSRE.regionEvaluations, function (item) { return { CriteriaId: item.CriteriaId ,Name: item.Name, Priority: item.Priority, MIndex: item.MIndex }; });
+                
+                //vmMSRE.templateData.Name = tempName;
+                //vmMSRE.templateData.Value = JSON.stringify(theValue);                
+
+                if (vmMSRE.evalTempAction == templateAction.Add) {
+                    var newTemplate = {
+                        ObjId: vmMSRE.marketSegmentRegion.Id,
+                        Name: tempName,
+                        Type: templateType.MarketSegmentReview
+                    };
+                    
+                    callAjaxProductEvaluation('loadingEvaluation', "insertTemplate", vmMSRE.projectId, vmMSRE.regionId, JSON.stringify(newTemplate), AjaxConst.PostRequest,
+                    //callAjaxMarketSegmentEvalHandler('loadingEvaluation', "insertTemplate", vmMSRE.projectId, vmMSRE.regionId, JSON.stringify(entryData), AjaxConst.PostRequest,
+                        function(serData) {
+                            //Check role
+                            if (!checkRole(serData))
+                                return;                                                        
+                            vmMSRE.popEditTemp.close();
+                            vmMSRE.marketSegmentRegion.TemplateId = serData.value.Id;
+                            vmMSRE.marketSegmentRegion.Mdf = serData.value.Mdf;
+                            vmMSRE.event.initddlEvalTemp(serData.value.Id);
+                        });
+                }
+                if (vmMSRE.evalTempAction == templateAction.Update) {
+                    //var tempId = ddlEvalTemp.value();
+                    //vmMSRE.templateData.Id = tempId;                    
+                    var newTemplate = {
+                        Id: ddlEvalTemp.value(),
+                        ObjId: vmMSRE.marketSegmentRegion.Id,
+                        Name: tempName,
+                        Type: templateType.MarketSegmentReview
+                    };
+                   // entryData = { Template: vmMSRE.templateData, MarketSegmentRegionId: vmMSRE.marketSegmentRegion.Id };
+                    //callAjaxProductEvaluation('loadingEvaluation', "updateTemplate", vmMSRE.projectId, vmMSRE.regionId, JSON.stringify(entryData), AjaxConst.PostRequest,
+                    callAjaxMarketSegmentEvalHandler('loadingEvaluation', "updateTemplate", vmMSRE.projectId, vmMSRE.regionId, JSON.stringify(newTemplate), AjaxConst.PostRequest,
+                        function(serData) {
+                            //Check role
+                            if (!checkRole(serData))
+                                return;
+                            vmMSRE.isUpdateAllMarketSegmentRegion = true;
+                            vmMSRE.popEditTemp.close();
+                            vmMSRE.event.initddlEvalTemp(newTemplate.Id);
+                            vmMSRE.marketSegmentRegion.TemplateId = newTemplate.Id; //case: change template structure then re-update template
+                            //closeLayout();
+                            
+                        });
+                }
+
+            },
+            close: function(e) {
+                vmMSRE.popEditTemp.close();
+            }
+        });
+        
+        kendo.bind($('#pop-edit-ms-temp'), viewModel);
+
+        vmMSRE.popEditTemp.bind("close", function () {            
+            vmMSRE.templateData = {};
+            vmMSRE.popEditTemp.destroy();
+            vmMSRE.popEditTemp = null;
+            $('#popEvalMarketSegment').prepend('<div id="popEditTempWindow"></div>');
+        });
+        setupLanguage();
+        
+    });   
+
+    function setupLanguage() {
+        $('#lblEvalTempNamePopEditTemplate').text(kLg.lblTemplateName);
+        $('#textCancelButtonPopEditTemplate').text(kLg.cancel);
+        $('#textUpdateButtonPopEditTemplate').text(kLg.btnOk);
+    }
+    function dwp(elem) {
+        $('button', "#" + elem).attr("disabled", "disabled");
+    }
+</script>

@@ -1,0 +1,530 @@
+﻿<style type="text/css">
+    #pop-kpisettingindex td {
+        height: 35px;
+        padding-left: 5px;
+        font-weight: normal;
+        border: 1px solid #e7e7e7;
+    }
+
+    #pop-kpisettingindex th {
+        color: white;
+        height: 35px;
+        padding-left: 5px;
+        background-color: #999999;
+        border: 1px solid white;
+        font-weight: normal;
+        padding-right: 22px;
+    }
+
+    .overflow-hidden {
+        overflow: hidden;
+    }
+
+    #pop-kpisettingindex table.modal-table-mass td {
+        border: none;
+    }
+
+
+</style>
+<div id="pop-kpisettingindex">
+   
+    <form id="add-kpitopic-form" >
+        <table style="width: 100%" >
+            <thead>
+            <tr>
+                <th style="width: 5%"></th>
+                <th style="width: 30%"><span id="lblKpiName"></span></th>
+                <th style="width: 20%"><span id="lblKpiUnitName">Unit</span></th>
+                <th ><span id="lblKpiTime">Time</span></th>
+                <th style="width: 26%"><span id="lblKpiSollName"></span></th>
+            </tr>
+            </thead>
+            <tbody data-template="row-index-template" data-bind="source: settingIndexs"></tbody>
+            <tfoot>
+            <tr data-bind="visible: isEmptyIndexs">
+                <td colspan="5"> <span class="icon-32 icon-kpi-add-gray pointer" data-bind="events:{click: addKpiIndex}"></span> </td>
+            </tr>
+
+            </tfoot>
+        </table>
+
+
+        <div id="pop-kpiformat" data-bind="source: settingFormats" data-template="kpi-format-template" style="margin-bottom: 20px;margin-top: 20px;"></div>
+        <div>
+            <table class="popup-table-email">
+                <tr>
+                    <td class="none-border">
+                        <input value="" class="categoryName" id="txtKpiFormat"/>
+                    </td>
+                    <td valign="bottom" class="none-border">
+                        <span class="icon-32 icon-add" onclick="vmPopKpiSettingIndex.addKpiFormat()"></span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </form>
+</div>
+<div id="divSelectKpiIndex" ></div>
+
+
+
+<script id="row-index-template" type="text/x-kendo-template">
+    <tr class="tr-kpi-hover">
+        <td style="padding-left: 2px;"> <span class="icon-28 icon-kpi-add-gray pointer" data-bind="visible: VisualAdd, events:{click: addKpiIndex}"></span> </td>
+        <td > <span data-bind="text: IndexName"></span>
+              <span class="icon-20 icon-url pull-right pointer" style="margin-right: 5px;" data-bind="events:{click: selectKpiIndex}" ></span>
+        </td>
+        <td data-bind="text: KpiUnitName" >
+       </td>
+        <td data-bind="text: KpiTimeName"></td>
+        <td class="posRelative"> 
+            <input type="text" class="input-kpi-index" data-bind="value: ExpectedValue, events:{change: updateExpectedValue}" />
+             <span class="icon-20 icon-close2 pointer no-wrap pull-right posAbsolute kpi-close" style="top: 8px;right: 0px;" data-bind="events:{click: deleteKpiIndex}"></span>
+        </td>
+    </tr>
+</script>
+
+
+<script type="text/html" id="kpi-format-template">
+    <div class="panel panel-default ms-parent w-full div-hover" style="width: 99%;margin-bottom: 0px">
+        <div class="panel-heading panel-heading-mass-parent-setting">
+            <h4 class="panel-title pull-left" style="line-height: normal">
+                <a id="linkkpiformat#:Id#" data-toggle="collapse" data-parent="\\#pop-kpiformat" href="\\#kpiformat#:Id#" class="panel-online collapsed childcategories" onclick="vmPopKpiSettingIndex.openFormat(#:Id#)">
+                    <span class="arrow-panel-online icon-24 icon-left-block arrow-collapse"></span>
+                    <span data-bind="text: Name"></span>
+                  
+                </a>
+            </h4>
+            <div style="position: relative;float: right">
+                <span class="icon-20  icon-right-block cursor-pointer icon-edit-white-independency" data-toggle="dropdown" style="position: absolute; right: -8px;"></span>
+                <ul role="menu" class="popup-menu dropdown-menu ms-popup-menu-left" style="    right: -6px;top: 16px;">
+                    <li><a class="dropdow-menu-li-a" data-bind="events:{click: editKpiFormat}" style="width: inherit" ><span class="icon-24  icon-left-block icon-edit" ></span>#:kLg.edit#</a></li>
+                    <li role="presentation" class="divider"></li>
+                    <li><a class="dropdow-menu-li-a" data-bind="events:{click: deleteKpiFormat}" style="width: inherit"><span class="icon-24  icon-left-block icon-delete" ></span>#:kLg.lblDelete#</a></li>
+                </ul>
+            </div>
+        </div>        
+
+
+        <div id="kpiformat#:Id#" class="panel-collapse collapse height0px parent-body overflow-hidden">
+
+            <form id="kpiformat-form#:Id#" class="valid-form" type="#:Id#">
+
+                <div id="place-kpiformat#:Id#" class="modal-body ms-modal-body" type="content-table-categories">
+                </div>
+                <div style="padding-left: 8px;">
+
+                    <table style="width: 99%;margin-bottom: 0;" class="modal-table-mass margin-modal">
+                        # for(var i = 0; i < KpiFormatItems.length; i++) { #
+                        #var item = KpiFormatItems[i]#
+                        <tr>
+                            <td style="padding-bottom: 7px !important;width: 30%" >                                
+                                <label>#:item.Name#</label>
+                                <div class="clear"></div>                          
+                                #=renFormatControl(item)#
+                                #if(i > 2){#
+                                <span class="icon-20 icon-close2 pointer no-wrap pull-right" onclick="vmPopKpiSettingIndex.deleteFormatItem(#:item.Id#)"></span>
+                                #}#
+                            </td>
+                        </tr>
+                        # } #
+
+                        <tr>
+                            #if(KpiFormatItems.length < 5){#
+                            <td style="padding-bottom: 7px !important;" class="posRelative">
+                                <span class="icon-32 icon-add pointer pull-left" onclick="" data-toggle="dropdown" ></span>
+                                <ul role="menu" class="popup-menu dropdown-menu ms-popup-menu-left" style="top: -6px;left: 47px;">
+                                    <li data-bind="visible: IsCrmLink" ><a style="width: inherit" class="dropdow-menu-li-a" data-bind="events:{click: addCrmLink}"><span class="icon-24  icon-left-block icon-add-region"></span>#:kLg.lblCrmLink#</a></li>
+                                    <li data-bind="visible: IsHideLine" role="presentation" class="divider"></li>
+                                    <li data-bind="visible: IsDocument" ><a style="width: inherit" class="dropdow-menu-li-a" data-bind="events:{click: addDocument}"><span class="icon-24  icon-left-block icon-copy"></span>#:kLg.lblDocument#</a></li>
+                                </ul>
+                            </td>
+                            #}#
+                        </tr>
+                    </table>
+                </div>
+ 
+                <p class="clear4px"></p>
+            </form>
+        </div>       
+
+    </div>
+
+
+</script>
+
+<div class="loading" id="setting-index-loading"></div>
+<script type="text/javascript">
+
+    //var popKpiTopicViewModel;
+
+    var vmPopKpiSettingIndex = vmPopKpiSettingIndex || {};
+
+    vmPopKpiSettingIndex.SetLang = function () {
+        $("#pop-kpisettingindex #lblKpiName").text(kLg.menuKpiIndex);
+        $("#pop-kpisettingindex #lblKpiUnitName").text(kLg.lblKpiUnit);
+        $("#pop-kpisettingindex #lblKpiTime").text(kLg.lblKpiTimePeriod);
+        $("#pop-kpisettingindex #lblKpiSollName").text(kLg.lblSoll);
+    };
+
+    vmPopKpiSettingIndex.dataService = function() {
+        var callAjaxIndex = function (divId, funcName, entryData, requestType, successCallBack) {
+            var url = "../Handlers/SettingHandler.ashx?funcName=" + funcName + "&projid=" + projectId + "&strid=" + strategyId + "&lang=" + language;
+            return callAjax(divId, url, entryData, successCallBack, requestType);
+        };
+
+        var callAjaxByPost = function (funcName, entryData, successFunc, loadingdiv) {
+            return callAjaxIndex(loadingdiv || "categories-loading", funcName, JSON.stringify(entryData), AjaxConst.PostRequest, successFunc);
+        };
+
+        var getAllSettingIndex = function(entryData, successFunc) {
+            return callAjaxByPost("getallsettingindex", entryData, successFunc);
+        }
+
+        var updateKpiFormat = function(entryData, successFunc) {
+            return callAjaxByPost("updatekpiformat", entryData, successFunc);
+        }
+
+        var updateKpiSettingIndex = function (entryData, successFunc) {
+            return callAjaxByPost("updatekpisettingindex", entryData, successFunc);
+        }
+
+        var getSelectIndex = function (entryData, successFunc) {
+            return callAjaxByPost("getselectindex", entryData, successFunc);
+        }
+        var deleteSettingIndex = function (entryData, successFunc) {
+            return callAjaxByPost("deletesettingindex", entryData, successFunc);
+        }
+        var deleteKpiFormat = function (entryData, successFunc) {
+            return callAjaxByPost("deletekpiformat", entryData, successFunc);
+        }
+        var updateKpiFormatItem = function (entryData, successFunc) {
+            return callAjaxByPost("updatekpiformatitem", entryData, successFunc);
+        }
+        var deleteFormatItem = function (entryData, successFunc) {
+            return callAjaxByPost("deleteformatitem", entryData, successFunc);
+        }
+        var updateKpiFormatMIndex = function (entryData, successFunc) {
+            return callAjaxByPost("updatekpiformatmindex", entryData, successFunc);
+        }
+        
+        
+        return {
+            getAllSettingIndex: getAllSettingIndex,
+            updateKpiFormat: updateKpiFormat,
+            getSelectIndex: getSelectIndex,
+            updateKpiSettingIndex: updateKpiSettingIndex,
+            deleteSettingIndex: deleteSettingIndex,
+            deleteKpiFormat: deleteKpiFormat,
+            updateKpiFormatItem: updateKpiFormatItem,
+            deleteFormatItem: deleteFormatItem,
+            updateKpiFormatMIndex: updateKpiFormatMIndex
+        }
+    }();
+
+    vmPopKpiSettingIndex.enumTypeFormat = {
+        Format: 1,
+        Cost: 2,
+        Description: 3,
+        CrmLink: 4,
+        Document: 5
+    };
+    vmPopKpiSettingIndex.openFormatId = 0;
+    
+    vmPopKpiSettingIndex.binKpiFormat = function (indexformat) {
+
+            var viewModelSettingIndex = kendo.observable({
+                settingIndexs: vmPopKpiSettingIndex.updateListSettingIndex(indexformat.KpiSettingIndexs),
+                settingFormats: indexformat.KpiFormats,
+                //formChange : function(){
+                //    vmPopKpiSettingIndex.IsModified = true;
+                //},
+                isEmptyIndexs: indexformat.KpiSettingIndexs.length === 0,
+                selectKpiIndex: function (e) {
+                    //var src = this.settingIndexs;
+                    vmPopKpiSettingIndex.IndexObj = e.data;
+                    //vmPopKpiSettingIndex.Index = src.indexOf(e.data);
+                    vmPopKpiSettingIndex.selectKpiUnit(e.data.Id);
+                },
+                addKpiIndex: function () {
+                    vmPopKpiSettingIndex.IndexObj = { Id: 0, CategoryId: vmPopSetting.SettingIndexCatId };
+                    vmPopKpiSettingIndex.selectKpiUnit(0);
+                },
+                updateExpectedValue: function (e) {
+                    var eData = e.data;
+                    var entryData = {
+                        Id: eData.Id,
+                        CategoryId: eData.CategoryId,
+                        ExpectedValue: eData.ExpectedValue,
+                        KpiIndexId: eData.IndexId
+                    };
+                    vmPopKpiSettingIndex.dataService.updateKpiSettingIndex(entryData, function(res) {
+
+                    });
+                },
+                deleteKpiIndex: function (e) {
+                    pConfirm(kLg.saveConfirmQuestion).then(function () {
+                        var entryData = { Id: e.data.Id };
+                        vmPopKpiSettingIndex.dataService.deleteSettingIndex(entryData, function (res) {
+                            vmPopKpiSettingIndex.getAndBindIndexFormat();
+                        });
+                    });
+                },
+                editKpiFormat: function (e) {
+                    var eData = e.data;
+                    vmPopKpiSettingIndex.OpenPopUpKpiFormat(eData);
+                },
+                deleteKpiFormat: function (e) {
+                    pConfirm(kLg.saveConfirmQuestion).then(function () {
+                        var entryData = { Id: e.data.Id };
+                        vmPopKpiSettingIndex.dataService.deleteKpiFormat(entryData, function (res) {
+                            if (res.value === vmPopSetting.enumsRoleConflict.using) {
+                                pAlert(kLg.msgFormatAreUsing).then(function() {
+                                });
+                            } else {
+                                vmPopKpiSettingIndex.getAndBindIndexFormat();
+                            }
+                        });
+                    });
+                },
+                addCrmLink: function (e) {
+                    var entryData = { Id: 0, KpiFormatId: e.data.Id, FTypeId: vmPopKpiSettingIndex.enumTypeFormat.CrmLink }
+                    vmPopKpiSettingIndex.dataService.updateKpiFormatItem(entryData, function (res) {
+                        vmPopKpiSettingIndex.getAndBindIndexFormat();
+                    });
+                },
+                addDocument: function (e) {
+                    var entryData = { Id: 0, KpiFormatId: e.data.Id, FTypeId: vmPopKpiSettingIndex.enumTypeFormat.Document }
+                    vmPopKpiSettingIndex.dataService.updateKpiFormatItem(entryData, function (res) {
+                        vmPopKpiSettingIndex.getAndBindIndexFormat();
+                    });
+                }
+
+            });
+
+            kendo.bind($("#pop-kpisettingindex"), viewModelSettingIndex);
+  
+
+    }
+
+    vmPopKpiSettingIndex.updateListSettingIndex = (function (listSettingIndex) {
+        if (listSettingIndex.length === 0) {
+                listSettingIndex = [];
+                return listSettingIndex;
+            }
+        listSettingIndex[listSettingIndex.length - 1].VisualAdd = true;
+        for (var i = 0; i < listSettingIndex.length; i++) {
+            if (listSettingIndex[i].ExpectedValue === 0)
+                {
+                    listSettingIndex[i].ExpectedValue = '';
+                 }
+        }
+        return listSettingIndex;
+
+    });
+
+    vmPopKpiSettingIndex.addKpiFormat = function () {
+
+        var txtformat = $("#txtKpiFormat").val();
+        var entryData = { Id: 0, CategoryId: vmPopSetting.SettingIndexCatId, Name: txtformat };
+        vmPopKpiSettingIndex.dataService.updateKpiFormat(entryData, function (res) {
+
+            if (res.value === vmPopSetting.enumsRoleConflict.nameExist) {
+                vmPopSetting.ShowToolTip($("#txtKpiFormat"), kLg.msgUsingKpiFormat.format(kLg.lblKpiFormat), 'top');
+            } else {
+                vmPopKpiSettingIndex.getAndBindIndexFormat();
+                $("#txtKpiFormat").val("");
+            }
+           
+        });
+    }
+
+    vmPopKpiSettingIndex.openFormat = function (id) {
+        
+        if ($("#kpiformat" + id).attr("class").indexOf("collapsed") !== -1) {
+            vmPopKpiSettingIndex.openFormatId = 0;
+        }
+        else
+        vmPopKpiSettingIndex.openFormatId = id;
+
+    }
+
+    vmPopKpiSettingIndex.getAndBindIndexFormat = function () {
+
+        var entryData = { Id: vmPopSetting.SettingIndexCatId };
+        vmPopKpiSettingIndex.dataService.getAllSettingIndex(entryData, function (res) {
+            $("#txtKpiFormat").tooltip('destroy');
+            vmPopKpiSettingIndex.AllData = res.value;
+            vmPopKpiSettingIndex.binKpiFormat(res.value);
+            if (vmPopKpiSettingIndex.openFormatId !==0) {
+                $("#linkkpiformat" + vmPopKpiSettingIndex.openFormatId).trigger('click');
+            }
+
+            $("#txtKpiFormat").bind("keyup", function () {
+                $("#txtKpiFormat").tooltip('destroy');
+            });
+
+            vmPopKpiSettingIndex.SetLang();
+            vmPopKpiSettingIndex.bindFormatSortable();
+        });
+    }
+
+    
+
+    popUpSettingIndex.bind("close", function (e) {
+            popUpSettingIndex.destroy();
+            popUpSettingIndex = null;
+            $('#pop-setting').after('<div id="pop-add-categories-place"></div>');
+    });
+
+    var popUpSelectIndex = undefined;
+    vmPopKpiSettingIndex.selectKpiUnit = function (id) {
+
+        //var act = e.data;
+        //alert(act.SettingIndexId);
+        var entryData = {Id:id}
+        vmPopKpiSettingIndex.dataService.getSelectIndex(entryData, function (serData) {
+            vmPopKpiSettingIndex.TopicIndex = serData.value.KpiTopics;
+            vmPopKpiSettingIndex.Paths = serData.value.Paths;
+            popUpSelectIndex = showPopup(popUpSelectIndex,
+                $('#divSelectKpiIndex'),
+                '../Contents/MsPopSelectSettingIndex.html',
+                {
+                    title: kLg.titleSelectKpiIndex.format(kLg.menuKpiIndex) ,
+                    width: 800,
+                    height: 525,
+                    resizable: false,
+                    scrollable: true
+                }
+            );
+        });
+    };
+
+    var popUpKpiFormat = undefined;
+    vmPopKpiSettingIndex.OpenPopUpKpiFormat = function (data) {
+        vmPopKpiSettingIndex.FormatItem = data;
+        popUpKpiFormat = showPopup(popUpKpiFormat,
+            $('#divSelectKpiIndex'),
+            '../Contents/MsPopAddKpiFormat.html',
+            {
+                title: kLg.lblKpiFormat,
+                height: 290,
+                width: 500,
+                resizable: false
+            });
+    };
+
+
+  
+    $(document).ready(function () {
+        vmPopKpiSettingIndex.getAndBindIndexFormat();
+    });
+
+    vmPopKpiSettingIndex.ControlType = {
+        Format: 1,
+        Cost: 2,
+        Description: 3,
+        Link: 4,
+        MFile: 5
+
+    };
+
+    function renFormatControl(item) {
+        var res = '';
+        switch (item.FTypeId) {
+            case vmPopKpiSettingIndex.ControlType.Format:
+                res = vmPopKpiSettingIndex.renFormatTextbox(item);
+                break;
+            case vmPopKpiSettingIndex.ControlType.Cost:
+                res = vmPopKpiSettingIndex.renFormatTextbox(item);
+                break;
+            case vmPopKpiSettingIndex.ControlType.Description:
+                res = vmPopKpiSettingIndex.renFormatTextArea(item);
+                break;
+            case vmPopKpiSettingIndex.ControlType.Link:
+                res = vmPopKpiSettingIndex.renFormatTextbox(item);
+                break;
+            case vmPopKpiSettingIndex.ControlType.MFile:
+                res = vmPopKpiSettingIndex.renFormatTextbox(item);
+                break;
+          }
+
+        return res;
+    };
+
+    vmPopKpiSettingIndex.renFormatTextbox = function (item) {
+        return '<input type="text" class="input-kpi-format-item"  maxlength="50" value="' + item.MValue + '" onchange= vmPopKpiSettingIndex.updateFormatItem(this,' + item.Id + ')' +
+            ' id="ft' + item.Id  + '"  />';
+    }
+    vmPopKpiSettingIndex.renFormatTextArea = function (item) {
+        return '<textarea class="eval-textarea" onchange= vmPopKpiSettingIndex.updateFormatItem(this,' + item.Id + ')' +
+            ' id="ft' + item.Id + '" >' + item.MValue + '</textarea>';
+    }
+
+
+    vmPopKpiSettingIndex.deleteFormatItem = function (id) {
+        pConfirm(kLg.saveConfirmQuestion).then(function () {
+            var entryData = { Id: id };
+            vmPopKpiSettingIndex.dataService.deleteFormatItem(entryData, function (res) {
+                vmPopKpiSettingIndex.getAndBindIndexFormat();
+            });
+        });
+
+    }
+
+    vmPopKpiSettingIndex.updateFormatItem = function (e,id) {
+        var entryData = { Id: id, MValue: e.value.trim()}
+        vmPopKpiSettingIndex.dataService.updateKpiFormatItem(entryData, function (res) {
+
+        });
+    }
+
+    var srcIndex = 0, desIndex = 0;
+    vmPopKpiSettingIndex.bindFormatSortable = function() {
+        $("#pop-kpiformat").sortable({
+            axis: "y",
+            items: "div.div-hover",
+            cancel: "h4.panel-title,a.childcategories,input.popup-input",
+            cursor: "n-resize",
+            revert: false,
+            opacity: 0.8,
+            tolerance: "pointer",
+            containment: "parent",
+            start: function (event, ui) {
+                srcIndex = ui.item.index();
+            },
+            stop: function (event, ui) {
+                desIndex = ui.item.index();
+                if (srcIndex === desIndex) return;
+
+                var src = vmPopKpiSettingIndex.AllData.KpiFormats;
+                if (src.length === 0) return;
+
+                var srcId = src[srcIndex].Id;
+                var desId = src[desIndex].Id;
+
+                vmPopKpiSettingIndex.ChangePositionFormat(desId, srcId, vmPopSetting.enumsType.categoryKpiFormat, srcIndex > desIndex ? 0 : 1);
+            }
+        });
+    }
+
+    vmPopKpiSettingIndex.ChangePositionFormat = function (desId, sourceId, type, position) {
+
+        var moving = {
+            SourceId: sourceId,
+            DesId: desId,
+            SourceMdf: 0,
+            DesMdf: 0,
+            ParentType: vmPopSetting.enumsParentType.Marketing,
+            Type: type,
+            Position: position,
+            ParentSourceId: vmPopSetting.SettingIndexCatId === null ? 0 : vmPopSetting.SettingIndexCatId
+        };
+        vmPopKpiSettingIndex.dataService.updateKpiFormatMIndex(moving, function (res) {
+            
+        });
+    };
+
+
+</script>
+

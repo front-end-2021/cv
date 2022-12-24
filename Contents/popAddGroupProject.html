@@ -1,0 +1,475 @@
+﻿<style type="text/css">
+    table.popup-table-email { margin: 0; }
+    table.popup-table-email td { padding: 0 7px 0 0 !important; }
+    .popup-footer{ margin-top: 0 }
+</style>
+
+<div id="pop-add-projectGroup" class="pop-wrapper">
+    <form id="form-add-group">
+        <div class="modal-body ms-modal-body" style="height: 314px; overflow-x: overlay;">
+            <div class="form-group">
+                <label class="popup-lable" id="lblProjectGroupName">Projectname</label>
+                <div class="clearx1"></div>
+                <input class="k-input" name="GroupName" maxlength="100" id="txtProjectGroupName" value="Name Projektgruppe" tabindex="1" style="width:300px;padding-left:3px;height:23px;" />
+            </div>
+            
+            <div class="form-group">
+                <label id="lblMks">Marketingstrategie</label>
+                <div id="div-memberList-place"></div>
+            </div>
+
+            <div class="form-group">
+                <table class="popup-table-email">
+                    <tr>
+                        <td>
+                            <label id="lblEmail">E-Mail Adresse</label>
+                            <div class="clear"></div>
+                        <td>
+                            <label id="lblRole">Rolle</label>
+                            <div class="clear"></div>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><input value="" name="email" class="popup-input" id="txtEmail" tabindex="2" /></td>
+                        <td>
+
+                            <select class="" id="combobox-role" tabindex="3">
+                                <option value="2" id="itemSelectEdit" selected="selected">Edit</option>
+                                <option value="3" id="itemSelectView">View</option>
+                            </select>
+
+                        </td>
+                        <td><span class="icon-32  icon-add" id="btnAddMemberToGroup" onclick=" vmProjectGroup.AddMember() " tabindex="4"></span></td>
+                    </tr>
+                </table>
+            </div>
+
+            <p class="clearx2"></p>
+            <div id="pop-add-group-error"></div>
+        </div>
+        <div class="popup-footer">
+            <button type="button" class="ms-button" onclick=" vmProjectGroup.closePopUp() " tabindex="5" id="closeButton" ><span class="icon-20  icon-close margin-right6"></span><span id=lblClose>Aktualisieren</span></button>
+        </div>
+    </form>
+</div>
+<div id="pop-add-group-loading" class="loading"></div>
+
+<script type="text/HTML" id="template-memberList">
+    <table class="tbgrid modal-table" id="tbl-memberList">
+        <tr>
+            <th class="title bg-grey" width="150px">#:kLg.fullName#</th>
+            <th class="title bg-grey" width="181px">#:kLg.emailAddress#</th>
+            <th class="title bg-grey" width="140px">#:kLg.role#</th>
+            <th class="title bg-grey" width="170px">#:kLg.lastLoggedIn#</th>
+            <th class="title bg-grey" width="48px"></th>
+        </tr>
+        #for(var i = 0; i < data.length; i++) {#
+        #   var member = data[i];#
+        #if(member.RowState != dataState.Deleted) {#
+        <tr indexArr="#:i#">
+            <td>#:member.MemberName#</td>
+            <td>#:member.MemberEmail#</td>
+            <td>
+                #if(member.Role == vmProjectGroup.Role.GroupOwner) {#
+                #:vmProjectGroup.Lang.GroupOwner#
+                #} else {#
+
+                    <select onchange="vmProjectGroup.changeRole(#=i#, this.value)" class="ms-select" >
+                        <option value="3" # if (member.Role==3) { #  selected="selected" #}#>#=vmProjectGroup.Lang.GroupView#</option>
+                        <option value="2" # if (member.Role==2) { #  selected="selected" #}#>#=vmProjectGroup.Lang.GroupEdit#</option>
+                        #if(vmProjectGroup.CurrentRole == vmProjectGroup.Role.GroupOwner) { # 
+                        <option value="1" # if (member.Role==1) { # selected="selected" #}#>#=vmProjectGroup.Lang.GroupOwner#</option>
+                        #}#
+                    </select>
+
+                #}#
+
+            </td>
+            <td>#if(member.LastLoginedDate != null){#
+                #:kendo.toString(member.LastLoginedDate.jsonToDate(),"d")#
+                #}#
+            </td>
+            <td class="td-bin td-v-align-middle">
+                #if(member.Role != vmProjectGroup.Role.GroupOwner) {#
+                <div class="ms-dropdow">
+                    <span class="icon-16 icon-dropdow" data-toggle="dropdown" ></span>
+                    <ul aria-labelledby="btnGroupVerticalDrop1" role="menu" class="popup-menu dropdown-menu ms-popup-menu" >
+                        #if (!member.IsActived) {#
+                        <li><a class="dropdow-menu-li-a" data-toggle="modal" data-target=".bs-example-modal-lg" onclick="vmProjectGroup.EditInActiveMember(this)"> <span class="icon-24 icon-left-block icon-edit"></span><span id="lblQGEdit">#:kLg.edit#</span></a></li>
+                        <li role="presentation" class="divider"></li>
+                        #}#
+                        <li><a class="dropdow-menu-li-a" onclick="vmProjectGroup.RemoveMember(this)"><span class="icon-24  icon-left-block icon-delete"></span><span id="lblQGDel">#:kLg.lblDelete#</span></a></li>
+                    </ul>
+                </div>
+                #}#
+            </td>
+        </tr>
+        #}#
+        #}#       
+    </table>
+</script>
+
+<style>
+    .k-header {
+        background-color: transparent !important;
+    }
+
+    .ms-select {
+        padding: 0px !important;
+    }
+
+    #pop-add-projectGroup .dropdown-menu {
+        left: -142px;
+    }
+
+    #pop-add-projectGroup .icon-dropdow {
+        background-position: -81px -299px;
+        text-indent: -999px;
+        float: right;
+        display: block;
+        width: 20px;
+    }
+
+    #pop-add-projectGroup .dropdow-menu-li-a {
+        padding: 0 10px 0 10px !important;
+        width: 87% !important;
+    }
+</style>
+
+<script>
+    var vmProjectGroup = vmProjectGroup || {};
+    var vmProjectList = vmProjectList || {};
+
+    vmProjectGroup.ListMember = [];
+    vmProjectGroup.TempMember = {};
+    vmProjectGroup.Role = {
+        GroupOwner: 1,
+        GroupEdit: 2,
+        GroupView: 3
+    };
+    vmProjectGroup.Lang = {
+        GroupOwner: kLg.groupOwner,
+        GroupEdit: kLg.roleEdit,
+        GroupView: kLg.roleView
+    };
+    vmProjectGroup.ProjectGroupId = 0;
+    vmProjectGroup.CurrentRole = 0;
+    vmProjectGroup.GroupDetail = {};
+    vmProjectGroup.Errors = [];
+    vmProjectGroup.ErrorsState = {
+        NoRole: -1,
+        Conflict: -3
+    };
+    vmProjectGroup.IsModified = false;
+
+    vmProjectGroup.BindMemberList = function () {
+        
+        bindTemplate("div-memberList-place", "template-memberList", vmProjectGroup.ListMember);
+        vmProjectGroup.SetupValidate();
+        $(".ms-select").kendoDropDownList();
+        $('#combobox-role').kendoDropDownList({
+            dataTextField: 'Text',
+            dataValueField: 'Value',
+            dataSource: [{ Value: 2, Text: vmProjectGroup.Lang.GroupEdit }, { Value: 3, Text: vmProjectGroup.Lang.GroupView }]
+        });
+        if (popUpAddProjectGroup) {
+
+            var maxPopupHeight = (typeof projectApp != "undefined" ? $("#app").height() : $(window).height()) - 50;
+            var maxPopupWidth = window.innerWidth - 100;
+
+            var modalBody = $("#form-add-group .modal-body #div-memberList-place").height() + 315;
+            // popupHeight = (.modal-body).height + 117
+            var popupHeight = modalBody < maxPopupHeight ? modalBody : maxPopupHeight;
+            $("#form-add-group .modal-body").height(popupHeight - 80);
+            var popupWidth = $("#form-add-group #tbl-memberList").width() + 50; // $("#form-add-group .modal-body").width() + 20;
+            resizePopUp(popUpAddProjectGroup, { height: popupHeight, width: popupWidth > maxPopupWidth ? maxPopupWidth : popupWidth });
+        }
+
+    };
+
+    vmProjectGroup.GetMemberByEmail = function (email) {
+        var url = 'Handlers/AccountHandler.ashx?funcName=getbyemail&email=' + email;
+        callAjax('pop-add-group-loading', url, null, vmProjectGroup.GetMemberCallBack, AjaxConst.GetRequest);
+    };
+
+    vmProjectGroup.GetMemberById = function (groupId) {
+        var url = 'Handlers/ProjectGroupHandler.ashx?funcName=getprojectgroupinfo';
+        var obj = { Id: groupId };
+        callAjax('pop-add-group-loading', url, JSON.stringify(obj), vmProjectGroup.GetListMemberCallBack, AjaxConst.PostRequest);
+    };
+
+    vmProjectGroup.GetCurrentRole = function (groupId) {
+        var url = 'Handlers/ProjectGroupHandler.ashx?funcName=getcurrole';
+        var obj = { Id: groupId };
+        callAjax('pop-add-group-loading', url, JSON.stringify(obj), vmProjectGroup.GetRoleCallBack, AjaxConst.PostRequest);
+    };
+
+    vmProjectGroup.GetRoleCallBack = function (data) {
+        vmProjectGroup.CurrentRole = data.value;
+        vmProjectGroup.GetMemberById(vmProjectGroup.ProjectGroupId);
+    };
+
+    vmProjectGroup.GetListMemberCallBack = function (data) {
+        vmProjectGroup.ListMember = data.value;
+        vmProjectGroup.BindMemberList();
+    };
+
+    vmProjectGroup.GetMemberCallBack = function (data) {
+        var member = data.value;
+        if (member == null) {
+            member = {};
+            member.MemberEmail = vmProjectGroup.TempMember.MemberEmail;
+            member.MemberName = '';
+            member.LastLoginedDate = null;
+            
+            vmProjectGroup.OpenPopAddUser(vmProjectGroup.TempMember.MemberEmail, vmProjectGroup.TempMember.Role);
+            return;
+        }
+        member.RowState = dataState.Added;
+        member.Role = vmProjectGroup.TempMember.Role;
+        vmProjectGroup.ListMember.push(member);
+        vmProjectGroup.BindMemberList();
+    };
+
+    var popAddNewUser;
+    vmProjectGroup.OpenPopAddUser = function(email, role,e) {
+        var isAdd = e == null;
+        if (isAdd) {
+            vmNewMember = { Email: email, Role: role };
+        }
+        else {
+            var indexer = $(e).closest('tr').attr('indexArr');
+            var list = vmProjectGroup.ListMember;
+            vmNewMember = list[indexer];
+            vmNewMember.IsUpdate = true;
+        }
+
+        var popTitle = isAdd ? kLg.titleAccountRegisterForm: kLg.changeInforTitle;
+        vmNewMember.Source = "group";
+        
+        popAddNewUser = showPopup(popAddNewUser,
+                $('#pop-add-new'),
+                '../Contents/popAddPerson.html',
+                {
+                    title: popTitle,
+                    height: 410,
+                    width: 730,
+                    resizable: false
+                }).center();
+    };
+
+    vmProjectGroup.AddMember = function () {
+        if (!$('#form-add-group').valid()) return;
+        vmProjectGroup.IsModified = true;
+        vmProjectGroup.TempMember.MemberEmail = $("#pop-add-projectGroup #txtEmail").val().trim();
+        vmProjectGroup.TempMember.Role = $("#pop-add-projectGroup #combobox-role").val();
+        if (vmProjectGroup.TempMember.MemberEmail == null || vmProjectGroup.TempMember.MemberEmail == '') {
+            return;
+        }
+        var check = vmProjectGroup.FindByEmail(vmProjectGroup.TempMember.MemberEmail);
+        if (check != null) {
+            $("#pop-add-projectGroup #txtEmail").attr('title', kLg.emailExisted);
+            $("#pop-add-projectGroup #txtEmail").tooltip('show');
+            return;
+        }
+        vmProjectGroup.GetMemberByEmail(vmProjectGroup.TempMember.MemberEmail);
+    };
+
+    
+
+    vmProjectGroup.RemoveMember = function (e) {
+        vmProjectGroup.IsModified = true;
+        var indexer = $(e).closest('tr').attr('indexArr');
+        if (vmProjectGroup.ListMember[indexer].RowState != dataState.Added) {
+            vmProjectGroup.ListMember[indexer].RowState = dataState.Deleted;
+        } else {
+            vmProjectGroup.ListMember.splice(indexer, 1);
+        }
+
+        vmProjectGroup.BindMemberList();
+    };
+
+    vmProjectGroup.UpdateGroup = function () {
+        //if (!$('#form-add-group').valid()) return;
+        vmProjectGroup.GroupDetail.ListMember = vmProjectGroup.ListMember;
+        vmProjectGroup.GroupDetail.Name = $('#pop-add-projectGroup #txtProjectGroupName').val();
+        var funcName = 'insert';
+        if (vmProjectGroup.ProjectGroupId > 0) {
+            funcName = 'update';
+            vmProjectGroup.GroupDetail.Id = vmProjectGroup.ProjectGroupId;
+            vmProjectGroup.GroupDetail.Mdf = vmProjectGroup.CurrentMdf;
+
+            var projectIds = [];
+            if (vmProjectList.ListGroupDetail && vmProjectList.ListGroupDetail.ListGroups) {
+                var groupItem = vmCommon.findById(vmProjectGroup.GroupDetail.Id, vmProjectList.ListGroupDetail.ListGroups);
+                if (groupItem) {
+                    projectIds = vmCommon.selectProperty(groupItem.ListProject, "Id");                   
+                }
+            }
+
+            vmProjectGroup.GroupDetail.ProjectIds = projectIds;
+        }
+        var url = 'Handlers/ProjectGroupHandler.ashx?funcName=' + funcName;
+        callAjax('pop-add-group-loading', url, JSON.stringify(vmProjectGroup.GroupDetail), vmProjectGroup.updateCallBack, AjaxConst.PostRequest);
+
+    };
+
+    vmProjectGroup.updateCallBack = function (data) {
+        var state = parseInt(data.value);
+        switch (state) {
+            case vmProjectGroup.ErrorsState.NoRole:
+                pAlert(kLg.msgNoEditPermission).then(function () {
+                    getListByMember();
+                    popUpAddProjectGroup.close();
+                });
+                break;
+            case vmProjectGroup.ErrorsState.Conflict:
+                pAlert(kLg.msgConflictData).then(function () {
+                    getListByMember();
+                    popUpAddProjectGroup.close();
+                });
+                break;
+            default:
+                if (typeof projectApp !== 'undefined') {
+                    projectApp.getData();
+                }
+
+                if (typeof getListByMember !== 'undefined') {
+                    getListByMember();
+                }
+                
+                popUpAddProjectGroup.close();
+                break;
+        }
+    };
+
+    vmProjectGroup.closePopUp = function () {
+        if (!$('#form-add-group').valid()) return;
+        vmProjectGroup.IsModified = false;
+        vmProjectGroup.UpdateGroup();
+        //popUpAddProjectGroup.close();
+    };
+
+    vmProjectGroup.FindByEmail = function (email) {
+        email = email.toLowerCase();
+        return vmCommon.findByFunc(vmProjectGroup.ListMember, function(obj) { return obj.MemberEmail.toLowerCase() === email && obj.RowState != dataState.Deleted; });
+    };
+
+    vmProjectGroup.changeRole = function (indexer, value) {
+        vmProjectGroup.IsModified = true;
+        if (vmProjectGroup.ListMember[indexer].RowState == dataState.Unchanged) {
+            vmProjectGroup.ListMember[indexer].RowState = dataState.Modified;
+
+        }
+        if (parseInt(value) == vmProjectGroup.Role.GroupOwner) {
+            var member = vmCommon.findByFunc(vmProjectGroup.ListMember, function(obj) { return obj.Role == vmProjectGroup.Role.GroupOwner; });
+            if (member != null) {
+                member.Role = vmProjectGroup.Role.GroupEdit;
+                if (member.RowState == dataState.Unchanged) {
+                    member.RowState = dataState.Modified;
+                }
+            }
+        }
+        vmProjectGroup.ListMember[indexer].Role = value;
+        vmProjectGroup.BindMemberList();
+
+    };
+    vmProjectGroup.SetLang = function () {
+        $("#pop-add-projectGroup #itemSelectOwner").text(vmProjectGroup.Lang.GroupOwner);
+        $("#pop-add-projectGroup #itemSelectEdit").text(vmProjectGroup.Lang.GroupEdit);
+        $("#pop-add-projectGroup #itemSelectView").text(vmProjectGroup.Lang.GroupView);
+        $("#pop-add-projectGroup #lblClose").text(kLg.lblClose);
+        $("#pop-add-projectGroup #lblProjectGroupName").text(kLg.projectGroupName);
+        $("#pop-add-projectGroup #lblMks").text(kLg.lblMks);
+        $("#pop-add-projectGroup #lblRole").text(kLg.role);
+        $("#pop-add-projectGroup #lblEmail").text(kLg.emailAddress);
+        
+    };
+
+    vmProjectGroup.flag = false;
+    vmProjectGroup.BindClosePopup = function () {
+        popUpAddProjectGroup.bind("close", function (e) {
+            if (vmProjectGroup.IsModified && !popUpAddProjectGroup.needClose) {
+                e.preventDefault();
+                
+                pConfirm(kLg.saveConfirmQuestion).then(function() {
+                    if ($('#form-add-group').valid()) {
+                        popUpAddProjectGroup.needClose = true;
+                        vmProjectGroup.UpdateGroup();
+                    }
+                }, function() {
+                    popUpAddProjectGroup.needClose = true;
+                    popUpAddProjectGroup.close();
+                });
+            } else {
+                popUpAddProjectGroup = null;
+            }
+        });
+    };
+
+    $.validator.addMethod('betterEmail', function (value, element) {
+        return this.optional(element) || /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(value);
+    }, kLg.validEmail);
+
+    vmProjectGroup.SetupValidate = function () {
+        $('#form-add-group').validate({
+            rules: {
+                email: {
+                    betterEmail: true,
+                    maxlength: 75
+                },
+                GroupName: {
+                    required: true
+                }
+            },
+            messages: {
+                email: {
+                    betterEmail: kLg.validEmail,
+                    maxlength: kLg.msgMaxlenghEmail
+                },
+                GroupName: {
+                    required: kLg.requiredName
+                }
+            }
+        });
+    };
+
+    vmProjectGroup.EditInActiveMember = function (e) {
+        vmProjectGroup.OpenPopAddUser(null,null,e);
+    };
+
+    //Pageload
+    $(document).ready(function () {
+        $("#pop-add-projectGroup #txtProjectGroupName").on("change keyup paste", function () {
+            vmProjectGroup.IsModified = true;
+        });
+        $("#pop-add-projectGroup #txtProjectGroupName").focus();
+        vmProjectGroup.ProjectGroupId = parseInt(vmProjectList.GroupId);
+        if (vmProjectGroup.ProjectGroupId == 0) {
+            if (popUpAddProjectGroup) popUpAddProjectGroup.title(kLg.addProjectGroup);
+            vmProjectGroup.ListMember = [];
+            vmProjectGroup.CurrentRole = vmProjectGroup.Role.GroupOwner;
+            var owner = {};
+            owner.MemberName = vmUser.currentAccount.Name;
+            owner.MemberEmail = vmUser.currentAccount.Email;
+            owner.LastLoginedDate = vmUser.currentAccount.LastLoginedDate;
+            owner.Role = vmProjectGroup.Role.GroupOwner;
+            owner.RowState = dataState.Added;
+            vmProjectGroup.ListMember.push(owner);
+            vmProjectGroup.BindMemberList();
+        } else {
+            if (popUpAddProjectGroup) popUpAddProjectGroup.title(kLg.EditProjectGroupTitle);
+            $("#pop-add-projectGroup #txtProjectGroupName").val(vmProjectList.GroupName);
+            vmProjectGroup.CurrentMdf = vmProjectList.GroupMdf;
+            vmProjectGroup.GetCurrentRole(vmProjectGroup.ProjectGroupId);
+            vmProjectGroup.ListMember = [];
+            
+        }
+        vmProjectGroup.SetLang();
+        vmProjectGroup.BindClosePopup();
+        //$(".ms-select").kendoDropDownList();
+        //vmCommon.resetTabIndex("pop-add-projectGroup");
+    });
+
+</script>

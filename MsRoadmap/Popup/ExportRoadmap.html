@@ -1,0 +1,180 @@
+﻿
+<div class="dnb-inline-block wrapper" style="width:100%;height:100%;" v-cloak>
+    
+    <tbody id="dnb_export_pdf" class="divExportSetting">
+        <tr class="kgv-review-roadmap">
+            <td class="settings-export-rm" style=" padding-left: 358px; position: relative;">
+                <div id="SettingExportRM">
+                    <div class="div-top-settings" style="       ">
+                        <label style="font-size: 18px;color: #635c5c;" id="lblExSetting">{{kLg.exSettings}}</label><br />
+                        <div class="form-group pull-right" style="margin-top: 15px;">
+                            <button class="ms-button" @click="closeopenPopExportRoadmap">
+                                <span class="icon-20 icon-close" style="float: left"></span>
+                                <span id="lblClose">{{kLg.lblCloseForm}}</span>
+                            </button>
+                            <button class="ms-button" @click="onExportRoadmap"
+                                    v-bind:class="{'bg-disable' : (IsEnableBtnExport == false)}">
+                                <span class="icon-20 icon-download" style="float: left"></span>
+                                <span>{{kLg.textExport  }}</span>
+                            </button>                                                                          
+                        </div>
+                    </div>
+                    <div class="div-bottom-settings" style="">
+                        <div style="margin-top: 20px;">
+
+                            <table class="tableSetting" style="color: gray;display: block;">
+                                <thead>
+                                    <tr style="height: 0px"></tr>
+                                </thead>
+                                <tbody style="float: right; padding-right: 100px;">
+                                    <tr>
+                                        <td class="tdleft" style="float: right; margin-top: 30px;">{{kLg.PDFExport}}:</td>
+                                        <td class="tdright"><input type="checkbox" v-model="isExportPdf" style=" margin-left: 15px;margin-top: 30px;" /></td> 
+                                    </tr>
+                                    <tr>
+                                        <td class="tdleft" style="float: right;">{{kLg.textExcel}}:</td>
+                                        <td class="tdright"><input type="checkbox" v-model="isExportExcel" style=" margin-left: 15px;" /></td>
+                                    </tr>
+                                    <tr v-if="IsOwner">
+                                        <td class="tdleft">{{kLg.lblLinkPreview}}:</td>
+                                        <td class="tdright"><input type="checkbox" v-model="isPreviewCheck" style=" margin-left: 15px;" /></td>
+                                    </tr>
+                                </tbody>
+                                <thead style="display: inline-flex; padding-right: 200px;">
+                                    <tr>
+                                        <th colspan="2" class="headerSetting" id="thPaper">{{kLg.paperSetting}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody style=" display: inline; ">
+                                    <tr style=" float: right;">
+                                        <td class="tdoptionleftroadmap" id="tdPaperSize" style="width: 113px; text-align: left;">{{kLg.paperSize}}</td>
+                                        <td class="tdoptionrightroadmap">
+                                            <select id="sltPaperSize" data-role="dropdownlist" style="width: 140px !important;"
+                                                    data-value-primitive="true"
+                                                    data-text-field="Name"
+                                                    data-value-field="Id"
+                                                    data-bind="source: paperSize">
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr style=" float: right;">
+                                        <td class="tdoptionleft" style="  padding-top: 10px; width: 113px; text-align: left; " id="tdOrien">{{kLg.orientation}}</td>
+                                        <td class="tdoptionrightroadmap">
+
+                                            <select id="sltOrientation" data-role="dropdownlist" value="1" style="width: 140px !important;"></select>
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                                <tbody style=" display: inline; ">
+
+                                    <tr style=" float: right;">
+                                        <td class="tdleft">{{kLg.exDateRangeStart}}</td>
+                                        <td class="tdrightroadmap" style="padding-top:15px!important">
+                                            <input id="txtStartDateEx" maxlength="10" data-role="datepicker" autocomplete="off"
+                                                   style="width: 130px" />
+
+                                        </td>
+                                    </tr>
+                                    <tr style=" float: right;">
+                                        <td class="tdleft" style="padding-right: 7px;">{{kLg.exDateRangeEnd}}</td>
+                                        <td class="tdrightroadmap">
+                                            <input id="txtEndDateEx" maxlength="10" data-role="datepicker" autocomplete="off"
+                                                   style="width: 130px" />
+
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                                <thead>
+                                    <tr>
+                                        <th colspan="2" class="headerSetting" id="thPaper">{{kLg.addColumn}}</th>
+                                    </tr>
+                                </thead>
+
+                                <thead style="float: right; padding-right: 100px;">
+                                
+                                    <tr>
+                                        <td class="tdleft" style="float: right; margin-top: 10px;">{{kLg.hidePathRoadmap}}:</td>
+                                        <td class="tdright"><input type="checkbox" v-model="IsHidePath" style=" margin-left: 15px;margin-top: 13px;" /></td>
+                                    </tr>
+                               
+                                </thead>
+
+
+
+                            </table>
+                                                        
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td class="kgv-calenda-review">
+                <div class="div-info-measuresplan">
+                    <div class="min-w">
+                        <p class="clear"></p>
+                    </div>
+                    <div class="min-w">
+
+                        <div id="ms-view-month-quarter" style=" margin-top: 15px;" class="navi-place">
+                            <span class="btn" v-bind:class="{ activebtn: ViewTypeId == 0 }" @click="saveViewStatus(0)" style="box-shadow: 0 3px 5px rgb(0 0 0 / 13%);">{{kLg.TabQuarter}}</span>
+                            <span class="btn" v-bind:class="{ activebtn: ViewTypeId == 1 }" @click="saveViewStatus(1)" style="box-shadow: 0 3px 5px rgb(0 0 0 / 13%);">{{kLg.TabMonth}}</span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <CalendarHead :viewType="ViewTypeId" :StartEndM="ViewMonth" :StartEndQ="ViewQuarter" :IsHidePath="IsHidePath"/>
+
+                <div class="rm-view-quarter kgv-clendaquarter dnb-pdf-1-page" v-if="ViewTypeId == 0"
+                     v-bind:style="{
+                        width: (IsHidePath ? ViewWidth - 17 : ViewWidth) + 'px',
+                        height: StyleHeightViewQuarter,
+                        overflow: StyleWithTimeRangeTo.overflow }">
+
+                    <!--use key to re-render-->
+                    <rm-quarter-calendar v-if="ViewTypeId == 0"
+                                         v-bind:style="{marginLeft: IsHidePath ? '-6px' : '0' }"
+                                         v-bind:key="'carlendar-q-from-'+ViewFrom+'-to-'+ViewTo"
+                                         :StartEnd="ViewQuarter"
+                                         :TimerangeStart="TimeRangeFrom" :TimerangeEnd="TimeRangeTo">
+                    </rm-quarter-calendar>
+
+                    <rm-view-quarter v-if="ViewTypeId == 0" class="dnb-w101p"
+                                     v-bind:key="KeyLabeling"
+                                     v-bind:style="{marginLeft: IsHidePath ? '-6px' : '0' }"
+                                     :MinStart="ViewQuarter.Start" :MaxEnd="ViewQuarter.End"
+                                     :TimerangeStart="TimerangeStart" :TimerangeEnd="TimerangeEnd"
+                                     :MasterBlocks="Elements.MasterBlocks">
+                    </rm-view-quarter>
+
+                </div>
+
+                <div class="rm-view-month dnb-pdf-1-page" v-if="ViewTypeId == 1"
+                     v-bind:style="{
+                            width: (IsHidePath ? ViewWidth - 127 : ViewWidth - 118) + 'px',
+                            height: StyleHeightViewMonth,
+                            overflow: StyleWithTimeRangeTo.overflow }">
+
+                    <!--use key to re-render-->
+                    <rm-month-calendar v-if="ViewTypeId == 1"
+                                       v-bind:key="'carlendar-m-from-'+ViewFrom+'-to-'+ViewTo"
+                                       :StartEnd="ViewMonth"
+                                       :TimerangeStart="TimeRangeFrom" :TimerangeEnd="TimeRangeTo">
+                    </rm-month-calendar>
+                    <rm-view-month v-if="ViewTypeId == 1"
+                                   v-bind:key="KeyLabeling"
+                                   :MinStart="ViewMonth.Start" :MaxEnd="ViewMonth.End"
+                                   :TimerangeStart="TimerangeStart" :TimerangeEnd="TimerangeEnd"
+                                   :MasterBlocks="Elements.MasterBlocks">
+                    </rm-view-month>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+
+    <table class="dnb-export_pdf-wrapper">
+        <tbody id="dnb_rm_export_pdf_cache"> </tbody>
+    </table>
+    
+</div>

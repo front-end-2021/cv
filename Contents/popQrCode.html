@@ -1,0 +1,38 @@
+﻿<style type="text/css">
+    
+</style>
+
+<div style="width: 400px; margin: 0 auto" class="pop-wrapper">
+    <div class="loading" id="loadingEditInfo"></div>
+    <div class="modal-body ms-modal-body">
+        <div id="divQrCode">
+            <img id="imageQrCode" style="width: 85%;height: 85%;margin-left: 29px;" src=""/>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    var vmQrCode = vmQrCode || {};
+    
+    vmQrCode.genQrCode = function () {
+        var url = "../Handlers/AccountHandler.ashx?funcName=genqrcode";
+        callAjax('div-loading-ucaccount', url, null, function (data) {
+            $('#imageQrCode').attr('src', data);
+        }, AjaxConst.PostRequest);
+    };
+
+    $(document).ready(function () {
+        vmQrCode.genQrCode();
+    });
+    
+    vmUser.popUpQrCode.bind("close", function (e) {
+        destroyInfoPopUp();
+    });
+
+    function destroyInfoPopUp() {
+        vmUser.popUpQrCode.destroy();
+        vmUser.popUpQrCode = undefined;
+        $('.block-menu-icon').after('<div id="pop-showQrCode"></div>');
+    };
+</script>

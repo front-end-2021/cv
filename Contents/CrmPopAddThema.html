@@ -1,0 +1,111 @@
+﻿<div class="pop-wrapper" id="pop-add-thema" >
+    <div class="ms-modal-body">
+        <form id="add-thema-form" data-bind="events:{change: formChange}">
+            <div class="form-group">
+                <label id="lblNameThema">Name :</label>
+                <p class="clear"></p>
+                <input class="modal-input txtInput w-98per" maxlength="100" name="ThemaName" id="txtNameThema" data-value-update="keyup" tabindex="1" data-bind="value: vmpthema.Name" />
+                <!--data-value-update="keyup"-->
+            </div>
+            <hr class="modal-market-hr" />
+            <div class="form-group">
+                <label id="lblDescriptionThema">Description :</label>
+                <p class="clear"></p>
+                <textarea class="modal-textarea w-98per" name="ThemaDescription" id="txtDescriptionThema" tabindex="2" data-value-update="keyup" data-bind="value: vmpthema.Description" ></textarea>
+            </div>
+
+        </form>
+    </div>
+    <div class="modal-market-footer">
+        <button type="button" class="ms-button" id="btnCloseThema" tabindex="3" data-bind="events:{click: saveChange}">
+            <span class="icon-16 icon-close margin-right6"></span><span id="lblClose">Speichern und schliessen</span>
+        </button>
+    </div>
+</div>
+<div class="loading" id="add-question-loading"></div>
+
+
+<script type="text/javascript">    
+    //var vmEditThema = {};    
+    vmEditThema.SetupValidate = function () {
+        $('#add-thema-form').validate({
+            rules: {
+                ThemaName: {
+                    required: true,
+                    maxlength: 100
+                }
+            },
+            messages: {
+                ThemaName: {
+                    required: kLg.requiredName,
+                    maxlength: kLg.msgMaxlenghName
+                }
+            }
+        });
+        
+        //prevent Enter key submit form
+        $('form').on('submit', function (e) {
+            e.preventDefault();
+            $('#btnCloseThema').trigger('click');
+        });
+    };
+
+
+    vmEditThema.setupLanguage = function () {
+        $('#lblClose').text(kLg.lblClose);
+        $('#lblNameThema').text(kLg.lblName);
+        $('#lblDescriptionThema').text(kLg.labelDes);
+    };
+    popUpAddThema.bind("close", function (e) {        
+        if (vmEditThema.IsModified == true) {
+            if (!confirm(kLg.saveConfirmQuestion)) {
+                popUpAddThema.destroy();
+                popUpAddThema = null;
+                $('.body-content').after('<div id="pop-add-thema-place"></div>');
+
+            } else {
+                if (!$('#add-thema-form').valid()) {
+                    e.preventDefault();
+                    return;
+                };
+                questionViewModel.saveChange(questionViewModel.vmpthema);// how to solve ??? pass e ???
+                // popUpAddProject.destroy();
+                popUpAddThema = null;
+                $('.body-content').after('<div id="pop-add-thema-place"></div>');
+            }
+        } else {
+            popUpAddThema.destroy();
+            popUpAddThema = null;
+            $('.body-content').after('<div id="pop-add-thema-place"></div>');
+
+        }
+    });
+    //pageload
+    var questionViewModel;    
+    var temp = JSON.parse(JSON.stringify(vmQuestionView.editOptionThema.Thema)); //deep copy value of Thema object to temp
+
+    //Pageload
+    $(function () {
+        questionViewModel = kendo.observable({
+            vmpthema: temp,
+            formChange: function () {
+                vmEditThema.IsModified = true;
+            },
+            saveChange: function (e) {
+                if (!$('#add-thema-form').valid()) return;
+                
+                //xu ly truong hop check isAccess truoc khi update client nhu the nao
+                questionViewModel.vmpthema.Name = questionViewModel.vmpthema.Name.trim();
+                questionViewModel.vmpthema.Description = questionViewModel.vmpthema.Description.trim();
+                vmQuestionView.viewModel.set("vmpthema", questionViewModel.vmpthema);
+                vmQuestionView.viewModel.saveChange(e);
+                
+            }
+        });
+        kendo.bind($('#pop-add-thema'), questionViewModel);
+        vmEditThema.SetupValidate();
+        vmEditThema.setupLanguage();
+        limitedTabKey();
+        $("#txtNameThema").focus();
+    });
+</script>

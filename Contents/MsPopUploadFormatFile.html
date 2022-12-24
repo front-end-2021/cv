@@ -1,0 +1,174 @@
+﻿<style type="text/css">
+    .upload-form-group {
+        margin-left: 15px;
+    }
+
+    .w-470 {
+        width: 450px;
+    }
+
+    .upload-type {
+        margin-bottom: 20px;
+    }
+
+        .upload-type > span {
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+
+    .title-upload {
+        display: inline-block;
+        margin-bottom: 5px;
+        margin-top: 3px;
+    }
+
+    .type-visible {
+        color: gray;
+    }
+
+    .type-select {
+        margin-left: 3px;
+    }
+
+    .select-group {
+        line-height: 10px;
+    }
+</style>
+
+<div id="pop-upload-formatfile">
+    <div class="modal-body ms-modal-body">
+        <form>
+            <div class="upload-type type-visible" id="fcom">
+                <div class="select-group">
+                    <input type="radio" name="radAddFile" id="radFromComputer" value="com" checked><label class="type-select" id="titleFromComputer">FROM COMPUTER </label><br />
+                </div>
+                <div class="upload-form-group">
+                    <input type="file" name="txtFile" id="txtFile" style="display: none;" class="modal-input txtInput w-470" multiple />
+                    <input type="text" name="txtFileName" id="txtFileName" class="modal-input txtInput pull-left" style="width: 414px;" readonly />
+                    <button type="button" class="ms-button button-upload margin-left6 pull-right" tabindex="1" name="uploadFile" id="uploadFile" onclick="openUploadDialog()" style="margin-right: 0; height: 19px;"><span class="icon-16 icon-upload"></span><span id="lblBrowse">Browse...</span></button>
+                    <div class="clear"></div>
+                </div>
+            </div>
+            <div class="upload-type" id="furl">
+                <div class="select-group">
+                    <input type="radio" name="radAddFile" id="radFromUrl" value="url"><label class="type-select" id="titleFromUrl">FROM URL </label>
+                </div>
+                <div class="upload-form-group">
+                    <label id="lblUrl" class="title-upload">URL: </label><span style="font-weight: bold">*</span>
+                    <input type="text" name="txtUrl" id="txtUrl" tabindex="2" class="modal-input txtInput w-98per"/>
+
+                    <label id="lblTextDisplay" class="title-upload">Text display: </label><span style="font-weight: bold">*</span>
+                    <input type="text" name="txtUrlName" id="txtUrlName" tabindex="3" class="modal-input txtInput w-98per" maxlength="250"/><br/>
+                </div>
+                <hr class="modal-market-hr">
+            </div>
+
+            <div class="upload-type" id="fpath">
+                <div class="select-group">
+                    <input type="radio" name="radAddFile" id="radFromPath" value="path"><label class="type-select" id="titleFromPath">FROM PATH </label>
+                </div>
+                <div class="upload-form-group">
+                    <label id="lblPath" class="title-upload">URL: </label><span style="font-weight: bold">*</span>
+                    <input type="text" name="txtUrl" id="txtPath" tabindex="2" class="modal-input txtInput w-98per" />
+
+                </div>
+                <hr class="modal-market-hr">
+            </div>
+
+            <div class="upload-type" id="fdes">
+                <label id="lblDescription" class="title-upload"> Description: </label>
+                <div class="clear"></div>
+                <textarea name="txtDescription" id="txtDescription" tabindex="4" class="modal-textarea w-98per"></textarea>
+            </div>
+        </form>
+    </div>
+    <div class="modal-market-footer">
+        <button type="button" class="ms-button" tabindex="6" onclick="closeForm()"><span class="icon-16 icon-close margin-right6"></span><span id="lblCancel">Schliessen</span></button>
+        <button type="button" class="ms-button" tabindex="5" onclick="uploadFile()"><span class="icon-16 icon-upload margin-right6"></span><span id="lblUploadFile">Upload</span></button>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var vmFormatFile = {};
+    //vmFormatFile.modelChanged = false;
+    var vmKpiAction = vmKpiAction || {};
+
+    vmFormatFile.destroyPop = function () {
+        vmGoalAction.popUploadFormatFile.destroy();
+        vmGoalAction.popUploadFormatFile = null;
+        $(".body-content").after("<div id='pop-uploadformatfile'></div>");
+    };
+
+    vmGoalAction.popUploadFormatFile.bind("close", function (e) {
+        vmFormatFile.destroyPop();
+    });
+
+    function setLanguage() {
+        $("#pop-upload-formatfile #titleFromComputer").text(kLg.lblFromComputer);
+        $("#pop-upload-formatfile #titleFromUrl").text(kLg.lblFromUrl);
+        $("#pop-upload-formatfile #lblBrowse").text(kLg.lblBrowse);
+        $("#pop-upload-formatfile #lblTextDisplay").text(kLg.lblTextDisplay);
+        $("#pop-upload-formatfile #lblUrl").text(kLg.lblUrl);
+        $("#pop-upload-formatfile #lblDescription").text(kLg.labelDes);
+        $("#pop-upload-formatfile #lblCancel").text(kLg.btnCancel);
+        $("#pop-upload-formatfile #lblUploadFile").text(kLg.btnUpload);
+    }
+
+    $(function() {
+        visibleFile();
+        setLanguage();
+    });
+
+    $("input[type=radio]").on("change", function () {
+        visibleFile();
+    });
+
+    //$("[type!=radio]", "#fcom").click(function () {
+    //    if (!$('#radFromComputer').prop("checked")) {
+    //        $('#radFromComputer').prop("checked", true);
+    //        $('#radFromUrl').prop("checked", false);
+    //        visibleFile();
+    //    }
+    //});
+
+    //$("[type!=radio]", "#furl").click(function () {
+    //    if (!$('#radFromUrl').prop("checked")) {
+    //        $('#radFromUrl').prop("checked", true);
+    //        $('#radFromComputer').prop("checked", false);
+    //        visibleFile();
+    //    }
+    //});
+
+    $(".upload-type").on("click", function (e) {
+        var radio = $(this).find("input[type='radio'][name='radAddFile']");
+    });
+
+    function visibleFile() {
+
+        var isFile = $("#radFromComputer").prop("checked");
+        if (isFile) {
+            $('#pop-upload-file #txtUrlName').tooltip('destroy');
+            $('#pop-upload-file #txtUrl').tooltip('destroy');
+
+            $('#pop-upload-file #txtUrl').prop("readonly", true);
+            $('#pop-upload-file #txtUrlName').prop("readonly", true);
+
+
+            $('#pop-upload-file #uploadFile').removeAttr("disabled");
+            $('#pop-upload-file #uploadFile').removeClass("bg-disable");
+
+
+        } else {
+            $('#pop-upload-file #uploadFile').attr("disabled", "disabled");
+            $('#pop-upload-file #txtFileName').tooltip('destroy');
+
+            $('#pop-upload-file #txtUrl').prop("readonly", false);
+            $('#pop-upload-file #txtUrlName').prop("readonly", false);
+
+            $('#pop-upload-file #uploadFile').addClass("bg-disable");
+        }
+
+        $('#fcom').toggleClass('type-visible');
+        $('#furl').toggleClass('type-visible');
+    }
+</script>

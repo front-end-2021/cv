@@ -1,0 +1,153 @@
+﻿<!-- Manh: -->
+<style type="text/css">
+    .upload-form-group {
+        margin-left: 15px;
+    }
+
+    .w-470 {
+        width: 450px;
+    }
+
+    .upload-type {
+        margin-bottom: 20px;
+    }
+
+    .upload-type > span {
+        display: inline-block;
+        margin-bottom: 5px;
+    }
+
+    .title-upload {
+        display: inline-block;
+        margin-bottom: 5px;
+        margin-top: 3px;
+    }
+
+    .type-visible {
+        color: gray;
+    }
+
+    .type-select {
+        margin-left: 3px;
+    }
+
+    .select-group {
+        line-height: 10px;
+    }
+
+    .mt20{
+        margin-top: 20px;
+    }
+</style>
+
+<div id="pop-update-link">
+    <div class="modal-body ms-modal-body">
+        <form>            
+            <div class="upload-type" id="furl">                  
+                <label id="lblUrl" class="title-upload mt20">URL: </label><span style="font-weight: bold">*</span>
+                <input type="text" name="txtUrl" id="txtUrl" tabindex="2" class="modal-input txtInput w-98per"/>
+            </div>
+
+        </form>
+    </div>
+    <div class="modal-market-footer">
+        <button type="button" class="ms-button" tabindex="6" onclick="closeForm()"><span class="icon-16 icon-close margin-right6"></span><span id="lblCancel">Cancel</span></button>
+        <button type="button" class="ms-button" tabindex="5" onclick="updateLink()"><span class="icon-16 icon-update margin-right6"></span><span id="lblUpdateLink">Update</span></button>
+    </div>
+</div>
+<!-- ReSharper disable NativeTypePrototypeExtending -->
+<!-- ReSharper disable CoercedEqualsUsing -->
+<script type="text/javascript">
+    var vmUpdateLink = {};
+
+    String.prototype.startWith = function (needle) {
+        return (this.indexOf(needle) == 0);
+    };
+
+
+    vmAdmin.openPopVideoLink.bind("close", function() {
+        vmAdmin.popVideoLink.close();
+    });
+
+    $(function () {
+        
+        setLanguage();  
+        $('#txtUrl').val(vmAdmin.textVideoLink);
+    });
+    
+    function updateLink() {
+        if (ValidUpload()) {
+            upUrl();
+        }
+
+    };
+    
+    function upUrl() {
+        var txtUrl = $('#txtUrl').val().trim();
+
+        var url = "../Handlers/AdminHandler.ashx?funcName=updatevideolink&typeId=" + vmAdmin.typeVideoLink + "&link=" + txtUrl;
+
+        callAjax("admin-loading", url, null, function (data) {
+            if (data.value === 1) {
+                LoadForm();
+            } else {
+                pAlert("Der Link kann nicht aktualisiert werden.");
+            }
+
+        }, AjaxConst.PostRequest);
+
+        vmAdmin.popVideoLink.close();
+    }
+
+    function ValidUpload() {
+        var textUrl = $('#txtUrl').val().trim();
+        var inputUrl = $('#txtUrl');
+
+        if (textUrl.length === 0) {
+            ShowToolTip(inputUrl, "Link ist nicht leer", "top");
+            return false;
+        } else if (!(textUrl.startWith("http://") || textUrl.startWith("https://"))) {
+            ShowToolTip(inputUrl, "Es fehlt dem Protokoll 'http://' oder 'https://'", "top");
+            return false;
+        }
+        return true;
+    };
+
+    $("#furl input[type=text], #fpath input[type=text]").on("change keyup", function (e) {        
+        var element = $(this);
+        var len = element.val().trim();
+        if (!len.length > 0) {
+            element.tooltip('destroy');
+            var name = element.prop('name');
+            switch (name) {
+            case "txtUrl":
+                    element.attr("title", "Link ist nicht leer");
+                break;
+            }
+            element.tooltip({ placement: 'top', trigger: 'manual' }).tooltip('show');
+            return;
+        }
+        element.tooltip('destroy');
+        return;
+    });
+
+    function clearTooltip() {
+        //url
+        $("#pop-update-link #txtUrl").tooltip("destroy");
+
+    };
+
+
+    function closeForm() {
+        vmAdmin.popVideoLink.close();
+    }
+
+    function setLanguage() {
+        $('#pop-update-link #lblUrl').text(vmAdmin.typeVideoLink == 1 ? "Marketing Video Link hinzufügen" : "CRM Video Link hinzufügen");
+        $('#pop-update-link #lblCancel').text("Abbrechen");
+        $('#pop-update-link #lblUpdateLink').text("Aktualisieren");
+    }
+
+</script>
+<!-- ReSharper restore CoercedEqualsUsing -->
+<!-- ReSharper restore NativeTypePrototypeExtending -->

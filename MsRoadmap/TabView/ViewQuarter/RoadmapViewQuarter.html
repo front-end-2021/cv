@@ -1,0 +1,171 @@
+﻿<div class="dnb-msa-view dnb-relative dnb_25880_freezed">
+    <!-- navigator -->
+    <roadmapnavigator v-if="isOpenNavigator" :data="navigatorData" />
+
+    <div v-for="(masterBlock, iBlock) in MasterBlocks" 
+         class="dnb-msa-view-masterblock dnb_25880_freezed_col">
+        <div class="rm-grp-parent dnb_25880_freezed_item"
+             v-for="(parentRegion,iParent ) in masterBlock.ParentRegionRMs">
+
+            <div v-if="HasBlock && iParent < 1 && IsShowPath" class="rm-master-block"
+                 @mouseover="e => onHoverBlockPath(masterBlock.Path, e)">
+                <span>{{ masterBlock.Path }}</span>
+            </div>
+            
+            <!--parentRegion in ParentRegionRMs-->
+            <div class="rm-responsibilities-quarter dnbScrollItem dnb-flex dnb-overhidden dnb_25880_freezed_dataParent"
+                 v-bind:class="[ child.ClassOneElement, child.ClassOdd ]"
+                 v-for="(child, iChildhoder) in parentRegion.ChildStakeHolders">
+                <!--child in parentRegion.ChildStakeHolders-->                
+                <div class="rm-rms-h dnb_view_path dnb-bg-fe dnb-flex dnb-flex-col-r dnb-bg-f0 dnb-overhidden"
+                     v-if="IsShowPath" style="display:inline">
+                    <a style="float:right;margin-top:4px!important; color: rgb(118, 131, 138); margin-left: 3px; font-size: 12px; margin-right: 5px;"
+                       @click="(e) => { toggleViewFromPath(iBlock, iParent, iChildhoder) }"
+                       class="dnb-color98 dnb-overhidden-text minheight22 dnb_icon-toggle-collapse_expand font-arrow-down"
+                       
+                       v-bind:iblock="iBlock"
+                       v-bind:iparent="iParent"
+                       v-bind:ichild="iChildhoder"
+
+                       v-bind:class="[child.ClassWordBreak, getArrowInPath(iBlock, iParent, iChildhoder)]"
+                       v-bind:style="{maxHeight: getStyleChildStakeholder(child).maxHPath,
+                       display: StyleInPopupPreviewSharepointRegion.display}"></a>
+                    <p style="margin-bottom: 0px; max-height: 37px; overflow: hidden;">{{child.Path}}</p>
+                    <h6 class="margin0 dnb-color32 dnb-font14 rm-lineh145"
+                        v-bind:class="[child.ClassWordBreak]"
+                        v-bind:style="{ wordBreak: child.WordBreak,
+                        maxHeight: getStyleChildStakeholder(child).maxHName,
+                        overflow: getStyleChildStakeholder(child).overflow,
+                        'margin-left':StyleInPopupPreviewSharepointRegion.marginLeft + 'px'}">{{child.Name}}
+                    </h6>
+                </div>
+
+                <div v-if="isExpandBlockPath(iBlock, iParent, iChildhoder)"
+                     class="rm-group-goalactions dnb-w101p dnb_25880_freezed_data"
+                     v-bind:key="getKeyObserver(iBlock, iParent, iChildhoder)"
+                     v-bind:class="[getClassDnbClsObserver()]"
+                     v-bind:iblock="iBlock"
+                     v-bind:iparent="iParent"
+                     v-bind:ichild="iChildhoder"
+                     v-bind:style="{
+                        height: child.TotalHeight1Block ? child.TotalHeight1Block + 'px' : '',
+                        minHeight: child.TotalHeight1Block ? child.TotalHeight1Block + 'px' : '',
+                        maxHeight: child.TotalHeight1Block ? child.TotalHeight1Block + 'px' : ''
+                     }">
+                    <div v-if="getVisibleAndShowFromPath(iBlock, iParent, iChildhoder)"
+                         v-for="(category,iCategory) in child.Categories"
+                         class="dnb-flex dnb-flex-col dnb-w100p rm-cate-wrap dnb-group-of-elements dnb-maxwidth-calc"
+                         v-bind:class="{'msa-grp-elements-labaling' : IsLabeling }"
+                         style="max-width: calc(100% - 252px);">
+                        <!--category in child.Categories-->
+                        <draggable :list="getListElement(category)"
+                                   v-bind:group="getGroupElement()"
+                                   v-bind="DragdropOptions"
+                                   handle=".pointSortMIndex"
+                                   filter=".dnbIgnoreDragDropSortMIndex"
+                                   class="MIndex_GoalAction"
+                                   @start="onDragStartElement"
+                                   @end="onDragEndElement"
+                                   :move="onDragMoveElement">
+                            <div class="rm-main-goal-action"
+                                 v-for=" (elements, iColumn) in category.Elements"
+                                 
+                                 v-bind:sort-mindex-type="getSortMIndexTypeId(elements)"
+                                 v-bind:sort-mindex-id="getSortMIndexId(elements)"
+                                 v-bind:sort-mindex-pos="getSortMIndexPos(elements)"
+
+                                 v-bind:lbling-root-id="getLblingRootId(elements)"
+
+                                 v-bind:freezedid="getAttrsLabeling(elements).FreezedId"
+                                 v-bind:class="[getAttrsLabeling(elements).Class]"
+                                 v-bind:style="[getAttrsLabeling(elements).Style, getStyleFlex(elements)]">
+                                <!--elements in category.Elements-->
+                                <div v-if="IsLabeling" class="hline-islabeling"
+                                     v-for="(element, index) in elements"
+                                     v-bind:parentid="getParentIdWhenLabeling(element).ParentId"
+                                     v-bind:dataid="getParentIdWhenLabeling(element).Id"
+                                     v-bind:typeid="getParentIdWhenLabeling(element).TypeId"
+                                     v-bind:maingoalid="getParentIdWhenLabeling(element).MainGoalId"
+                                     v-bind:subgoalid="getParentIdWhenLabeling(element).SubgoalId"
+                                     v-bind:style="getStyleHLine(element, index)"
+                                     v-bind:class="[getParentIdWhenLabeling(element).Class]"></div>
+
+                                <div v-for="(element, index) in elements"
+                                     class="dnb-inline-flex rm-element-wrap dnb-overhidden kgv-style-name-element-popup"
+                                     style="min-height:31px;"
+
+                                     v-bind:lbling-id="element.Id"
+                                     v-bind:lbling-type="element.TypeId"
+                                     v-bind:lbling-parent-id="element.ParentId"
+                                     v-bind:lbling-subgoal-id="element.SubGoalId"
+                                     v-bind:lbling-maingoal-id="element.MaingoalId"
+
+                                     v-bind:style="{ width: getStyle(elements, index, iColumn, iCategory, iChildhoder, iParent, iBlock).width,
+                                        marginLeft: getStyle(elements, index, iColumn, iCategory, iChildhoder, iParent, iBlock).marginLeft,
+                                        minWidth: getStyle(elements, index, iColumn, iCategory, iChildhoder, iParent, iBlock).minWidth }">
+                                    <!--element in elements-->
+
+                                    <div class="rm-msa-month-0 dnb-inline-block dnb-bg-colord dnb-w100p dnb-elm_toggle-wrap"
+                                         @mousedown="mousedownToSortMIndex" @mouseup="mouseupToSortMIndex"
+                                         :adjust-se-id="element.Id"
+                                         :adjust-se-s="getTime(element.Start)"
+                                         :adjust-se-e="getTime(element.End)"
+                                         :adjust-se-parent-id="element.TypeId == 4 ? element.ParentId : null"
+                                         v-bind:class="[element.End == null ? 'dnb-elm-endnull': '', getClassPointSortMIndex(element)]"
+                                         @dblclick="e => showPopupEdit(element, e)"
+                                         style="position: relative"
+                                         v-bind:style="{
+                                                    backgroundColor: getBgColor(element), 
+                                                    color: getColor(element),
+                                                    opacity: opacityOutOfView(element),
+                                                    paddingLeft:  getStyle(elements, index, iColumn, iCategory, iChildhoder, iParent, iBlock).paddingLeft,
+                                                    overflow: StyleInPopupPreview.overflow }">
+                                        <span v-if="element.Name"
+                                              style="cursor: pointer;margin-right:5px;"
+                                              v-bind:class="[getIcon(element), 'dnbIgnoreDragDropSortMIndex']" @click="openNavigator(element)"
+                                              @mouseover="e => HoverWithTimeRFrom(e, element)"></span>
+                                        <span v-if="!element.Name" 
+                                              style="cursor: pointer;"
+                                              v-bind:class="[getIcon(element), 'dnb_tooltip', 'dnbIgnoreDragDropSortMIndex']" 
+                                              @click="openNavigator(element)" 
+                                              v-bind:style="[getStyleActivity(element)]"
+                                              @mouseover="e => onHoverTooltip(element, e)"
+                                              :id="'id'+element.Id + element.CategoryId"></span>
+                                        <div class="rm-text1line text-left dnb_tooltip"
+                                             style="cursor: pointer;"
+                                             v-bind:class="[getClassName(element), 'dnbIgnoreDragDropSortMIndex']"
+                                             v-bind:style="[getStyleActivityNameWrap(element)]"
+                                             @mouseover="e => onHoverTooltip(element, e)" :id="'id'+element.Id + element.CategoryId">
+                                            <span style=" max-width: 245px; "
+                                                  class="dnb-elm-name"
+                                                  v-bind:style="getFontLabeling(element)">{{element.Name}}</span>
+                                        </div>
+                                              
+                                        <span v-if="canDragStartDate(element) && CanAdjustStartEnd" 
+                                              class="pointArangeStart"
+                                              @mouseover="e => checkArangeStartEnd(element, iCategory, iChildhoder, iParent, iBlock, e.target.parentElement, true)"
+                                              style="position: absolute; top: 0; left: 0; width: 6px; height: 27px;cursor:w-resize"></span>
+                                        <span v-if="element.End && CanAdjustStartEnd" 
+                                              class="pointArangeEnd"
+                                              @mouseover="e => checkArangeStartEnd(element, iCategory, iChildhoder, iParent, iBlock, e.target.parentElement, false)"
+                                              style="position: absolute; top: 0; right: 0; width: 6px; height: 27px;cursor:w-resize"></span>
+                                    </div>
+                                    <a style="color: rgb(118, 131, 138);font-size: 12px;margin-top: 6px;margin-right: 10px;"
+                                       class="dnb-icon_toggle font-arrow-down"
+                                       v-if="getIconToggle(element) != 'none'"
+                                       v-bind:class="getIconToggle(element)"
+                                       v-bind:elmid="element.Id"
+                                       @click="(e) => { onToggleLabelingFromPath(e.target, element) }"></a>
+                                </div>
+                            </div>
+                        </draggable>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

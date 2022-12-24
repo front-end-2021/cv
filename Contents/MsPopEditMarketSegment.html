@@ -1,0 +1,950 @@
+﻿<div id="popUpMainContent"></div>
+<div id="editsubproductname"></div>
+<div id="editMarketLoading" class=""></div>
+<link href="../Css/multiple-select.css" rel="stylesheet" />
+
+<style>
+    .hoand-tb-subproduct {
+        margin-top: 20px;
+    }
+
+        .hoand-tb-subproduct .text-justify {
+            width: 100%;
+        }
+        
+        .hoand-tb-subproduct .divDragDrop:hover .icon-dropdow {
+            background-position: -81px -299px;
+            text-indent: -999px;
+            float: right;
+            display: block;
+            width: 20px;
+            height: 20px;
+            margin-top: -2px;
+        }
+
+        .hoand-tb-subproduct .divDragDrop .icon-dropdow {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 3px;
+        }
+
+        .hoand-tb-subproduct .divDragDrop .ms-dropdow {
+            position: absolute;
+            right: 16px;
+        }
+
+    .hoand-ctrl-subproduct {
+        height: 12px;
+        margin-top: 20px;
+        padding-left: 10px;
+    }
+
+    .k-widget.k-notification.k-notification-info.k-popup {
+        border: none;
+    }
+    #div.k-animation-container div.k-notification-wrap {
+        padding-top: 4px !important;
+    }
+    div.k-animation-container div.k-notification-wrap span.k-i-close {
+        display: none;
+    }
+    div.k-animation-container div.k-notification-wrap .k-i-note {
+        display: none;
+    }
+    div.k-animation-container div.k-notification-wrap .k-icon.k-i-info {
+        margin-top: -4px;
+    }
+    .k-widget.k-notification.k-notification-info {
+        background-color: #38baf8;
+        border-color: #38baf8;
+    }
+    #hoand-k-notification-8290 {
+        display: inline-block;
+        white-space: normal;
+        margin-left: 30px;
+    }
+
+    .k-icon.k-i-info {
+        float: left;
+        padding-top: 5px;
+    }
+
+    .w-100per {
+        width: 98% !important;
+    }
+
+    .btnApplySubProSe {
+        margin-top: -23px;
+        background-position: -81px -299px;
+        text-indent: -999px;
+        float: right;
+        display: block;
+        width: 20px;
+        position: absolute;
+        right: 16px;
+    }
+
+    .btnChildApplySubProSe {
+        margin-top: -5px;
+        background-position: -81px -299px;
+        text-indent: -999px;
+        float: right;
+        display: block;
+        width: 20px;
+        position: absolute;
+        left: 246px;
+    }
+    td.td-v-align-top {width:558px !important;}
+    tr.ui-sortable-helper {
+        background-color: white;
+        width: 96% !important;
+        -webkit-box-shadow: 0 0 10px 0 rgba(0,0,0,0.75);
+        -moz-box-shadow: 0 0 10px 0 rgba(0,0,0,0.75);
+        box-shadow: 0 0 10px 0 rgba(0,0,0,0.75);
+    }
+    .span-sub-product-name {
+       width: 505px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        float: left;
+        white-space:initial;
+    }
+</style>
+
+<div id="popSelectSubmarketProductSeHolder"></div>
+<div id="popSelectSubmarketProductSe"></div>
+
+<script src="../Scripts/jquery.multiple.select.js"></script>
+<div id="popMarketSegmentEdit">
+    <div class="modal-body ms-modal-body" id="popMarketSegmentBody" 
+        style="height:250px; overflow: hidden scroll;">
+        <div id="formEditMarket">
+            <div class="form-group">
+                <label id="lblPopName">Name</label><span style="font-weight: bold">*</span>
+                <div class="clear"></div>
+                <input  type="text" id="marketName" name="marketName" tabindex="0" class="modal-input txtInput w-100per input-name-marketsegment " data-bind="value: Name , events: {change: changeName}" maxlength="50" />
+                <span class="icon-16 icon-dropdow btnApplySubProSe" data-bind="visible: IsProductForm, events: {click: linkProductSe}"></span>
+            </div>
+            <hr class="modal-market-hr" />
+            <div class="form-group">
+                <label id="lblPopDescription">Description</label>
+                <div class="clear"></div>
+                <textarea id="marketDescription" data-bind="value: Description" class="modal-textarea w-100per" tabindex="0" ></textarea>
+            </div>
+
+            <div class="w-100per document-region" data-bind="visible: IsProductForm">
+                <label id="lblDocument">Dokument</label>
+                <div class="clear"></div>
+                <div data-template="smpdocument-template" data-bind="source: SubmarketProductDocuments"></div>
+                <div class="clear"></div>
+                <button type="button" class="ms-button smp-button-upload" id="smpUploadFile" name="smpUploadFile" data-bind="events: {click: uploadDocumentItem}">
+                    <span class="icon-16 icon-upload"></span><span id="lblBrowseDocument">Durchsuchen...</span>
+                </button>
+            </div>
+            <div class="clear"></div>
+            <div class="checkbox">
+                <label>
+                    <input id="marketType" type="checkbox" tabindex="0" data-bind="checked: IsNew"  />
+                    <span id="lblPopNew" >Neu</span>
+                </label>
+            </div>
+            <div class="checkbox cbAddSubProduct" data-bind="visible: IsProduct">
+                <label>
+                    <input id="cbAddSubProduct" type="checkbox"
+                           data-bind="checked: IsSubProduct, enabled: EnSubProducts"   />
+                    <span id="lblPopIsSubProduct">SubProduct</span>
+                </label>
+            </div>
+
+
+            <div class="hoand-rg-subproduct" data-bind="visible: IsSubProduct">
+                <div class="hoand-ctrl-subproduct">
+
+                    <input type="text" id="subProductName" tabindex="0" class="modal-input txtInput subProductName"
+                           style="float: left; margin: -10px !important; width: 250px;"
+                           data-bind="value: SubProductName, events: {change: textChange}" maxlength="100" />
+
+                    <span class="icon-16 icon-dropdow btnChildApplySubProSe" data-bind="events: {click: addSubProductFromSetting}"></span>
+
+                    <span class="icon-32 icon-add margin-left10" style="float:left; margin: -12px 0 10px 20px !important;" data-bind="events: {click: addSubProduct}"></span>
+
+                </div>
+
+                <div class="hoand-tb-subproduct" data-bind="visible: IvSubProducts">
+                    <table class="table-bordered" style="width: 100%">
+                        <thead>
+                            <tr>
+                                <td class="title" style="padding-left: 5px; padding-right: 10px; font-size: inherit; height: 24px;">
+                                    <span id="lblSubProduct" ></span>
+                                    <span class="icon-16 icon-right-block icon-plus" data-bind="events: {click: addSubProductByPlusIcon}"></span>
+                                </td>
+                            </tr>
+                        </thead>
+
+                        <tbody data-template="subproducts-row-template" data-bind="source: SubProducts"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal-market-footer">
+        <button type="button" class="ms-button" tabindex="0" onclick="closeEditMarket()"><span class="icon-16 icon-close margin-right6"></span><span>Schliessen</span></button>
+    </div>
+
+</div>
+
+<script id="subproducts-row-template" type="text/x-kendo-template">
+    <tr class="divDragDrop" data-bind="attr: {sid: Id, mindex: MIndex}">
+        <td class="td-v-align-top td-hover" style="padding-left: 20px; padding-right: 10px">
+            <div class="divDragDrop no-wrap" style="padding-right: 40px;" data-bind="attr: {mindex: MIndex}">
+                <span class="icon-16  icon-arow-towway-vertical"></span>
+                <span class="span-sub-product-name" data-bind="text: Name"></span>
+                <div class="ms-dropdow">
+                    <span class="icon-16 icon-dropdow" data-toggle="dropdown"></span>
+                    <ul aria-labelledby="btnGroupVerticalDrop1" role="menu" class="popup-menu dropdown-menu ms-popup-menu posAbsolute" style="top: inherit; left: inherit; right: 19px; bottom: 0;">
+                        <li><a class="dropdow-menu-li-a" data-toggle="modal" data-target=".bs-example-modal-lg" data-bind="events: {click: editSubProduct}"><span class="icon-24  icon-left-block icon-edit"></span>#=kLg.edit#</a></li>
+                        <li role="presentation" class="divider"></li>
+                        <li><a class="dropdow-menu-li-a" data-bind="events: {click: delSubProduct}"><span class="icon-24  icon-left-block icon-delete"></span>#:kLg.Delele#</a></li>
+                    </ul>
+                </div>
+            </div>
+        </td>
+    </tr>
+
+</script>
+
+<script id="smpdocument-template" type="text/x-kendo-template">
+    <div class="document-item pull-left">
+        <div class="pull-left">
+            <a class="item-document-truncate ms-link" data-bind="text: FolderFileName, events: {click: downloadDocument}"></a>
+        </div>
+        <span class="icon-20 ms-icon-delete-gray" data-bind="events: {click: deleteDocumentItem}"></span>
+    </div>
+</script>
+<script type="text/javascript">
+    
+    var vmMarketSegment = vmMarketSegment || {};
+    vmMarketSegment.isChange = false;
+    vmMarketSegment.nameChanged = false;
+    vmMarketSegment.askForCloneAlbe = false;
+    vmMarketSegment.AdjustHeight = function () {
+        var popFooterH = $('#popMarketSegmentEdit .modal-market-footer').height() + 2; // border 1px
+        var popBodyH = 350;
+        var subProduct = $('#popMarketSegmentEdit .hoand-rg-subproduct');
+        if (subProduct.is(':hidden')) {
+            popBodyH = $('#formEditMarket').height() + 38;
+        } else {
+            popBodyH = $('#formEditMarket').height() + 50;
+        }
+        var popHeight = vmCommon.getPopupHeight(popBodyH, popFooterH);
+        var popWidth = $('#popMarketSegmentEdit .modal-body').width() + 20; // padding 10px
+        $('#popMarketSegmentBody').height(popHeight - popFooterH - 20);
+        resizePopUp(vmCommon.popEditType, { width: popWidth, height: popHeight });
+        if (vmMarketSegment.viewModel.get("Name") != "" && popWidth == 500) { // edit
+            $("#formEditMarket .input-name-marketsegment").addClass('edit-input-productgroup');
+        }
+        if (vmMarketSegment.viewModel.get("Name") != "" && popWidth == 600) {
+            $("#formEditMarket .input-name-marketsegment").addClass('edit-input-name-marketsegment');
+        }
+       
+    }
+    vmMarketSegment.dataservice = (function () {
+        var callAjaxQuestionFilter = function (divId, funcName, entryData, requestType, successCallBack) {
+            var url = "/Handlers/MsSubMarketHandler.ashx?funcName=" + funcName + "&projid=" + projectId + "&strid=" + strategyId;
+            if (typeof (vmSProduct) != 'undefined') url += "&regid=" + vmSProduct.regId;
+            return callAjax(divId, url, entryData, successCallBack, requestType);
+        };
+
+        var callAjaxByPost = function (funcName, entryData, successFunc) {
+            return callAjaxQuestionFilter('loadingRegionMatrix', funcName, JSON.stringify(entryData), AjaxConst.PostRequest, successFunc);
+        };
+
+        var isDuplicateName = function (entryDate, successFunc) {
+            callAjaxByPost("isDuplicateName", entryDate, successFunc);
+        };
+
+        //var getProductSameName = function (entryDate, successFunc) {
+        //    callAjaxByPost("getproductsamename", entryDate, successFunc);
+        //};
+
+        return {
+            isDuplicateName: isDuplicateName
+            //getProductSameName: getProductSameName
+        };
+    })();
+    
+    function setupSubProductDragDropAble() {
+        var sMIndex, tMIndex;
+
+        function changeSubproductPosition(arr, sidx, tidx) {
+            var temp = arr[sidx];
+            arr.splice(sidx, 1);
+            arr.splice(tidx, 0, temp);
+            vmMarketSegment.nameChanged = true;
+            return arr;
+        };
+
+        $('table.table-bordered').sortable({
+            axis: "y",
+            items: "tbody tr.divDragDrop",
+            revert: false,
+            start: function (event, ui) {
+                sMIndex = ui.item.index();
+            },
+            stop: function (event, ui) {
+                tMIndex = ui.item.index();
+                if (tMIndex != sMIndex) {
+                    var sources = vmMarketSegment.viewModel.get("SubProducts");
+                    sources = changeSubproductPosition(sources, sMIndex, tMIndex);
+                    sources = vmMarketSegment.updateSubproductPosition(sources);
+                    sMIndex = 0; tMIndex = 0;
+                    vmMarketSegment.isChange = true;
+                    var tempSource = vmCommon.deepCopy(sources);
+                    vmMarketSegment.viewModel.set("SubProducts", tempSource);
+                }
+            }
+        });
+    }
+
+    vmMarketSegment.updateNewMarket = (function(typeUpdate, entryData) {        
+        //for MsSubMarketProduct.aspx
+        if ((typeUpdate === vmCommon.enumType.ProductGroup) ||
+            (typeUpdate === vmCommon.enumType.Submarket) ||
+            (typeUpdate === vmCommon.enumType.Product)) {
+            if (entryData.Id === 0) {
+                editProduct(entryData, "insert" + typeUpdate);                
+            } else {
+                editProduct(entryData, "update" + typeUpdate);
+            };
+
+        } else {
+            //for MsMarketSegment.aspx
+            if (typeUpdate === vmCommon.enumType.Region || typeUpdate === vmCommon.enumType.Market) {
+                entryData.LandId = vmSMarket.MarketData.LastLandId;
+            }
+            if (entryData.Id === 0) {
+                editMarket(entryData, "insert" + typeUpdate);
+                if (!vmCommon.checkCurrentPage(vmCommon.enumPage.Market)) btnRefreshFilter_Onclick();
+            } else {
+                editMarket(entryData, "update" + typeUpdate);
+            }
+        }
+        vmMarketSegment.isChange = false;
+        vmCommon.popEditType.close();
+    });
+
+    function closeEditMarket() {
+        if (!vmCommon.currentMarket.RoleMaster) {
+            vmCommon.popEditType.close();
+        }
+        if (validEditMarket()) {
+            vmMarketSegment.checkDuplicateNameThenSave();
+        }
+    }
+
+    function onCheckChange() {
+        $("#marketName").on("change keyup paste", function () {
+            vmMarketSegment.isChange = true;
+        });
+
+        $("#marketDescription").on("change keyup paste", function () {
+            vmMarketSegment.isChange = true;
+        });
+
+        $("#marketType").on("change", function () {
+            vmMarketSegment.isChange = true;
+        });
+
+        $('#cbAddSubProduct').on('change', function () { vmMarketSegment.AdjustHeight(); });
+    }
+
+    function setPopEditMarketSegmentLanguage() {
+        $("#lblPopName").text(kLg.PopName);
+        $("#lblPopDescription").text(kLg.labelDes);
+        $("span.icon-close").next().text(kLg.lblClose);
+        $("#marketType").next().text(kLg.newLandRegion);
+        $("#marketType").next().text(kLg.newLandRegion);
+        $("#popMarketSegmentEdit #lblBrowseDocument").text(kLg.lblBrowse);
+        $("#popMarketSegmentEdit #lblDocument").text(kLg.lblDocument);
+        $("#popMarketSegmentEdit #lblSubProduct").text(kLg.lblSubProductGroup);
+        $("#popMarketSegmentEdit #lblPopIsSubProduct").text(kLg.lblSubProductGroup);
+        $("#popMarketSegmentEdit #lblPopNew").text(kLg.newSegment);
+        
+    }
+
+    function validEditMarket() {
+        $('#marketName').tooltip('destroy');
+        var marketName = $('#marketName').val().trim();
+        if (marketName == null || marketName == '') {
+            $('#marketName').attr('title', kLg.requiredName);
+            $('#marketName').tooltip({ placement: 'top', trigger: 'manual' }).tooltip('show');
+            $('#marketName').focus();
+            return false;
+        } else {
+            if (marketName.length > 100) {
+                $('#marketName').attr('title', kLg.msgMaxlenghName);
+                $('#marketName').tooltip({ placement: 'top', trigger: 'manual' }).tooltip('show');
+                $('#marketName').focus();
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
+
+    //function cbAfterCheckDuplicate(data) {
+    //    if (!data.value.IsDuplicateName) {
+    //        vmMarketSegment.isChange = false;
+    //        vmMarketSegment.updateNewMarket(vmCommon.currentControl);
+    //    } else {
+    //        vmCommon.showTooltip($('#marketName'), kLg.msgDuplicateName, 3000);
+    //    }
+    //}
+
+    //Check Duplicate Name and Update if the name is not duplicate
+    vmMarketSegment.checkDuplicateNameThenSave = (function () {
+        var vm = vmMarketSegment.viewModel;
+        var entry = {};
+        entry.ProductGroupId = vmCommon.currentMarket.ProductGroupId;
+        entry.MarketSegmentRegionId = vmCommon.currentMarket.MarketSegmentRegionId;
+        entry.CurrentControl = vmCommon.currentControl;
+        entry.Name = vm.get("Name");
+        entry.Description = vm.get("Description");
+        entry.IsNew = vm.get("IsNew");
+        entry.IsXy = vm.get("IsXy");
+        entry.IsSubProduct = vm.get("IsSubProduct");
+        entry.Type = vm.get("IsNew") ? 1 : 2;
+        entry.SubmarketProductDocuments = vm.get("SubmarketProductDocuments");
+        entry.SubProducts = vm.get("SubProducts");
+        entry.LinkId = vm.get("LinkId");
+        entry.LinkType = vm.get("LinkType");
+        entry.Id = vmCommon.currentMarket.Id;
+        
+        if ((entry.CurrentControl === vmCommon.enumType.Submarket) || (entry.CurrentControl === vmCommon.enumType.Product)) {
+            vmMarketSegment.dataservice.isDuplicateName(entry, function (res) {
+                if (!res.value.IsDuplicateName) {
+                    vmMarketSegment.updateNewMarket(vmCommon.currentControl, entry);
+                } else {
+                    vmCommon.showTooltip($('#marketName'), kLg.msgDuplicateName, 3000);
+                }
+            });
+        } else {
+            vmMarketSegment.updateNewMarket(vmCommon.currentControl, entry);
+        }
+    });
+    
+    vmMarketSegment.changeSubproductPosition = function (arr, sidx, tidx) {
+        if (arr.length < 1) return [];
+
+        var temp = vmCommon.deepCopy(arr[sidx]);
+        arr.splice(sidx, 1);
+        arr.splice(tidx, 0, temp);
+
+        vmMarketSegment.nameChanged = true;
+
+        return arr;
+    };
+
+    vmMarketSegment.updateSubproductPosition = function (arr) {
+        for (var i = 0; i < arr.length; i++) {
+            arr[i].MIndex = (i + 1) * 1000;
+        }
+
+        return arr;
+    };
+    
+    vmMarketSegment.showToolTipByClass = function (n, t, pos) {
+        var p = "top";
+        if (pos)
+            p = pos;
+
+        $('.' + n + '').tooltip('destroy');                       
+        $('.' + n + '').tooltip({placement: p, title: t }).tooltip('show');       
+        $('.' + n + '').focus();
+    };
+
+    vmMarketSegment.isExistedName = function (idx, name) {
+        var sources = vmMarketSegment.viewModel.get("SubProducts");
+        var isValid = false;
+
+        if (sources) {
+            for (var i = 0; i < sources.length; i++) {
+                if (sources[i].Name === name && sources[i].MIndex !== idx) {
+                    isValid = true;
+                    break;
+                } else if (sources[i].Name === name && idx === -1) {
+                    isValid = true;
+                    break;
+                }
+            }
+        }
+
+        return isValid;
+    };
+    
+    var vmEditSubsProduct = undefined;
+    
+    vmMarketSegment.bindSubproducts = function () {
+        if (vmCommon.currentMarket.SubProducts && vmCommon.currentMarket.SubProducts.length > 1)
+            vmCommon.currentMarket.SubProducts.sort(function (a, b) {
+                return a.MIndex - b.MIndex;
+            });
+        if (vmMarketSegment.viewModel) vmMarketSegment.viewModel = null;
+        vmMarketSegment.viewModel = kendo.observable({
+            LinkId: vmCommon.currentMarket.LinkId,
+            LinkType: vmCommon.currentMarket.LinkType,
+            Name: vmCommon.currentMarket.Name,
+            Description: vmCommon.currentMarket.Description,
+            IsSubProduct: vmCommon.currentMarket.IsSubProduct,
+            IsNew: vmCommon.currentMarket.IsNew,
+            SubProductName: "",
+            SubProducts: vmCommon.currentMarket.SubProducts,
+            EnSubProducts: !vmCommon.checkNullItem(vmCommon.currentMarket.SubProducts),
+            IvSubProducts: vmCommon.checkNullItem(vmCommon.currentMarket.SubProducts),
+            IsProduct: vmCommon.currentControl === vmCommon.enumType.Product,
+            IsProductForm: vmCommon.currentControl === vmCommon.enumType.Product || vmCommon.currentControl === vmCommon.enumType.ProductGroup,
+            SubmarketProductDocuments: vmCommon.currentMarket.SubmarketProductDocuments ? vmCommon.currentMarket.SubmarketProductDocuments: [],
+            addSubProductByPlusIcon: function () {
+                vmMarketSegment.isChange = false;
+                vmMarketSegment.SubProduct = { Id: -1, Name: "", Description: "", SubmarketProductDocuments: [], MIndex: -1 }
+                vmMarketSegment.IsSubProductEdit = false;
+                vmMarketSegment.IsQuickAdd = false;
+                vmMarketSegment.popSubClient = undefined;
+                vmMarketSegment.popSubClient = showPopup(vmMarketSegment.popSubClient, $('#editsubproductname'),
+                    '/Contents/MsPopEditSubProductName.html',
+                    {
+                        title: vmCommon.joinString(kLg.addlowcase, htmlDecode(kLg.lblSubProductGroup)),
+                        height: 370,
+                        width: 500,
+                        resizable: false
+                    });
+                //vmEditSubsProduct.SubProductName = "";
+                //vmEditSubsProduct.SubProductDescription = "";
+                //vmEditSubsProduct.excuteInsert = vmMarketSegment.excuteInsert;
+                //vmEditSubsProduct.isExistedName = vmMarketSegment.isExistedName;
+                //vmEditSubsProduct.showTooltipById = vmMarketSegment.showToolTipById;
+            },
+            addSubProduct: function () {
+                var sname = vmMarketSegment.viewModel.get("SubProductName").trim();
+                if (sname.length > 0) {
+                    var sources = vmMarketSegment.viewModel.get("SubProducts");
+                    if (sources == null) sources = [];
+
+                    var isValid = true;
+                    for (var i = 0; i < sources.length; i++) {
+                        if (sources[i].Name === sname) {
+                            isValid = false;
+                            break;
+                        }
+                    }
+
+                    if (isValid) {
+                        sources.push({ Id: -1, Name: sname, Description: "", SubmarketProductDocuments: [] });
+
+                        sources = vmMarketSegment.updateSubproductPosition(sources);
+                        var tempSource = vmCommon.deepCopy(sources);
+                        vmMarketSegment.isChange = true;
+                        vmMarketSegment.viewModel.set("SubProducts", tempSource);
+                        vmMarketSegment.viewModel.set("IvSubProducts", true);
+                        vmMarketSegment.viewModel.set("SubProductName", '');
+                        vmMarketSegment.viewModel.set("EnSubProducts", false);
+                        setupSubProductDragDropAble();
+                        //bindSwitchSpanToInputSubsProduct(updateSubNameCallback, "sub-product-name", removeAllHover, addAllHover, 100);
+                    } else {
+                        vmMarketSegment.showToolTipByClass("subProductName", kLg.msgNameIsExisted, "top");
+                    }
+
+                } else {
+
+                    vmMarketSegment.showToolTipByClass("subProductName", kLg.requiredName, "top");
+                }
+                vmMarketSegment.AdjustHeight();
+               
+            },
+            addSubProductFromSetting: function (e) {
+                vmMarketSegment.SubProduct = { Id: -1, Name: "", Description: "", SubmarketProductDocuments: [], MIndex: -1 }
+                vmMarketSegment.IsSubProductEdit = false;
+                vmMarketSegment.IsQuickAdd = true;
+                vmMarketSegment.showSelectSubProSe(vmCommon.enumType.SubProduct,0,0);
+            },
+            editSubProduct: function (e) {
+                var item = e.data;
+
+                vmMarketSegment.isChange = true;
+                vmMarketSegment.SubProduct = item;
+                vmMarketSegment.IsSubProductEdit = true;
+                vmMarketSegment.IsQuickAdd = false;
+                //var el = $(e.target).parent().parent().parent();
+
+                //var idx = parseInt(el.parent(".divDragDrop").attr("mindex"));
+                vmMarketSegment.popSubClient = undefined;
+                vmMarketSegment.popSubClient = showPopup(vmMarketSegment.popSubClient, $('#editsubproductname'),
+                    '/Contents/MsPopEditSubProductName.html',
+                    {
+                        title: vmCommon.joinString(kLg.editlowcase, htmlDecode(kLg.lblSubProductGroup)),
+                        height: 370,
+                        width: 500,
+                        resizable: false
+                    });
+                //var sources = vmMarketSegment.viewModel.get("SubProducts");
+
+                //vmEditSubsProduct.MIndex = item.MIndex;
+                ////var item = ($.grep(sources, function (item) { return item.MIndex === idx; }))[0];
+                //vmEditSubsProduct.SubProductName = item.Name;
+                //vmEditSubsProduct.SubProductDescription = item.Description;
+                //vmEditSubsProduct.excuteUpdate = vmMarketSegment.excuteUpdate;
+                //vmEditSubsProduct.isExistedName = vmMarketSegment.isExistedName;
+                //vmEditSubsProduct.showTooltipById = vmMarketSegment.showToolTipById;
+                //vmEditSubsProduct.SubmarketProductDocuments = item.SubmarketProductDocuments;
+            },
+            delSubProduct: function (e) {
+                pConfirmWithDesc({
+                    Name: kLg.msgAskForDeleteSubProduct.format(kLg.lblSubProductGroup),
+                    Description: '( ' + kLg.msgAskForDeleteSubProductHint.format(kLg.lblSubProductGroup) + ' )'
+                }).then(function () {
+                    vmMarketSegment.isChange = true;
+               
+                    var item = e.data;
+                    var idx = item.MIndex;
+
+                    var sources = vmMarketSegment.viewModel.get("SubProducts");
+                    for (var i = 0; i < sources.length; i++) {
+                        if (sources[i].MIndex == idx) {
+                            sources.splice(i, 1);
+                            break;
+                        }
+                    }
+                    sources = vmMarketSegment.updateSubproductPosition(sources);
+                    var tempSource = vmCommon.deepCopy(sources);
+                    vmMarketSegment.viewModel.set("SubProducts", tempSource);
+                    var isSubProduct = !(sources.length > 0);
+                    vmMarketSegment.viewModel.set("EnSubProducts", isSubProduct);
+                    vmMarketSegment.AdjustHeight();
+                    setupSubProductDragDropAble();
+                    //bindSwitchSpanToInputSubsProduct(updateSubNameCallback, "sub-product-name", removeAllHover, addAllHover, 100);
+                });                
+            },
+            textChange: function () {
+                $('.subProductName').tooltip('destroy');
+            },
+            uploadDocumentItem: function (e) {
+                var item = e.data;
+                var role = vmCommon.currentMarket.RoleMaster;
+                vmCommon.showUploadDocument(function (savedFiles) {
+                    var dataDocs = vmMarketSegment.viewModel.get("SubmarketProductDocuments");
+                    for (var i = 0; i < savedFiles.length; i++) {
+                        var baseDoc = vmCommon.deepCopy(vmCommon.defaultDocument);
+                        baseDoc.Type = item.Type;
+                        baseDoc.FolderFileId = savedFiles[i].Id;
+                        baseDoc.LinkId = item.Id;
+                        baseDoc.LinkType = item.Level;
+                        baseDoc.FolderFileName = savedFiles[i].Name;
+                        baseDoc.PhysicalName = savedFiles[i].PhysicalName;
+                        baseDoc.FileTypeId = savedFiles[i].Type;
+
+                        dataDocs.push(baseDoc);
+                    }
+                    vmMarketSegment.viewModel.set("SubmarketProductDocuments", dataDocs);
+                    vmMarketSegment.AdjustHeight();
+                }, role);
+            },
+            deleteDocumentItem: function (e) {            
+                var docItem = e.data;
+                var dataDocs = vmMarketSegment.viewModel.get("SubmarketProductDocuments");
+                var newDocs = [];
+                vmCommon.findAllByFunc(newDocs, dataDocs, function (item) { return item.FolderFileId !== docItem.FolderFileId; });
+                vmMarketSegment.viewModel.set("SubmarketProductDocuments", newDocs);
+                vmMarketSegment.AdjustHeight();
+            },
+            linkProductSe: function (e) {
+                vmMarketSegment.showSelectSubProSe(vmCommon.currentControl, e.data.LinkId,e.data.LinkType);
+            },
+            changeName: function (e) {
+                vmMarketSegment.viewModel.set("LinkId", 0);
+            },
+            downloadDocument: function (e) {
+                var docItem = e.data;
+                if (/^http(s)?:\/\//ig.test(docItem.PhysicalName)) {
+                    vmCommon.CopyTitleToClipboard(docItem.PhysicalName, e.target);
+                } else
+                    vmCommon.ClickToDownAndCopy("../FileUpload/" + docItem.PhysicalName,
+                        docItem.FolderFileName,
+                        docItem.FileTypeId,
+                        e.target
+                    );
+            }
+        });
+        
+        kendo.bind($("#popMarketSegmentEdit"), vmMarketSegment.viewModel);
+        
+        setupSubProductDragDropAble();
+
+        // Bugs 9284
+        //bindSwitchSpanToInputSubsProduct(updateSubNameCallback, "sub-product-name", removeAllHover, addAllHover, 100);
+    };
+    
+    function getRemoveIdCallback(e, callbackCheckTime, callbackTime) {
+        if (!callbackCheckTime) callbackCheckTime = 10;
+        if (!callbackTime) callbackTime = 0;
+        callbackTime++;
+
+        var c = $(e.target).parent().parent().parent();
+        var idx = parseInt(c.parent(".divDragDrop").attr("mindex"));
+        if (callbackTime >= callbackCheckTime)
+            return -1;
+        if (isNaN(idx))
+            idx = getRemoveIdCallback(e, callbackCheckTime, callbackTime);
+        return idx;
+    }
+
+    function removeAllHover() {
+        $('table.tbgrid-marketing td').removeClass('td-hover');
+        $('table.tbgrid td').removeClass('td-hover');
+    }
+
+    function addAllHover() {
+        $('table.tbgrid td').addClass('td-hover');
+        $('table.tbgrid td.is-null').removeClass('td-hover');
+        $('table.tbgrid-marketing td').addClass('td-hover');
+        $('table.tbgrid-marketing td.is-null').removeClass('td-hover');
+    }
+
+
+    function bindSwitchSpanToInputSubsProduct(updateMarketData, cssSelector, removeHover, addHover, maxlength) {
+        var currentText = '';
+        var switchToInput = function () {
+            var $input = $("<input>", {
+                val: $(this).text(),
+                type: "text"
+            });
+            currentText = $(this).text();
+            $input.attr('maxlength', maxlength);
+            $input.addClass(cssSelector);
+            $(this).replaceWith($input);
+            $input.width('85%');
+            $input.addClass('span-to-input pull-left');
+            removeHover();
+            $input.on("mouseleave", switchToSpan);
+            $input.select();
+
+            $input.keydown(function (e) {
+                if (e.keyCode == 13 || e.keyCode == 27) {
+                    $input.mouseleave();
+                }
+            });
+        };
+
+        var switchToSpan = function () {
+            var $span = $("<span>", {
+                text: $(this).val(),
+                style: "white-space:initial;"
+            });
+            var id = $(this).closest('td').attr('id');
+
+            if ($(this).val().trim().length > 0) {
+                updateMarketData(id, $(this).val(), currentText, $span);
+            } else {
+                $span.text(currentText);
+            }
+
+            addHover();
+            $span.addClass(cssSelector);
+            $span.addClass("text-justify icon-left-block");
+            $(this).replaceWith($span);
+            $span.on("click", switchToInput);
+
+        };
+        $("." + cssSelector).on("click", switchToInput);
+    }
+
+    function updateSubNameCallback(id, newText, oldText, holder) {
+        if (newText == oldText) return;
+        updateSubProductName(newText.trim(), oldText.trim());
+    }
+
+    function updateSubProductName(newText, oldText) {
+        var vmSources = vmMarketSegment.viewModel.get("SubProducts");
+
+        if (vmSources && newText.length <= 100) {
+            var isName = false;
+
+            for (var i = 0; i < vmSources.length; i++) {
+                if (vmSources[i].Name == newText) {
+                    isName = true;
+                    break;
+                }
+            }
+
+            if (!isName) {
+                for (var i = 0; i < vmSources.length; i++) {
+                    if (vmSources[i].Name == oldText) {
+                        vmSources[i].Name = newText;
+                        vmSources[i].LinkId = 0;
+                        break;
+                    }
+                }
+            } else {
+                vmCommon.showNotification(".hoand-tb-subproduct", kLg.msgNameIsExisted, 2000);
+            }
+            vmMarketSegment.viewModel.set("SubProducts", vmSources);
+            //vmMarketSegment.bindSubproducts(vmSources);
+        }
+    }
+
+    function buildEntryObject() {
+        var id = vmCommon.currentMarket.Id;
+        var name = $("input#marketName").val().trim();
+
+        var jsonObject = {
+            Id: id,
+            Name: name
+        };
+
+        return jsonObject;
+    }
+
+    //function processSameNameProduct(data) {
+    //    if (data != null && data.value != null) {
+    //        var isDisabled = $("#cbAddSubProduct").attr("disabled");
+    //        if (isDisabled != null) $("#cbAddSubProduct").removeAttr("disabled");
+
+    //        var product = data.value;
+
+    //        vmCommon.showNotification("#marketName", kLg.msgErrorDataOverrideByProductSameName, 3000, -65);
+
+    //        var ischecked = $('input#cbAddSubProduct').is(':checked');
+    //        if (ischecked && product.IsSubProduct === false)
+    //            $("#cbAddSubProduct").click();
+    //        if (!ischecked && product.IsSubProduct === true)
+    //            $("#cbAddSubProduct").click();
+
+    //        for (var i = 0; i < product.SubProducts.length; i++) {
+    //            product.SubProducts[i].Id = -1;
+    //        }
+
+    //        vmMarketSegment.viewModel.set("SubProducts", product.SubProducts);
+    //        vmMarketSegment.bindSubproducts();
+
+
+    //    } else {
+    //        //Case - clone able
+    //        if (vmCommon.currentMarket.IsCloneAble === true && vmMarketSegment.askForCloneAlbe === false) {
+    //            vmMarketSegment.askForCloneAlbe = true;
+    //            pConfirm(kLg.msgConfirmCloneAbleSubProduct).then(null, function () {
+    //                vmMarketSegment.bindSubproducts([]);
+    //            });
+
+    //        }
+
+    //    }
+    //}
+
+    vmMarketSegment.showSelectSubProSe = function (control, linkId, linkType) {
+
+        vmCommon.popSelectSubProOptions.Type = control || vmCommon.currentControl;
+        //var oldentry = vmCommon.deepCopy(vmCommon.currentMarket);
+        vmCommon.popSelectSubProOptions.OldLinkId = linkId; 
+        vmCommon.popSelectSubProOptions.OldLinkType = linkType;
+
+        vmCommon.popSelectSubProOptions.CallbackFunc = function(checkSubSource) {
+
+        };
+        vmCommon.popSelectSubmarketProductSe = showPopup(vmCommon.popSelectSubmarketProductSe,
+            $('#popSelectSubmarketProductSe'),
+            '/Contents/MsPopSelectSubmarketProductSe.html',
+            {
+                title: kLg.strSelectionFormat.format(kLg.createNewProduct),
+                height: 525,
+                width: 650,
+                resizable: false
+            });
+    };
+
+    //Pageload
+    $(document).ready(function () {        
+        //vmFile.assginedIcon("popEditMarketSegment");
+
+        if (vmCommon.currentControl == "productgroup" || vmCommon.currentControl == "submarket" || vmCommon.currentControl == vmCommon.enumType.Product) {
+            vmCommon.currentMarket.RoleMaster = vmSProduct.SMProductData.RoleMaster > 0 ? true : false;
+        } else {
+            vmCommon.currentMarket.RoleMaster = vmSMarket.MarketData.Role > 0 ? true : false;
+        }
+        vmMarketSegment.bindSubproducts();
+
+        onCheckChange();
+        vmCommon.popEditType.bind("close", function (e) {
+            vmFile.enableAssignedIcon = false; 
+            if (vmMarketSegment.isChange) {
+                if (!window.confirm(kLg.saveConfirmQuestion)) {
+                    vmCommon.popEditType.destroy();
+                    vmCommon.popEditType = null;
+                    $('.body-content').after('<div id="popEditMarketSegment"></div>');
+                } else {
+                    e.preventDefault();
+                    if (validEditMarket()) {
+                        vmMarketSegment.checkDuplicateNameThenSave(); 
+                    }
+                }
+            } else {
+                vmCommon.popEditType.destroy();
+                vmCommon.popEditType = null;
+                $('.body-content').after('<div id="popEditMarketSegment"></div>');
+            }
+        });
+        
+        setPopEditMarketSegmentLanguage();
+
+        //$('#marketName').keydown(function (e) {
+        //    $('#marketName').tooltip('destroy');
+        //    if (e.keyCode == 13) {
+        //        e.preventDefault();
+        //    }
+        //});
+        //if (vmCommon.currentControl == vmCommon.enumType.Product) {
+        //    //$('.cbAddSubProduct').show();
+        //    //$(".hoand-rg-subproduct").show();
+        //    var source = vmCommon.currentMarket.SubProducts;
+        //    //vmMarketSegment.viewModel.set("SubProducts", source);
+        //    //vmMarketSegment.bindSubproducts();
+        //    //vmMarketSegment.updateIsSubProducts(source);
+        //} else {
+        //    //$('.cbAddSubProduct').hide();
+        //    //$(".hoand-rg-subproduct").hide();
+        //}
+
+        $("#marketName").bind("change keyup paste", function () {
+            vmMarketSegment.nameChanged = true;
+        });
+
+        vmMarketSegment.nameChanged = false;
+
+        //$("#marketName").bind("mouseout", function () {
+        //    if (vmCommon.currentControl === vmCommon.enumType.Product)
+        //        $("#marketName").blur();
+        //    if (vmMarketSegment.nameChanged && vmCommon.currentControl === vmCommon.enumType.Product) {
+        //        var isValid = true;
+        //        var name = $("#marketName").val().trim();
+        //        if (name == null || name == "" || name.trim().lenght < 1) isValid = false;
+        //        if (isValid) {
+        //            var entry = buildEntryObject();
+        //            vmMarketSegment.dataservice.getProductSameName(entry, processSameNameProduct);
+        //            vmMarketSegment.nameChanged = false;
+        //        }
+        //    }
+        //});
+
+        vmMarketSegment.isChange = false;
+
+        limitedTabKey();
+        $('#marketName').focus();
+        vmMarketSegment.AdjustHeight();
+    });
+
+</script>
+
+
+
+

@@ -1,0 +1,395 @@
+﻿<p class="clearx2"></p>
+<div id="swotArea" class="tab-swotanalyse">
+    <div class="ms-layout-wrap evaluation-template-control">
+        <a class="k-button btnAddTemp" onclick="vmApSwotanalyse.btnAddTemp_Onclick(templateAction.Add, this)" tabindex="0">Add</a>
+        <a class="k-button btnUpdateTemp" onclick="vmApSwotanalyse.btnAddTemp_Onclick(templateAction.Update, this)" tabindex="0">Update</a>
+        <a class="k-button btnDelTemp" onclick="vmApSwotanalyse.btnOpenTemplate_Onclick(templateType.ApSwotanalyseTemplate)" tabindex="0">Delete</a>
+        <select id="ddlTemplate" class="ms-dropdown">
+            <option>Choose layout</option>
+        </select>
+        <a class="k-button btnImportTemp" onclick="vmApEval.btnImportTemp_Onclick(templateType.ApSwotanalyseTemplate)" tabindex="0">Import templates</a>
+    </div>
+    <p class="clearx1"></p>
+    <div id="lblSwotEditError" style="color: red"></div>
+    <div id="div-criteria"></div>
+    <p class="clearx3"></p>
+    <div id="div-general-trends"></div>
+    <div id="swotanalyse-loading" class="loading"></div>
+</div>
+
+
+<style type="text/css">
+    .w25 {
+        width: 25px;
+    }
+
+    .w175 {
+        width: 175px;
+    }
+
+    .w300 {
+        width: 315px;
+    }
+
+    .w516 {
+        width: 516px;
+    }
+
+    .fixw258 {
+        min-width: 258px;
+        width: 258px;
+        max-width: 258px;
+    }
+
+    .maxw560 {
+        max-width: 560px;
+    }
+
+    .fixW315 {
+        min-width: 315px;
+        width: 315px;
+        max-width: 315px;
+    }
+
+    .fixW370 {
+        min-width: 300px;
+        width: 300px;
+        max-width: 300px;
+    }
+
+    .popPos1stCol {
+        right: 0;
+        top: -7px;
+    }
+
+    .popPos3rdCol {
+        right: -3px;
+        bottom: -5px
+    }
+
+    .margin4 {
+        margin-right: 4px;
+    }
+
+    .zindex5000 {
+        z-index: 50000;
+    }
+
+    .posAddIcon {
+        right: 0px;
+        top: -30px;
+    }
+
+    .posDeleteIcon {
+        right: 29px;
+        top: -30px;
+    }
+
+    .divDropSwotChild:hover .icon-arow-towway-vertical{
+        margin-left:-52px;
+    }
+
+     .divDropSwotParent:hover .icon-arow-towway-vertical{
+        margin-left:-12px;
+    }
+
+    .editAbleChildDes {
+        height: 2em;
+        min-width: 90%;
+        line-height:2em;
+    }
+</style>
+
+<script type="text/html" id="template-citeria">
+    <table class="swottable">
+        <thead>
+            <tr>
+                <th class="textleft text-white fixW315"><span id="spanCriteria">Criteria</span></th>
+                <th class="textleft text-white w516" colspan="3"><span id="spanWeakStrong">Weak &lsaquo;-&rsaquo; Strong</span></th>
+                <th class="textleft text-white fixW370"><span class="spanDescriptionSwotanalyse">Description</span></th>
+            </tr>
+        </thead>
+        <tbody id="criteriaDrag">
+            <!--Case: No Criteria, no Strength-Weakness-->
+            #if(data.Criterias.length == 0) {#
+            <tr>
+                <td colspan="5">
+                    <!--hover menu-->
+                    #if(data.role > 0) {#
+
+                    <a class="icon-28 icon-add-small firstSwotButton floatleft" onclick="vmApSwotanalyse.addCriteria(this) "></a>
+                    #}#
+                </td>
+            </tr>
+            #} else {#
+            #for(var i = 0; i < data.Criterias.length; i ++) {#
+            #var parent = data.Criterias[i];#
+            #if(parent.Childs.length == 0){#
+            <!--Case: There is one Criteria but there is no Strength-Weakness-->
+            <tr index="#=i#" val="#=parent.Id#" type="Swot" id="#=parent.Id#">
+                <td id="#=parent.Id#" val="#=parent.Id#" class="posRelative fixw258 content-break-word itemDraggable divDropSwotParent td-hover field_value" rowspan="1">
+                    <div class="content-break-word posRelative w300">
+                        <span class="icon-16  icon-arow-towway-vertical"></span>
+
+                        <span class="editAble content-break-word" id="#=parent.Id#">#:parent.Name#</span>
+                        #if(data.role > 0) {#
+                        <div class="h-100per posAbsolute popPos1stCol">
+                            <div class="ms-table h-100per">
+                                <div class="td-v-align-middle ms-table-cell">
+                                    <a class="icon-28 icon-add-small floatleft" onclick=" vmApSwotanalyse.addCriteria(this) " parent="#:parent.Id#"></a>
+                                    <a class="icon-28 icon-bin-small floatleft" onclick=" vmApSwotanalyse.deleteCriteria(this) " parent="#:parent.Id#"></a>
+                                </div>
+                            </div>
+                        </div>
+                        #}#
+                    </div>
+                </td>
+                <td colspan="4" val="-1" parentid="#=parent.Id#" class="itemDraggable divDropSwotChild td-hover">
+                    #if(data.role > 0) {#
+                    <a class="icon-28 icon-add-small firstButton floatleft" onclick=" vmApSwotanalyse.addSubCriteria(this) " parent="#=parent.Id#"></a>
+                    #}#
+                </td>
+            </tr>
+
+            #}#
+
+            #for (var j = 0; j < parent.Childs.length; j ++) {#
+            #var child = parent.Childs[j];#
+            <tr index="#=j#" val="#=parent.Id#" type="Swot" id="#=parent.Id#">
+                <!--Criteria Column-->
+                #if(j == 0) {#
+                <td id="#=parent.Id#" val="#=parent.Id#" class="posRelative itemDraggable divDropSwotParent td-hover field_value" rowspan="#=parent.Childs.length#">
+                    <div class="posRelative w300 content-break-word">
+                        <span class="icon-16  icon-arow-towway-vertical"></span>
+                        <span id="#=parent.Id#" class="editAble content-break-word">#:parent.Name#</span>
+                        <!--hover menu-->
+                        #if(data.role > 0) {#
+                        <div class="posAbsolute h-100per popPos1stCol">
+                            <div class="ms-table h-100per">
+                                <div class="ms-table-cell td-v-align-middle">
+                                    <a class="icon-28 icon-add-small floatleft" onclick=" vmApSwotanalyse.addCriteria(this) " parent="#:parent.Id#"></a>
+                                    <a class="icon-28 icon-bin-small floatleft" onclick=" vmApSwotanalyse.deleteCriteria(this) " parent="#:parent.Id#"></a>
+                                </div>
+                            </div>
+                        </div>
+                        #}#
+                    </div>
+                </td>
+                #}#
+                <!--Color column-->
+                <td class="w25">
+                    <div id="div-color-criteria#:i##:j#" class="floatleft" style="width: 20px; height: 20px;">&nbsp;</div>
+                </td>
+                <!--Strength-weakness column-->
+                <td id="#:child.Id#" val="#=child.Id#" parentid="#=parent.Id#" class="w300 itemDraggable divDropSwotChild td-hover">
+                    <div class="content-break-word floatleft posRelative fixW315">
+                        <span class="icon-16  icon-arow-towway-vertical"></span>
+                        <div>
+                            <span class="floatleft editAbleChild w-100per content-break-word" childid="#:child.Id#" parent="#=parent.Id#">#:child.Name#</span>
+                        </div>
+                        <!--hover menu-->
+                        #if(data.role > 0) {#
+                        <div class="posAbsolute popPos3rdCol">
+                            <div class="posRelative">
+                                <a class="icon-28 icon-add-small premove posAbsolute posAddIcon" onclick=" vmApSwotanalyse.addSubCriteria(this) " parent="#=parent.Id#" child="#:child.Id#"></a>
+                                <a class="icon-28 icon-bin-small  premove posAbsolute posDeleteIcon" onclick=" vmApSwotanalyse.deleteSub(this) " child="#:child.Id#" parent="#=parent.Id#"></a>
+                            </div>
+                        </div>
+                        #}#
+                    </div>
+                </td>
+                <!--Slider column-->
+                <td class="w175">
+                    <input id="kendo-slider-criteria#:i##:j#" class="margin4" value="#=child.Value#" childid="#:child.Id#" parent="#=parent.Id#" />
+                </td>
+                <!--Description column-->
+                <td class="fixW370 content-break-word">
+                    #var text;#
+                    #if(child.Description == null || (child.Description != null && child.Description.trim() == '')) {#
+                    #text = setText();#
+                    #} else text = child.Description;#
+                    <div class="divDemandTextAreaEdit posRelative zindex5000"></div>
+                    <span class="editAbleChildDes content-break-word maxw560" 
+						style="display: inline-block; min-width: 45px; min-height: 30px; overflow: hidden; max-width: 300px; text-overflow: ellipsis; white-space: pre;"
+						childid="#:child.Id#" parent="#=parent.Id#">#:text#</span>
+                </td>
+            </tr>
+            #}#
+            #}#
+            #}#
+        </tbody>
+    </table>
+</script>
+
+<script type="text/html" id="template-general-trends">
+    <table class="swottable">
+        <thead>
+            <tr>
+                <th class="textleft text-white fixW315"><span id="spanTrend">Trends</span></th>
+                <th class="textleft text-white w516" colspan="3"><span id="spanRiskChance">Risk &lsaquo;-&rsaquo; Chance</span></th>
+                <th class="textleft text-white fixW370"><span class="spanDescriptionSwotanalyse">Description</span></th>
+            </tr>
+        </thead>
+        <tbody id="trendsDrag">
+            #if(data.Trends.length == 0) {#
+            <!--Case: No sub trend-->
+            <tr>
+                <td colspan="5">
+                    #if(data.role > 0) {#
+                    <a class="icon-28 icon-add-small firstSwotButton floatleft" onclick=" vmApSwotanalyse.addTrend(this) "></a>
+                    #}#
+                </td>
+            </tr>
+            #} else {#
+            #for(var i = 0; i < data.Trends.length; i ++) {#
+            #var parent = data.Trends[i];#
+            #if(parent.Childs.length == 0){#
+            <!--Case: There is one Trend but there is no sub-trend-->
+            <tr index="#=i#" val="#=parent.Id#" type="Swot" id="#=parent.Id#">
+                <td id="#=parent.Id#" val="#=parent.Id#" class="posRelative fixW315 content-break-word itemDraggable divDropSwotParent td-hover field_value" rowspan="1">
+                    <div class="content-break-word posRelative w300">
+                        <span class="icon-16  icon-arow-towway-vertical"></span>
+                        <span class="editAble content-break-word" id="#=parent.Id#">#:parent.Name#</span>
+                        #if(data.role > 0) {#
+                        <!--hover menu-->
+                        <div class="h-100per posAbsolute popPos1stCol">
+                            <div class="ms-table h-100per">
+                                <div class="td-v-align-middle ms-table-cell">
+                                    <a class="icon-28 icon-add-small floatleft" onclick=" vmApSwotanalyse.addTrend(this) " parent="#:parent.Id#"></a>
+                                    <a class="icon-28 icon-bin-small floatleft" onclick=" vmApSwotanalyse.deleteCriteria(this) " parent="#:parent.Id#"></a>
+                                </div>
+                            </div>
+                        </div>
+                        #}#
+                    </div>
+                </td>
+                <td colspan="4" val="-1" parentid="#=parent.Id#" class="itemDraggable divDropSwotChild td-hover">
+                    <!--hover menu-->
+                    #if(data.role > 0) {#
+                    <a class="icon-28 icon-add-small floatleft firstButton" onclick=" vmApSwotanalyse.addSubTrend(this) " parent="#=parent.Id#"></a>
+                    #}#
+                </td>
+            </tr>
+
+            #}#
+
+            #for (var j = 0; j < parent.Childs.length; j ++) {#
+            #var child = parent.Childs[j];#
+            <tr index="#=j#" val="#=parent.Id#" type="Swot" id="#=parent.Id#">
+                <!--General Trend column-->
+                #if(j == 0) {#
+                <td id="#=parent.Id#" val="#=parent.Id#" class="posRelative itemDraggable divDropSwotParent td-hover field_value" rowspan="#=parent.Childs.length#">
+                    <div class="posRelative w300 content-break-word">
+                        <span class="icon-16  icon-arow-towway-vertical"></span>
+                        <span id="#=parent.Id#" class="editAble content-break-word">#:parent.Name#</span>
+                        <!--hover menu-->
+                        #if(data.role > 0) {#
+                        <div class="posAbsolute h-100per popPos1stCol">
+                            <div class="ms-table h-100per">
+                                <div class="ms-table-cell td-v-align-middle">
+                                    <a class="icon-28 icon-add-small floatleft" onclick=" vmApSwotanalyse.addTrend(this) " parent="#:parent.Id#"></a>
+                                    <a class="icon-28 icon-bin-small  floatleft" onclick=" vmApSwotanalyse.deleteCriteria(this) " parent="#:parent.Id#"></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    #}#
+                </td>
+                #}#
+                <!--Square Color column-->
+                <td class="w25">
+                    <div id="div-color-trend#:i##:j#" class="floatleft" style="width: 20px; height: 20px;">&nbsp;</div>
+                </td>
+                <!--Sub trends column-->
+                <td id="#:child.Id#" val="#=child.Id#" parentid="#=parent.Id#" class="w300 itemDraggable divDropSwotChild td-hover">
+                    <div class="content-break-word floatleft posRelative fixW315">
+                        <span class="icon-16  icon-arow-towway-vertical"></span>
+                        <div>
+                            <span class="floatleft editAbleChild w-100per content-break-word" childid="#:child.Id#" parent="#=parent.Id#">#:child.Name#</span>
+                        </div>
+                        <!--hover menu-->
+                        <div class="posAbsolute popPos3rdCol">
+                            <div class="posRelative">
+                                #if(data.role > 0) {#
+                                <a class="icon-28 icon-add-small premove posAbsolute posAddIcon" onclick=" vmApSwotanalyse.addSubTrend(this) " parent="#=parent.Id#" child="#:child.Id#"></a>
+                                <a class="icon-28 icon-bin-small  premove posAbsolute posDeleteIcon" onclick=" vmApSwotanalyse.deleteSub(this) " child="#:child.Id#" parent="#=parent.Id#"></a>
+                                #}#
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <!--Slider column-->
+                <td class="w175">
+                    <input id="kendo-slider-trendall#:i##:j#" class="margin4" value="#=child.Value#" childid="#:child.Id#" parent="#=parent.Id#" />
+                </td>
+                <!--Description column-->
+                <td id="#:child.Id#" parentid="#=parent.Id#" class="fixW370 content-break-word">
+                    #var text;#
+                    #if(child.Description == null || (child.Description != null && child.Description.trim() == '')) {#
+                    #text = setText();#
+                    #} else text = child.Description;#
+                    <div class="divDemandTextAreaEdit posRelative zindex5000"></div>
+                    <span class="editAbleChildDes content-break-word" 
+                          style="display:inline-block;min-width:45px;min-height:30px;"
+                          childid="#:child.Id#" parent="#=parent.Id#">#:text#</span>
+                </td>
+            </tr>
+            #}#
+            #}#
+            #}#
+        </tbody>
+    </table>
+</script>
+
+<!--Popup Add, edit ProductEvaluation, Competition template-->
+<script id="ap-swotanalyse-template" type="text/x-kendo-template">
+    <div class="modal-body ms-modal-body">
+        <form>
+            <!--<div id="msgEditTemplate" />-->
+            <div class="form-group">
+                <label class="lblEvalTempName">Template name</label>
+                <div class="clear"></div>
+                <input id="txtTempName" class="modal-input txtInput w-100per" value="#:data#" />
+            </div>
+        </form>
+    </div>
+    <div class="modal-market-footer">
+        <button type="button" class="ms-button" onclick="vmApSwotanalyse.closeLayout(this)" tabindex="1"><span class="icon-20 icon-close margin-right6"></span><span class="scancel" id="textCancelButton">Cancel</span></button>
+        <button type="button" class="ms-button" id="btnSaveTemplate"><span class="icon-20 icon-update margin-right6"></span><span id="textUpdateButton">OK</span></button>
+    </div>
+</script>
+
+<script id="delete-temp-pop-swot" type="text/x-kendo-template">
+    <div class="modal-body ms-modal-body" style="overflow:auto; height:420px">
+        <form>
+            <table id='myTable' class="tbgrid modal-table">
+                <thead>
+                    <tr>
+                        <th class="title bg-grey lblPrjName"></th>
+                        <th class="title bg-grey" id="lblPrjOwner"></th>
+                        <th class="title bg-grey" id="lblTemplateNameDeleteTemplate">Template name</th>
+                        <!--<th class="title bg-grey" id="lblProjectName">Project name</th>-->
+                    </tr>
+                </thead>
+                <tbody>
+                    # for(var i = 0; i < data.length; i ++) { #
+                    <tr id="#=data[i].Id#">
+                        <td>#=i + 1#</td>
+                        <td>
+                            <input class="cbTemp" type="checkbox" />
+                        </td>
+                        <td>#:data[i].Name#</td>
+                        <!--<td>#:data[i].ProjectName#</td>-->
+                    </tr>
+                    # } #
+                </tbody>
+            </table>
+        </form>
+    </div>
+    <div class="modal-market-footer" id="divImportFooter">
+        <button type="button" class="ms-button" onclick="vmApSwotanalyse.btnDeleteTemplate_Onclick()" tabindex="1"><span class="icon-20 icon-bin-sub margin-right6"></span><span class="btnChoose">Delete</span></button>
+        <button type="button" class="ms-button" onclick="vmApSwotanalyse.btnCloseDelTemplatePopup_Onclick()(this)"><span class="icon-20 icon-close margin-right6"></span><span class="btnCancel">Cancel</span></button>
+    </div>
+</script>
+
+<script src="../Scripts/ActionPlanEval/msApSwotanalyseEval.js"></script>

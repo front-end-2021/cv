@@ -1,0 +1,102 @@
+﻿<div id="pop-import" class="pop-wrapper">
+    <form id="fpopimport" role="form" class="form-horizontal">
+        <div class="modal-body ms-modal-body" style="padding: 0 !important;">
+            <div class="form-group noMargin" style="padding: 10px;">
+                <div style="display: flex;margin-top:22px;margin-bottom: 10px; width: 100%;">
+                    <div style="width: 64%">
+                        <input type="file" name="txtImport" id="txtImport" style="display: none;" class="modal-input txtInput" onchange="vmImport.onChangeFile(this)" />
+                        <input type="text" name="txtImportName" id="txtImportName" class="modal-input txtInput" style="float: left; width: 100%" readonly />
+                    </div>
+                    <div style="width: 36%">
+                        <button type="button" class="ms-button button-upload margin-left6 pull-right" tabindex="1" name="uploadFile" id="importFile" style="margin-right: 0;display: flex;" onclick="vmImport.showImportDialog()">
+                        <span class="icon-16 icon-upload"> </span>
+                        <span id="lblBrowse" style="margin-top: 2px;"></span>
+                        </button>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+
+            <div class="modal-market-footer">
+                <button id="btnUpdate" type="button" tabindex="2" class="ms-button" onclick="vmImport.import()">
+                    <span class="icon-20 icon-close"></span>
+                    <span id="lblClose">Close</span>
+                </button>
+            </div>
+        </div>
+        
+    </form>
+</div>
+
+<script type="text/javascript">
+    vmGoalAction.popImport = vmGoalAction.popImport || {};
+    var vmImport = vmImport || {};
+
+    function setupLanguage() {
+        $("#pop-import #lblBrowse").text(kLg.lblBrowse);
+        $("#pop-import #lblClose").text(kLg.importFragenset);
+    };
+
+    vmGoalAction.popImport.bind("close", function () {
+        vmGoalAction.popImport.destroy();
+        vmGoalAction.popImport = null;
+        $(".body-content").after("<div id='popimport'></div>");
+    });
+
+    //
+    vmImport.showImportDialog = function () {
+        $("#pop-import #txtImport").click();
+    };
+
+    vmImport.onChangeFile = function (e) {
+        var files = $(e).prop("files");
+        $("#pop-import #txtImportName").tooltip("destroy");
+        $('#pop-import #txtImportName').val(vmFile.generateFilesToString(files));
+    };
+
+    vmImport.valid = function (files) {
+        //require
+        if (files.length == 0) {
+            ShowToolTip2($("#pop-import #txtImportName"), kLg.requiredTextDisplay, "top");
+            return false;
+        }
+
+        //count
+        if (!vmGoalAction.importOptions.multifile && files.length > 1) {
+            ShowToolTip2($("#pop-import #txtImportName"), "just only one file", "top");
+            return false;
+        }
+
+        //type
+        //if (files[0].type != "application/x-zip-compressed") {
+        if (getFileExtention(files[0].name) !== "zip") {
+            ShowToolTip2($("#pop-import #txtImportName"), kLg.importWrongExtension, "top");
+            return false;
+        }
+
+        //size
+        if (files[0].size > 50 * 1024 * 1024) {
+            ShowToolTip2($("#pop-import #txtImportName"), kLg.importOversize, "top");
+            return false;
+        }
+
+        $("#pop-import #txtImportName").tooltip("destroy");
+        return true;
+    };
+
+    vmImport.import = function () {
+        var files = $("#pop-import #txtImport").prop("files");
+        if (vmImport.valid(files) == false) return;
+
+        //todo: upload
+        vmGoalAction.importOptions.callBack(files);
+
+        $("#pop-import #txtImport").val("");
+        vmGoalAction.popImport.close();
+    };
+
+    $(function () {
+        setupLanguage();
+    });
+
+</script>

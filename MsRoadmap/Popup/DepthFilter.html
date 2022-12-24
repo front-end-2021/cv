@@ -1,0 +1,64 @@
+﻿<div class="header-first" id="colume-name-id-filterdepth" style="display:flex">
+    <div>
+        <div class="iconshow-filterdepth">
+            <span class="pull-left" style="margin-top: -2px; min-width:80px; text-align:left;">{{Lang.titleFilterDept}}</span>
+            <a class="msa-ic-font icondownfilterdepth pointer" @click="onClickFilterDepth"
+               v-bind:class="{ 'font-arrow-down': isShowMenu, 'font-arrow-right': !isShowMenu }"></a>
+            <div class="Roadmapviewquater-menufilterdepth" v-if="isShowMenu" @mouseleave="hoverOut">
+                <div class="row cbGap childmenufilterdepth">
+                    <span class="icon-26 icon-target node-goal col-md-2" style="width: 1px;margin-left: 10px;"></span>
+                    <label style="white-space: pre; max-width: 300px; overflow: hidden; padding-left: 0; padding-right: 0; text-overflow: ellipsis;"
+                           class="col-md-8 kgv-name-menufilterdepth"> {{Lang.labelMainGoalName}}</label>
+                    <input type="checkbox" v-model="subFilter.IsMain" class="col-md-2" @change="onChange" />
+                </div>
+                <div class="row cbGap childmenufilterdepth">
+                    <span class="icon-26 icon-milestone node-goal col-md-2" style="width: 1px;margin-left: 10px;"></span>
+                    <label style="white-space: pre; max-width: 300px; overflow: hidden; padding-left: 0; padding-right: 0; text-overflow: ellipsis;"
+                           class="col-md-8 kgv-name-menufilterdepth"> {{Lang.labelSubGoalName}}</label>
+                    <input type="checkbox" v-model="subFilter.IsSub" class="col-md-2" @change="onChange" />
+                </div>
+                <div class="row cbGap childmenufilterdepth">
+                    <span class="icon-26 icon-vertical-rectangle node-goal col-md-2 kgv-menudepth-action"></span>
+                    <label style="white-space: pre; max-width: 300px; overflow: hidden; padding-left: 0; padding-right: 0; text-overflow: ellipsis;"
+                           class="col-md-8 kgv-name-menufilterdepth"> {{Lang.labelActionName}}</label>
+                    <input type="checkbox" v-model="subFilter.IsAction" class="col-md-2" style="margin-left: 1px" @change="onChange" />
+                </div>
+                <div class="row childmenufilterdepth">
+                    <span class="icon-26 icon-vertical-activity node-goal col-md-2 kgv-menudepth-activity"></span>
+                    <label style="white-space: pre; max-width: 300px; overflow: hidden; padding-left: 0; padding-right: 0; text-overflow: ellipsis;"
+                           class="col-md-8 kgv-name-menufilterdepth"> {{Lang.cbActivityRoadmap}}</label>
+                    <input type="checkbox" v-model="subFilter.IsActivity" class="col-md-2" style="margin-left: 1px" @change="onChange" />
+                </div>
+            </div>
+        </div>
+        <div class="iconshow-filterdepth" style="margin-top: 6px;">
+            <span class="pull-left" style="margin-top: -2px; min-width:80px; text-align:left;">{{Lang.TxtLabeling}}</span>
+            <a class="msa-ic-font icondownfilterdepth pointer" @click="onClickLabeling" 
+               v-bind:class="{ 'font-arrow-down': Labeling.IsShow, 'font-arrow-right': !Labeling.IsShow }"></a>
+            <div class="Roadmapviewquater-menufilterdepth" style="top: 66px;" 
+                 v-if="Labeling.IsShow" @mouseleave="closeMenuLabeling">
+                <div class="row cbGap childmenufilterdepth">
+                    <span class="icon-26 icon-target node-goal col-md-2" style="width: 1px;margin-left: 10px;"></span>
+                    <label style="white-space: pre; max-width: 300px; overflow: hidden; padding-left: 0; padding-right: 0; text-overflow: ellipsis;"
+                           class="col-md-8 kgv-name-menufilterdepth"> {{Lang.labelMainGoalName}}</label>
+                    <input type="checkbox" v-model="Labeling.IsMain" class="col-md-2" 
+                           @change="(e) => { onChangeLabeling(1)}" />
+                </div>
+                <div class="row cbGap childmenufilterdepth">
+                    <span class="icon-26 icon-milestone node-goal col-md-2" style="width: 1px;margin-left: 10px;"></span>
+                    <label style="white-space: pre; max-width: 300px; overflow: hidden; padding-left: 0; padding-right: 0; text-overflow: ellipsis;"
+                           class="col-md-8 kgv-name-menufilterdepth"> {{Lang.labelSubGoalName}}</label>
+                    <input type="checkbox" v-model="Labeling.IsSub" class="col-md-2" 
+                           @change="(e) => { onChangeLabeling(2)}" />
+                </div>
+                <div class="row cbGap childmenufilterdepth">
+                    <span class="icon-26 icon-vertical-rectangle node-goal col-md-2 kgv-menudepth-action"></span>
+                    <label style="white-space: pre; max-width: 300px; overflow: hidden; padding-left: 0; padding-right: 0; text-overflow: ellipsis;"
+                           class="col-md-8 kgv-name-menufilterdepth"> {{Lang.labelActionName}}</label>
+                    <input type="checkbox" v-model="Labeling.IsAction" class="col-md-2" style="margin-left: 1px" 
+                           @change="(e) => { onChangeLabeling(3)}" />
+                </div>
+            </div>
+        </div>
+    </div>    
+</div>

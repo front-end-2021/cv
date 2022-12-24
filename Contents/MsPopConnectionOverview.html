@@ -1,0 +1,451 @@
+﻿<style type="text/css" scoped>
+    #pop-connectoverview .mastermain {
+        border-bottom: 1px solid #c5bebe;
+        background-color: #76838b;
+        color: white;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        width: 100%;
+        display: inline-flex;
+    }
+
+    #pop-connectoverview .mastersub {
+        background-color: #5e696d;
+        color: white;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        width: 100%;
+        display: inline-flex;
+    }
+
+    #pop-connectoverview .gaitem {
+        border-radius: 4px;
+        width: 94%;
+        height: 96px;
+        margin-bottom: 5px;
+    }
+
+        #pop-connectoverview .gaitem .ganame {
+            height: 54px;
+            overflow: hidden;
+            word-break: break-word;
+            padding: 3px 3px 0 3px;
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+        }
+
+        #pop-connectoverview .gaitem .mainname {
+            background-color: #76838b;
+            color: white;
+        }
+
+        #pop-connectoverview .gaitem .subname {
+            background-color: #5e696d;
+            color: white;
+        }
+
+        #pop-connectoverview .gaitem .actionname {
+            background-color: #cbe9f8;
+        }
+
+        #pop-connectoverview .gaitem .gadate {
+            height: 20px;
+            display: inline-flex;
+            width: 100%;
+            background-color: #27a6e2;
+            color: white;
+            border-bottom-left-radius: 3px;
+            border-bottom-right-radius: 3px;
+        }
+
+    [v-cloak] {
+        display: none;
+    }
+</style>
+
+<div id="pop-connectoverview" class="pop-wrapper">
+    <div v-if="loading" id="loading-center-helper"><div id="loading-center" style="display:block;"></div></div>
+    <div v-cloak v-else id="fKpiGoalActionForm" role="form" class="form-horizontal">
+        <div v-if="goalactionlinks" class="modal-body ms-modal-body" style="overflow: auto;padding: 0 !important;" id="gacontent">
+            <div class="mastermain pointer" @click="moveToMain()">
+                <div style="width: 12%;padding-left: 5px;">{{maingoal}}</div>
+                <div style="width: 86%;word-wrap: break-word;overflow: hidden;">{{goalactionlinks.MainGoalName}}</div>
+            </div>
+            <div class="clear"></div>
+            <div class="mastersub pointer" @click="moveToSub()">
+                <div style="width: 12%;padding-left: 5px;">{{subgoal}}</div>
+                <div style="width: 86%;word-wrap: break-word;overflow: hidden;">{{goalactionlinks.SubGoalName}}</div>
+            </div>
+            <div class="clear"></div>
+
+            <goal-action-links-overview v-if="goalactionlinks.Blocks"
+                                        v-for="(block,index) in goalactionlinks.Blocks" :key="index" :block="block" />
+        </div>
+    </div>
+</div>
+
+<script id="link-template" type="text/x-template">
+    <div style="padding: 10px 15px 0 15px;">
+        <div>
+            <b>{{ block.Path|capitalize }}</b>
+        </div>
+        <div class="clearx2"></div>
+        <div>
+            <div v-for="main in block.GoalActions" style="width:100%;display:inline-flex;">
+                <div style="width: 25%;">
+                    <div class="gaitem">
+                        <div class="ganame mainname pointer" :gaid="main.Id" typeid="1" @click="e => moveTo(e)" @dblclick="e => edit(e)">
+                            <span v-show="main.IsLink" style="float:right; margin-top:32px;" class="icon-20 white" v-bind:class="{'icon-url': !main.HasMasterLink, 'icon-url-red': main.HasMasterLink }"></span>
+                            <p>{{main.Name}}</p>
+                        </div>
+                        <div class="gadate">
+                            <div style="width: 50%;padding-left: 3px;border-right: 0.5px solid #76838b;padding-top: 1px;">{{ main.Start|date }}</div>
+                            <div style="width: 50%;padding-right: 3px;border-left: 0.5px solid #76838b;text-align: right;padding-top: 1px;">{{ main.End|date }}</div>
+                        </div>
+                        <div style="padding-left: 3px;padding-right: 3px;overflow: hidden;white-space: nowrap;">
+                            <span style="float: left;width:49%;">{{showpercent(main.IsShowPercent ,main.Percent, main.ApEvaluation)}}</span>
+                            <span style="float: right;width:49%;text-align:right;" class="tbTitleTooltip"
+                                  v-bind:title="toToolstrip(main.StatusDate, main.StatusDescription)">
+                                {{main.Status}}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="width:75%;">
+                    <div v-for="sub in main.Childs" :key="sub.Id" style="width:100%;display:inline-flex;">
+                        <div style="width: 33%;">
+                            <div class="gaitem">
+                                <div class="ganame subname pointer" :gaid="sub.Id" typeid="2" @click="e => moveTo(e)" @dblclick="e => edit(e)">
+                                    <span v-show="sub.IsLink" style="float:right; margin-top:32px;" class="icon-20 white" v-bind:class="{'icon-url': !sub.HasMasterLink, 'icon-url-red': sub.HasMasterLink }"></span>
+                                    <p>{{sub.Name}}</p>
+                                </div>
+
+                                <div class="gadate">
+                                    <div style="width: 50%;padding-left: 3px;border-right: 0.5px solid #5e696d;padding-top: 1px;">{{sub.Start|date}}</div>
+                                    <div style="width: 50%;padding-right: 3px;border-left: 0.5px solid #5e696d;text-align: right;padding-top: 1px;">{{sub.End|date}}</div>
+                                </div>
+                                <div style="padding-left: 3px;padding-right: 3px;overflow: hidden;white-space: nowrap;">
+                                    <span style="float: left;width:49%;">{{showpercent(sub.IsShowPercent ,sub.Percent, sub.ApEvaluation)}}</span>
+                                    <span style="float: right;width:49%;text-align:right;" class="tbTitleTooltip"
+                                          :title="toToolstrip(sub.StatusDate, sub.StatusDescription)">{{sub.Status}}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="width:67%;">
+                            <div v-for="action in sub.Childs" :key="action.Id" style="width: 50%;float:left;">
+                                <div class="gaitem">
+                                    <div class="ganame actionname pointer" :gaid="action.Id" typeid="3"  @click="e => moveTo(e)" @dblclick="e => edit(e)">
+                                        <span v-show="action.IsLink" style="float:right; margin-top:32px;" class="icon-20" v-bind:class="{'icon-url': !action.HasMasterLink, 'icon-url-red': action.HasMasterLink }"></span>
+                                        <p>{{action.Name}}</p>
+                                    </div>
+
+                                    <div class="gadate">
+                                        <div style="width: 50%;padding-left: 3px;border-right: 0.5px solid #cbe9f8;padding-top: 1px;">{{action.Start|date}}</div>
+                                        <div style="width: 50%;padding-right: 3px;border-left: 0.5px solid #cbe9f8;text-align: right;padding-top: 1px;">{{action.End|date}}</div>
+                                    </div>
+                                    <div style="padding-left: 3px;padding-right: 3px;overflow: hidden;white-space: nowrap;">
+                                        <span style="float: left;width:49%;">{{showpercent(action.IsShowPercent ,action.Percent, action.ApEvaluation, action.TodoPercent)}}</span>
+                                        <span style="float: right;width:49%;text-align:right;" class="tbTitleTooltip"
+                                              :title="toToolstrip(action.StatusDate, action.StatusDescription)">{{action.Status}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/javascript">
+    var vmLinkOverview = {};
+
+    vmLinkOverview.id = vmGoalAction.popConnectionOverview.id;
+    vmLinkOverview.typeId = vmGoalAction.popConnectionOverview.typeId;
+    vmLinkOverview.areaId = vmGoalAction.popConnectionOverview.areaId;
+
+    if (typeof MsaApp == 'object' && MsaApp.ApLinkOverviewUrl.GoalActionId) {
+        vmLinkOverview.id = MsaApp.ApLinkOverviewUrl.GoalActionId;
+        vmLinkOverview.typeId = MsaApp.ApLinkOverviewUrl.TypeId;
+        vmLinkOverview.areaId = MsaApp.ApLinkOverviewUrl.AreaId;
+    }
+
+    Vue.filter('capitalize', function (value) {
+        if (!value) return ''
+        value = value.toString()
+        return value.charAt(0).toUpperCase() + value.slice(1)
+    })
+
+    Vue.component('goal-action-links-overview', {
+        props: {
+            block: Object
+        },
+        template: '#link-template',
+        filters: {
+            capitalize: function (value) {
+                if (!value) return ''
+                value = value.toString()
+                return value.charAt(0).toUpperCase() + value.slice(1)
+            },
+            date: function (value) {
+                var temp = (value && typeof (value) == "string") ? value.toDate() : value;
+                return kendo.toString(temp, "d");
+            }
+        },
+        computed: {
+
+        },
+        methods: {
+            _convertdate: function (value) {
+                if (!value) return ''
+
+                var temp = (value && typeof (value) == "string") ? value.toDate() : value;
+                return kendo.toString(temp, "d");
+            },
+            toToolstrip: function (date, des) {
+                if (date != undefined) {
+                    return this._convertdate(date) + " " + des;
+                } else {
+                    return des;
+                }
+            },
+            showpercent: function (isShow, val, eval, todopercent) {
+                let rs;
+                if (eval != null) {
+                    rs = eval
+                } else if (isShow) {
+                    rs = isShow ? vmCommon.toString(val) + "%" : "";        // KPI
+                } else if (todopercent != null) {
+                    rs = todopercent + "%";
+                }
+
+                return rs;
+            },
+            moveTo(e) {
+                var that = this;
+                var elm = e.currentTarget;
+                that.timeOutClick = setTimeout(function () {
+                    if (that.timeOutClick == undefined) return;
+
+                    var gaid = $(elm).attr("gaid");
+                    var typeid = $(elm).attr("typeid");
+
+                    var ga = vmLinkOverview.findGa(gaid, typeid);
+                    if (ga == null || !ga.Visibility) return;
+
+                    var gainfo = vmLinkOverview.getGaInfo(gaid, typeid);
+
+                    var areaId = ga.ThemaId || ga.SubMarketProductId;
+                    MsaApp.redirectTo(gainfo, areaId, true);
+
+                }, 550);
+            },
+            edit: function (e) {
+                var that = this;
+                clearTimeout(that.timeOutClick);
+                that.timeOutClick = undefined;
+
+                var gaid = $(e.currentTarget).attr("gaid");
+                var typeid = $(e.currentTarget).attr("typeid");
+
+                var ga = vmLinkOverview.findGa(gaid, typeid);
+                if (ga == null || !ga.Visibility) return;
+
+                if (typeid == vmCommon.GoalActionContentType.Action) {
+                    var info = {
+                        actionId: gaid,
+                        subMarketProductId: ga.SubMarketProductId,
+                        independencyId: ga.ThemaId,
+                        title: kLg.titlepEditMainGoalNew1 + kLg.labelActionName + kLg.titlepEditMainGoalNew2,
+                        isEdit: true
+                    };
+
+                    vmGoalAction.openPopUpAction2(info);
+                } else {
+                    var info = {
+                        goalId: gaid,
+                        subMarketProductId: ga.SubMarketProductId,
+                        independencyId: ga.ThemaId,
+                        isEdit: true,
+                        goalType: Number(typeid)
+                    };
+                    vmGoalAction.openPopUpGoal2(info)
+                }
+            }
+        }
+    })
+    var popConnectVueVM;
+    $(function () {
+        popConnectVueVM = new Vue({
+            el: '#pop-connectoverview',
+            data: {
+                loading: true,
+                errored: false,
+                rootUrl: "../Handlers/MsGoalAction.ashx?funcName=get_actionplanlink_overview_by_id&projid=" + projectId + "&lang=" + kLg.language + "&strid=" + strategyId,
+                id: vmLinkOverview.id,
+                typeId: vmLinkOverview.typeId,
+                areaId: vmLinkOverview.areaId,
+                goalactionlinks: {},
+                checkall: kLg.labelShowall,
+                maingoal: kLg.labelMainGoalName,
+                subgoal: kLg.labelSubGoalName,
+                timeOutClick: undefined
+            },
+            created() {
+                this.reload();
+            },
+            mounted() {
+                var that = this;
+
+                var s = "margin-top: 3px;";
+                var $kWindowActions = $("#popConnectionOverview_wnd_title").next();
+                if ($kWindowActions.children('.pull-left.oncollapsekr').length < 1) {
+                    $kWindowActions.prepend(`<a role="button" href="javascript:vmLinkOverview.collapse();" class="pull-left oncollapsekr" style="${s}"><span role="presentation" class="icon-20 arrow-left-white"></span></a>`);
+                };
+
+                ////if (gaid == undefined && typeid == undefined && isNaN(Number(typeid))) return;
+                ////typeid = Number(typeid);
+                ////var ga = vmLinkOverview.findGa(gaid, typeid);
+                ////if (ga == null || gaid == vmCommon.emptyGuid) return;
+                //////edit
+                ////var areaid = areaid || that.areaId;
+                ////vmGoalAction.apLinkOverviewService.edit(ga, typeid, areaid);
+                //});
+
+                $(that.$el).on('click', 'input', function () {
+                    $(this).prop("checked") ? $('div.act-percent-isn-show').show() : $('div.act-percent-isn-show').hide();
+                });
+
+                vmLinkOverview.collapse = function () {
+                    MsaApp.apLinkService().collapse();
+                };
+                vmGoalAction.popConnectionOverview.vueVM = that;
+                that.ToolTip;
+            },
+            computed: {
+                ToolTip() {
+                    var tooltip = $(this.$el).kendoTooltip({
+                        filter: ".tbTitleTooltip",
+                        width: 200,
+                        show: function (e) {
+                            var $content = e.sender.content;
+                            var isHtmlFormat = vmCommon.TexEditor.isHtmlFomat($content.html())
+                            var $tooltip = $content.closest('.k-tooltip');
+                            if (isHtmlFormat) {
+                                var cssObj = vmCommon.TexEditor.getCssFrom($content);
+                                $content.css(cssObj);
+                                $tooltip.css({ 'overflow': 'hidden', 'width': '' });
+                                //} else {
+                                //    var width = $tooltip.width();
+                                //    $tooltip.css({ 'overflow': '' });
+                                //    $content.css({ 'width': width + 'px', 'min-width': '' });
+                            }
+                        }
+                    });
+                    return tooltip.data("kendoTooltip");
+                }
+            },
+            methods: {
+                reload() {
+                    var url = this.rootUrl;
+                    url += '&id=' + this.id;
+                    url += '&typeId=' + this.typeId;
+
+                    callAjaxPromise(url).then(response => {
+                        this.goalactionlinks = response.value;
+                    }).catch(error => {
+                        console.log(error)
+                        this.errored = true
+                    }).finally(() => this.loading = false);
+                },
+                moveToMain() {
+                    MsaApp.redirectTo([this.goalactionlinks.MainGoalId], vmLinkOverview.areaId);
+                },
+                moveToSub() {
+                    MsaApp.redirectTo([this.goalactionlinks.MainGoalId, this.goalactionlinks.SubGoalId], vmLinkOverview.areaId);
+                }
+            }
+        });
+
+        vmGoalAction.popConnectionOverview.bind("close", function (e) {
+            MsaApp.apLinkService().clear();
+            //vmGoalAction.apLinkOverviewService.close(vmLinkOverview.areaId);
+            vmGoalAction.closePopConnectionOverview();
+            popConnectVueVM.$destroy();
+        });
+
+        vmLinkOverview.findGa = function (gaid, typeid) {
+            var blocks = popConnectVueVM.goalactionlinks.Blocks;
+            for (var i = 0; i < blocks.length; i++) {
+                var block = blocks[i];
+                var mains = block.GoalActions;
+
+                for (var m = 0; m < mains.length; m++) {
+                    var main = mains[m];
+
+                    if (typeid == vmCommon.GoalActionContentType.MainGoal && main.Id == gaid) return main;
+
+                    var subs = main.Childs;
+                    for (var s = 0; s < subs.length; s++) {
+                        var sub = subs[s];
+
+                        if (typeid == vmCommon.GoalActionContentType.SubGoal && sub.Id == gaid) return sub;
+
+                        var actions = sub.Childs;
+                        for (var a = 0; a < actions.length; a++) {
+                            var action = actions[a];
+
+                            if (typeid == vmCommon.GoalActionContentType.Action && action.Id == gaid) return action;
+                        }
+                    }
+                }
+            }
+            return null;
+        };
+
+        vmLinkOverview.getGaInfo = function (gaid, typeid) {
+            var rs = [];
+            var blocks = popConnectVueVM.goalactionlinks.Blocks;
+            for (var i = 0; i < blocks.length; i++) {
+                var block = blocks[i];
+                var mains = block.GoalActions;
+
+                for (var m = 0; m < mains.length; m++) {
+                    var main = mains[m];
+
+                    if (typeid == vmCommon.GoalActionContentType.MainGoal && main.Id == gaid) {
+                        rs.push(main.Id);
+                        return rs;
+                    }
+
+                    var subs = main.Childs;
+                    for (var s = 0; s < subs.length; s++) {
+                        var sub = subs[s];
+
+                        if (typeid == vmCommon.GoalActionContentType.SubGoal && sub.Id == gaid) {
+                            rs.push(main.Id);
+                            rs.push(sub.Id);
+                            return rs;
+                        };
+
+                        var actions = sub.Childs;
+                        for (var a = 0; a < actions.length; a++) {
+                            var action = actions[a];
+
+                            if (typeid == vmCommon.GoalActionContentType.Action && action.Id == gaid) {
+                                rs.push(main.Id);
+                                rs.push(sub.Id);
+                                rs.push(action.Id);
+                                return rs;
+                            };
+                        }
+                    }
+                }
+            }
+            return null;
+        };
+    })
+</script>

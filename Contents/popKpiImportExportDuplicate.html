@@ -1,0 +1,323 @@
+﻿<link href="../Css/multiple-select.css" rel="stylesheet" />
+
+<style>
+    .tbgrid {
+        width: 100%;
+    }
+
+        .tbgrid th, .tbgrid td {
+            height: 30px;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+            .tbgrid td div {
+                padding-left: 5px;
+            }
+
+    #kpi-duplicate-place th.title {
+        padding-left: 5px !important;
+    }
+</style>
+
+<div>
+    <div id="kpi-duplicate">
+        <div id="kpi-duplicate-place">
+            <div class="modal-body ms-modal-body" style="height: 320px; overflow-y: scroll;">
+                <div data-bind="visible: isShowMainDuplicate">
+                    <div><label id="lblOrganiastion">Kennzahlen Einstellung</label></div>
+                    <div>
+                        <table class="tbgrid modal-table">
+                            <thead>
+                                <tr>
+                                    <th class="title bg-grey" style="width: 40%"><div>Überbegriff</div></th>
+                                    <th class="title bg-grey" style="width: 25%"><div>KPI</div></th>
+                                    <th class="title bg-grey" style="width: 15%"><div>Einheit</div></th>
+                                    <th class="title bg-grey" style="width: 15%"><div>Zeitraum</div></th>
+                                    <th class="title bg-grey" style="width: 5%;padding-left:13px !important;"><input type="checkbox" id="cbxAllMain" class="selectall" /></th>
+                                </tr>
+                            </thead>
+                            <tbody data-bind="source: src.MainDatas" data-template="mainDup-Temp"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div data-bind="visible: isShowUnitDuplicate">
+                    <div><label id="lblOrganiastion">Einheiten Einstellung</label></div>
+                    <div>
+                        <table class="tbgrid modal-table">
+                            <thead>
+                                <tr>
+                                    <th class="title bg-grey" style="width: 10%"><div>Name</div></th>
+                                    <th class="title bg-grey" style="width: 10%"><div>Typ</div></th>
+                                    <th class="title bg-grey" style="width: 10%"><div>Symbol</div></th>
+                                    <th class="title bg-grey" style="width: 10%"><div>Position</div></th>
+                                    <th class="title bg-grey" style="width: 20%;"><div>Zahlenanordnung</div></th>
+                                    <th class="title bg-grey" style="width: 10%"><div>Kontact</div></th>
+                                    <th class="title bg-grey" style="width: 10%"><div>Outflow</div></th>
+                                    <th class="title bg-grey" style="width: 15%"><div>Beschreibung</div></th>
+                                    <th class="title bg-grey" style="width: 5%;padding-left:13px !important;"><input type="checkbox" id="cbxAllUnit" class="selectall" /></th>
+                                </tr>
+                            </thead>
+                            <tbody data-bind="source: src.UnitDatas" data-template="unitDup-Temp"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div data-bind="visible: isShowTimeDuplicate">
+                    <div><label id="lblOrganiastion">Zeitraum Einstellung</label></div>
+                    <div>
+                        <table class="tbgrid modal-table">
+                            <thead>
+                                <tr>
+                                    <th class="title bg-grey" style="width: 40%"><div>Name</div></th>
+                                    <th class="title bg-grey" style="width: 55%"><div>Beschreibung</div></th>
+                                    <th class="title bg-grey" style="width: 5%;padding-left:13px !important;"><input type="checkbox" id="cbxAllTime" class="selectall" /></th>
+                                </tr>
+                            </thead>
+                            <tbody data-bind="source: src.TimeDatas" data-template="timeDup-Temp"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div data-bind="visible: isShowAdvertiseDuplicate">
+                    <div><label id="lblOrganiastion">Werbemittel Einstellung</label></div>
+                    <div>
+                        <table class="tbgrid modal-table">
+                            <thead>
+                                <tr>
+                                    <th class="title bg-grey" style="width: 25%"><div>Werbemittel</div></th>
+                                    <th class="title bg-grey" style="width: 20%"><div>Werbeträger</div></th>
+                                    <th class="title bg-grey" style="width: 25%"><div>KPI</div></th>
+                                    <th class="title bg-grey" style="width: 25%"><div>Format</div></th>
+                                    <th class="title bg-grey" style="width: 5%;padding-left:13px !important;"><input type="checkbox" id="cbxAllAdvertiser" class="selectall" /></th>
+                                </tr>
+                            </thead>
+                            <tbody data-bind="source: src.AdvertiseDatas" data-template="advertiseDup-Temp"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="modal-market-footer">
+            <button id="btnClose" type="button" tabindex="2" class="ms-button pull-right" data-bind="events:{click: close}">
+                <span class="icon-20 icon-close"></span>
+                <span id="lblClose">Abschliessen</span>
+            </button>
+            <button id="btnSave" type="button" tabindex="2" class="ms-button" data-bind="events:{click: update}">
+                <span class="icon-20 icon-update"></span>
+                <span id="lblSave">Speichern</span>
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<script type="text/html" id="mainDup-Temp">
+    <tr>
+        <td>
+            <div>
+                <span data-bind="text: TopicName"></span>
+            </div>
+        </td>
+        <td>
+            <div>
+                <span data-bind="text: IndexName"></span>
+            </div>
+        </td>
+        <td>
+            <div>
+                <span data-bind="text: UnitName"></span>
+            </div>
+        </td>
+        <td>
+            <div>
+                <span data-bind="text: TimeName"></span>
+            </div>
+        </td>
+        <td align="center">
+            <input type="checkbox" class="selectchild" data-bind="checked: IsOverride" parent="cbxAllMain" />
+        </td>
+    </tr>
+</script>
+<script type="text/html" id="unitDup-Temp">
+    <tr>
+        <td>
+            <div>
+                <span data-bind="text: Name"></span>
+            </div>
+        </td>
+        <td>
+            <div>
+                <span data-bind="text: Type"></span>
+            </div>
+        </td>
+        <td>
+            <div>
+                <span data-bind="text: Symbol"></span>
+            </div>
+        </td>
+        <td>
+            <div>
+                <span data-bind="text: Position"></span>
+            </div>
+        </td>
+        <td>
+            <div>
+                <span data-bind="text: Order"></span>
+            </div>
+        </td>
+        <td>
+            <div>
+                <span data-bind="text: Contact"></span>
+            </div>
+        </td>
+        <td>
+            <div>
+                <span data-bind="text: Outflow"></span>
+            </div>
+        </td>
+        <td>
+            <div>
+                <span data-bind="text: Description"></span>
+            </div>
+        </td>
+        <td align="center">
+            <input type="checkbox" class="selectchild" data-bind="checked: IsOverride" parent="cbxAllUnit" />
+        </td>
+    </tr>
+</script>
+<script type="text/html" id="timeDup-Temp">
+    <tr>
+        <td>
+            <div>
+                <span data-bind="text: Name"></span>
+            </div>
+        </td>
+        <td>
+            <div>
+                <span data-bind="text: Description"></span>
+            </div>
+        </td>
+        <td align="center">
+            <input type="checkbox" class="selectchild" data-bind="checked: IsOverride" parent="cbxAllTime" />
+        </td>
+    </tr>
+</script>
+<script type="text/html" id="advertiseDup-Temp">
+    <tr>
+        <td>
+            <div>
+                <span data-bind="text: ProductAdvertise"></span>
+            </div>
+        </td>
+        <td>
+            <div>
+                <span data-bind="text: Advertise"></span>
+            </div>
+        </td>
+        <td>
+            <div>
+                <span data-bind="text: Kpi"></span>
+            </div>
+        </td>
+        <td>
+            <div>
+                <span data-bind="text: Format"></span>
+            </div>
+        </td>
+        <td align="center">
+            <input type="checkbox" class="selectchild" data-bind="checked: IsOverride" parent="cbxAllAdvertiser" />
+        </td>
+    </tr>
+</script>
+
+<script type="text/javascript">
+    kpiImport = kpiImport || {};
+    var kpiDupModel = undefined;
+    var isConfirm = false;
+
+    kpiImport.popDuplicate.bind("close", function (e) {
+        if (!isConfirm) {
+            ynConfirm("Möchten Sie die Daten überschreiben?").then(
+                function () {
+                    kpiDupModel.update();
+                },
+                function () {
+                    kpiDupModel.close();
+                }
+            );
+
+            e.preventDefault();
+        } else {
+            kpiImport.popDuplicate.destroy();
+            kpiImport.popDuplicate = null;
+            $("div[class='admin-content']").after("<div id='kpiDuplicateHolder'></div>");
+        }
+    });
+
+    $(function () {
+        var data = kpiImport.duplicateData;
+
+        kpiDupModel = kendo.observable({
+            isShowMainDuplicate: data.MainDatas.length > 0,
+            isShowUnitDuplicate: data.UnitDatas.length > 0,
+            isShowTimeDuplicate: data.TimeDatas.length > 0,
+            isShowAdvertiseDuplicate: false,
+            src: data,
+
+            update: function () {
+                isConfirm = true;
+                kpiImport.dataservice.saveImport(this.src, function (res) {
+                    var msg;
+                    switch (res.value) {
+                        case -1:
+                            msg = "Konflikt ist aufgetreten beim Importieren";
+                            break;
+                        default:
+                            msg = "Die Daten wurden erfolgreich importiert";
+                            break;
+                    }
+                    pAlert(msg);
+                });
+
+                kpiImport.popDuplicate.close();
+            },
+            close: function () {
+                isConfirm = true;
+                //kpiImport.dataservice.cancelImport({ Key: this.src.Key });
+                kpiImport.popDuplicate.close();
+            }
+        });
+
+        kendo.bind($("#kpi-duplicate"), kpiDupModel);
+    });
+
+    $("#kpi-duplicate").on("change", ".selectall", function (e) {
+        var id = $(e.currentTarget).attr("id");
+        var isCheck = $(e.currentTarget).is(":checked");
+        $("input.selectchild[type='checkbox'][parent='" + id + "']").prop("checked", isCheck);
+
+        //update model
+        var source = kpiDupModel.get("src");
+        var data = undefined;
+        if (id == "cbxAllMain") {
+            data = source.MainDatas;
+        } else if (id == "cbxAllUnit") {
+            data = source.UnitDatas;
+        } else if (id == "cbxAllTime") {
+            data = source.TimeDatas;
+        } else if (id == "cbxAllAdvertiser") {
+            data = source.AdvertiseDatas;
+        }
+
+        if (data == undefined || data.length == 0) return;
+        for (var i = 0; i < data.length; i++) {
+            data[i].set("IsOverride", isCheck);
+        }
+
+    });
+
+    $("#kpi-duplicate").on("change", ".selectchild", function (e) {
+        var parent = $(e.currentTarget).attr("parent");
+        $("#" + parent).prop("checked", $("input.selectchild[type='checkbox'][parent='" + parent + "']").not(':checked').length == 0);
+    });
+</script>

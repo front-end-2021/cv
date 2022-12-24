@@ -1,0 +1,159 @@
+﻿<div id="loading-independency" class="loading"></div>
+<div id="area-edit-independency" class="pop-wrapper">
+	<div class="modal-body ms-modal-body">
+        <form role="form" id="fEditIndependency" class="form-horizontal" >
+            <div class="form-group noMarginLeft noMarginRight" data-bind="invisible: IsOverallThreadNameInvisible">
+                <label class="col-sm-4 no-padding-right" for="txtIndependencyName" id="lblOverallThread">Independence name</label>
+                <div class="col-sm-8">
+                    <input type="text" name="txtIndependencyName" data-placement="bottom" tabindex="1" id="txtIndependencyName" class="col-md-10 modal-input txtInput" onkeypress="vmOverallThread.activeModelChange()"
+                           data-bind="value: IndependencyFull.Name, disabled: roleEdit" maxlength="100">
+                </div>
+            </div>
+        </form>
+	</div>
+	<div class="clear43px"></div>
+	<div class="modal-market-footer">
+		<button id="btnUpdate" type="button" tabindex="4" class="ms-button" data-bind="events: {click: update}">
+			<span class="icon-20 icon-close"></span>
+			<span id="lblClose">Close</span>
+		</button>
+	</div>
+</div>
+<script src="../Scripts/jquery.multiple.select.js"></script>
+<script>
+	var vmOverallThread = vmOverallThread || {};
+	vmOverallThread.dataservice = (function () {
+
+	    var updateOverallThread = function (entryDate, successFunc) {
+			vmGoalAction.dataservice.callAjaxByPost("updateOverallThread", entryDate, successFunc, 'loading-independency');
+		};
+
+	    return {
+	        updateOverallThread: updateOverallThread
+	    };
+	}());
+
+	vmOverallThread.setupLanguage = function () {
+		$("#area-edit-independency #lblOverallThread").text(kLg.gaLblOverallThread);
+		$('#area-edit-independency #lblClose').text(kLg.lblClose);
+	};
+
+	vmOverallThread.setupValidation = function() {
+		$('#fEditIndependency').validate({
+			rules: {
+				txtIndependencyName: {
+					maxlength: 100,
+					required: true
+				},
+				txtThreadName: {
+					maxlength: 100,
+					required: true
+				}
+			},
+			messages: {
+				txtIndependencyName: {
+					required: kLg.msgRequired,
+					maxlength: kLg.msgMaxlenghName
+				},
+				txtThreadName: {
+					required: kLg.msgRequired,
+					maxlength: kLg.msgMaxlenghName
+				}
+			}
+		});
+	};
+
+	vmGoalAction.popEditIndependence.bind("close", function (e) {
+		if (vmOverallThread.modelChanged) {
+			if (confirm(kLg.saveConfirmQuestion)) {
+				if ($('#fEditIndependency').valid()) {
+				    vmOverallThread.viewModel.update();
+				    vmGoalAction.popEditIndependence.destroy();
+				    vmGoalAction.popEditIndependence = null;
+				    $('.body-content').after('<div id="popEditIndependence"></div>');
+				} else {
+					e.preventDefault();
+				}
+			} else {
+			    vmGoalAction.popEditIndependence.destroy();
+			    vmGoalAction.popEditIndependence = null;
+			    $('.body-content').after('<div id="popEditIndependence"></div>');
+			}
+		} else {
+		    vmGoalAction.popEditIndependence.destroy();
+		    vmGoalAction.popEditIndependence = null;
+		    $('.body-content').after('<div id="popEditIndependence"></div>');
+		}
+	});
+
+    //Pageload
+	$(function () {
+	    limitedTabKey();
+
+		vmOverallThread.independencyFull = {};
+		vmOverallThread.independencyFull = {
+		        Id: vmGoalAction.IndepencencyOptions.Id,
+		        Name: vmGoalAction.IndepencencyOptions.Name,
+		        Mdf: vmGoalAction.IndepencencyOptions.Mdf
+		    };
+		
+		vmOverallThread.viewModel = kendo.observable({
+		    roleEdit: vmGoalAction.Role < vmCommon.MemberRole.Edit,
+			IndependencyFull: vmOverallThread.independencyFull,
+			update: function () {
+				if (vmGoalAction.Role < vmCommon.MemberRole.Edit) {
+					vmGoalAction.popEditIndependence.close();
+					return;
+				}
+
+				if (!$('#fEditIndependency').valid()) {
+					return;
+				}
+
+				var entryData = vmOverallThread.independencyFull;
+
+				vmOverallThread.dataservice.updateOverallThread(entryData, function (serData) {
+						if (!vmGoalAction.checkRole(serData)) return;
+
+						if (vmCommon.checkConflict(serData.value.ResultStatus)) {
+							vmOverallThread.modelChanged = false;
+
+							//vmGoalAction.bindIndepdendencyView();
+							
+							var independecy = {
+								Id: independency.Id,
+								Name: independency.Name
+							};
+							if (typeof (vmFilter) != "undefined") {
+								vmFilter.EditParent(independecy, 15);
+							}					
+
+							if (vmGoalAction.popEditIndependence)
+								vmGoalAction.popEditIndependence.close();
+						} else {
+							vmOverallThread.modelChanged = false;
+						}
+					});
+			
+
+				if (vmGoalAction.popEditIndependence)
+				vmGoalAction.popEditIndependence.close();
+			
+			}
+		});
+
+		vmOverallThread.viewModel.bind("change", function () {
+			vmOverallThread.modelChanged = true;
+		});
+		vmOverallThread.activeModelChange = function () {
+			vmOverallThread.modelChanged = true;
+		};
+		
+		kendo.bind($("#area-edit-independency"), vmOverallThread.viewModel);
+
+		vmOverallThread.setupLanguage();
+		vmOverallThread.setupValidation();
+
+		vmGoalAction.focusFirstInput('#area-edit-independency');
+	});
+</script>

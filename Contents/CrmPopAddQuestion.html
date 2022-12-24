@@ -1,0 +1,143 @@
+﻿<div class="pop-wrapper" id="pop-add-question" >
+    <div class="ms-modal-body">
+        <form id="add-question-form" data-bind="events:{change: formChange}">
+            <div class="form-group">
+                <label id="lblNameQuestion">Name :</label>
+                <p class="clear"></p>
+                <input class="modal-input txtInput w-100per-fix" name="QuestionName" id="txtNameQuestion" tabindex="1" maxlength="500" data-bind="value: question.Name" data-value-update="keyup" />
+            </div>
+            <!--<hr class="modal-market-hr"/>-->
+            <div class="form-group">
+                <label id="lblDescriptionQuestion">Description :</label>
+                <p class="clear"></p>
+                <textarea class="modal-textarea w-100per-fix" name="QuestionDescription" id="txtDescriptionQuestion" tabindex="2" data-bind="value: question.Description" data-value-update="keyup" ></textarea>
+            </div>
+
+        </form>
+    </div>
+    <div class="modal-market-footer">
+        <button type="button" class="ms-button" id="btnCloseQuestion" tabindex="3" data-bind="events:{click: update}">
+            <span class="icon-16 icon-close margin-right6"></span><span id="lblClose">Speichern und schliessen</span>
+        </button>
+    </div>
+</div>
+
+<div class="loading" id="add-question-loading"></div>
+
+
+<script type="text/javascript">
+    var questionViewModel;
+    var vmEditQuestion = {};
+    
+    vmEditQuestion.IsModified = false;
+
+    vmEditQuestion.SetupValidate = function () {
+        $('#add-question-form').validate({
+            rules: {
+                QuestionName: {
+                    required: true
+                    //maxlength: 100
+                }
+            },
+            messages: {
+                QuestionName: {
+                    required: kLg.requiredName
+                    //maxlength: kLg.msgMaxlenghName
+                }
+            }
+        });
+        //prevent Enter key submit form
+        $('form').on('submit', function (e) {
+            e.preventDefault();
+            $('#btnCloseQuestion').trigger('click');
+        });
+    };
+
+
+    vmEditQuestion.setupLanguage = function () {
+
+        $('#lblClose').text(kLg.lblClose);      
+        $('#lblNameQuestion').text(kLg.lblName);
+        $('#lblDescriptionQuestion').text(kLg.labelDes);
+    };
+
+ 
+
+    popUpAddQuestion.bind("close", function (e) {
+
+        if (vmEditQuestion.IsModified == true) {
+            if (!confirm(kLg.saveConfirmQuestion)) {
+                popUpAddQuestion.destroy();
+                popUpAddQuestion = null;
+                $('.body-content').after('<div id="pop-add-question-place"></div>');
+
+            } else {
+                if (!$('#add-question-form').valid()) { 
+                    e.preventDefault();
+                    return;
+                };
+                questionViewModel.update();
+                
+                popUpAddQuestion = null;
+                $('.body-content').after('<div id="pop-add-question-place"></div>');
+            }
+        } else {
+            popUpAddQuestion.destroy();
+            popUpAddQuestion = null;
+            $('.body-content').after('<div id="pop-add-question-place"></div>');
+
+        }
+    });
+
+    //pageload
+    $(function () {
+        
+        questionViewModel = kendo.observable({            
+            question: vmQuestionView.editOptionQuestion.Question,
+            formChange : function(){
+                vmEditQuestion.IsModified = true;
+            },
+            update: function (e) {
+                if ($('#add-question-form').valid()) {
+                    var funcName = vmQuestionView.editOptionQuestion.IsEdit ? "updatequestion" : "addquestion";
+                    var themaObject = vmQuestionView.ultilities.getCurrentThema(this.question.CrmThemaId);
+
+                    var obj = { themaId: themaObject.Id, question: this.question, themaLabelNumber: themaObject.LabelNumber };
+                    obj.question.Name = obj.question.Name.trim();
+                    obj.question.Description = obj.question.Description.trim();
+                    vmEditQuestion.saveChange(obj, funcName);
+                }
+            }
+        });
+        
+        kendo.bind($('#pop-add-question'), questionViewModel);      
+        vmEditQuestion.SetupValidate();
+        vmEditQuestion.setupLanguage();
+        limitedTabKey();
+        $("#txtNameQuestion").focus();
+    });
+
+    vmEditQuestion.saveChange = function (data, funcName) {
+        var url = '../Handlers/CrmQuestionAnswerHandler.ashx?funcName=' + funcName + "&projid=" + projectId + "&strid=" + strategyId + "&fid=" + vmQuestionView.fragensetId;
+        callAjax('add-question-loading', url, JSON.stringify(data), function (res) {
+            var thema = vmQuestionView.ultilities.getCurrentThema(data.themaId);
+
+            if (vmQuestionView.editOptionQuestion.IsEdit)
+                vmQuestionView.callbackResultHandler(res, "updatequestion", thema);
+            else
+                vmQuestionView.callbackResultHandler(res, "rebind", thema);
+
+        }, AjaxConst.PostRequest);
+
+
+        vmEditQuestion.IsModified = false;
+        popUpAddQuestion.close();
+    };
+    vmEditQuestion.callBackData = function (res) {
+        if (vmQuestionView.editOptionQuestion.IsEdit)
+            vmQuestionView.callbackResultHandler(res, "updatequestion");
+        else
+            vmQuestionView.callbackResultHandler(res, "rebind");
+    };
+
+</script>

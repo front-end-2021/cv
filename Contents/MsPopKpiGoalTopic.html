@@ -1,0 +1,180 @@
+﻿<div id="loading-goaltopic" class="loading"></div>
+<div id="pop-goal-topic" class="pop-wrapper">
+    <form id="fGoalTopicForm" role="form" class="form-horizontal">
+        <div class="modal-body ms-modal-body" style="height: 210px;overflow: auto">
+            <div>
+                <label id="lblTopicName">Name</label>
+                <div class="clear"></div>
+                <input id="textTopicName" name="textTopicName" tabindex="0" class="modal-input txtInput w-100per-fix" maxlength="250" data-bind="value: topic.Name" />
+            </div>
+            <hr class="modal-market-hr">
+            <div>
+                <label id="lblTopicDescription">Description</label>
+                <div class="clear"></div>
+                <textarea id="textTopicDescription" tabindex="0" class="modal-textarea w-100per-fix" data-bind="value: topic.Description"></textarea>
+            </div>
+            
+            <!--<div style="margin-top: 10px;">
+                <label id="lblTopicType">Type</label>
+                <div class="clear"></div>
+                <input data-role="dropdownlist"
+                       data-auto-bind="false"
+                       data-value-primitive="false"
+                       data-text-field="Name"
+                       data-value-field="Id"
+                       data-bind="source: goalTopicSrc, value: topic.TypeId, disabled: isHasIndex"
+                       class="pull-left" id="dropTemp" />
+            </div>-->
+
+        </div>
+        <div class="modal-market-footer">
+            <button id="btnUpdateGoalTopic" type="button" class="ms-button" data-bind="events:{click: update}">
+                <span class="icon-20 icon-close"></span>
+                <span id="lblGoalTopicClose">Speichern und schliessen</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+
+<script type="text/javascript">
+    var vmKpiTopic = {};
+    var vmKpiGoal = vmKpiGoal || {};
+    vmKpiTopic.modelChanged = false;
+
+    var kpiGoalTopic = [
+        { Id: vmCommon.KpiGoalTopicType.LandRegion, Name: kLg.newLand + '/' + kLg.vtextRegion },
+        { Id: vmCommon.KpiGoalTopicType.Market, Name: kLg.titleStackholderGroups },
+        { Id: vmCommon.KpiGoalTopicType.Product, Name: kLg.filterLblProduct }
+        //{ Id: vmCommon.KpiGoalTopicType.Goal, Name: kLg.kpiTopicGoal }
+    ],
+    goalTopicModel;
+
+    vmKpiTopic.destroyPop = function() {
+        vmGoalAction.popKpiGoalTopic.destroy();
+        vmGoalAction.popKpiGoalTopic = null;
+        $(".body-content").after("<div id='popkpigoaltopic'></div>");
+    };
+
+    vmGoalAction.popKpiGoalTopic.bind("close", function (e) {
+        if (!vmGoalAction.kpiTopicOptions.IsEdit && goalTopicModel.topic.Name.trim().length === 0) {
+            vmKpiTopic.destroyPop();
+            return;
+        }
+
+        if (vmKpiTopic.modelChanged) {
+            if (confirm(kLg.saveConfirmQuestion)) {
+                if (!goalTopicModel.update()) e.preventDefault();
+            } else {
+                vmKpiTopic.destroyPop();
+            }
+
+        } else {
+            vmKpiTopic.destroyPop();
+        }
+    });
+
+    vmKpiTopic.setUpLanguage = function() {
+        $("#pop-goal-topic #lblGoalTopicClose").text(kLg.lblClose);
+        //lblTopicDescription
+        $("#pop-goal-topic #lblTopicDescription").text(kLg.labelDes);
+        //lblTopicType
+        $("#pop-goal-topic #lblTopicType").text(kLg.lblType);
+    };
+
+    vmKpiTopic.buildingTopicSource = function (temps) {
+        var lst = [];
+
+        if (temps.indexOf(vmCommon.KpiGoalTopicType.LandRegion) >= 0) lst.push({ Id: vmCommon.KpiGoalTopicType.LandRegion, Name: kLg.newLand + '/' + kLg.vtextRegion });
+        if (temps.indexOf(vmCommon.KpiGoalTopicType.Market) >= 0) lst.push({ Id: vmCommon.KpiGoalTopicType.Market, Name: kLg.titleStackholderGroups });
+        if (temps.indexOf(vmCommon.KpiGoalTopicType.Product) >= 0) lst.push({ Id: vmCommon.KpiGoalTopicType.Product, Name: kLg.filterLblProduct });
+        if (temps.indexOf(vmCommon.KpiGoalTopicType.Goal) >= 0) lst.push({ Id: vmCommon.KpiGoalTopicType.Goal, Name: kLg.kpiTopicGoal });
+
+        return lst;
+    };
+
+    //READY
+    var topicNames = {}, kpiGoalSelectable = true;
+    $(function () {
+        var topic = vmGoalAction.kpiTopicOptions.kpiTopic;
+        topicNames = vmGoalAction.kpiTopicOptions.topicNames;
+        kpiGoalSelectable = vmGoalAction.kpiTopicOptions.kpiGoalSelectable;
+
+        goalTopicModel = kendo.observable({
+            isHasIndex: topic.KpiGoalIndexes.length > 0,
+            topic: topic,
+            goalTopicSrc: vmKpiTopic.buildingTopicSource(vmGoalAction.kpiTopicOptions.selectableTopics),
+            update: function () {
+                if (!vmKpiTopic.validForm()) return false;
+
+                if (!vmKpiTopic.modelChanged) {
+                    vmGoalAction.popKpiGoalTopic.close();
+                    return true;
+                }
+
+                this.topic.set("Name", this.topic.Name.trim());
+                this.topic.set("Description", this.topic.Description.trim());
+
+                var topics = vmGoalAction.kpiTopicOptions.kpiData.KpiGoalTopics;
+
+                if (vmGoalAction.kpiTopicOptions.IsEdit) {
+                    var currentTopic = vmCommon.findById(this.topic.Id, topics);
+
+                    currentTopic.Name = this.topic.Name;
+                    currentTopic.TypeId = this.topic.TypeId;
+                    currentTopic.Description = this.topic.Description;
+
+                    if (currentTopic.DataState === dataState.Unchanged) currentTopic.DataState = dataState.Modified;
+
+                    $("#topicname" + (this.topic.Id)).text(this.topic.Name);
+
+                    var iconCls = "icon-28 " + vmKpiGoal.getTopicIcon(this.topic.TypeId);
+                    if ($("#topicicon" + this.topic.Id).attr("class") !== iconCls) {
+                        $("#topicicon" + this.topic.Id).attr("class", iconCls);
+                    }
+
+                } else {
+                    topics.push(this.topic);
+                    vmKpiGoal.addTopic(this.topic);
+                }
+                vmKpiGoal.modelChanged = true;
+
+                vmKpiTopic.modelChanged = false;
+                vmGoalAction.popKpiGoalTopic.close();
+                return true;
+            }
+        });
+
+        goalTopicModel.bind("change", function() {
+            vmKpiTopic.modelChanged = true;
+        });
+
+        if (!vmGoalAction.kpiTopicOptions.IsEdit) vmKpiTopic.modelChanged = true;
+
+        kendo.bind($("#pop-goal-topic"), goalTopicModel);
+        vmKpiTopic.setUpLanguage();
+    });
+
+    vmKpiTopic.validForm = function () {
+
+        var topic = goalTopicModel.topic;
+        if (topic.Name == undefined || topic.Name.trim().length === 0) {
+            ShowToolTip($("#pop-goal-topic #textTopicName"), kLg.InvalidData, "top");
+            return false;
+        }
+
+        //check same name
+        var otheNames = topicNames[topic.TypeId];
+        if (otheNames.indexOf(topic.Name.trim()) > -1) {
+            ShowToolTip($("#pop-goal-topic #textTopicName"), kLg.msgTopicNameExisted, "top");
+            return false;
+        }
+
+        return true;
+    };
+
+    $("#pop-goal-topic #textTopicName").on("keypress", function (e) {
+        if (e.keyCode == 13) e.preventDefault();
+    });
+
+</script>

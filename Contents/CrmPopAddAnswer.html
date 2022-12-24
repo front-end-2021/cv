@@ -1,0 +1,122 @@
+﻿<div class="pop-wrapper" id="pop-add-answer" >
+    <div class="ms-modal-body">
+        <form id="add-answer-form" data-bind="events:{change: formChange}">
+            <div class="form-group">
+                <label id="lblDescriptionAnswer">Value :</label>
+                <p class="clear"></p>
+            </div>
+
+        </form>
+    </div>
+    <div class="modal-market-footer">
+        <button type="button" class="ms-button" id="btnCloseAnswer" tabindex="2" data-bind="events: { click: update }">
+            <span class="icon-16 icon-close margin-right6"></span><span id="lblClose">Speichern und schliessen</span>
+        </button>
+    </div>
+</div>
+<div class="loading" id="add-answer-loading"></div>
+
+
+<script type="text/javascript">
+    var answerViewModel;
+    var vmEditAnswer = {};
+    
+    vmEditAnswer.IsModified = false;
+
+    vmEditAnswer.setupLanguage = function () {
+        $('#lblClose').text(kLg.lblClose);
+        $('#lblNameAnswer').text(kLg.lblName);
+        //$('#lblDescriptionAnswer').text(kLg.labelDes);
+    }; 
+
+    popUpAddAnswer.bind("close", function (e) {
+        if (vmEditAnswer.IsModified == true) {
+            if (!confirm(kLg.saveConfirmQuestion)) {
+                popUpAddAnswer.destroy();
+                popUpAddAnswer = null;
+                $('.body-content').after('<div id="pop-add-answer-place"></div>');
+
+            } else {
+                if (!$('#add-answer-form').valid()) {
+                    e.preventDefault();
+                    return;
+                };
+                answerViewModel.update();
+                
+                popUpAddAnswer = null;
+                $('.body-content').after('<div id="pop-add-answer-place"></div>');
+            }
+        } else {
+            popUpAddAnswer.destroy();
+            popUpAddAnswer = null;
+            $('.body-content').after('<div id="pop-add-answer-place"></div>');
+
+        }
+    });
+
+    //AnswerNo Detail : vmQuestionView.EnumRatingscaleAnswerNo = { StartLabel: 0, EndLabel: 1, StartValue: 2, EndValue: 3, Greaterthan: 4, Lessthan: 5, Equal: 6 };
+    vmEditAnswer.initValueControl = function () {
+        //answerNo : order number of question
+        if (vmQuestionView.editOptionAnswer.question.TypeId == vmCrmEnum.QuestionType.Ratingscale && vmQuestionView.editOptionAnswer.answerNo > vmQuestionView.EnumRatingscaleAnswerNo.EndLabel) {
+            $("p.clear").after('<input class="w-98per" rows="4" name="AnswerName" id="txtNameAnswer" tabindex="1" data-bind="value: answer.Name" data-value-update="keyup" maxlength="30"></input>');
+            $("#txtNameAnswer").kendoNumericTextBox({ format: "#", spinners: false });
+        }
+        else {
+            var strmaxlength = (vmQuestionView.editOptionAnswer.question.TypeId == vmCrmEnum.QuestionType.Ratingscale && vmQuestionView.editOptionAnswer.answerNo <= vmQuestionView.EnumRatingscaleAnswerNo.EndLabel) ? 'maxlength="30"' : '';
+            $("p.clear").after('<textarea class="modal-textarea w-98per" rows="4" name="AnswerName" id="txtNameAnswer" tabindex="1" data-bind="value: answer.Name" data-value-update="keyup"' + strmaxlength + ' ></textarea>');
+        }
+    };
+
+    vmEditAnswer.SetupValidate = function () {
+        //prevent Enter key submit form
+        $('form').on('submit', function (e) {
+            e.preventDefault();
+            $('#btnCloseAnswer').trigger('click');
+        });       
+    };
+    
+    
+    vmEditAnswer.saveChange = function (data, funcName) {
+        var url = '../Handlers/CrmQuestionAnswerHandler.ashx?funcName=' + funcName + "&projid=" + projectId + "&strid=" + strategyId + "&fid=" + vmQuestionView.fragensetId;
+        if (vmQuestionView.editOptionAnswer.IsEdit) {
+            callAjax('add-answer-loading', url, JSON.stringify(data), vmEditAnswer.callBackDataUpdateAnswer, AjaxConst.PostRequest);
+        }
+        else {
+            callAjax('add-answer-loading', url, JSON.stringify(data), vmEditAnswer.callBackDataAddAnswer, AjaxConst.PostRequest);
+        }
+        vmEditAnswer.IsModified = false;
+        popUpAddAnswer.close();
+    };
+
+    vmEditAnswer.callBackDataAddAnswer = function (res) {
+        vmQuestionView.callbackResultHandler(res, "AddAnswerAndRebind", themaObject);
+    };
+    vmEditAnswer.callBackDataUpdateAnswer = function (res) {
+        res.value.Name = answerViewModel.answer.Name;
+        vmQuestionView.callbackResultHandler(res, "updateanswerByPop", themaObject);
+    };
+
+    //pageload
+    var themaObject = {};
+    $(function () {
+        themaObject = vmQuestionView.ultilities.getCurrentThema(vmQuestionView.editOptionAnswer.Answer.CrmThemaId);
+        answerViewModel = kendo.observable({
+            answer: vmQuestionView.editOptionAnswer.Answer,
+            formChange: function () {
+                vmEditAnswer.IsModified = true;
+            },
+            update: function (e) {
+                var funcName = vmQuestionView.editOptionAnswer.IsEdit ? "updateanswer" : "addanswer";
+
+                var obj = { themaId: this.answer.CrmThemaId, answer: this.answer, themaLabelNumber: themaObject.LabelNumber };
+                obj.answer.Name = obj.answer.Name.toString().trim();
+                vmEditAnswer.saveChange(obj, funcName);
+            },
+        });
+        vmEditAnswer.initValueControl();
+        kendo.bind($('#pop-add-answer'), answerViewModel);
+        vmEditAnswer.setupLanguage();
+        vmEditAnswer.SetupValidate();
+        limitedTabKey();
+    });
+</script>

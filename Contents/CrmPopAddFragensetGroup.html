@@ -1,0 +1,143 @@
+﻿<div class="pop-wrapper" id="pop-add-fragensetgroup">
+    <div class="ms-modal-body">
+        <form id="add-fragensetgroup-form" data-bind="events:{change: formChange}">
+            <div class="form-group">
+                <label id="lblNameFragensetGroup"></label>
+                <p class="clear"></p>
+                <input class="modal-input txtInput w-98per" maxlength="100" name="FragensetGroupName" id="txtNameFragensetGroup" tabindex="1" data-bind="value: group.Name" data-value-update="keyup" />
+            </div>
+            <hr class="modal-market-hr" />
+            <div class="form-group">
+                <label id="lblDescriptionFragensetGroup"></label>
+                <p class="clear"></p>
+                <textarea class="modal-textarea w-98per" name="FragensetGroupDescription" id="txtDescriptionFragensetGroup" tabindex="2" data-bind="value: group.Description" data-value-update="keyup" ></textarea>
+            </div>
+        </form>
+    </div>
+    <div class="modal-market-footer">
+        <button type="button" class="ms-button" id="btnCloseFragensetGroup" tabindex="3" data-bind="events:{click: update}">
+            <span class="icon-16 icon-close margin-right6"></span><span id="lblClose">Speichern und schliessen</span>
+        </button>
+    </div>
+</div>
+<div class="loading" id="add-fragensetgroup-loading"></div>
+
+
+<script type="text/javascript">
+    var fragensetGroupViewModel;
+    var vmEditFragensetGroup = {};
+  
+
+    vmEditFragensetGroup.IsModified = false;
+    vmEditFragensetGroup.SetupValidate = function () {
+        $('#add-fragensetgroup-form').validate({
+            rules: {
+                FragensetGroupName: {
+                    required: true,
+                   // maxlength: 100
+                }
+            },
+            messages: {
+                FragensetGroupName: {
+                    required: kLg.requiredName,
+                   // maxlength: kLg.msgMaxlenghName
+                }
+            }
+        });
+        //prevent Enter key submit form
+        $('form').on('submit', function (e) {
+            e.preventDefault();
+            $('#btnCloseFragensetGroup').trigger('click');
+        });
+    };
+
+
+    vmEditFragensetGroup.setupLanguage = function () {
+        $('#lblClose').text(kLg.lblClose);
+        $('#lblNameFragensetGroup').text(kLg.titleFrGName);
+        $('#lblDescriptionFragensetGroup').text(kLg.titleFrDescription);
+    };
+    $("#txtNameFragensetGroup").on('keydown', function (e) {
+        if (e.keyCode == 9 || e.keyCode == 13) {
+            e.preventDefault();
+            return;
+        }
+    });
+    popUpAddFragensetGroup.bind("close", function (e) {
+
+        if (vmEditFragensetGroup.IsModified == true) {
+            if (!confirm(kLg.saveConfirmQuestion)) {
+                popUpAddFragensetGroup.destroy();
+                popUpAddFragensetGroup = null;
+                $('.body-content').after('<div id="pop-add-fragensetgroup-place"></div>');
+
+            } else {
+                e.preventDefault();
+                if (!$('#add-fragensetgroup-form').valid()) {
+                    return;
+                };
+                fragensetGroupViewModel.update();
+                
+                //popUpAddFragensetGroup = null;
+                $('.body-content').after('<div id="pop-add-fragensetgroup-place"></div>');
+            }
+        } else {
+            popUpAddFragensetGroup.destroy();
+            popUpAddFragensetGroup = null;
+            $('.body-content').after('<div id="pop-add-fragensetgroup-place"></div>');
+
+        }
+    });
+
+    $(function () {
+        
+        fragensetGroupViewModel = kendo.observable({
+            
+            group: vmFragensetList.editOptionFragensetGroup.Group,
+            update: function (e) {
+                if ($('#add-fragensetgroup-form').valid()) {
+                    var funcName = vmFragensetList.editOptionFragensetGroup.IsEdit ? "updatefragensetgroup" : "addfragensetgroup";
+                    var theFragensetGroup = this.group;
+                    vmEditFragensetGroup.saveChange(theFragensetGroup, funcName);
+
+                }
+            },
+            formChange: function () {
+                vmEditFragensetGroup.IsModified = true;
+            }
+        });
+
+        vmEditFragensetGroup.activeModelChange = function () {
+            vmEditFragensetGroup.IsModified = true;
+        };
+        kendo.bind($('#pop-add-fragensetgroup'), fragensetGroupViewModel);
+
+      
+        vmEditFragensetGroup.SetupValidate();
+        vmEditFragensetGroup.setupLanguage();
+        limitedTabKey();
+    });
+
+   
+
+   
+    vmEditFragensetGroup.saveChange = function (data, funcName) {
+        if (vmEditFragensetGroup.IsModified == true) {
+            var url = '../Handlers/CrmFragensetHandler.ashx?funcName=' + funcName + "&projid=" + projectId + "&strid=" + strategyId;
+            callAjax('add-fragensetgroup-loading', url, JSON.stringify(data), vmEditFragensetGroup.callBackData, AjaxConst.PostRequest);
+            vmEditFragensetGroup.IsModified = false;
+        } else {
+            popUpAddFragensetGroup.close();
+        }
+    };
+    vmEditFragensetGroup.callBackData = function (res) {
+        if (res == vmCrmEnum.ResultStatus.CONFLICT) {
+            pAlert(kLg.projectConflict);
+        }
+        if (popUpAddFragensetGroup != null) {
+            popUpAddFragensetGroup.close();
+        }
+        vmFragensetList.dataservice.getfragensetbyproject(null, vmFragensetList.loadFragensetListTemplate);
+    };
+    
+</script>

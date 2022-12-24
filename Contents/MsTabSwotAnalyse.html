@@ -1,0 +1,615 @@
+﻿<p class="clearx2"></p>
+<div id="swotArea" class="tab-swotanalyse">
+    <div id="lblSwotEditError" style="color: red"></div>
+    <div id="div-criteria"></div>
+    <p class="clearx3"></p>
+    <div id="div-general-trends"></div>
+    <div id="swotanalyse-loading" class="loading"></div>
+</div>
+<style type="text/css">
+    .w25 {
+        width: 25px;
+    }
+    .w175 {
+        width: 175px;
+    }
+            
+    .w300 {
+        width: 300px;
+    }
+    .w516 {
+        width: 516px;        
+    }
+    .fixw258 {
+        min-width: 258px;
+        width: 258px;
+        max-width: 258px;
+    }
+    .maxw560 {
+       max-width: 560px; 
+    }   
+    .fixW315 {
+        min-width: 315px;
+        width:315px;
+        max-width: 315px;
+    }
+    .fixW370 {
+        min-width: 370px;
+        width:370px;
+        max-width: 370px;
+    }
+    .popPos1stCol {
+        right: 0; 
+        top: -7px;
+    }
+    .popPos3rdCol {
+        right: -3px; 
+        bottom: -5px
+    }
+    .margin4 {
+        margin-right: 4px;
+    }
+    .zindex5000 {
+        z-index: 50000;
+    }
+
+    .posAddIcon {
+        right: 0px;
+        top: -30px;
+    }
+    .posDeleteIcon {
+        right: 29px;
+        top: -30px;
+    }
+</style>
+
+<script type="text/html" id="template-citeria">
+    <table class="swottable">
+        <thead>
+        <tr>
+            <th class="textleft text-white fixW315"><span id="spanCriteria">Criteria</span></th>
+            <th class="textleft text-white w516" colspan="3"><span id="spanWeakStrong">Weak &lsaquo;-&rsaquo; Strong</span></th>
+            <th class="textleft text-white fixW370"><span class="spanDescriptionSwotanalyse">Description</span></th>
+        </tr>
+        </thead>
+        <tbody>
+        <!--Case: No Criteria, no Strength-Weakness-->
+        #if(data.criterias.length == 0) {#
+        <tr>
+            <td colspan="5">
+                <!--hover menu-->
+                #if(data.role > 0) {#
+                <a class="icon-28 icon-add-small firstSwotButton floatleft" onclick=" addCriteria(this) "></a>
+                #}#
+            </td>
+        </tr>
+        #} else {#
+        #for(var i = 0; i < data.criterias.length; i ++) {#
+        #var parent = data.criterias[i];#
+        #if(parent.Childs.length == 0){#
+        <!--Case: There is one Criteria but there is no Strength-Weakness-->
+        <tr>
+            <td id="#=parent.Id#" class="posRelative fixw258 content-break-word" rowspan="1">
+                <div class="content-break-word posRelative w300">
+                    <span class="editAble content-break-word" id="#=parent.Id#">#:parent.Name#</span>
+                    #if(data.role > 0) {#
+                    <div class="h-100per posAbsolute popPos1stCol">
+                        <div class="ms-table h-100per">
+                            <div class="td-v-align-middle ms-table-cell">
+                                <a class="icon-28 icon-add-small floatleft" onclick=" addCriteria(this) " parent="#:parent.Id#"></a>
+                                <a class="icon-28 icon-bin-small floatleft" onclick=" deleteCriteria(this) " parent="#:parent.Id#"></a>
+                            </div>
+                        </div>
+                    </div>
+                    #}#
+                </div>
+            </td>
+            <td colspan="4">
+                #if(data.role > 0) {#
+                <a class="icon-28 icon-add-small firstButton floatleft" onclick=" addSubCriteria(this) " parent="#=parent.Id#"></a>
+                #}#
+            </td>
+        </tr>
+
+        #}#
+
+        #for (var j = 0; j < parent.Childs.length; j ++) {#
+        #var child = parent.Childs[j];#
+        <tr>
+            <!--Criteria Column-->
+            #if(j == 0) {#
+            <td id="#=parent.Id#" class="posRelative" rowspan="#=parent.Childs.length#">
+                <div class="posRelative w300 content-break-word">
+                    <span id="#=parent.Id#" class="editAble content-break-word">#:parent.Name#</span>                    
+                    <!--hover menu-->
+                    #if(data.role > 0) {#
+                    <div class="posAbsolute h-100per popPos1stCol">
+                        <div class="ms-table h-100per">
+                            <div class="ms-table-cell td-v-align-middle">
+                                <a class="icon-28 icon-add-small floatleft" onclick=" addCriteria(this) " parent="#:parent.Id#"></a>
+                                <a class="icon-28 icon-bin-small floatleft" onclick=" deleteCriteria(this) " parent="#:parent.Id#"></a>
+                            </div>
+                        </div>
+                    </div>
+                    #}#
+                </div>                
+            </td>
+            #}#
+            <!--Color column-->
+            <td class="w25">
+                <div id="div-color-criteria#:i##:j#" class="floatleft" style="width: 20px; height: 20px;">&nbsp;</div>
+            </td>
+            <!--Strength-weakness column-->
+            <td id="#:child.Id#" parentid="#=parent.Id#" class="w300">
+                <div class="content-break-word floatleft posRelative fixW315">
+                    <div>
+                        <span class="floatleft editAbleChild w-100per content-break-word" childid="#:child.Id#" parent="#=parent.Id#">#:child.Name#</span>
+                    </div>
+                    <!--hover menu-->
+                    #if(data.role > 0) {#
+                    <div class="posAbsolute popPos3rdCol">
+                        <div class="posRelative">
+                            <a class="icon-28 icon-add-small premove posAbsolute posAddIcon" onclick=" addSubCriteria(this) " parent="#=parent.Id#" child="#:child.Id#"></a>
+                            <a class="icon-28 icon-bin-small  premove posAbsolute posDeleteIcon" onclick=" deleteSub(this) " child="#:child.Id#" parent="#=parent.Id#"></a>
+                        </div>
+                    </div>
+                    #}#
+                </div>
+            </td>
+            <!--Slider column-->
+            <td class="w175">
+                <input id="kendo-slider-criteria#:i##:j#" class="margin4" value="#=child.Value#" childid="#:child.Id#" parent="#=parent.Id#"/>
+            </td>
+                <!--Description column-->
+                <td class="fixW370 content-break-word">
+                    #var text;#
+                    #if(child.Description.trim() == null || child.Description.trim() == '') {#
+                    #text = setText();#
+                    #} else text = child.Description;#
+                    <span class="editAbleChildDes content-break-word maxw560" childid="#:child.Id#" parent="#=parent.Id#">#:text#</span>
+                    <div class="divDemandTextAreaEdit posRelative zindex5000"></div>
+                </td>
+            </tr>
+            #}#
+            #}#
+            #}#
+        </tbody>
+    </table>
+</script>
+
+<script type="text/html" id="template-general-trends">
+    <table class="swottable">
+        <thead>
+        <tr>
+            <th class="textleft text-white fixW315"><span id="spanTrend">Trends</span></th>
+            <th class="textleft text-white w516" colspan="3"><span id="spanRiskChance">Risk &lsaquo;-&rsaquo; Chance</span></th>
+            <th class="textleft text-white fixW370"><span class="spanDescriptionSwotanalyse">Description</span></th>
+        </tr>
+        </thead>
+        <tbody>
+        #if(data.trends.length == 0) {#
+        <!--Case: No sub trend-->
+        <tr>
+            <td colspan="5">
+                #if(data.role > 0) {#
+                <a class="icon-28 icon-add-small firstSwotButton floatleft" onclick=" addTrend(this) "></a>
+                #}#
+            </td>
+        </tr>
+        #} else {#
+        #for(var i = 0; i < data.trends.length; i ++) {#
+        #var parent = data.trends[i];#
+        #if(parent.Childs.length == 0){#
+        <!--Case: There is one Trend but there is no sub-trend-->
+        <tr>
+
+            <td id="#=parent.Id#" class="posRelative fixW315 content-break-word" rowspan="1">
+                <div class="content-break-word posRelative w300">
+                    <span class="editAble content-break-word" id="#=parent.Id#">#:parent.Name#</span>
+                    #if(data.role > 0) {#
+                    <!--hover menu-->
+                    <div class="h-100per posAbsolute popPos1stCol">
+                        <div class="ms-table h-100per">
+                            <div class="td-v-align-middle ms-table-cell">
+                                <a class="icon-28 icon-add-small floatleft" onclick=" addTrend(this) " parent="#:parent.Id#"></a>
+                                <a class="icon-28 icon-bin-small floatleft" onclick=" deleteCriteria(this) " parent="#:parent.Id#"></a>
+                            </div>
+                        </div>
+                    </div>
+                    #}#
+                </div>
+            </td>
+            <td colspan="4">
+                <!--hover menu-->
+                #if(data.role > 0) {#
+                <a class="icon-28 icon-add-small floatleft firstButton" onclick=" addSubTrend(this) " parent="#=parent.Id#"></a>
+                #}#
+            </td>
+        </tr>
+
+        #}#
+
+        #for (var j = 0; j < parent.Childs.length; j ++) {#
+        #var child = parent.Childs[j];#
+        <tr>
+            <!--General Trend column-->
+            #if(j == 0) {#
+            <td id="#=parent.Id#" class="posRelative" rowspan="#=parent.Childs.length#">
+                <div class="posRelative w300 content-break-word">
+                    <span id="#=parent.Id#" class="editAble content-break-word" >#:parent.Name#</span>                    
+                    <!--hover menu-->
+                    #if(data.role > 0) {#
+                    <div class="posAbsolute h-100per popPos1stCol">
+                        <div class="ms-table h-100per">
+                            <div class="ms-table-cell td-v-align-middle">
+                                <a class="icon-28 icon-add-small floatleft" onclick=" addTrend(this) " parent="#:parent.Id#"></a>
+                                <a class="icon-28 icon-bin-small  floatleft" onclick=" deleteCriteria(this) " parent="#:parent.Id#"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                #}#
+            </td>
+            #}#
+            <!--Square Color column-->
+            <td class="w25">
+                <div id="div-color-trend#:i##:j#" class="floatleft" style="width: 20px; height: 20px;">&nbsp;</div>
+            </td>
+            <!--Sub trends column-->
+            <td id="#:child.Id#" parentid="#=parent.Id#" class="w300">
+                <div class="content-break-word floatleft posRelative fixW315">
+                    <div>
+                        <span class="floatleft editAbleChild w-100per content-break-word" childid="#:child.Id#" parent="#=parent.Id#">#:child.Name#</span>
+                    </div>
+                    <!--hover menu-->
+                    <div class="posAbsolute popPos3rdCol">
+                        <div class="posRelative">
+                            #if(data.role > 0) {#
+                            <a class="icon-28 icon-add-small premove posAbsolute posAddIcon" onclick=" addSubTrend(this) " parent="#=parent.Id#" child="#:child.Id#"></a>
+                            <a class="icon-28 icon-bin-small  premove posAbsolute posDeleteIcon" onclick=" deleteSub(this) " child="#:child.Id#" parent="#=parent.Id#"></a>
+                            #}#
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <!--Slider column-->
+            <td class="w175">
+                <input id="kendo-slider-trendall#:i##:j#" class="margin4" value="#=child.Value#" childid="#:child.Id#" parent="#=parent.Id#"/>
+            </td>
+            <!--Description column-->
+            <td id="#:child.Id#" parentid="#=parent.Id#" class="fixW370 content-break-word">
+                #var text;#
+                #if(child.Description.trim() == null || child.Description.trim() == '') {#
+                #text = setText();#
+                #} else text = child.Description;#
+                <span class="editAbleChildDes content-break-word" childid="#:child.Id#" parent="#=parent.Id#">#:text#</span>
+                <div class="divDemandTextAreaEdit posRelative zindex5000"></div>
+            </td>
+        </tr>
+        #}#
+        #}#
+        #}#
+        </tbody>
+    </table>
+</script>
+
+<script type="text/javascript">
+    var swotanalyseData = {
+        criterias: [],
+        trends: [],
+        role: 0
+    };
+
+
+    function loadSwotTemplate(template, divId, data, sliderString, divColorString, isCriteria) {
+        var result = kendo.template($("#" + template).html())(data);
+        $("#" + divId).html(result);
+        var tmpData;
+        if (isCriteria) tmpData = data.criterias;
+        else tmpData = data.trends;
+        setupKendoSlider(tmpData, sliderString, divColorString);
+        setupLabelEditable();
+        setupLangueSwotanalyse();
+        setButtonVisible();
+    }
+
+    function setText() {
+        return kLg.doubleclick;
+    }
+
+    function setupKendoSlider(data, sliderString, divColorString) {
+        for (var i = 0; i < data.length ; i++) {
+            var parent = data[i];
+            for (var j = 0; j < parent.Childs.length; j++) {
+                var index = "" + i + j;
+                var sliderName = sliderString + index;
+                var slider = $("#" + sliderName).kendoSlider({
+                    change: function (e) {
+                        setColorDiv(divColorString + this.element.attr("id").substring(21), this.element.val() * 10);
+                        updateSubItemValue(this.element.attr("childId"), this.element.val(), this.element.attr("parent"));
+                    },
+                    min: -10,
+                    max: 10,
+                    smallStep: 1,
+                    showButtons: false
+                }).data("kendoSlider");
+
+
+                var val = $("#" + sliderName).attr('value');
+                slider.value(val);
+                setColorDiv(divColorString + index, val * 10);
+                if (vmSME.curRole == 0) {
+                    slider.disable();
+                }
+            }
+        }
+    }
+
+    function setColorDiv(divId, val) {
+        $('#' + divId).removeClass();
+        $('#' + divId).addClass(ChoseColorPercent(val));
+        $('#' + divId).addClass("floatleft");
+    }
+
+    function loadDataSwotanalyse() {
+        var url = "/Handlers/MsSwotanalyseHandler.ashx?projId=" + projectId + "&submpId=" + vmSME.SubMarketProductId+ "&strid=" + strategyId + "&regId=" + vmSProduct.regId;
+        var jsonObj = { funcName: "getswotanalyse" };
+        callAjax("loadingProdEvaluation", url, jsonObj, loadSwotSuccessCallBack, AjaxConst.GetRequest);
+    }
+
+    function loadSwotSuccessCallBack(data) {
+        swotanalyseData.role = vmSME.curRole;
+        swotanalyseData.criterias = data.value.Criterias;
+        swotanalyseData.trends = data.value.Trends;
+        loadSwotTemplate("template-citeria", "div-criteria", swotanalyseData, "kendo-slider-criteria", "div-color-criteria", true);
+        loadSwotTemplate("template-general-trends", "div-general-trends", swotanalyseData, "kendo-slider-trendall", "div-color-trend", false);
+
+    }
+
+    function addCriteria(e) {
+        var swotanalyse = {
+            Id: $(e).attr('parent'),
+            Name: kLg.criteria,
+            GroupType: 1,
+            SubMarketProductId: vmSME.SubMarketProductId,
+            SwotTemplateId: 0
+        };
+        var url = "/Handlers/MsSwotanalyseHandler.ashx?projId=" + projectId + "&funcName=addcriteria" + "&strid=" + strategyId  + "&regId=" + vmSProduct.regId;
+        callAjax("loadingProdEvaluation", url, JSON.stringify(swotanalyse), addSuccessCallBack, AjaxConst.PostRequest);
+    }
+
+    function addSubCriteria(e) {
+        var subSwotanalyse = {
+            Id: $(e).attr('child'),
+            Name: kLg.subCriteria,
+            SwotanalyseId: $(e).attr('parent'),
+            Value: 0,
+            Description: kLg.descriptionSwotanalyse
+        };
+        var url = "/Handlers/MsSwotanalyseHandler.ashx?projId=" + projectId + "&funcName=addsubcriteria" + "&strid=" + strategyId  + "&regId=" + vmSProduct.regId;
+        callAjax("loadingProdEvaluation", url, JSON.stringify(subSwotanalyse), addSuccessCallBack, AjaxConst.PostRequest);
+
+    }
+
+    function addTrend(e) {
+        var swotanalyse = {
+            Id: $(e).attr('parent'),
+            Name: kLg.trend,
+            GroupType: 2,
+            SubMarketProductId: vmSME.SubMarketProductId,
+            SwotTemplateId: 0
+        };
+        var url = "/Handlers/MsSwotanalyseHandler.ashx?projId=" + projectId + "&funcName=addcriteria" + "&strid=" + strategyId  + "&regId=" + vmSProduct.regId;
+        callAjax("loadingProdEvaluation", url, JSON.stringify(swotanalyse), addSuccessCallBack, AjaxConst.PostRequest);
+    }
+
+    function addSubTrend(e) {
+        var subSwotanalyse = {
+            Id: $(e).attr('child'),
+            Name: kLg.subTrend,
+            SwotanalyseId: $(e).attr('parent'),
+            Value: 0,
+            Description: kLg.descriptionSwotanalyse
+        };
+        var url = "/Handlers/MsSwotanalyseHandler.ashx?projId=" + projectId + "&funcName=addsubcriteria" + "&strid=" + strategyId  + "&regId=" + vmSProduct.regId;
+        callAjax("loadingProdEvaluation", url, JSON.stringify(subSwotanalyse), addSuccessCallBack, AjaxConst.PostRequest);
+    }
+
+
+    function findCriteria(id) {
+        for (var i = 0; i < swotanalyseData.criterias.length; i++) {
+            if (swotanalyseData.criterias[i].Id == id) {
+                return swotanalyseData.criterias[i];
+            }
+        }
+        for (var j = 0; j < swotanalyseData.trends.length; j++) {
+            if (swotanalyseData.trends[j].Id == id) {
+                return swotanalyseData.trends[j];
+            }
+        }
+
+        return null;
+    }
+
+    function findSubItem(parentId, subId) {
+        var parent = findCriteria(parentId);
+        for (var i = 0; i < parent.Childs.length; i++) {
+            if (parent.Childs[i].Id == subId) {
+                return parent.Childs[i];
+            }
+        }
+        return null;
+    }
+
+    function updateSubItemValue(subId, value, parentId) {
+        var sub = {
+            Id: subId,
+            Evaluation: value,
+            Mdf: findSubItem(parentId, subId).Mdf,
+            SwotanalyseId: parentId
+        };
+        findSubItem(parentId, subId).Mdf += 1;
+        var url = "/Handlers/MsSwotanalyseHandler.ashx?projId=" + projectId + "&funcName=updatevalue&regId=" + vmSProduct.regId + "&strid=" + strategyId;
+        callAjax("loadingProdEvaluation", url, JSON.stringify(sub), editCallBack, AjaxConst.PostRequest);
+    }
+
+    function setupLabelEditable() {
+        if (vmSME.curRole > 0) {
+            bindSwitchSpanToInputLib(updateItemName, "editAble", removeHover, setButtonVisible);
+            bindSwitchSpanToInputLibWithParent(updateSubName, "editAbleChild", removeHover, setButtonVisible);
+            //setEditbaleSwotanalyseCanBeNull("span.editAbleChildDes", updateSubDescription, setButtonVisible);
+            convertTextToTextarea();
+        }
+    }
+    function removeHover() {
+        $("#swotArea a.icon-add-small").hide();
+        $('a.icon-bin-small').hide();
+        $('td').unbind('mouseenter mouseleave');
+    }
+
+    function setUpDbClick(e) {
+        $(e).dblclick(function () {
+            $('td').unbind('hover');
+            $("#swotArea a.icon-bin-small").hide();
+            $("#swotArea a.icon-add-small").hide();
+        });
+    }
+
+    function updateItemName(id,value) {
+        var parent = findCriteria(id);
+        var swotanalyse = { Id:id, Name: value, Mdf: parent.Mdf };
+        var url = "/Handlers/MsSwotanalyseHandler.ashx?projId=" + projectId + "&funcName=updatenamecriteria&regId=" + vmSProduct.regId + "&strid=" + strategyId;
+        callAjax("loadingProdEvaluation", url, JSON.stringify(swotanalyse), addSuccessCallBack, AjaxConst.PostRequest);
+        return value;
+    }
+
+    function updateSubName(parentid,id, value) {
+        var parent = findSubItem(parentid, id);
+        var swotanalyse = { Id: id, Name: value, Mdf: parent.Mdf, SwotanalyseId: parentid };
+        var url = "/Handlers/MsSwotanalyseHandler.ashx?projId=" + projectId + "&funcName=updatenamesub&regId=" + vmSProduct.regId + "&strid=" + strategyId;
+        callAjax("loadingProdEvaluation", url, JSON.stringify(swotanalyse), addSuccessCallBack, AjaxConst.PostRequest);
+        return value;
+    }
+
+    function updateSubDescription(value, e) {
+        var parent = findSubItem(e.attr('parent'), e.attr('childId'));
+        var swotanalyse = { Id: e.attr('childId'), Description: value, Mdf: parent.Mdf, SwotanalyseId: e.attr('parent') };
+        parent.Mdf += 1;
+        var url = "/Handlers/MsSwotanalyseHandler.ashx?projId=" + projectId + "&funcName=updatedessub&regId=" + vmSProduct.regId + "&strid=" + strategyId;
+        callAjax("loadingProdEvaluation", url, JSON.stringify(swotanalyse), editCallBack, AjaxConst.PostRequest);
+        return value;
+    }
+
+    function editCallBack(data) {
+        if (!data)
+            return;
+        var res = data.value;
+        switch (res) {
+            case -1:
+                pAlert(kLg.msgNoEditPermission, refreshCurrentPage);
+                break;
+            case -2:
+                pAlert(kLg.msgConflickData, refreshCurrentPage);
+                break;
+        }
+    }
+
+    function setupLangueSwotanalyse() {
+        $("#spanCriteria").text(kLg.criteria);
+        $("#spanTrend").text(kLg.trend);
+        $("#spanRiskChance").text(kLg.chance + '-' + kLg.risk);
+        $("#spanWeakStrong").text(kLg.strong + '-' + kLg.weak);
+        $(".spanDescriptionSwotanalyse").text(kLg.descriptionSwotanalyse);
+    }
+
+    function addSuccessCallBack(data) {
+        var res = data.value;
+        switch (res) {
+            case -1:
+                pAlert(kLg.msgNoEditPermission, refreshCurrentPage);
+                break;
+            case -2:
+                pAlert(kLg.msgConflickData, refreshCurrentPage);
+                break;
+            default:
+                loadDataSwotanalyse();
+                break;
+        }
+    }
+
+    function deleteCriteria(e) {
+       pConfirm(kLg.confirmDeleteItem).then(function () {
+            var id = $(e).attr("parent");
+            var criteria = { Id: id, Mdf: findCriteria(id).Mdf };
+           var url = "/Handlers/MsSwotanalyseHandler.ashx?projId=" + projectId + "&funcName=deletecriteria&regId=" + vmSProduct.regId + "&strid=" + strategyId;
+            callAjax("div-loading", url, JSON.stringify(criteria), addSuccessCallBack, AjaxConst.PostRequest);
+        });
+    }
+
+    function deleteSub(e) {
+        pConfirm(kLg.confirmDeleteItem).then(function () {
+            var childId = $(e).attr("child");
+            var parentId = $(e).attr("parent");
+            var sub = { Id: childId, Mdf: findSubItem(parentId, childId).Mdf, SwotanalyseId: parentId };
+            var url = "/Handlers/MsSwotanalyseHandler.ashx?projId=" + projectId + "&funcName=deletesub&regId=" + vmSProduct.regId + "&strid=" + strategyId;
+            callAjax("div-loading", url, JSON.stringify(sub), addSuccessCallBack, AjaxConst.PostRequest);
+        });
+    }
+
+    function setButtonVisible() {
+        $("#swotArea a.icon-bin-small").hide();
+        $("#swotArea a.icon-add-small:not(.firstSwotButton)").hide();
+        $("#swotArea a.icon-add-small.firstSwotButton").show();
+        $("#swotArea td").hover(function () {
+            $(this).find("a.icon-bin-small").show();
+            $(this).find("a.icon-add-small").show();
+
+
+        }, function () {
+            $(this).find("a.icon-bin-small").hide();
+            $(this).find("a.icon-add-small:not(.firstSwotButton)").hide();
+        }
+        );
+    }
+
+    function refreshCurrentPage() {
+        location.reload();
+    }
+
+    var defaultwidth = 300;
+    function convertTextToTextarea() {
+        $('span.editAbleChildDes').bind("dblclick", function () {
+            var inputDemandEdit = $(this);
+            var width = inputDemandEdit.closest('td').width() > defaultwidth ? inputDemandEdit.closest('td').width() : defaultwidth;
+            var tex = $(this).text();
+            $('td').unbind('hover');
+            $("#swotArea a.icon-bin-small").hide();
+            $("#swotArea a.icon-add-small").hide();
+            var textarea = $('<textarea rows="10" cols="30" style="position: absolute; left:-5px; top:-27px; z-index:60000;width: ' + width + 'px;">' + tex + '</textarea>');
+            $(this).next("div.divDemandTextAreaEdit").html(textarea);
+            textarea.focus();
+            textarea.blur(function () {
+                textarea.hide();
+                inputDemandEdit.text($(this).val());
+                setButtonVisible();
+            });
+            textarea.donetyping(function () {
+                if ($(this).val() == tex) return;
+                if ($(this).val().trim() == null || $(this).val().trim() == '') {
+                    inputDemandEdit.text(kLg.doubleclick);
+                    updateSubDescription($(this).val(), inputDemandEdit);
+                }
+                else {
+                    updateSubDescription($(this).val(), inputDemandEdit);
+                }
+            });
+        });
+    }
+
+
+    $(document).ready(function () {
+        loadDataSwotanalyse();
+    });
+
+</script>
+

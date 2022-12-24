@@ -1,0 +1,267 @@
+﻿<div id="popsubclient">
+    <form id="fsubclient">
+        <div class="modal-body ms-modal-body" style="height:270px; overflow-x: hidden;">
+            <div class="clear"></div>
+            <div class="form-group">
+                <label id="lblSubName">Name</label><span style="font-weight: bold">*</span>
+                <div class="clear"></div>
+                <input data-role="autocomplete"
+                       data-value-primitive="false"
+                       data-text-field="Name"
+                       data-value-field="Id"
+                       data-filter="contains"
+                       data-bind="source: Orgs, value: tempName, events:{select: selectOrg, change: changeOrg}"
+                       type="text" id="txtSubClientName"
+                       class="txtInput" maxlength="100" tabindex="1" style="    width: 100%;padding-right:78px !important; " />
+                <span class="icon-16 icon-dropdow btnApplySubProSe" data-bind="events: {click: linkSubmarketSe}"></span>
+            </div>
+
+            <hr class="modal-market-hr" />
+
+            <div class="form-group">
+                <label id="lblSubDescription">Description</label>
+                <div class="clear"></div>
+                <textarea class="modal-textarea w-98per" tabindex="2" data-bind="value: SubClient.Description"></textarea>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 40px;">
+                <label id="lblDocument">Dokument</label>
+                <div class="clear"></div>
+                <div data-template="scdocument-template" data-bind="source: SubClient.SubmarketProductDocuments"></div>
+                <div class="clear"></div>
+                <button type="button" class="ms-button smp-button-upload" id="smpUploadFile" name="smpUploadFile" data-bind="events: {click: uploadDocumentItem}">
+                    <span class="icon-16 icon-upload"></span><span id="lblBrowseDocument">Durchsuchen...</span>
+                </button>
+            </div>
+
+        </div>
+        <div class="modal-market-footer">
+            <button type="button" tabindex="3" class="ms-button" data-bind="events:{click: update}">
+                <span class="icon-20 icon-close"></span>
+                <span id="lblSubClose">Close</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script id="scdocument-template" type="text/x-kendo-template">
+    <div class="document-item pull-left">
+        <div class="pull-left">
+            <a class="item-document-truncate ms-link" data-bind="text: FolderFileName, events: {click: downloadDocument}"></a>
+        </div>
+        <span class="icon-20 ms-icon-delete-gray" data-bind="events: {click: deleteDocumentItem}"></span>
+    </div>
+</script>
+
+
+<!-- ReSharper disable once PossiblyUnassignedProperty -->
+<script type="text/javascript">
+    var vmSubMarket = vmSubMarket || {};
+    vmSubClient = {};
+    vmSubClient.isModified = false;
+    vmSubClient.subModel = undefined;    
+    vmSubMarket.popSubClient.bind("close", function () {
+        var destroyForm = function () {
+            vmSubMarket.popSubClient.destroy();
+            vmSubMarket.popSubClient = null;
+            $(".body-content").append("<div id='popeditsubclient'></div>");
+        };
+
+        vmFile.enableAssignedIcon = false;
+        if (vmSubClient.isModified) {
+            if (confirm(kLg.saveConfirmQuestion)) {
+                if (vmSubClient.subModel.valid()) {
+                    vmSubClient.subModel.update();
+                } else {
+                    e.preventDefault();
+                }
+            } else {
+                destroyForm();
+            }
+        } else {
+            destroyForm();
+        }
+    });
+
+    vmSubClient.setUpLanguage = function () {
+        $("#popsubclient #lblSubName").text(kLg.PopName);
+        $("#popsubclient #lblSubDescription").text(kLg.labelDes);
+        $("#popsubclient #lblSubClose").text(kLg.lblClose);
+        $("#popsubclient #lblBrowseDocument").text(kLg.lblBrowse);
+        $("#popsubclient #lblDocument").text(kLg.lblDocument);
+    };
+
+    $(function () {
+        vmSubMarket.ClientOptions = vmSubMarket.ClientOptions || {};
+
+        var subClient = vmCommon.deepCopy(vmSubMarket.ClientOptions.SubClient),
+            orgs = vmSubMarket.ClientOptions.Orgs;
+
+        vmSubClient.subModel = kendo.observable({
+            SubClient: subClient,
+            Orgs: orgs,
+            tempName: subClient.Name,
+            tempOrg: null,
+            update: function () {
+                if (!vmSubClient.isModified) {
+                    vmSubMarket.popSubClient.close();
+                    return;
+                }
+
+                if (!this.valid()) {
+                    return;
+                }
+
+                var name = this.tempName.trim(), orgId, des = this.SubClient.Description; //orgId = this.tempOrg ? this.tempOrg.Id : null
+
+                if (this.tempOrg) {
+                    orgId = this.tempOrg.Id;
+                } else {
+                    var os = this.Orgs, org;
+                    for (var i = 0, len = os.length; i < len; i++) {
+                        if (os[i].Name === name) {
+                            org = os[i];
+                            break;
+                        }
+                    }
+
+                    orgId = org ? org.Id : null;
+                }
+
+                if (subClient.Name === name && subClient.OrganisationId === orgId && subClient.Description === des
+                    && subClient.SubmarketProductDocuments === this.SubClient.SubmarketProductDocuments) {
+                    vmSubClient.isModified = false;
+                    vmSubMarket.popSubClient.close();
+                    return;
+                }
+                if (vmSubMarket.ClientOptions.IsEdit) {
+
+                    vmSubMarket.ClientOptions.SubClient.set("Name", name);
+                    vmSubMarket.ClientOptions.SubClient.set("OrganisationId", orgId);
+                    vmSubMarket.ClientOptions.SubClient.set("Description", des);
+                    vmSubMarket.ClientOptions.SubClient.set("SubmarketProductDocuments", this.SubClient.SubmarketProductDocuments);
+                    vmSubMarket.ClientOptions.SubClient.set("LinkId", this.SubClient.LinkId);
+                    vmSubMarket.ClientOptions.SubClient.set("LinkType", this.SubClient.LinkType);
+                    if (subClient.Id) {
+                        vmSubMarket.ClientOptions.SubClient.set("DataState", dataState.Modified);
+                    }
+
+                    if (vmSubMarket.ClientOptions.Element) {
+                        var span = vmSubMarket.ClientOptions.Element;
+
+                        if (orgId && !$(span).hasClass("clientlink")) {
+                            $(span).addClass("clientlink");
+                        } else {
+                            $(span).removeClass("clientlink");
+                        }    
+                    }
+
+                    //codes for edit inline
+                    //if (vmSubMarket.ClientOptions.Element) {
+                    //    var span = vmSubMarket.ClientOptions.Element;
+                    //    if (org) {
+                    //        $(span).css({ "color": "blue", "text-decoration": "underline" });
+                    //    } else {
+                    //        $(span).css({ "color": "inherit", "text-decoration": "none" });
+                    //    }    
+                    //}
+                    
+                } else {
+                    vmSubMarket.ClientOptions.SubClient.Name = name;
+                    vmSubMarket.ClientOptions.SubClient.OrganisationId = orgId;
+                    vmSubMarket.ClientOptions.SubClient.Description = des;
+                    vmSubMarket.ClientOptions.SubClient.SubmarketProductDocuments = this.SubClient.SubmarketProductDocuments;
+
+                    vmSubMarket.ClientOptions.SubClient.LinkId = this.SubClient.LinkId;
+                    vmSubMarket.ClientOptions.SubClient.LinkType = this.SubClient.LinkType;
+
+                    vmSubMarket.ClientOptions.SubClients.push(vmSubMarket.ClientOptions.SubClient);
+                }
+
+                if (vmSubMarket.ClientOptions.CallBack) {
+                    vmSubMarket.ClientOptions.CallBack();
+                }
+
+                vmSubClient.isModified = false;
+                vmSubMarket.popSubClient.close();
+            },
+            isSelectOrg: false,
+            selectOrg: function (e) {
+                this.tempOrg = e.sender.dataItem(e.item.index());
+                this.isSelectOrg = true;
+            },
+            changeOrg: function () {
+                if (!this.isSelectOrg)
+                    this.tempOrg = null;
+
+                this.isSelectOrg = false;
+                vmSubClient.subModel.SubClient.set("LinkId", 0);
+            },
+            valid: function () {
+                var flag = this.tempName.trim().length > 0;
+
+                if (!flag) {
+                    vmCommon.showTooltip($("#txtSubClientName"), kLg.requiredName, 3000);
+                }
+
+                return flag;
+            },
+            uploadDocumentItem: function (e) {
+                var item = e.data;
+                var role = vmSProduct.SMProductData.Role;
+                vmCommon.showUploadDocument(function (savedFiles) {
+                    var dataDocs = vmSubClient.subModel.SubClient.get("SubmarketProductDocuments") ? vmSubClient.subModel.SubClient.get("SubmarketProductDocuments"): [];
+                    for (var i = 0; i < savedFiles.length; i++) {
+                        var baseDoc = vmCommon.deepCopy(vmCommon.defaultDocument);
+                        baseDoc.Type = item.Type;
+                        baseDoc.FolderFileId = savedFiles[i].Id;
+                        baseDoc.LinkId = item.Id;
+                        baseDoc.LinkType = item.Level;
+                        baseDoc.FolderFileName = savedFiles[i].Name;
+                        baseDoc.PhysicalName = savedFiles[i].PhysicalName;
+                        baseDoc.FileTypeId = savedFiles[i].Type;
+                        dataDocs.push(baseDoc);
+                    }     
+                    vmSubMarket.AdjustPopSubClientHeight();
+                    vmSubClient.subModel.SubClient.set("SubmarketProductDocuments", dataDocs);                    
+                }, role);
+            },
+            deleteDocumentItem: function (e) {
+                var docItem = e.data;
+                var dataDocs = vmSubClient.subModel.SubClient.get("SubmarketProductDocuments");
+                var newDocs = [];
+                vmCommon.findAllByFunc(newDocs, dataDocs, function (item) { return item.FolderFileId !== docItem.FolderFileId; });
+                vmSubClient.subModel.SubClient.set("SubmarketProductDocuments", newDocs);
+                vmSubMarket.AdjustPopSubClientHeight();
+            },
+            linkSubmarketSe: function (e) {
+                vmSubMarket.showSelectSubProSe(vmCommon.enumType.SubClient, e.data.SubClient.LinkId, e.data.SubClient.LinkType,false);
+            },
+            downloadDocument: function (e) {
+                var docItem = e.data;
+                if (/^http(s)?:\/\//ig.test(docItem.PhysicalName)) {
+                    vmCommon.CopyTitleToClipboard(docItem.PhysicalName, e.target);
+                } else
+                    vmCommon.ClickToDownAndCopy("../FileUpload/" + docItem.PhysicalName,
+                        docItem.FolderFileName,
+                        docItem.FileTypeId,
+                        e.target
+                    );
+            }
+        });
+
+        vmSubClient.subModel.bind("change", function () {
+            vmSubClient.isModified = true;
+        });
+
+        kendo.bind($("#popsubclient"), vmSubClient.subModel);
+        vmSubClient.isModified = false;
+        vmSubMarket.AdjustPopSubClientHeight();
+        vmSubClient.setUpLanguage();
+    });
+
+    $("#txtSubClientName").on("keydown", function (e) {
+        return !(e.keyCode === 13);
+    });
+
+</script>

@@ -1,0 +1,325 @@
+﻿<!--//Author: SONPT
+//Start date: 2016-03-28
+
+//============Convention===========
+//:
+//mps: Multiple select
+//ddl: Dropdownlist
+//=================================-->
+<STYLE>
+    #area-reminder .k-numeric-wrap.k-expand-padding .k-input {
+        width: 99%;
+    }
+    #area-reminder .k-multiselect-wrap .k-input {
+        width: 0px !important;
+        background-color: white !important;
+        display: none;
+    }     
+    #area-reminder textarea {
+        resize: none;
+    }
+
+    /*#divtag .k-multiselect-wrap li[class~="k-button"] {
+        color: #2e2e2e;
+        border-color: #fafafa;
+        background-color: #fafafa;
+        border-radius: 30px;
+    }
+
+    #divtag .k-multiselect-wrap li[class~="k-button"]:hover {
+        color: #2e2e2e;
+        border-color: #EBEBEB;
+        background-color: #EBEBEB;
+        border-radius: 30px;
+    }
+
+    #divtag .k-multiselect.k-header.k-state-hover {
+        border-color: #a99f9a;
+        background-color: #FFFFFF;
+    }
+
+    #divtag .k-multiselect-wrap {
+        position: relative;
+        border-width: 0px;
+        border-style: solid;
+        border-radius: 0px !important; 
+        border-color: #C5C5C5;
+        background-color: #FFF;
+        min-height: 2.04em;
+    }
+
+     #divtag .k-widget {
+        border-color: #E7E7E7 !important;
+    }
+
+    #divtag .k-multiselect-wrap input {
+        border: 1px solid #FFFFFF !important;
+    }*/
+
+    #area-reminder .k-animation-container .k-state-focused {
+        border-width: 0;
+        border-color: #E7E7E7;
+        box-shadow: none;
+    }
+
+    #area-reminder .k-picker-wrap .k-select {
+        right: 0px !important;
+    }
+
+    #area-reminder .k-picker-wrap .k-select, .k-numeric-wrap .k-select {
+        border-style: solid;
+        border-width: 0px 0px 0px 1px !important;
+        border-color: inherit;
+        line-height: 23px;
+        height: 30px;
+    }
+
+    #area-reminder .k-numeric-wrap, .k-picker-wrap {
+       border-style: none;
+    }
+
+    .modal-mass-iconplus span {
+        float: none;
+    }
+    .k-picker-wrap {
+        border-width: 1px;
+        border-style: solid;
+        padding: 0 1.7em 0 0;
+    }
+    .k-input {
+        padding: 0;
+    }
+</style>
+<div class="loading" id="div-loading"></div>
+<div id="area-reminder" class="pop-wrapper">
+    <div class="modal-body ms-modal-body" style="height: 170px;">
+
+        <div class="clear"></div>
+        <div style="display: table;margin-top: 40px;" class="w-100per">
+            <div style="display: table-row;">
+                <div style="display: table-cell; margin: 10px; width: 29%;">
+                    <label id="lblDay">Number of days</label>
+                    <div class="clear"></div>
+                    <input tabindex="1" data-bind="value:reminder.ReminderDay, events: {change: dayChange}, disabled: noRightOrFisnish" data-format="####" data-interger="4"
+                           maxlength="4" id="txtDay" name="txtDay" style="width: 165px;" data-value-update="keyup" onkeyup=" vmReminder.activeModelChange() " onpaste="vmReminder.activeModelChange()"
+                           data-role="numerictextbox" data-spinners="false" max="1000" min="0" /> <!--SONPT. Temporary Solution: data-format="#'###.#########" cause issue. Conflict MVVM numeric textbox-->
+
+                </div>
+                <div style="display: table-cell; margin: 5px; width: 18%;">
+                    <form id="frmtxtTime">
+                        <label id="lblTime">Time point</label>
+                        <div class="clear"></div>
+                        <input tabindex="2" data-bind="value:reminder.ReminderTime, disabled: noRightOrFisnish, events: {change: timeChange}" data-format="HH:mm"
+                               data-role="timepicker" data-spinners="false"
+                               id="txtTime" name="txtTime" class="input-append" style="width: 98%;" maxlength="5" />
+                    </form>
+                </div>
+                <div style="display: table-cell; margin: 5px; width: 50%;">
+                    <div style="margin-left: 15px;margin-right: 10px;">
+                        <label id="lblDescription">Description</label>
+                        <div class="clear"></div>
+                        <div class="input-append">
+                            <textarea id="txtDescription" class="eval-textarea" tabindex="3" name="txtDescription" data-bind="value: reminder.Description" style="width: 100%; height: 70px;" onkeyup=" vmReminder.activeModelChange() " draggable="false"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+        <div class="modal-market-footer" >
+            <button id="btnUpdate" type="button" class="ms-button" tabindex="5" data-bind="events: {click: savereminder}">
+                <span class="icon-20 icon-update"></span>
+                <span id="lblClose">Save</span>
+            </button>
+        </div>
+</div>
+
+<script type="text/javascript">
+    var vmReminder = vmReminder || {};
+    vmReminder.Ultis = {};
+    vmReminder.event = {};
+    var reminderOld = [];
+    var languageReminder = kLg.language;
+    var formH = 0;
+    var reminderRole = false;
+
+    vmEditAct.pop.ReminderManager.IsModified = false;
+    //this is prototype function which is used in pop close event
+    vmEditAct.pop.ReminderManager.onOKFunc = function () {
+        //implement here
+        vmReminder.viewModel.savereminder();
+    };
+    //this is prototype function which is used in pop close event
+    vmEditAct.pop.ReminderManager.formValid = function () {
+        //implement here        
+        return true;
+    }
+    
+    vmReminder.BindClosePopup = function () {
+        //Todo: move this inside showPopup of kendoPopup
+        vmEditAct.pop.ReminderManager.bind("close", function (e) {
+            var pop = this;
+            if (pop.IsModified && !pop.needClose) {
+                e.preventDefault();
+                if ($('#frmtxtTime').valid()) {
+                    pConfirm(kLg.saveConfirmQuestion).then(function () {
+                        pop.needClose = true;
+                        if (pop.formValid())
+                            pop.onOKFunc();
+                        pop.destroyPop();
+                    }, function () {
+                        vmEditAct.theActivity.Reminder = reminderOld;
+                        pop.needClose = true;
+                        pop.destroyPop();
+                    });
+                }
+            } else {
+                pop.destroyPop();
+            }
+        });
+    };
+    
+    vmReminder.activeModelChange = function() {
+        vmEditAct.pop.ReminderManager.IsModified = true;
+        vmEditAct.isModified = true;
+    };    
+
+    vmReminder.InitParam = function (res) {
+        var qs = new queryString(true);
+        vmReminder.currentLang = qs.get('lang');//SONPT. no master page
+        //vmReminder.Role = res.value.Role;
+    };
+
+    vmReminder.SetupLanguage = function () {
+        $('#area-reminder #lblDay').text(kLg.reminderday);
+        $('#area-reminder #lblTime').text(kLg.lblTime);
+        $('#area-reminder #lblDescription').text(kLg.labelDes);
+        $('#area-reminder #lblClose').text(kLg.lblClose);
+    };
+        
+    vmReminder.SetupValidate = function () {
+        $.validator.addMethod("timeformat", function(value, element) {
+            return this.optional(element) || /^[0-2][0-9]:[0-5][0-9]$/i.test(value);
+        }, "");
+        $.validator.addMethod("valueBetween", function (value, element, options) {
+            return value >= options.min && value <= options.max;
+        }, "");
+        //SONPT. because Jquery validator & Kendo numeric conflict
+        $('#frmtxtTime').validate({
+            rules: {
+                txtDay: {                    
+                    valueBetween: { min: 0, max: 1000 }
+                    //,required: true,
+                    //maxlength: 100
+                },
+                txtTime: {                    
+                    timeformat: true
+                }
+            },
+            messages: {
+                txtDay: {                    
+                    valueBetween: ""
+                },
+                txtTime: {                    
+                    timeformat: kLg.validTime
+                }
+            }
+        });
+
+        //prevent Enter key submit form
+        $('form').on('submit', function (e) {
+            e.preventDefault();
+            $('#btnUpdate').trigger('click');
+        });
+    };
+
+    vmReminder.DisableControl = function () {
+        var dayVal = $('#txtDay').val().replace(',','.');        
+        if (dayVal == '' || dayVal == null || vmCommon.isFloat(parseFloat(dayVal)))
+            $('#txtTime').data("kendoTimePicker").enable(false);
+
+    };
+
+    vmReminder.Ultis.calculateCamp = function (camp) {
+        if (vmCommon.isInteger(camp.ReminderDay))
+        {
+            if (camp.ReminderTime != null) {                    
+                if (typeof (camp.ReminderTime) == 'string') // type when get value from DB
+                    camp.ReminderTime = kendo.parseDate(camp.ReminderTime.toString().substring(0, 5), 'HH:mm');// convert change format "HH:mm:ss" to "HH:mm" & convert to type Date
+                camp.ReminderTime = camp.ReminderTime.getHours() + ":" + camp.ReminderTime.getMinutes();
+            }
+            else // null
+            {
+                camp.ReminderTime = '00:00'; //set default value
+            }     
+        }
+        else { //camp.ReminderDay is float 
+            if (camp.ReminderDay !== null) {
+                camp.ReminderDay = Math.round(camp.ReminderDay);
+            }
+            if (camp.ReminderTime != null) {
+                if (typeof (camp.ReminderTime) == 'string') // type when get value from DB
+                    camp.ReminderTime = kendo.parseDate(camp.ReminderTime.toString().substring(0, 5), 'HH:mm');// convert change format "HH:mm:ss" to "HH:mm" & convert to type Date
+                camp.ReminderTime = camp.ReminderTime.getHours() + ":" + camp.ReminderTime.getMinutes();
+            }
+        }
+        
+    };
+
+    vmReminder.Ultis.loadForm = function (res) {
+        vmReminder.viewModel = kendo.observable({
+            reminder: res.Reminder ? res.Reminder : [],
+            
+            savereminder: function (e) {
+                
+                if ($('#frmtxtTime').valid()) {
+                    
+                    var camp = this.reminder;
+                    vmReminder.Ultis.calculateCamp(camp);
+                    camp.CurrentLang = languageReminder;
+                    if (camp.Description !== undefined && camp.Description !== null && camp.Description !== "") {
+                        camp.Description = vmCommon.convertSpecialCharacter(camp.Description);
+                    }
+                    //camp.Description = vmCommon.convertSpecialCharacter(camp.Description);
+                    vmEditAct.theActivity.Reminder = camp;
+                    vmEditAct.pop.ReminderManager.destroyPop();
+                    return;
+                }
+                
+            },
+            dayChange: function (e) {
+                var dayVal = Math.round(e.data.reminder.ReminderDay);
+                var isDisableTime = vmCommon.isFloat(dayVal) || dayVal == null;
+                $("#txtTime").data("kendoTimePicker").enable(!isDisableTime);
+                vmReminder.activeModelChange();
+            },
+            timeChange: function (e) {
+                vmReminder.activeModelChange();
+            }
+        });
+        kendo.bind($("#area-reminder"), vmReminder.viewModel);
+        
+        vmReminder.SetupLanguage();
+        vmReminder.BindClosePopup();
+        vmReminder.DisableControl();
+        vmReminder.SetupValidate();
+        vmReminder.InitParam(res);      
+        limitedTabKey();// in common.js
+        $('#txtDay').focus();
+    };
+    
+    //Pageload
+    $(document).ready(function () {
+        var value = vmEditAct.theActivity;
+        if (value !== null && value !== undefined && value.Reminder !== undefined) {
+            value.Reminder.Description = htmlEncode(value.Reminder.Description);
+        }
+        vmReminder.Ultis.loadForm(value);
+        if (value !== undefined && value !== null) {
+            reminderOld = vmCommon.deepCopy(value.Reminder ? value.Reminder : []);
+        }
+    });
+
+</script>
+

@@ -1,5 +1,5 @@
 ﻿var msRoadmapApp;
-$.get("/MsRoadmap/MsRoadmap.html").done(template => {
+$.get("../MsRoadmap/MsRoadmap.html").done(template => {
     msRoadmapApp = new Vue({
         el: '#RoadmapApp',
         template: template,

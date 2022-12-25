@@ -13,7 +13,7 @@ $.get('Actionplan/Actionplan.html').done(template => {
             ListIndependence: [],
             ListEvalXYZ: [],
             DataNavigationMenu: [], NavMenuExpandIds: [],
-            IsShowNavigationMenu: true,
+            IsShowNavigationMenu: false,
             NavigationMenuView: [],     // Data detail của view bên phải khi có Navigation Menu
             ViewRightWidth: window.outerWidth,
             MapListMain: new Map(),     // Ref map dùng cho bind MainSubAction của view Default
@@ -149,14 +149,6 @@ $.get('Actionplan/Actionplan.html').done(template => {
                 removeExpand: this.removeExpand,
                 countChildren: (landid) => {
                     return 1;       // fake de Market component goi len
-                    //var spg;
-                    //if (this.ListSubmarketProductGroup.length) {
-                    //    spg = this.ListSubmarketProductGroup.find(_spg => _spg.LandId == landid);
-                    //} else if (this.SubMarketProductViewGroup.length) {
-                    //    spg = this.SubMarketProductViewGroup.find(_spg => _spg.LandId == landid);
-                    //}
-                    //if (spg) return spg.MarketSegmentGroups.length;
-                    //return 0;
                 },
                 hasKeyMapDelegate: this.hasKeyMapDelegate,
                 
@@ -264,7 +256,10 @@ $.get('Actionplan/Actionplan.html').done(template => {
                 document.querySelector('.body-content').addEventListener('scroll', this.onBodyContentScroll);
 
             this.getWidthUpdated();
-            //vmGoalAction.loadDataFirstTime();
+            vmGoalAction.loadDataFirstTime().then(serData => {
+                MsaApp.pushLoadTimeActions('vmGoalAction.dataservice.loadDataFirstTime');
+                MsaApp.setData(serData.value); 
+            });
             const prg = document.querySelector('#nprogressActionPlanDisableAll');if(prg) prg.style.display = 'none';
         },
         beforeUpdate(){const prg = document.querySelector('#nprogressActionPlanDisableAll');if(prg) prg.style.display = 'block';},
@@ -352,8 +347,6 @@ $.get('Actionplan/Actionplan.html').done(template => {
                 } else {
                     this.$el.querySelector('.kpigapopover-sticky').style.left = '';
                 }
-
-
                 if (this.IsShowNavigationMenu) {
                     const mLeft = document.querySelector('.msa-navigation-menu');
                     const wLeft = mLeft ? mLeft.offsetWidth + parseInt(mLeft.style.marginRight) : 0;
@@ -862,7 +855,7 @@ $.get('Actionplan/Actionplan.html').done(template => {
                     });
                 }
             },
-            setData(res, keyStr) {          //MsaApp.setData
+            setData(res) {          //MsaApp.setData
                 // check undefined vi co the dung o nhung cho khac ma khong can update tat ca cac bien
                 if (typeof res.Role !== 'undefined') this.Role = res.Role;
                 if (typeof res.IsOverdue !== 'undefined') this.Settings.vmGoalActionIsOverdue = res.IsOverdue;
@@ -874,38 +867,37 @@ $.get('Actionplan/Actionplan.html').done(template => {
                 const item1 = res.Data.Item1;
                 if (typeof item1.ListTitle !== 'undefined') this.ListTitle = item1.ListTitle;
 
-                if (typeof item1.ListSubmarketProductGroup !== 'undefined') {
-                    this.ListSubmarketProductGroup.splice(0);// = vmCommon.deepCopy(item1.ListSubmarketProductGroup);
+                if (Array.isArray(item1.ListSubmarketProductGroup)) {
+                    this.ListSubmarketProductGroup.splice(0);
                     item1.ListSubmarketProductGroup.forEach(i => {
                         MsaApp.ListSubmarketProductGroup.push(i);
                     });
                 }
-                if (typeof item1.SubMarketProductViewGroup !== 'undefined') {
-                    this.SubMarketProductViewGroup.splice(0);// = vmCommon.deepCopy(item1.SubMarketProductViewGroup);
+                if (Array.isArray(item1.SubMarketProductViewGroup)) {
+                    this.SubMarketProductViewGroup.splice(0);
                     item1.SubMarketProductViewGroup.forEach(i => {
                         MsaApp.SubMarketProductViewGroup.push(i);
                     });
                 }
-                if (typeof item1.ListSubmarketProduct !== 'undefined') {
-                    this.ListSubmarketProduct.splice(0);// = vmCommon.deepCopy(item1.ListSubmarketProduct);
+                if (Array.isArray(item1.ListSubmarketProduct)) {
+                    this.ListSubmarketProduct.splice(0);
                     item1.ListSubmarketProduct.forEach(i => {
                         MsaApp.ListSubmarketProduct.push(i);
                     });
                 }
-                if (typeof item1.ListSubmarketProductWithColor !== 'undefined') {
-                    this.ListSubmarketProductWithColor.splice(0);// = vmCommon.deepCopy(item1.ListSubmarketProductWithColor);
+                if (Array.isArray(item1.ListSubmarketProductWithColor)) {
+                    this.ListSubmarketProductWithColor.splice(0);
                     item1.ListSubmarketProductWithColor.forEach(i => {
                         MsaApp.ListSubmarketProductWithColor.push(i);
                     });
                 }
 
-                if (typeof item1.ListIndependence !== 'undefined') {
-                    this.ListIndependence.splice(0); //= vmCommon.deepCopy(item1.ListIndependence);
+                if (Array.isArray(item1.ListIndependence)) {
+                    this.ListIndependence.splice(0);
                     item1.ListIndependence.forEach(i => {
                         MsaApp.ListIndependence.push(i);
                     });
                 }
-
                 if (res.LastFocusElement && res.LastFocusElement != vmCommon.emptyGuid) {
                     this.LastActiveElementId = res.LastFocusElement;
                 }
@@ -1533,12 +1525,10 @@ $.get('Actionplan/Actionplan.html').done(template => {
                     }
 
                     vmGoalAction.dataservice.loadDataFirstTime({ ShowFinishedElements: showFinishedElements }, function (serData) {
-                        console.log("reloadAllDataOfPage");
                         if (serData.Role < 0) {
                             return;
                         };
                         const res = serData.value;
-
                         // clear khong cho set vao data
                         res.Role = undefined;
                         res.IsOverdue = undefined;
@@ -1716,8 +1706,7 @@ $.get('Actionplan/Actionplan.html').done(template => {
             isKeyBoardCode(keyName) {
                 return this.KeyBoardCode == keyName;
             },
-            editGoal(entryData, info, title, strActionName, mgoal) {
-                
+            editGoal(entryData, info, title, strActionName, mgoal) {                
                 MsaApp.setMapDelegate(`OpenPopupEditgoal_FromItem_`, entryData.goalId);
                 MsaApp.hideAllTooltipDes();
                 this.handlerLoadding();
@@ -1759,7 +1748,6 @@ $.get('Actionplan/Actionplan.html').done(template => {
                                     vmGoalAction.goalOptions.GoalType = vmCommon.GoalType.SubGoal;
                                 }
                             }
-
                             vmCommon.AddressBar.ClientQuery.setActpopupEncoded(serData.value.Actpopup);
 
                             const elm = { productid: info.ProductId }
@@ -1780,7 +1768,6 @@ $.get('Actionplan/Actionplan.html').done(template => {
 
                             $.extend(vmGoalAction.goalOptions, info);
                             vmGoalAction.goalOptions.role = serData.value.RoleId;
-                            //vmGoalAction.Role = serData.value.RoleId;
 
                             if (strActionName == 'vmGoalAction.showAddDetachedSubgoal') {
                                 vmGoalAction.goalOptions.parentStart = new Date();

@@ -92,28 +92,11 @@ MsaComponent = (function () {
                         return `MIndexTheme_${id}`;
                     },
                 },
-                created() {         // duoc goi sau cac ham: data, computed properties, methods, watchers
-                    
-                },
-                beforeMount() {     // duoc goi sau cac ham: data, computed properties, methods, watchers, created
-                    // chua tao DOM
-
-                },
                 mounted() {
-                    MsaApp.componentService(false).set(this.item.Id, this);
-                    
-                },
-                beforeUpdate() {
-                    //console.log('ViewIndependence beforeUpdate', this.item.Name, this.item.Id);
+                    MsaApp.componentService(false).set(this.item.Id, this);                    
                 },
                 updated() {
                     MsaApp.componentService(false).set(this.item.Id, this);
-                    //actionPlanComponents[this.item.Id] = this;
-                    //console.log('[DOM] ___updated ViewIndependence ', Date.now(), this.item.Name, this.item.Id);
-                    // Tinh toan get elemnt DOM view o day
-
-                    // them code o day
-
                 },
                 methods: {
                     removeTheme (theme) {
@@ -123,7 +106,6 @@ MsaComponent = (function () {
                         if (this.item.ListSubIndependency.length < 1) {         // neu khong co theme 
                             this.removeIndependency(this.item);     //removeTheme
                             MsaApp.removeExpand(this.item.Id, 'Independence');
-
                         }
                     },
                     onClickToggleShow(e) {
@@ -200,9 +182,7 @@ MsaComponent = (function () {
 
                                     if (vmCommon.checkConflict(serData.value)) {
                                         MsaApp.removeExpand(id, 'Independence');
-                                        MsaApp.reloadAllDataOfPage('ViewIndependence_onMenuDeleteIndependency').then(() => {
-                                            //    console.log('action ====> onMenuDeleteIndependency')
-                                        });
+                                        MsaApp.reloadAllDataOfPage('ViewIndependence_onMenuDeleteIndependency');
                                     }
                                 }
                                     
@@ -426,11 +406,6 @@ MsaComponent = (function () {
                 return a;
             },
         },
-        //watch: {            // chay sau methods:
-        //},
-        //beforeMount() {     // duoc goi sau cac ham: data, computed properties, methods, watchers, created
-        //    // chua tao DOM
-        //},
         created() {
             MsaApp.componentService(this.getViewType()).set(this.item.Id, this);
         },
@@ -438,21 +413,13 @@ MsaComponent = (function () {
             if (this.IsExpand)
                 this.setCollapExpandAllMain();
         },
-        //beforeUpdate() {
-        ////    console.log('ViewTheme beforeUpdate', this.item.Name, this.item.Id);
-        //},
         updated() {
             MsaApp.componentService(this.getViewType()).set(this.item.Id, this);
-            //actionPlanComponents[this.item.Id] = this;
-            console.log('[DOM] ___updated ViewTheme', Date.now(), this.item.Name, this.item.Id);
             // Tinh toan get element DOM view o day
-
             if (this.IsExpand)
                 this.setCollapExpandAllMain();
 
             MsaApp.getWidthUpdated();
-            // them code o day
-
         },
         methods: {
             setCollapExpandAllMain() {
@@ -513,6 +480,8 @@ MsaComponent = (function () {
                     goalType: vmCommon.GoalActionContentType.MainGoal, //vmCommon.GoalType.MainGoal,
                     parentStart: new Date()
                 };
+                vmCommon.RefLstGa = this.ListMain;  // ref Array
+                vmCommon.RefAddTypeStr = 'addMaingoalByNav';
                 vmGoalAction.openPopUpGoal2(info);
             },
             showAddSubGoalWithoutMainTheme(e) {
@@ -526,6 +495,8 @@ MsaComponent = (function () {
                     parentStart: new Date(),
                     parentEnd: new Date(),
                 };
+                vmCommon.RefLstGa = this.ListMain;  // ref Array
+                vmCommon.RefAddTypeStr = 'addSubgoalByNav';
                 vmGoalAction.openPopUpGoal2(info);
             },
             showAddActionTheme(e) {
@@ -541,6 +512,8 @@ MsaComponent = (function () {
                     title: kLg.titlepAddAction,//kLg.titlepEditMainGoalNew1 + kLg.labelActionName + kLg.titlepEditMainGoalNew2,
                     isEdit: false
                 };
+                vmCommon.RefLstGa = this.ListMain;  // ref Array
+                vmCommon.RefAddTypeStr = 'addActionByNav';
                 vmGoalAction.openPopUpAction2(info);
             },
             ToggelExpandAllMailGoalTheme(e) {
@@ -602,9 +575,7 @@ MsaComponent = (function () {
                     },
                 },
                 created() {         // duoc goi sau cac ham: data, computed properties, methods, watchers
-                    const _isEx = this.IsExpand;
-                    if (_isEx) this.loadDataGoalAction();
-
+                    this.loadDataGoalAction();
                 },
                 mounted() {
                     MsaApp.componentService(this.getViewType()).set(this.item.Id, this);
@@ -746,7 +717,7 @@ MsaComponent = (function () {
                 template: template,
                 props: ['item', 'hasSearchTypeCritias'],
                 inject: ['showPopupAddAction', 'HoverTooltipStatusProtocol', 'countAction',
-                    'getView_TitleSubAction', 'getDataContentRightView',
+                    'getView_TitleSubAction', 'getDataContentRightView', 'getChildrenGa',
                     'getIsOverdue', 'getIsCheckActionDate', 'getParentStartDate', 'getParentEndDate', 'countSub',
                     'getEndDateSubgoal', 'is_ReduceSize', 'hasAddNewBtn', 
                     'getRegionId', 'getProductId', 'getSubMarketId', 'getIsMaster', "getRole", "getViewType"],
@@ -864,7 +835,6 @@ MsaComponent = (function () {
                         if (action.IsOverdue) return true;
                         if (vmCommon.compareDate(new Date(), action.End.jsonToDate()) != 1)
                             return false;
-                        //(action.IsOverdue || (action.End && vmCommon.compareDate(new Date(), action.End.jsonToDate()) == 1 && !action.Finish)) && this.getIsOverdue()
                         return true;
                     },
                     cssActionFinished() {
@@ -931,17 +901,12 @@ MsaComponent = (function () {
                 },
                 mounted() {
                     MsaApp.componentService(this.getViewType()).set(this.item.Id, this);
-                    //actionPlanComponents[this.item.Id] = this;
-                    //console.log('[DOM] mounted <<<<<<<<<<ViewAction>>>>>>>> ', Date.now(), this.item.Name, this.item.Id);
                     this.reloadConnection();
 
                     this.checkLastActiveAndScrollXY();
                 },
                 updated() {
                     MsaApp.componentService(this.getViewType()).set(this.item.Id, this);
-                    //actionPlanComponents[this.item.Id] = this;
-                    //console.log('[DOM] ___updated <<<<<<<<<<<ViewAction >>>>>>>>>> ', Date.now(), this.item.Name, this.item.Id);
-
                     this.reloadConnection();
                    // Tinh toan get elemnt DOM view o day
 
@@ -1053,10 +1018,16 @@ MsaComponent = (function () {
                         vmGoalAction.openPopUpAction2(info);
                     },
                     onMenuDuplicateAction(e) {
+                        const lstAct = this.getChildrenGa();    // ref array
+                        const newA = vmCommon.deepCopy(this.item);
+                        const newId = vmCommon.newGuid();
+                        newA.Id = newId; newA.GetId = newId;
+                        lstAct.push(newA);
+                        this.isShowMenu = false;
+                        return;
                         var actionId = this.item.Id;
                         var mdf = this.item.Mdf;
                         if (actionId == null || actionId == vmCommon.emptyGuid || !(mdf >= 0)) return;
-
                         var url = "../Handlers/MsGoalAction.ashx?funcName=cloneaction&projid=" + projectId + "&strid=" + strategyId;
                         var dataEntry = { actionId: actionId, mdf: mdf };
                         callAjax("loading-goalaction", url, dataEntry, function (data) {
@@ -1064,48 +1035,47 @@ MsaComponent = (function () {
                             if (newActionId != vmCommon.emptyGuid) {      // success
                                 MsaApp.setLastActiveElement(newActionId);
                                 MsaApp.pushLoadTimeActions('vmEditActionDataserviceCloneAction');
-
                                 MsaApp.updateDataProductOrTheme_Expand_InView_Observer();
                             } else {        // conflict
                                 pAlert(kLg.msgConflickData).then(function () {
-                                    MsaApp.updateDataProductOrTheme_Expand_InView_Observer();   //conflict [ViewAction].onMenuDuplicateAction
+                                    MsaApp.updateDataProductOrTheme_Expand_InView_Observer();   
                                 });
                             }
-                        }, AjaxConst.PostRequest);
-                        
+                        }, AjaxConst.PostRequest);                        
                     },
                     DeleteAction(e) {
                         var actionId = this.item.Id;
-                        var mdf = this.item.Mdf;
-                        
+                        //var mdf = this.item.Mdf;                        
                         var titleAction = "";
-
+                        const lstAct = this.getChildrenGa();    // ref array
                         pConfirm(kLg.confirmDeleteAc1 + titleAction + kLg.confirmDeleteAc2).then(function () {
-                            var entryData = { actionId: actionId, mdf: mdf };
-                            vmGoalAction.dataservice.deleteAction(entryData, function () {
-                                MsaApp.reloadAllDataOfPage();       //[ViewAction].DeleteAction
+                            const lstAcId = lstAct.map(a => a.Id);
+                            const i = lstAcId.indexOf(actionId);
+                            if(i > -1) {
+                                lstAct.splice(i, 1);
+                            }
+                            // var entryData = { actionId: actionId, mdf: mdf };
+                            // vmGoalAction.dataservice.deleteAction(entryData, function () {
+                            //     MsaApp.reloadAllDataOfPage();       //[ViewAction].DeleteAction
 
-                                msFilter.controlService.reLoadDataFilter(vmCommon.FilterType.ActionPlan, () => { });
-                                if (vmCommon.checkCurrentPage(vmCommon.enumPage.ActionPlan)) {
-                                    MsaApp.deleteEvalXYZ(entryData.actionId)
-                                }
-                            });
+                            //     msFilter.controlService.reLoadDataFilter(vmCommon.FilterType.ActionPlan, () => { });
+                            //     if (vmCommon.checkCurrentPage(vmCommon.enumPage.ActionPlan)) {
+                            //         MsaApp.deleteEvalXYZ(entryData.actionId)
+                            //     }
+                            // });
                         });
                         
                     },
                     GetFileDOCXAction(e) {
+                        return;
                         var id = this.item.Id;
                         var type = vmCommon.GoalActionContentType.Action;
-                        var entry = {
-                            Id: id,
-                            TypeId: type
-                        };
+                        var entry = { Id: id, TypeId: type };
                         vmGoalAction.dataservice.getFileDOCX(entry, function (res) {
                             var state = res.value.ResultStatus;
                             var fileInfo = res.value.TheObject;
                             if (state == vmCommon.ResultState.SUCCESS) {
                                 vmCommon.GetFileFromUrl("../TempExport/" + fileInfo.Path, fileInfo.Name);
-                                //vmGoalAction.expandService.addSubgoalNavItem(id);
                             }
                         });
                     },
@@ -1119,8 +1089,7 @@ MsaComponent = (function () {
                     },
                     openPopUpFileAssignAction() {
                         vmFile.openFileAsignCrm(this.item.Id, "action");
-                    },
-                    
+                    },                    
                     showSubActionDescription(e) {
                         var item = this.item || {};
                         var currency = this.item.CurrencyName || '';
@@ -1162,17 +1131,16 @@ MsaComponent = (function () {
                         
                     },
                     gotoConnectionLink() {
+                        return;
                         var id = this.item.Id;
                         var typeid = vmCommon.GoalActionContentType.Action;
                         var areaid = this.item.IndependencyId || this.item.SubMarketProductId;
-
                         MsaApp.apLinkService().open(areaid, typeid, id);
                     },
                     onclickDetailkpiAction(e) {
                         return;
                     },
-                    onTooltipkpiTodo(e) {
-                        
+                    onTooltipkpiTodo(e) {                        
                         let tooltipContent = buildSubActionDescription({ ActionTodos: this.item.ActionTodos, IsShowFinish: true });
                         if (tooltipContent) {
                             $(e.target).kendoTooltip({
@@ -1216,15 +1184,7 @@ MsaComponent = (function () {
                         const tlp = this.$root.initAndShowEvarluationXYZ;
                         if (typeof tlp == 'function' && !vmCommon.IsShowTooltipChartEvalXYZ) {
                             const item = this.item;
-                            //const _itm = {
-                            //    Id: item.Id,
-                            //    EvalX: item.ApEvaluation, // item.APEvaluation.Priority * item.APEvaluation.Evaluation,
-                            //    EvalY: 100,               // item.APEvaluationY.Priority * item.APEvaluationY.Evaluation,
-                            //    EvalZ: 100, ShowEvalZ: Math.abs(100),
-                            //    Color: item.Color || '#b8c92e'
-                            //};
                             tlp($(target), item.Id, item.Color);
-                           // console.log('show chart', vmCommon.deepCopy(item), target);
                         }
                     },
                     ExpandReduce(e) {
@@ -1449,15 +1409,13 @@ MsaComponent = (function () {
                         }
                     },
                 },
-                mounted() { //   console.log('[DOM] mounted GoalOverview', Date.now(), this.item.Name, this.item.Id);
-
+                mounted() { 
                     this.checkLastActiveAndScrollY2Goal();
                 },
                 beforeUpdate() {
                    // set data o day
                 },
-                updated() { //  console.log('[DOM] ___updated GoalOverview', Date.now(), this.item.Name, this.item.Id)
-                    
+                updated() {                     
                     if (MsaApp.isLastLoadTimeAction('vmEditGoalDataserviceUpdateGoal')) {
                         const lstId = MsaApp.getLastActiveElementId();
                         if (lstId == this.item.Id) {
@@ -1669,8 +1627,6 @@ MsaComponent = (function () {
                     },
                 },
                 mounted() {
-                  //  console.log('[DOM] mounted ColumnItem ', Date.now(), this.item.Name, this.item.Id);
-
                     const __key = `vmGoalAction_openPopEditColumn_addColumn_${this.item.Id}`;
                     if (MsaApp.hasKeyMapDelegate(__key)) {
                         setTimeout(function () {
@@ -1687,19 +1643,15 @@ MsaComponent = (function () {
                         },
                     }
                 },
-                //updated() { //    console.log('[DOM] ___updated ColumnItem updated', Date.now(), this.item.Name, this.item.Id);
-                    
-                //},
                 methods: {
                     
                     deleteColumn(e) {
                         var goalId = this.item.GoalId;//this.getSubgoalId();
                         var columnId = this.item.Id;
-                        //const thisRef = this;
+                        
                         pConfirm(kLg.confirmDeleteAc1 + kLg.confirmDeleteAc2).then(function () {
                             var entryData = { ActionPlanColunmId: columnId, GoalId: goalId };
                             vmGoalAction.dataservice.deleteColumn(entryData, function (serData) {
-                                //console.log('deleteColumn id = ' + columnId, serData);
                                 MsaApp.updateDataProductOrTheme_Expand_InView_Observer();       //[ColumnItem].deleteColumn
                             });
                         });
@@ -1936,6 +1888,7 @@ MsaComponent = (function () {
                     }
                 },
                 countAction: () => { return this.item.ListAction.length; },
+                getChildrenGa: () => {return this.item.ListAction},
             }
         },
         data() {
@@ -2267,7 +2220,6 @@ MsaComponent = (function () {
                 MsaApp.DragDropColumn.LastEvent = 'onDragStartColumn';
             },
             onDragChangeColumn(evt) {
-                //console.log('onDragChangeColumn', evt)
                 if (evt.moved) {
                     MsaApp.DragDropColumn.iFrom = evt.moved.oldIndex;
                     MsaApp.DragDropColumn.iTo = evt.moved.newIndex;
@@ -2307,7 +2259,6 @@ MsaComponent = (function () {
             onDragStartAction: function (evt) {
                 MsaApp.hideAllTooltipDes(); //onDragStartAction
                 MsaApp.pushLoadTimeActions('dnbOnDragDrop');
-                //   console.log('onDragStartAction', evt);
                 MsaApp.DragDropAction.LastEvent = 'onDragStartAction';
                 MsaApp.clearTimmerGetListMain_GAMIndex();
             },
@@ -2325,9 +2276,8 @@ MsaComponent = (function () {
                         MsaApp.DragDropAction.iFrom = evt.removed.oldIndex;
                     }
                 }
-                //     console.log('onDragChangeAction', evt);
             },
-            onDragEndAction: function (evt) {           //console.log('onDragEndAction', evt);
+            onDragEndAction: function (evt) {
 
                 if (MsaApp.DragDropAction.LastEvent == 'onDragChangeAction_moved') {
                     if (MsaApp.DragDropAction.iFrom == MsaApp.DragDropAction.iTo) {
@@ -2367,7 +2317,6 @@ MsaComponent = (function () {
                 }
             },
             onDragMoveAction(evt, originalEvent) {
-                //  console.log('onDragMoveAction', evt, originalEvent);
                 const dragged = evt.dragged;//div.msa-column-group
                 const related = evt.related;//div.msa-column-group
                 const id1 = dragged.getAttribute('drgdrp-id');
@@ -2689,7 +2638,6 @@ MsaComponent = (function () {
                         $btnLeft.css('visibility', 'visible');
                         $btnRight.css('visibility', 'visible');
                     }
-                    //console.log(event);
                 });
             },
             onScrollColumnView(isLeft) {
@@ -2875,7 +2823,6 @@ MsaComponent = (function () {
             }
         },
         beforeUpdate() {
-            //    console.log('ViewSubGoalOverView beforeUpdate', this.item.Name, this.item.Id);
             var isExpFromLst = this.getIsExpand(this.item.Id, 'subgoal');
             if (!this.IsExpand && isExpFromLst) {       // Neu no chua expand nhwng co trong list MsaApp.Expand.ExpandSubgoalValue
                 this.IsExpand = isExpFromLst;       // set data
@@ -2884,9 +2831,7 @@ MsaComponent = (function () {
         },
         updated() {
             MsaApp.componentService(this.getViewType()).set(this.item.Id, this);
-            //actionPlanComponents[this.item.Id] = this;
-            //console.log('[DOM] ___updated ViewSubGoalOverView', Date.now(), this.item.Name, this.item.Id);
-
+            
             if (this.IsExpand) {        // tinh toan (get value) tu DOM
                 const a = this.getDOM2Scroll();
                 this.ColumnView.WidthAllColumn = a.WidthAllColumn;
@@ -2900,9 +2845,7 @@ MsaComponent = (function () {
         },
         mounted() {
             MsaApp.componentService(this.getViewType()).set(this.item.Id, this);
-            //actionPlanComponents[this.item.Id] = this;
-            //console.log('[DOM] mounted ViewSubGoalOverView ', this.item.Name, this.item.Id);
-
+            
             window.addEventListener('resize', this.onResizeView);
 
             this.onResizeView();
@@ -2952,7 +2895,7 @@ MsaComponent = (function () {
                 updated() { this.handlerSize(); },
                 methods: {
                     handlerSize(e) {
-                        const rWrap = this.$el.querySelector('.handleResize');
+                        const rWrap = typeof this.$el.querySelector == 'function' ? this.$el.querySelector('.handleResize') : null;
                         if (rWrap && rWrap.offsetWidth < 1277) {
                             this.StyleWithNavMenu.SubCollapseW = '291px';
                             this.StyleWithNavMenu.NameSub = '174px';
@@ -2981,7 +2924,7 @@ MsaComponent = (function () {
             resolve({
                 template: template,
                 props: ['item', 'StartDatemain', 'Datemain'],
-                inject: ['HoverTooltipStatusProtocol', 'getMaingoalId', 'getRole',
+                inject: ['HoverTooltipStatusProtocol', 'getMaingoalId', 'getRole', 'getChildrenGaSg', 'getChildrenGaPrd',
                     'loadAllGoalActionInOpenArea', 'pEditMenuGoal', 'checkRegionView', 'MainOverViewAddSubGoal',
                     'deleteMainGoal', 'isEditMain', 'getIndependencyId', 'getIsMaster', 
                     'getProductId', 'getRegionId', 'getSubMarketId', 'getSubMarketProductId', 'countSub',
@@ -2994,8 +2937,7 @@ MsaComponent = (function () {
                         Effect: '',
                         Arrived: '',
                         ExpectedEffect: '',
-                        ActualEffect: '',
-                        
+                        ActualEffect: '',                        
                         delay: 700,
                         clicks: 0,
                         timer: null,
@@ -3099,9 +3041,6 @@ MsaComponent = (function () {
                     },
                     ContainFilterResult() {
                         return this.item.IsShow > 0 && this.item.IsColor ? "finish-element-style" : "";
-                        //if (this.item.IsContainFilterResult) return 'finish-element-style';
-                        //if (this.item.IsColor && this.item.HasSearchTypeCritirias) return 'finish-element-style';
-                        //return '';
                     },
                     mstype() {
                         if (this.IsMain) return 'mainGoal';
@@ -3128,21 +3067,15 @@ MsaComponent = (function () {
                         deleteGoal: this.deleteGoal,
                         onClickOpenMenu: this.onClickOpenMenu,
                         expandApLinkOverviewUrl: this.expandApLinkOverviewUrl,
-
                         // export computed value to children
-                        TypeId: this.Typeid,
-                        
+                        TypeId: this.Typeid,                        
                     }
                 },
                 updated() {
-       //             console.log('[DOM] updated ItemMainSub ', Date.now(), this.item.Name, this.item.Id);
                     this.reloadConnection();
-
                 },
-                mounted() {     // console.log('[DOM] mounted ItemMainSub ', Date.now(), this.item.Name, this.item.Id);
-
+                mounted() { 
                     this.reloadConnection();
-
                 },
                 methods: {
                     onMouseOverHideTooltip(e) {     //onMouseOverShowTooltip
@@ -3186,10 +3119,8 @@ MsaComponent = (function () {
                         return _limBottom > window.outerHeight;
                     },
                     getFileDOCX() {
-                        var entry = {
-                            Id: this.item.Id,
-                            TypeId: this.Typeid
-                        };
+                        return;
+                        var entry = { Id: this.item.Id, TypeId: this.Typeid };
                         vmGoalAction.dataservice.getFileDOCX(entry, function (res) {
                             var state = res.value.ResultStatus;
                             var fileInfo = res.value.TheObject;
@@ -3199,20 +3130,19 @@ MsaComponent = (function () {
                         });
                     },
                     gotoMix() {
-                        var goalId = this.item.Id;
-                        vmGoalAction.gotoMixService.gotoMix(goalId)
+                        return;
+                        vmGoalAction.gotoMixService.gotoMix(this.item.Id)
                     },
                     gotoRoadmap() {
-                        var goalId = this.item.Id;
-                        vmGoalAction.gotoRMService.gotoRoadMap(goalId)
+                        return;
+                        vmGoalAction.gotoRMService.gotoRoadMap(this.item.Id)
                     },
                     deleteGoal(e) {                 // Delete
                         MsaApp.hideAllMenuDropdown();
                         if (this.Typeid == vmCommon.GoalActionContentType.MainGoal) {
                             this.deleteMainGoal();
-                            return;
-                        }
-                        this.deleteSubGoal();
+                        } else
+                            this.deleteSubGoal();
                     },
                     expandApLinkOverviewUrl() {
                         var id = this.item.Id;
@@ -3220,15 +3150,11 @@ MsaComponent = (function () {
                         var areaid = this.item.IndependencyId || this.item.SubMarketProductId;
 
                         MsaApp.apLinkService().open(areaid, typeid, id);
-
-                        //this.setApLinkOverviewUrl(id, typeid, areaid);
-                        //vmGoalAction.apLinkOverviewService.expand(areaid, id, typeid);
                     },
                     openPopUpFileAssignFromDisplay() {
                         var goalId = this.item.Id;
                         var type = this.evaltype;
                         openPopUpFileAssignFromDisplay();
-
                         function openPopUpFileAssignFromDisplay() {
                             vmFile.setAssignedU(goalId, type, 1);       // edit = 1, add new = 0
 
@@ -3261,9 +3187,7 @@ MsaComponent = (function () {
                             }, AjaxConst.PostRequest);
                         }
                     },
-                    onclickDetailkpi(e) {
-                        return;
-                    },
+                    onclickDetailkpi(e) { },
                     onMenuSortAction(e) { },
                     duplicateMainSub() {
                         const isMastergoal = this.getIsMaster().MasterGoal;
@@ -3285,12 +3209,12 @@ MsaComponent = (function () {
                             isMainGoal: isMain,
                             mdf: this.item.Mdf,
                             startdate: this.item.StartDate
-                        }
-                        
+                        }                        
                         var message = kLg.msgConfirmDuplicateMG;
                         var mainGoalName = isMain ? this.item.Name : '';
-
-                        return ynConfirmDuplicate(message, entryData.startdate, entryData.enddate).then(function () {
+                        const lstSM = isMain ? this.getChildrenGaPrd() : this.getChildrenGaSg();     // ref array
+                        const refMS = vmCommon.deepCopy(this.item);
+                        return ynConfirmDuplicate(message, entryData.startdate, entryData.enddate).then(function () {                            
                             var sdate = $('#txtCopyStartDate').data("kendoDatePicker").value();
                             var edate = $('#txtCopyEndDate').data("kendoDatePicker").value();
                             if ($("#txtCopyStartDate").data("kendoDatePicker").enable() !== false) {
@@ -3299,15 +3223,19 @@ MsaComponent = (function () {
                             if ($("#txtCopyEndDate").data("kendoDatePicker").enable() !== false) {
                                 entryData.enddate = vmCommon.tryToServerDate(edate);
                             }
-
+                            console.log(entryData.startdate, entryData.enddate)
+                            if(!!entryData.startdate) refMS.StartDate = `/Date(${new Date(entryData.startdate).getTime()})/`;
+                            if(!!entryData.enddate) refMS.Date = `/Date(${new Date(entryData.enddate).getTime()})/`;
+                            else refMS.Date = null;
+                            lstSM.push(refMS);
+                            return;
                             vmGoalAction.dataservice.duplicateGoal(entryData, function (serData) {
                                 if (!serData.value.MainGoalId) {
                                     pAlert(kLg.msgConflickData).then(function () {
                                         MsaApp.updateDataProductOrTheme_Expand_InView_Observer();       //[ItemMainSub].duplicateMainSub
                                     });
                                     return;
-                                }
-                                else {
+                                } else {
                                     var maingoalId = serData.value.MainGoalId;
                                     var goalIdArr = serData.value.GoalId;
 
@@ -3345,11 +3273,9 @@ MsaComponent = (function () {
                         });
                     },
                     ExportDocxMainSub() {
+                        return;
                         var typeId = this.Typeid;
-                        var entry = {
-                            Id: this.item.Id,
-                            TypeId: typeId
-                        };
+                        var entry = { Id: this.item.Id, TypeId: typeId };
                         vmGoalAction.dataservice.getFileDOCX(entry, function (res) {
                             var state = res.value.ResultStatus;
                             var fileInfo = res.value.TheObject;
@@ -3359,12 +3285,12 @@ MsaComponent = (function () {
                         });
                     },
                     GotoMixfromMainSub() {
-                        var goalId = this.item.Id;
-                        vmGoalAction.gotoMixService.gotoMix(goalId)
+                        return;
+                        vmGoalAction.gotoMixService.gotoMix(this.item.Id)
                     },
                     GotoRoadmapfromMainSub() {
-                        var goalId = this.item.Id;
-                        vmGoalAction.gotoRMService.gotoRoadMap(goalId)
+                        return;
+                        vmGoalAction.gotoRMService.gotoRoadMap(this.item.Id)
                     },
                     deleteSubGoal() {
                         var smkId = this.item.SubMarketProductId;
@@ -3382,7 +3308,6 @@ MsaComponent = (function () {
                             SubMarketId: this.getSubMarketId(),
                             SubMarketProductId: smkId
                         };
-
                         var entryData = {
                             goalId: goalId,
                             mdf: this.item.Mdf,
@@ -3393,20 +3318,15 @@ MsaComponent = (function () {
                         var titleSubGoal = MsaApp.getSubgoalTitle(maingoalId);
 
                         MsaApp.hideAllMenuDropdown();
+                        const lstSg = typeof this.getChildrenGaSg == 'function' ? this.getChildrenGaSg() : [];  // ref array
+                        console.log(lstSg, goalId)
                         pConfirm(kLg.confirmDeleteSG1 + titleSubGoal + kLg.confirmDeleteSG2).then(function () {
-                            vmFile.checkEnableDeleteFileMarketing(entryData.goalId, 'subgoal').then(t => {
-                                vmGoalAction.dataservice.deleteGoal(entryData, function (serData) {
-                                    vmFile.deleteMultiFileMarketing(t).then(x => {
-                                        msFilter.controlService.reLoadDataFilter(vmCommon.FilterType.ActionPlan, function () {
-                                            if (!vmGoalAction.checkRole(serData)) return;
-                                            MsaApp.reloadAllDataOfPage();
-                                        });
-                                    });
-                                    if (vmCommon.checkCurrentPage(vmCommon.enumPage.ActionPlan)) {
-                                        MsaApp.deleteEvalXYZ(entryData.goalId)
-                                    }
-                                });
-                            });
+                            const lstSgId = lstSg.map(s => s.Id);
+                            const i = lstSgId.indexOf(goalId);
+                            if(i > -1) {
+                                lstSg.splice(i, 1);
+                                MsaApp.deleteEvalXYZ(entryData.goalId)
+                            }
                         });
                     },
                     dblclickApEvarluation(e) {      //ItemMainSub
@@ -3445,7 +3365,6 @@ MsaComponent = (function () {
                         if (typeof tlp == 'function' && !vmCommon.IsShowTooltipChartEvalXYZ) {
                             const item = this.item;
                             tlp($(target), item.Id, item.Color);
-                           // console.log('show chart', vmCommon.deepCopy(item), target);
                         }
                     },
                     onHoverShowTooltipAddSub(target) {
@@ -3469,7 +3388,7 @@ MsaComponent = (function () {
      */
     const mixinMainGoalOverView = {        // dung mixin de ke thua cho navigation menu
         props: ['goal', 'bg', 'itemtype'],
-        inject: ['getIsExpand', 'onDragMoveGoal', 'isDraggable',
+        inject: ['getIsExpand', 'onDragMoveGoal', 'isDraggable', 'getChildrenGaPrd',
             'onDragStartMaingoal', 'onDragChangeMaingoal', 'onDragEndMaingoal', 'onDragMoveGoal',
             'getGroupSub', 'getGroupMainExpand'],
         provide() {
@@ -3495,7 +3414,6 @@ MsaComponent = (function () {
                             }
                         }
                     }
-
                     // View Ben phai khi co navigation menu
                     var _goal;
                     lstM = MsaApp.NavigationMenuView.find(it => it.Id == subgoal.SubMarketProductId);
@@ -3510,7 +3428,6 @@ MsaComponent = (function () {
                     if (_goal) {
                         const subG = _goal.ListSubGoal.find(sg => sg.Id == subgoal.Id);
                         if (subG) {
-                            console.log(subG.IsReduceSize, isReduce)
                             subG.IsReduceSize = isReduce;
                         }
                     }
@@ -3545,6 +3462,7 @@ MsaComponent = (function () {
                 onDragEndSubgoal: this.onDragEndSubgoal,
                 getDragdropSubOptions: () => { return this.DragdropOptions; },
                 isRegionOverView: this.isRegionOverView,
+                getChildrenGaSg: () => {return this.goal.ListSubGoal; },
             }
         },
         data() {
@@ -3559,7 +3477,6 @@ MsaComponent = (function () {
             };
 
         },
-        //watch: { },
         beforeMount() {
             if (!this.IsExpand) {
                 if (this.countMain() == 1) {
@@ -3567,8 +3484,6 @@ MsaComponent = (function () {
                 }
             }
         },
-       // mounted() { },
-       // beforeUpdate() { },
         computed: {
             ClassExpandCollapseSub() {
                 const lenSub = Array.isArray(this.goal.ListSubGoal) ? this.goal.ListSubGoal.length : 0;
@@ -3655,7 +3570,6 @@ MsaComponent = (function () {
             },
             setAllExpand_Or_Collapse(isExpand) {        // goi tu Product || Theme
                 this.IsExpand = isExpand;
-
             },
             dataservice() {
                 var rootUrl = "/Handlers/MsGoalAction.ashx?funcName={funcName}&projid=" + projectId + "&lang=" + kLg.language + "&strid=" + strategyId;
@@ -3696,7 +3610,6 @@ MsaComponent = (function () {
 
                 const thisR = this;
                 const goalId = this.goal.Id;
-
                 MsaApp.ClcCountEditColumn += 1;
                 if (typeof MsaApp.ClcTimerEditColumn == 'undefined')
                     MsaApp.ClcTimerEditColumn = setTimeout(function () {
@@ -3706,15 +3619,12 @@ MsaComponent = (function () {
                             // xử lý sự kiện single click
                             const isE = thisR.IsExpand;
                             thisR.IsExpand = !isE;
-                            if (thisR.IsExpand) {
-                                
+                            if (thisR.IsExpand) {                                
                                 MsaApp.pushExpand(goalId, 'maingoal');
-                            } else {
-                                
+                            } else {                                
                                 MsaApp.removeExpand(goalId, 'maingoal');
                             }
                         }
-
                         MsaApp.ClcCountEditColumn = 0;          // xóa click count
                         clearTimeout(MsaApp.ClcTimerEditColumn);// xóa timmer 
                         MsaApp.ClcTimerEditColumn = undefined;  // set timmer về updefinded để chạy lệnh if (typeof MsaApp.ClcTimerEditColumn == 'undefined')
@@ -3803,10 +3713,8 @@ MsaComponent = (function () {
                 MsaApp.initAndShowKendoTooltip(tooltipObj, $elm);
             },
             getFileDOCX() {
-                var entry = {
-                    Id: this.goal.Id,
-                    TypeId: vmCommon.GoalActionContentType.MainGoal
-                };
+                return;
+                var entry = { Id: this.goal.Id, TypeId: vmCommon.GoalActionContentType.MainGoal };
                 vmGoalAction.dataservice.getFileDOCX(entry, function (res) {
                     var state = res.value.ResultStatus;
                     var fileInfo = res.value.TheObject;
@@ -3816,10 +3724,12 @@ MsaComponent = (function () {
                 });
             },
             gotoMix() {
+                return;
                 var goalId = this.goal.Id;
                 vmGoalAction.gotoMixService.gotoMix(goalId)
             },
             gotoRoadmap() {
+                return;
                 var goalId = this.goal.Id;
                 vmGoalAction.gotoRMService.gotoRoadMap(goalId)
             },
@@ -3827,9 +3737,7 @@ MsaComponent = (function () {
                 const isMastergoal = this.getIsMaster().MasterGoal;
                 var productId = this.getProductId();
                 const independencyId = this.goal.IndependencyId;
-
                 const titlesub = this.View_TitleSubgoal;
-
                 var info = {
                     CurrencyName: this.goal.CurrencyName,
                     IndependencyId: independencyId,
@@ -3849,59 +3757,19 @@ MsaComponent = (function () {
                     subMarketProductId: info.SubMarketProductId,
                     goalType: vmCommon.GoalActionContentType.SubGoal
                 };
+                vmCommon.RefLstGa = this.goal.ListSubGoal;  // ref Array
                 MsaApp.editGoal(entryData, info,
                     kLg.titlepAddMainGoalNew1 + htmlEscape(titlesub) + kLg.titlepAddMainGoalNew2,
-                    'vmGoalAction.showAddSubgoalFromMainOverview', vmCommon.deepCopy(this.goal));
-
+                    'vmGoalAction.showAddSubgoalFromMainOverview', vmCommon.deepCopy(this.goal));                    
             },
             deleteMainGoal(e) {
                 var goalId = this.goal.Id;
-                const isMastergoal = this.getIsMaster().MasterGoal;
-                var info = {
-                    CurrencyName: this.goal.CurrencyName,
-                    goalType: vmCommon.GoalActionContentType.MainGoal,
-                    IndependencyId: this.goal.IndependencyId,
-                    IsMasterGoal: isMastergoal,
-                    productId: this.getProductId(),
-                    RegionId: this.getRegionId(),
-                    SubMarketId: this.getSubMarketId(),
-                    SubMarketProductId: this.goal.SubMarketProductId //this.getSubMarketProductId()
-                };
-                var entryData = {
-                    goalId: this.goal.Id,
-                    mdf: this.goal.Mdf,
-                };
-
-                var smkId = info.SubMarketProductId;
-                var inpId = info.IndependencyId;
                 var titleMainGoal = this.View_TitleMaingoal;
-                const lstSubgoalId = Array.isArray(this.goal.ListSubGoal) ? this.goal.ListSubGoal.map(sg => sg.Id) : [];        // dùng để remove expand
-
+                const lstMg = this.getChildrenGaPrd();  // ref Array
                 pConfirm(kLg.confirmDeleteMG1 + titleMainGoal + kLg.confirmDeleteMG2).then(function () {
-                    //delete before update 2 db
-                    vmFile.checkEnableDeleteFileMarketing(entryData.goalId, 'maingoal').then(t => {
-                        vmGoalAction.dataservice.deleteGoal(entryData, function (serData) {
-
-                            var pid = smkId || inpId;
-                            vmGoalAction.goalFilterService.removeItemFilter(pid, { Id: goalId });
-
-                            vmFile.deleteMultiFileMarketing(t).then(x => {
-                                msFilter.controlService.reLoadDataFilter(vmCommon.FilterType.ActionPlan, function () {
-                                    if (!vmGoalAction.checkRole(serData)) return;
-
-                                    if (lstSubgoalId.length) {
-                                        MsaApp.removeExpandListSubgoal(vmCommon.deepCopy(lstSubgoalId)); // Chưa gọi handler save expand (se goi trong ham beforeDestroy)
-                                        MsaApp.removeExpand(goalId, 'maingoal');
-                                    }
-                                    MsaApp.reloadAllDataOfPage();
-                                });
-                            });
-
-                            if (vmCommon.checkCurrentPage(vmCommon.enumPage.ActionPlan)) {
-                                MsaApp.deleteEvalXYZ(entryData.goalId)
-                            }
-                        });
-                    });
+                    const lstMgId = lstMg.map(m => m.Id);
+                    let i = lstMgId.indexOf(goalId);
+                    if(i > -1) lstMg.splice(i, 1); // remove
                 });
             },
             onDragStartSubgoal(evt) {    //onDragStartTheme
@@ -3915,7 +3783,6 @@ MsaComponent = (function () {
                 }
             },
             onDragChangeSubgoal(evt) {
-                //            console.log('onDragChangeSubgoal', evt);
                 if (evt.moved) {
                     MsaApp.DragDropGoal.iFrom = evt.moved.oldIndex;
                     MsaApp.DragDropGoal.iTo = evt.moved.newIndex;
@@ -3930,7 +3797,7 @@ MsaComponent = (function () {
                     }
                 }
             },
-            onDragEndSubgoal(evt) {    //console.log('onDragEndSubgoal', evt)
+            onDragEndSubgoal(evt) {
                 const sumAction = evt.item.getAttribute('sum-action');
                 if (sumAction > 0) {
                     MsaApp.DragDropGoal.GroupMain = 'MIndexMainSubgoal';
@@ -3984,11 +3851,6 @@ MsaComponent = (function () {
                 }
             },
         },
-        //unmounted() {       // ham nay chay sau khi tat ca cac component con/chau bi unmouted
-        //},
-        //beforeDestroy() {
-        //    // Unregister the event listener before destroying this Vue instance
-        //}
     }
     Vue.component('MsaMainGoalOverView', (resolve) => {
         $.get(`${__rootFolder__}/${_MainSubFolder_}/ViewMaingoal.html`, template => {
@@ -4115,14 +3977,10 @@ MsaComponent = (function () {
                     //actionPlanComponents[this.goal.Id] = this;
                 },
                 updated() {
-                    MsaApp.componentService(this.getViewType()).set(this.goal.Id, this);
-                    //actionPlanComponents[this.goal.Id] = this;
-                    //console.log('[DOM] ___updated MsaMainGoalOverView', Date.now(), this.goal.Name, this.goal.Id);
+                    MsaApp.componentService(this.getViewType()).set(this.goal.Id, this);                    
                     // tinh toan get element tu DOM
 
                     this.setCollapExpandAllMain();
-                    // them code o day
-
                 },
                 methods: {
                     mouseLeaveEditTitleMain() {
@@ -4183,7 +4041,7 @@ MsaComponent = (function () {
         $.get(`${__rootFolder__}/${_marketProductFolder_}/ViewMarket.html`, template => {
             resolve({
                 template: template,
-                props: ['item', 'landid', 'bg', 'children', 'itemtype', 'products', 'isregionview'],
+                props: ['item', 'landid', 'children', 'itemtype', 'products', 'isregionview'],
                 inject: ['getIsExpand', 'countChildren', 'getBgColorByAvgEvaluation', 'getIsShowMarketLabel', 'pushExpand'],
                 provide() {
                     if (this.itemtype == 'ProductGroup') {
@@ -4232,9 +4090,7 @@ MsaComponent = (function () {
                     }
 
                 },
-                beforeMount() {
-                    
-                },
+                beforeMount() { },
                 mounted() { },
                 //watch: { },
                 //updated() { },
@@ -4307,11 +4163,11 @@ MsaComponent = (function () {
         inject: ['isViewer', 'handlerLoadding'],
         methods: {
             clickMenuGotoSubmarketProduct(e) {
+                return;
                 const landId = this.item.LandId;
                 const regionId = this.item.RegionId;
                 const subMarketId = this.item.SubMarketId;
                 const productId = this.item.ProductId;
-
                 var filtersearch = [{ TypeId: vmCommon.EnumFilterType.Market, ChildId: 0 }];
                 var jsonObject = { LandId: landId, RegionId: regionId, FilterValue: JSON.stringify(filtersearch) };
 
@@ -4321,7 +4177,6 @@ MsaComponent = (function () {
                     window.location = url;  //window.open(url, "_blank");
                 }, AjaxConst.PostRequest);
             },
-
         },      // end methods
     }
     const mixinProductDefault = {
@@ -4389,8 +4244,7 @@ MsaComponent = (function () {
             },
         },
         provide() {
-            return {
-                
+            return {                
                 getProductId: () => { return this.item.Id },
                 getIsMaster: () => {
                     const isMsterGoal = !!this.item.IsMasterGoal;
@@ -4402,18 +4256,12 @@ MsaComponent = (function () {
                 getIndependencyId: () => { return null },
                 countMain: () => { return this.ListMain.length },
                 getListMain: (id) => { return this.ListMain.filter(m => m.Id == id); },
-
+                getChildrenGaPrd: () => {return this.ListMain},
                 setCollapExpandAllMain: this.setCollapExpandAllMain,
                 getRole: () => this.item.RoleId,        // NavMenuViewProduct, MsaViewProduct
 
             }
         },
-        //watch: {         // duoc goi sau cac ham: data, computed properties, methods
-        //},
-        //beforeMount() {     // duoc goi sau cac ham: data, computed properties, methods, watchers, created
-        //},
-        //beforeUpdate() {  //    console.log('MsaViewProduct beforeUpdate', this.item.Name, this.SubMarketProductId);
-        //},
         methods: {
             setCollapExpandAllMain() {
                 const refMg = this.$refs['RefViewMainGoal'];
@@ -4486,9 +4334,11 @@ MsaComponent = (function () {
                 });
             },
             clickMenuImport(e) {
+                return;
                 vmGoalAction.gaExportService.importGa(this.SubMarketProductId, undefined);
             },
             clickMenuExport(e) {
+                return;
                 vmGoalAction.gaExportService.exportGa(this.SubMarketProductId, undefined);
             },
             addMaingoalByNav() {
@@ -4499,7 +4349,9 @@ MsaComponent = (function () {
                     isEdit: false,
                     goalType: vmCommon.GoalActionContentType.MainGoal,
                     parentStart: new Date()
-                };
+                };                
+                vmCommon.RefLstGa = this.ListMain;  // ref Array
+                vmCommon.RefAddTypeStr = 'addMaingoalByNav';
                 vmGoalAction.openPopUpGoal2(info);
             },
             addSubgoalByNav(e) {        //onHoverShowTooltipAddGoalAction
@@ -4512,7 +4364,9 @@ MsaComponent = (function () {
                     parentId: null,
                     parentStart: new Date(),
                     parentEnd: new Date(),
-                };
+                };                
+                vmCommon.RefLstGa = this.ListMain;  // ref Array
+                vmCommon.RefAddTypeStr = 'addSubgoalByNav';
                 vmGoalAction.openPopUpGoal2(info);
             },
             addActionByNav(e) {
@@ -4528,6 +4382,8 @@ MsaComponent = (function () {
                     title: kLg.titlepAddMainGoalNew1 + kLg.labelActionName + kLg.titlepAddMainGoalNew2,
                     isEdit: false
                 };
+                vmCommon.RefLstGa = this.ListMain;  // ref Array
+                vmCommon.RefAddTypeStr = 'addActionByNav';
                 vmGoalAction.openPopUpAction2(info);
             },
             ToggelExpandAllMailGoal(e) {
@@ -4586,7 +4442,7 @@ MsaComponent = (function () {
                     },
                 },
                 created() {         // duoc goi sau cac ham: data, computed properties, methods, watchers
-                    if(this.IsExpand) this.ReloadOpenProduct();
+                    this.ReloadOpenProduct();
                 },
                 mounted() {
                     // sau ham beforeMount da tao DOM
@@ -4745,29 +4601,25 @@ MsaComponent = (function () {
                         vmGoalAction.openPopUpAction2(info);
                     },
                     onChangeMasterGoalKpi(e) {
-                        var that = this;
+                        return;
+                        var lstMLen = this.item.ListMainGoal.length;
                         if (this.isViewer()) return;
                         var state = this.item.IsMasterGoalKpi;
                         const smpId = this.item.Id;
-
                         this.handlerLoadding();
-
                         vmGoalAction.dataservice.changeMasterSub({ id: smpId, isMasterGoalKpi: state }, function (res) {
-                            if (that.item.ListMainGoal.length) {
+                            if (lstMLen) {
                                 MsaApp.reloadAllDataOfPage('onChange_MasterGoalKpi');
                             }
-
                             if (!state) {
                                 msFilter.controlService.reLoadDataFilter();
                             }
-
                             MsaApp.canReaction();
                         });
                     },
                     getDataContentRightView() {
                         var itemPI = this.item;
                         const entryData = { SubMarketProductId: itemPI.Id };
-
                         return new Promise((resl) => {
                             vmGoalAction.dataservice.getGoalActionContentByArea(entryData, function (res) {
                                 if (res.value) {

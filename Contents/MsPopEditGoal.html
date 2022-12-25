@@ -2596,8 +2596,7 @@
                     });
 
                 } //endregion
-                else {
-                    
+                else {                    
                     var isChangeConection = false;
                     var tempSubPro = vmCommon.pushApply([], this.oldConnections, function (it) { return it.Id });
 
@@ -2719,7 +2718,7 @@
                                         var isReset = isResetByResults && vmEditGoal.checkFitFilter(theGoal, serData.value.TheObject);
 
                                         if (msFilter.controlService.hasCriteria(mFilter.enumFilter.masterGoal) &&
-                                            vmGoalAction.isGoalFitFilterMaster(vmGoalAction.goalOptions.GoalType, theGoal.Id, theGoal.parentId, vmGoalAction.GoalMaster.FirstId, vmGoalAction.GoalMaster.LastId))
+                                            vmGoalAction.isGoalFitFilterMaster(vmGoalAction.goalOptions.GoalType, theGoal.Id, theGoal.ParentId, vmGoalAction.GoalMaster.FirstId, vmGoalAction.GoalMaster.LastId))
                                             isResetByResults = true;
 
                                         if (isReset) {
@@ -2738,7 +2737,7 @@
                                             if ((isConnection || isSubConnection) && (isChangeConection || theGoal.subProductGroups.length > 0)) {
                                                 msFilter.controlService.reLoadData();
                                             } else {
-                                                if (!theGoal.parentId) {
+                                                if (!theGoal.ParentId) {
                                                     var pid = vmGoalAction.goalOptions.SubMarketProductId || vmGoalAction.goalOptions.IndependencyId;
                                                     vmGoalAction.goalFilterService.updateItemFilter(pid, { Id: theGoal.Id, Name: theGoal.Name });
                                                 };
@@ -2776,7 +2775,6 @@
                                     }
                                 }
                                 else if (vmCommon.checkCurrentPage(vmCommon.enumPage.TeamBoard)) {
-
                                     teamBoardVM.reloadBoardLineAfterUpdateElement({
                                         Name: theGoal.Name,
                                         Id: theGoal.Id,
@@ -2789,7 +2787,6 @@
                                     if (vmGoalAction.goalOptions.goalActionNavigationCallback) vmGoalAction.goalOptions.goalActionNavigationCallback();
                                     msRoadmapApp.reloadData();
                                 }
-
                                 if (vmGoalAction.popEditMainGoal)
                                     if (vmCommon.TexEditor.getSelectorEditor() == undefined) {
                                         vmGoalAction.popEditMainGoal.close();
@@ -2801,7 +2798,7 @@
                         }); 
                     } else { //Add new Goal
                         if (vmGoalAction.goalOptions.GoalType === vmCommon.GoalType.SubGoal) {
-                            theGoal.parentId = vmGoalAction.goalOptions.ParentId;
+                            theGoal.ParentId = vmGoalAction.goalOptions.ParentId;
                         }
                         
                         var indexStatus = theGoal.Status.length;
@@ -2816,14 +2813,11 @@
 
                         theGoal.subProductGroups = vmGoalAction.subService.dataToSave();
                         theGoal.subClientGroups = vmGoalAction.subService.dataClientToSave();
-
-                        theGoal.SubProducts = subproducts;
-                        
+                        theGoal.SubProducts = subproducts;                        
                         theGoal.SubMarketProductId = theGoal.SubMarketProductId || vmGoalAction.goalOptions.SubMarketProductId || vmCommon.emptyGuid;
                         theGoal.submarketProductId = theGoal.SubMarketProductId;
                         theGoal.IndependencyId = vmGoalAction.goalOptions.IndependencyId;
                         theGoal.independencyId = theGoal.IndependencyId
-
                         theGoal.ActionPlanRegions = actionRegions;
 
                         if (!theGoal.CreatedDate || typeof theGoal.CreatedDate === "string") {
@@ -2840,14 +2834,46 @@
                         };
 
                         if (this.templateId) dataEntry.TemplateId = this.templateId.Id;
-
                         vmEditGoal.dataservice.createGoal(dataEntry, function (serData) {
                             if (!vmGoalAction.checkRole(serData))
                                 return;
-
+                            
                             if (vmCommon.checkConflict(serData.value.ResultStatus)) {
                                 vmEditGoal.modelChanged = false;
-
+                                if(!serData.value.TheObject) {
+                                    if(Array.isArray(vmCommon.RefLstGa)){                                        
+                                        let cGoal = vmCommon.deepCopy(theGoal);
+                                        cGoal.Name = theGoal.Name;
+                                        MsaApp.pushLoadTimeActions('vmEditGoalDataserviceCreateGoal');
+                                        if(vmCommon.RefAddTypeStr == 'addMaingoalByNav') {
+                                            cGoal = sHandler.getNewMain(cGoal);
+                                            MsaApp.setLastActiveElement(cGoal.Id);
+                                        } else if(vmCommon.RefAddTypeStr == 'addSubgoalByNav') {
+                                            const mg = sHandler.getNewMain(cGoal, true);
+                                            const sg = sHandler.getNewSub(cGoal);
+                                            sg.ParentId = mg.Id;
+                                            MsaApp.setLastActiveElement(sg.Id);
+                                            mg.ListSubGoal.push(sg);
+                                            cGoal = mg;
+                                        }
+                                        else {
+                                            cGoal = sHandler.getNewSub(cGoal);
+                                            MsaApp.setLastActiveElement(cGoal.Id);
+                                        }
+                                        if (vmCommon.checkCurrentPage(vmCommon.enumPage.ActionPlan)){
+                                            if (vmGoalAction.goalOptions.GoalType == vmCommon.GoalType.SubGoal){
+                                                MsaApp.pushExpand(cGoal.Id, 'subgoal');
+                                            } else {
+                                                MsaApp.pushExpand(cGoal.Id, 'maingoal');
+                                            }
+                                        }
+                                        vmCommon.RefLstGa.push(cGoal);
+                                       if (vmGoalAction.popEditMainGoal) {
+                                            vmGoalAction.popEditMainGoal.close();
+                                        }
+                                    }
+                                    return;
+                                }
                                 var goalId = serData.value.TheObject.GoalId;        // new subgoal || maingoal
                                 if (vmCommon.checkCurrentPage(vmCommon.enumPage.TeamBoard)) {
                                     var newGoal = serData.value.TheObject || {};
@@ -2888,10 +2914,10 @@
                                     //Check if fit with current filter
                                     var statusObj = serData.value.TheObject.StatusObj;
                                     
-                                    var isResetByResults = vmGoalAction.hasResultsFilter(theGoal.Id, theGoal.parentId, vmGoalAction.goalOptions.SubMarketProductId, vmGoalAction.goalOptions.IndependencyId);
+                                    var isResetByResults = vmGoalAction.hasResultsFilter(theGoal.Id, theGoal.ParentId, vmGoalAction.goalOptions.SubMarketProductId, vmGoalAction.goalOptions.IndependencyId);
                                     var isReset = isResetByResults && vmEditGoal.checkFitFilter(theGoal, statusObj);
 
-                                    if (vmGoalAction.isGoalFitFilterMaster(vmGoalAction.goalOptions.GoalType, theGoal.Id, theGoal.parentId, vmGoalAction.GoalMaster.FirstId, vmGoalAction.GoalMaster.LastId))
+                                    if (vmGoalAction.isGoalFitFilterMaster(vmGoalAction.goalOptions.GoalType, theGoal.Id, theGoal.ParentId, vmGoalAction.GoalMaster.FirstId, vmGoalAction.GoalMaster.LastId))
                                         isResetByResults = true;
 
                                     if (vmGoalAction.isGoalFitVisibility(theGoal)) {

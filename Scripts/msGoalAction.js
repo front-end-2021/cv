@@ -67,9 +67,7 @@ window.onresize = function onresize() {
 vmGoalAction.dataservice = (function () {
     var callAjaxGoalAction = function (divId, funcName, entryData, requestType, successCallBack) {       
         var url = "../Handlers/MsGoalAction.ashx?funcName=" + funcName + "&projid=" + sHandler.ProjectId + "&strid=" + sHandler.StrategyId + "&lang=" + sHandler.Lang;        
-        return callAjax(divId, url, entryData, successCallBack, requestType).then((data) => {
-            if(typeof successCallBack == 'function') successCallBack(data); return data;
-        });
+        return callAjax(divId, url, entryData, successCallBack, requestType);
     };
 
     var callAjaxByPost = function (funcName, entryData, successFunc, loadingdiv) {
@@ -242,7 +240,7 @@ vmGoalAction.dataservice = (function () {
     };
 
     var loadDataFirstTime = function (entryData, successFunc) {
-        callAjaxByPostWithOutLoading("loaddatafirsttime", entryData, successFunc);
+        return callAjaxByPostWithOutLoading("loaddatafirsttime", entryData, successFunc);
     };
 
     var customExcel = function (entryData, successFunc) {
@@ -452,17 +450,13 @@ vmGoalAction.dataservice = (function () {
 })();
 
 vmGoalAction.loadDataFirstTime = function () {
-    vmGoalAction.dataservice.loadDataFirstTime(null, function (serData) {
+    return vmGoalAction.dataservice.loadDataFirstTime(null, function (serData) {
         $("#goalActionView").empty();
         $("#regionoverview").empty();
         $("#independencyView").empty();
 
         if (serData.Role < 0) {
             return;
-        }
-        if (typeof MsaApp == 'object') {
-            MsaApp.pushLoadTimeActions('vmGoalAction.dataservice.loadDataFirstTime');
-            MsaApp.setData(serData.value, 'loadDataFirstTime'); 
         }
         vmGoalAction.Role = serData.value.Role;
         vmGoalAction.simpleView = serData.value.Data.Item1;
@@ -502,9 +496,7 @@ $(function () {
     else {
         // check currentPage để hàm khởi tạo chạy đúng vì hàm khởi tạo cũng được chạy ở page khác
         // và file msGoalAction.js cũng được nhúng cùng ở page khác
-        msFilter.controlService.init(vmCommon.FilterType.ActionPlan, function(data){
-            vmGoalAction.loadDataFirstTime();
-        });
+        msFilter.controlService.init(vmCommon.FilterType.ActionPlan);
     }
 
     document.title = kLg.tabActionPlan;
@@ -513,8 +505,7 @@ $(function () {
     $('body').append($('#nprogressActionPlanDisableAll'));
     $('#nprogressActionPlanDisableAll').on('click', function (ev) {
         ev.stopImmediatePropagation();
-    });
-    
+    });    
 });
 function updateNameMainGoal(id, text, isNav) {
     editMainGoalUnload(id, text, isNav);
@@ -1183,7 +1174,6 @@ vmGoalAction.showPopFibu = function (title) {
 };
 
 vmGoalAction.showAddGoalPopup = function (title) {
-
     vmGoalAction.getTemplate(vmGoalAction.goalOptions.GoalType, function (res) {
         vmGoalAction.goalTemplates = res.value;
         vmGoalAction.popEditMainGoal = showPopup(vmGoalAction.popEditMainGoal,
@@ -7965,8 +7955,7 @@ vmGoalAction.getGoalActions = function (type) {
     return [];
 };
 
-vmGoalAction.openPopUpGoal2 = function (info) {
-    
+vmGoalAction.openPopUpGoal2 = function (info) {    
     var title = (info.isEdit === true) ? kLg.titlepEditMainGoalNew1 + kLg.labelMainGoalName + kLg.titlepEditMainGoalNew2 : kLg.titlepAddMainGoalNew1 + kLg.labelMainGoalName + kLg.titlepAddMainGoalNew2
     if (info.goalType === vmCommon.GoalActionContentType.SubGoal) {
         title = (info.isEdit === true) ? kLg.titlepEditMainGoalNew1 + kLg.labelSubGoalName + kLg.titlepEditMainGoalNew2 : kLg.titlepAddMainGoalNew1 + kLg.labelSubGoalName + kLg.titlepAddMainGoalNew2;

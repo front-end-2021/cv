@@ -48,9 +48,8 @@
                     </div>
                     <span style="font-weight:bold">{{getPath2(spg.NamePaths).RegionName}}</span>
                 </div>
-
                 <MsaViewMarket v-for="(mt, i) in spg.MarketSegmentGroups"
-                               :key="'list-market-' + mt.Id + '_' + i + '_key-force-update-' + 1"
+                               :key="'list-market-' + mt.Id + '_' + i"
                                ref="RefViewMarket"
                                itemtype="Market"
                                :landid="spg.LandId"
@@ -70,9 +69,8 @@
                     </div>
                     <span style="font-weight:bold">{{getPath2(spg.RegionViewPaths).RegionName}}</span>
                 </div>
-
                 <MsaViewMarket v-for="(mt, i) in spg.MarketSegmentGroups"
-                               :key="'list-market-' + mt.Id + '_' + i + '_key-force-update-' + 1"
+                               :key="'list-market-' + mt.Id + '_' + i"
                                ref="RefViewMarket"
                                itemtype="Market"
                                :isregionview="spg.IsRegionView"
@@ -97,7 +95,7 @@
                            @change="onDragChangeIndependence"
                            @end="onDragEndIndependence">
                     <ViewIndependence v-for="(inde, i) in ListIndependence"
-                                      :key="'list-independence-' + inde.Id + '_' + i + '_key-force-update-' + 1"
+                                      :key="'list-independence-' + inde.Id + '_' + i"
                                       ref="RefViewIndependence"
                                       v-bind:independence-scrolly-id="inde.Id"
                                       :item="inde" itemtype="Independence"

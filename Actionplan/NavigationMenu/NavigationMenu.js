@@ -128,22 +128,6 @@
                         }
 
                     },
-                    //onAddNewSubgoal() {
-                    //    const item = this.MenuFilter;
-                    //    var mgId = item.Id;
-                    //    var info = {
-                    //        goalId: vmCommon.emptyGuid,
-                    //        subMarketProductId: item.SubMarketProductId,
-                    //        independencyId: item.IndependencyId,
-                    //        isEdit: false,
-                    //        goalType: vmCommon.GoalActionContentType.SubGoal,
-                    //        parentId: mgId,
-                    //        parentStart: new Date(),
-                    //        parentEnd: new Date(),
-                    //    };
-                        
-                    //    vmGoalAction.openPopUpGoal2(info);
-                    //},
                     onAddNewTheme() {
                         const item = this.MenuFilter;
 

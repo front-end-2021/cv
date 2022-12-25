@@ -195,11 +195,7 @@
              v-bind:style="{width: item.Width + 'px', height: item.Height + 'px'}"></div>
     </div>
 
-
     <!--div reduce size-->
-
-
-
     <div v-if="(item.Id != undefined) && is_ReduceSize()"
          class="col-item-display col-reduce" style="width:344px;" v-on:dblclick="(e) => {dblclickEditAction(e.target) }">
         <div class="col-item-head head-reduce dnbHandleDragDropAction"

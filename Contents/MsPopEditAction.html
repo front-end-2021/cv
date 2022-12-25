@@ -2662,7 +2662,6 @@
     };
 
     vmEditAction.bindPopUpEvent = function () {
-
         vmGoalAction.popEditAction.bind("close", function (e) {
             vmFile.enableAssignedIcon = false;
             var aid = vmEditAction.viewModel.action.Id;
@@ -2677,8 +2676,6 @@
                 }
             }
             else {      // cac trang khac ActionPlan
-
-                //$("div[class~='divrela']").removeClass("last-active-element");
                 if (vmGoalAction.actionOptions.IsEdit)
                     $('.last-active-element').removeClass("last-active-element");
                 $("div[id~='" + aid + "']").addClass("last-active-element");
@@ -2776,9 +2773,6 @@
             $('#btnaddtodo').insertAfter($icondeletewhentodo);
             $('#btnaddtodo').css({ "right": "6px", "margin-top": "1px" });
         }
-
-        //vmEditAction.viewModel.styleButtonTodoActionCost();
-
     };
 
     vmEditAction.syncKpiService = function () {
@@ -5625,7 +5619,6 @@
                                 sStatus.push(theAction.Status[sidx]);
                             }
                         }
-
                         theAction.Status = sStatus;
                     }
                     if (vmEditAction.actionUpStreamId == null) {
@@ -5634,7 +5627,6 @@
                         typeAction = vmEditAction.typeActionConnect.add;
                         this.action.ActionUpStreamConnectionAction = { ActionId: vmEditAction.actionUpStreamId, TypeId: typeAction };
                     }
-
                     theAction.SubProducts = subproducts;
                     if (theAction.ApSwotanalyseTemplateId == -1) theAction.ApSwotanalyseTemplateId = null;
 
@@ -5655,10 +5647,33 @@
                         PathParentId: vmGoalAction.actionOptions.pathParentId,
                         PathParentMdf: vmGoalAction.actionOptions.pathParentMdf
                     };
-
+                    if(vmCommon.checkCurrentPage(vmCommon.enumPage.ActionPlan) && Array.isArray(vmCommon.RefLstGa)){
+                        vmEditAction.modelChanged = false;    
+                        MsaApp.pushLoadTimeActions('vmEditActionDataserviceCreateAction');
+                        let act = vmCommon.deepCopy(theAction);
+                        if(vmCommon.RefAddTypeStr == 'addActionByNav') {
+                            const mg = {
+                                SubMarketProductId: act.SubMarketProductId,
+                                IndependencyId: act.IndependencyId,
+                            }
+                            let nMg = sHandler.getNewMain(mg, true);
+                            let nSg = sHandler.getNewSub(mg, true);
+                            let cAct = sHandler.getNewAction(act);
+                            MsaApp.pushExpand(nSg.Id, 'subgoal');
+                            MsaApp.pushExpand(nMg.Id, 'maingoal');
+                            MsaApp.setLastActiveElement(cAct.Id);
+                            cAct.GoalId = nSg.Id;
+                            nSg.ListAction.push(cAct);
+                            nSg.ParentId = nMg.Id;
+                            nMg.ListSubGoal.push(nSg);
+                            vmCommon.RefLstGa.push(nMg);
+                        }
+                        if (vmGoalAction.popEditAction)
+                            vmGoalAction.popEditAction.close();
+                        return;
+                    }
                     vmEditAction.dataservice.createAction(dataEntry, function (serData) {
-                        vmEditAction.modelChanged = false;
-
+                        vmEditAction.modelChanged = false;                        
                         if (!vmGoalAction.checkRole(serData)) return;
                         if (serData.value.ResultStatus !== vmEditAction.eConflict.conflict) {
                             if (vmCommon.checkCurrentPage(vmCommon.enumPage.TeamBoard)) {

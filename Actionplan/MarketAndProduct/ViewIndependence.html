@@ -1,0 +1,56 @@
+﻿<section v-bind:type="itemtype">
+    <div class="market-title box-pointer dnbHandleDragDrop" 
+         style="display: flex; justify-content: space-between; height:36px">
+        <div @click="onClickToggleShow">
+            <span :class="[IcToggleClass]" style="cursor:pointer;"></span>
+            <span class="text-hover-underline font-16"
+                  style="margin-left: 10px;cursor:pointer">{{item.Name}}</span>
+        </div>
+        <div style="display:flex; align-items: center; margin-top: -8px;">
+            <span v-if="MasterStatus" :tid="item.Id"
+                  class="master-title" :status="item.MasterGoalStatus">{{MasterStatus}}</span>
+            <div class="dnbMenuToggleRight" 
+                 style="width:32px;height:32px;padding-right:12px;padding-top:6px;position:relative;">
+                <span v-if="item.IsEdit"
+                      class="icon-right-block cursor-pointer msa-ic-font font-edit2 overallthread"
+                      data-toggle="dropdown" style="font-size:13px;padding-top:1px;"></span>
+                <ul v-if="item.IsEdit"
+                    role="menu" class="popup-menu dropdown-menu ms-popup-menu-left" 
+                    style="position:absolute;top:24px;right:12px;">
+                    <li><a class="dropdow-menu-li-a" @click="showPopupEditIndependence" style="font-size:14px;">
+                        <span class="icon-24 icon-left-block icon-edit"></span>{{kLg.edit}}</a></li>
+                    <li role="presentation" class="divider" v-if ="getCurrentRole() > 0"></li>
+                    <li v-if ="getCurrentRole() > 0">
+                        <a class="dropdow-menu-li-a" @click="showPopupAddTheme" style="font-size:14px;">
+                            <span class="icon-24 icon-left-block icon-edit"></span>{{kLg.gaTitleAddThread}}
+                        </a>
+                    </li>
+                    <li v-if="item.IsEditFull" role="presentation" class="divider"></li>
+                    <li v-if="item.IsEditFull">
+                        <a class="dropdow-menu-li-a" @click="onMenuDeleteIndependency" style="font-size:14px;">
+                        <span class="icon-24 icon-left-block icon-delete"></span>{{kLg.lblDelete}}</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="market-content market-show msa-border-0top" v-if="IsExpand"
+         style="padding-top:2px;">
+        <draggable :list="item.ListSubIndependency"
+                   v-bind:group="GroupMIndexTheme"
+                   v-bind:class="GroupMIndexTheme"
+                   handle=".dnbHandleDragDropTheme"
+                   v-bind="DragdropOptions"
+                   @start="onDragStartTheme"
+                   @change="onDragChangeTheme"
+                   @end="onDragEndTheme">
+            <ViewTheme v-if="item.ListSubIndependency"
+                       v-for="(theme, i) in item.ListSubIndependency"
+                       :key="'list-theme-' + theme.Id + '-' + i"
+                       ref="RefViewTheme"
+                       v-bind:theme-scrolly-id="theme.Id"
+                       itemtype="Theme"
+                       :item="theme" />
+        </draggable>
+    </div>
+</section>

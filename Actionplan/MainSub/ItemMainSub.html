@@ -1,0 +1,61 @@
+﻿<div v-if="item.IsShow"
+     class="divrela maingoal-div td-hover wrapper-goalaction dnbWrapperGoal" 
+     v-bind:class="[ContainFilterResult, LastActiveClass]"
+     v-bind:mstype="mstype"
+     v-bind:id="IdDirect" mgroup="1"
+     v-bind:direction-id="IdDirect" direction-type="goal" 
+     v-bind:goalid="item.Id" v-bind:anchor-id="item.Id" 
+     v-bind:style="{backgroundColor: Style.BgColor, color: Style.Color}"
+     style="width:286px;margin-top:6px;padding-top: 10px;padding-bottom: 0;" >
+    <span class="icon-16 icon-arow-towway-vertical-w msa-mg-hover-arow-ud" v-if="item.IsShow > 0"
+          style="float:initial;margin-left:8px;position:absolute;top:12px;"></span>
+
+    <GoalOverview :item="item" />
+
+    <div v-if="item.Name && item.IsShow > 0" class="msa-mg-right"
+         @mouseover="e => onMouseOverHideTooltip(e)">
+        <div v-if="item.ApEvaluation != null" 
+             class="pull-right kpi-overview kpi-overview-goal msa-kpi-inside" 
+             v-bind:class="ColorApEvaluation"
+             v-bind:evaltype="evaltype" v-bind:data-id="item.Id" 
+             v-on:dblclick="(e) => {dblclickApEvarluation(e.target) }"
+             v-on:click="(e) => {clickApEvarluation(e.target) }">
+            <span style="margin-top:1px;max-width:50px" 
+                  class="dnbIgnoreDblClickEditGoal">{{item.ApEvaluation}}</span>
+        </div>
+        <div v-if="item.ApEvaluation == null && item.KpiOverViewIsShowPercent"
+             v-bind:kpitype="evaltype" 
+             v-bind:data-id="item.Id" 
+             v-bind:class="[KpiOverview.ClsArrow, KpiOverview.ClsBg, KpiOverview.KpiBg]"
+             class="pull-left maingoal-xx kpi-overview kpi-overview-goal msa-mg-collapse-kpi">
+            <span class="xnxx"></span>
+            <span style="margin-top: 1px; max-width: 50px" class="dnbIgnoreDblClickEditGoal"
+                  @click="onclickDetailkpi">{{item.KpiOverViewPercentStr}}%</span>
+        </div>
+
+        <div class="ms-assignfile" v-if="HasFileAssigned">
+            <span class="icon-16 msa-img-assignfile dnbIgnoreDblClickEditGoal"
+                  v-bind:type="evaltype"
+                  showfile=""
+                  v-bind:gafile="item.Id"
+                  style="float:right"
+                  v-bind:class="bindiconassignfile"
+                  @click="openPopUpFileAssignFromDisplay"></span>
+        </div>
+        <div v-if="HasReminder" class="ms-reminder" style="clear:both">
+            <span class="icon-16 icon-remindergray msa-img-reminder"
+                  v-bind:type="evaltype"
+                  style="float:right;margin-top:5px"></span>
+        </div>
+    </div>
+    <div class="msa-mg-addition-version391" style="z-index:11">
+        <span v-if="isEditMain() && IsMain && !checkRegionView() && item.IsShow > 0" 
+              v-bind:data-id="item.Id" 
+              class="msaHideOnRegionOverview dnbIgnoreDblClickEditGoal dnbTooltipDescriptionOnLive" 
+              @mouseover="e => onHoverShowTooltipAddSub(e.target)"
+              @mouseleave="e => onDestroyTooltipAddSub(e.target)"
+              v-bind:class="IconAddsubgoal" 
+              @click="MainOverViewAddSubGoal"></span>
+    </div>
+
+</div>

@@ -1,0 +1,128 @@
+﻿<section v-if="ViewByNavigationMenu"
+         :navmenu-directid="SubMarketProductId"
+         :product-id="item.Id"
+         v-bind:type="itemtype">
+    <div class="panel-heading panel-heading-common"
+         v-bind:class="[UiStyle.ClassBg]"
+         style="padding-left: 15px; display: flex; justify-content: space-between; padding-right: 4px;">
+        <div style="display:flex">
+            <h4 class="panel-title box-pointer" style="white-space:nowrap;min-width:232px; max-width:232px;">
+                <span v-if="item.ViewRightType != 'SubgoalProduct'"
+                      :class="[IcToggleClass]" style="cursor:pointer;"
+                      @click="onClickToggleShow"></span>
+                <span class="msa-text-ellips msa-product-name text-hover-underline"
+                      v-bind:style="{paddingLeft: item.ViewRightType == 'SubgoalProduct' ? '0' : ''}"
+                      style="padding-top:1px;cursor:pointer" :title="item.Name"
+                      @click="onClickToggleShow">{{item.Name}}</span>
+                <span class="msa-ic-font msa-toggle-expand-mg"
+                      v-bind:class="[IcCloseAllMaingoal]" style="margin-left: 6px"
+                      @click="(e) => {ToggelExpandAllMailGoal(e.target) }"></span>
+            </h4>
+            <!--View Default && ViewRightType == 'SubgoalProduct'-->
+            <div v-if="(!checkRegionView() && item.RoleId > 0)"
+                 style="display: inline-flex; width: 327px; justify-content: space-between; ">
+                <span class="msa-grp-btn-add-item">
+                    <span class="icon-16 icon-right-block icon-plus smAddGoal"
+                          @mouseover="e => onHoverShowTooltipAddGoalAction(e.target, 1)"
+                          @click="addMaingoalByNav"></span>
+                </span>
+                <span class="msa-grp-btn-add-item">
+                    <span class="icon-16 icon-right-block icon-plus" mstype="noGoal"
+                          @mouseover="e => onHoverShowTooltipAddGoalAction(e.target, 2)"
+                          @click="addSubgoalByNav"></span>
+                </span>
+            </div>
+        </div>
+        <div style="display:flex">
+            <span style="display:inline-flex">
+                <span v-show="item.RoleId > 0 && item.IsMasterGoalKpi" 
+                      class="master-title" 
+                      style="padding-right: 10px; margin-right: 10px;">{{kLg.textMastergoal}}</span>
+                <span v-show="(!checkRegionView() && item.RoleId > 0)" 
+                      style="margin: 0 7px 0 0; height:22px;padding-top:2px;">
+                    <span class="icon-16 icon-right-block icon-plus" 
+                          @mouseover="e => onHoverShowTooltipAddGoalAction(e.target, 3)"
+                          @click="addActionByNav"></span>
+                </span>
+
+            </span>
+            <div v-if="item.RoleId > 0"
+                 style="position: relative; border-left: 1px solid white; padding-left: 10px;" 
+                 class="msa-menu-override-uleft" >
+                <span class="icon-20 icon-open-w cursor-pointer" data-toggle="dropdown" style="display:inline-block"></span>
+                <ul role="menu" v-if="item.RoleId > 0"
+                    class="popup-menu dropdown-menu ms-popup-menu-left posAbsolute cursor-pointer msa-product-menu"
+                    style="right: 22px;top: 0;left: unset">
+                    <li>
+                        <a class="dropdow-menu-li-a" @click="clickMenuGotoSubmarketProduct">
+                            <span class="icon-24  icon-left-block icon-open"></span>{{kLg.tabSubMarketProduct}}
+                        </a>
+                    </li>
+                    <li role="presentation" class="divider"></li>
+                    <li v-if="item.RoleId > 0">
+                        <input type="checkbox" v-model="item.IsMasterGoalKpi" @change="onChangeMasterGoalKpi" style="float: left;margin-left: 12px;margin-top: 6px;margin-right: 10px;">
+                        <a class="dropdow-menu-li-a">
+                            <span>{{kLg.textMastergoal}}</span>
+                        </a>
+                    </li>
+                    <li role="presentation" class="divider"></li>
+                    <li>
+                        <a class="dropdow-menu-li-a" @click="clickMenuExport">
+                            <span class="icon-24 icon-left-block icon-export"></span>{{kLg.exportFragenset}}
+                        </a>
+                    </li>
+                    <li role="presentation" class="divider"></li>
+                    <li>
+                        <a class="dropdow-menu-li-a" @click="clickMenuImport">
+                            <span class="icon-24 icon-left-block icon-import"></span>{{kLg.importFragenset}}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div v-if="IsExpand"
+         v-bind:style="{maxWidth: StyleWithNavMenu}"
+         class="msgGoalExpandView msaTriggerResize collapse in">
+        <div v-if="ListMain.length"
+             data-queue-reload="false" :smk-product-id="item.SubMarketProductId"
+             class="msa-product-overview-list-maingoal zx dnbDraggGoalWr"
+             v-bind:class="[ClassExpand]"
+             style="width:100%;margin-left: 0px;border-bottom:0;">
+            <draggable v-if="ListMain.length"
+                       :list="ListMainDragDrop"
+                       v-bind:group="getGroupMain()"
+                       class="MIndexMaingoal"
+                       handle=".dnbHandleDragDropMaingoal"
+                       filter=".dnbIgnoreDragDropGoalCollapse"
+                       v-bind="DragdropOptions"
+                       @start="onDragStartMaingoal"
+                       @change="onDragChangeMaingoal"
+                       @end="onDragEndMaingoal"
+                       :move="onDragMoveGoal">
+                <MsaMainGoalOverView v-for="(mg, i) in ListMainDragDrop"
+                                     :key="'mg-product_' + mg.Id + '_' + mg.Mdf"
+                                     ref="RefViewMainGoal"
+                                     :goal="mg" itemtype="maingoal" bg="78BF52" />
+            </draggable>
+        </div>
+        <draggable v-else
+                   :list="ListMain"
+                   v-bind:group="getGroupMain()"
+                   class="MIndexMaingoal"
+                   handle=".dnbHandleDragDropMaingoal"
+                   v-bind="DragdropOptions"
+                   @start="onDragStartMaingoal"
+                   @change="onDragChangeMaingoal"
+                   @end="onDragEndMaingoal"
+                   :move="onDragMoveGoal">
+            <div class="drgdrpEmptyMain drgdrp-empty-item"
+                 drgdrp-id="00000000-0000-0000-0000-000000000000"
+                 drgdrp-mdf="-1"
+                 v-bind:drgdrp-regionid="getRegionId()"
+                 v-bind:drgdrp-smpid="item.SubMarketProductId"
+                 dragdroptype="1"></div>
+        </draggable>
+    </div>
+</section>

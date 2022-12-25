@@ -1,0 +1,335 @@
+﻿<div class="msa-maingoal-item frame-drgdrp" 
+     v-bind:class="ViewRightType == 'MaingoalNavMenu' ? 'nav_menu_viewright-goal_expand' : ''"
+     v-bind:navmenu-directid="MgId"
+     v-bind:drgdrp-id="goal.Id"
+     v-bind:drgdrp-mdf="goal.Mdf"
+     v-bind:drgdrp-smpid="goal.SubMarketProductId"
+     v-bind:drgdrp-regionid="getRegionId()"
+     v-bind:drgdrp-indid="goal.IndependencyId"
+     v-bind:sum-action="SumAction" dragdroptype="1"
+     v-bind:drgdrp-expand="IsExpand"
+     >
+    <div v-if="IsExpand && goal.Mdf > -1" :style="{backgroundColor: UiStyle.bg}"
+         class="panel-heading-common msa-viewmain-expand msa-bg-mg-collapsed msa-mg-collapse-head">
+        <div v-if="ViewRightType == 'MaingoalNavMenu'"
+             style="display: flex; align-items: center; height: 40px;">
+            <div class="collapse-allMailgoal"
+                 style="display: inline-flex; align-items:center; flex-grow:1;cursor:pointer;padding-left:12px;">
+                <span class="ms-tooltip font-14 msa-color1a msaMgCollapseBarName msa-mg-toggle-bar-name box-pointer TooltipFullMaingoal"
+                      style="overflow: hidden; white-space: pre; text-overflow: ellipsis; color: white; max-width: 213px;"
+                      @mouseover="e => onMouseoverTooltipMaingoal(e)">{{goal.Name}}</span>
+                
+                <span class="msa-ic-font text-before-color-white"
+                      v-bind:class="[ClassExpandCollapseSub]"
+                      style="color: #1a1a1a !important; cursor: pointer; margin-left: 4px;"
+                      @click="(e) => {CollapseExpandsubAll(e.target) }"></span>
+            </div>
+            <div v-if="!goal.IsRegionOverView && getRole() > 0" xx
+                 style="display: flex; min-width: 1313px; justify-content: space-between;">
+                <div style="display: flex; width: 327px; justify-content: space-between;">
+                    <span class="msa-grp-btn-add-item">
+                        <span class="icon-16 icon-right-block icon-plus smAddGoal"
+                              @mouseover="e => onHoverShowTooltipAddGoalAction(e.target, 1)"
+                              @click="addMaingoalByNav"></span>
+                    </span>
+                    <span class="msa-grp-btn-add-item">
+                        <span class="icon-16 icon-right-block icon-plus" mstype="noGoal"
+                              @mouseover="e => onHoverShowTooltipAddGoalAction(e.target, 2)"
+                              @click="addSubGoalWithoutMain"></span>
+                    </span>
+                </div>
+                <div style="display:flex;">
+                    <span class="msa-grp-btn-add-item" style="border-right: none;">
+                        <span class="icon-16 icon-right-block icon-plus"
+                              @mouseover="e => onHoverShowTooltipAddGoalAction(e.target, 3)"
+                              @click="addActionWithoutSub"></span>
+                    </span>
+                </div>
+
+            </div>
+        </div>
+        <div v-else
+             class="dnbHandleDragDropMaingoal msa-viewmain-exphead" >
+            <div @click="toggleMainDetail" class="collapse-allMailgoal"
+                 style="display: inline-flex; align-items:center; flex-grow:1;cursor:pointer;">
+                <span class="box-pointer" style="padding-left: 10px; padding-right: 10px; margin-top: -3px;">
+                    <span class="msa-ic-font font-arrow-down" style="color:white"></span>
+                </span>
+                <span class="ms-tooltip font-14 msa-color1a msaMgCollapseBarName msa-mg-toggle-bar-name box-pointer TooltipFullMaingoal"
+                      style="overflow: hidden;white-space:pre;text-overflow:ellipsis;color:white"
+                      @mouseover="e => onMouseoverTooltipMaingoal(e)">{{goal.Name}}</span>
+            </div>
+        </div>
+    </div>
+    <div v-if="IsExpand && goal.Mdf > -1" class="dnbIgnoreDragDropGoalCollapse">
+        <div class="msa-viewmain-detail">
+            <div v-if="ViewRightType == 'MaingoalDefault'"
+                 class="dnbIgnoreDragDropGoal">
+                <div style="display: flex;">
+                    <div class="goalaction-title-new goalaction-title-maingoal td-goal-title"
+                        style="padding-left: 36px; padding-top: 0; padding-bottom: 0; min-width: 286px; background-color: #9cd97c;height:40px;">
+                        <div class="msa-msg-head msa-css-allrole msaMaingoalTitle"
+                             style="max-width:333px;display:inline-flex;align-items:center;height:34px;">
+                            <input v-model="View_TitleMaingoal" v-if="IsEditTitleMain && getRole() > 0" 
+                                   @mouseleave="mouseLeaveEditTitleMain" 
+                                   v-on:keyup.enter="mouseLeaveEditTitleMain" 
+                                   maxlength="19" class="cssNameMainGoal span-to-input" />
+                            <span style="font-weight: 400; color: #1A1A1A; font-weight: bold; font-size: 14px; max-width: 242px;"
+                                  v-else @click="onClickEditTitleMain"
+                                  class="cssNameMainGoal">{{View_TitleMaingoal}}</span>
+                        </div>
+                    </div>
+                    <div style="width: 100%; padding-left: 13px; border-right: 0; background-color: #9cd97c; height: 40px;display:flex;align-items:center"
+                         class="goalaction-title-new goalaction-title-maingoal td-goal-title td-action-title">
+
+                        <span class="msa-ic-font msa-colorc1" 
+                              v-bind:class="[ClassExpandCollapseSub]"
+                              style="color: #1a1a1a!important;cursor:pointer;"
+                              @click="(e) => {CollapseExpandsubAll(e.target) }"></span>
+                        <div class="msa-msg-head h29px" style="max-width: 300px;margin-top:-3px;">
+                            <input v-if="IsEditTitleSub && getRole() > 0" v-model="View_TitleSubgoal" 
+                                   @mouseleave="mouseLeaveEditTitleSub" 
+                                   v-on:keyup.enter="mouseLeaveEditTitleSub"
+                                   class="cssNameSubGoal span-to-input" maxlength="19"/>
+                            <span v-else class="msaSubgoalTitle" style="padding-left:10px;" 
+                                  @click="onClickEditTitleSub">
+                                <span style="font-weight: 700;font-size:16px;color: #1A1A1A; font-size: 14px; font-weight: bold;"
+                                      class="cssNameSubGoal">{{View_TitleSubgoal}}</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="msa-viewmain-listsubgoal">
+                <div style="display: flex;">
+                    <div v-if="ViewRightType == 'MaingoalDefault'"
+                         class="cursor-pointer identifyGoal msa-maingoal-wrap msaTriggerResizeMg"
+                         mstype="mainGoal" isgoal="true"
+                         v-bind:goalid="goal.Id"
+                         v-bind:data-id="goal.Id"
+                         style="vertical-align:initial; min-height:490px">
+                        <draggable :list="[getListMain(goal.Id)]"
+                                   v-bind:group="getGroupMainExpand()"
+                                   class="MIndexMaingoalExpand"
+                                   handle=".dnbHandleDragDropMaingoal"
+                                   v-bind="DragdropOptions"
+                                   @start="onDragStartMaingoal"
+                                   @change="onDragChangeMaingoal"
+                                   @end="onDragEndMaingoal"
+                                   :move="onDragMoveGoal">
+                            <ItemMainSub v-if="ViewVisible.ShowOverview"
+                                         class="dnbHandleDragDropMaingoal"
+
+                                         v-bind:drgdrp-id="goal.Id"
+                                         v-bind:drgdrp-mdf="goal.Mdf"
+                                         v-bind:drgdrp-smpid="goal.SubMarketProductId"
+                                         v-bind:drgdrp-regionid="getRegionId()"
+                                         v-bind:drgdrp-indid="goal.IndependencyId"
+                                         dragdroptype="1" v-bind:sum-action="SumAction"
+                                         v-bind:drgdrp-expand="IsExpand"
+
+                                         :item="goal"
+                                         :Datemain="goal.Date"
+                                         :StartDatemain="goal.StartDate"
+                                         :hasSearchTypeCritias="hasSearchTypeCritias" />            <!--ItemMainSub component-->
+                        </draggable>
+                        
+                    </div>
+                    <div class="msa-subgoal-td divDropSubGoalVue msa-showall-subgoal msaSubgoalWrapVue">
+                        <div v-if="ViewVisible.IsShowSubgoalName"
+                             class="msa-sg-wrap-zebrabg"
+                             style="margin-top: -1px; background-color: white; height: 100%; cursor: pointer; border-bottom: 1px solid #f7f7f4; ">
+                            <draggable v-if="goal.ListSubGoal.length"
+                                       :list="goal.ListSubGoal"
+                                       v-bind:group="getGroupSub()"
+                                       class="MIndexSubgoal"
+                                       handle=".dnbHandleDragDropSubgoal"
+                                       filter=".dnbIgnoreDragDropGoal"
+                                       v-bind="DragdropOptions"
+                                       @start="onDragStartSubgoal"
+                                       @change="onDragChangeSubgoal"
+                                       @end="onDragEndSubgoal"
+                                       :move="onDragMoveGoal">
+                                <ViewSubGoalOverView v-for="(sg, i) in goal.ListSubGoal"
+                                                     :key="'sg-' + sg.Id"
+                                                     ref="RefViewSubGoal"
+                                                     :item="sg"
+                                                     :Datemain="goal.Date"
+                                                     :StartDatemain="goal.StartDate"
+                                                     :hasSearchTypeCritias="hasSearchTypeCritias" />            <!--ViewSubGoalOverView component-->
+                            </draggable>
+                            <draggable v-else
+                                       :list="goal.ListSubGoal"
+                                       v-bind:group="getGroupSub()"
+                                       class="MIndexSubgoal"
+                                       handle=".dnbHandleDragDropSubgoal"
+                                       filter=".dnbIgnoreDragDropGoal"
+                                       v-bind="DragdropOptions"
+                                       @start="onDragStartSubgoal"
+                                       @change="onDragChangeSubgoal"
+                                       @end="onDragEndSubgoal"
+                                       :move="onDragMoveGoal">
+                                <div class="drgdrpEmptySub drgdrp-empty-item"
+                                     drgdrp-id="00000000-0000-0000-0000-000000000000"
+                                     v-bind:drgdrp-pid="goal.Id"
+                                     v-bind:drgdrp-mdf="-1"
+                                     v-bind:drgdrp-smpid="goal.SubMarketProductId"
+                                     v-bind:drgdrp-regionid="getRegionId()"
+                                     v-bind:drgdrp-indid="goal.IndependencyId"
+                                     dragdroptype="2">
+                                </div>
+                            </draggable>
+                        </div>
+                        <div v-else
+                             class="msa-sg-wrap-zebrabg dnb-allsub-invisible"
+                             style="margin-top: -1px; background-color: white; height: 100%; cursor: pointer; border-bottom: 1px solid #f7f7f4;">
+                            <draggable :list="goal.ListSubGoal"
+                                       v-bind:group="getGroupSub()"
+                                       class="MIndexSubgoal"
+                                       handle=".dnbHandleDragDropSubgoal"
+                                       filter=".dnbIgnoreDragDropGoal"
+                                       v-bind="DragdropOptions"
+                                       @start="onDragStartSubgoal"
+                                       @change="onDragChangeSubgoal"
+                                       @end="onDragEndSubgoal"
+                                       :move="onDragMoveGoal">
+                                <div class="drgdrpEmptySub drgdrp-empty-item" 
+                                     drgdrp-id="00000000-0000-0000-0000-000000000000"
+                                     v-bind:drgdrp-pid="goal.Id"
+                                     v-bind:drgdrp-mdf="-1"
+                                     v-bind:drgdrp-smpid="goal.SubMarketProductId"
+                                     v-bind:drgdrp-regionid="getRegionId()"
+                                     v-bind:drgdrp-indid="goal.IndependencyId"
+                                     dragdroptype="2">
+                                </div>
+                            </draggable>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div v-if="IsExpand == false && goal.Mdf > -1"
+         class="panel-default ms-panel panel-block collapsed-maingoal GNavDroppable msa-no-overflow msaMaingoalParent">
+        <div class="panel-heading-common msaMgCollapseHead"
+             style="display: flex; justify-content: space-between; padding: 6px 8px 6px 5px">
+            <div @click="toggleMainDetail" class="expand-allMailgoal dnbHandleDragDropMaingoal"
+                 style="display: inline-flex; align-items:center; cursor: pointer;">
+                <span class="box-pointer" style="padding-left:10px; padding-right:10px;">
+                    <span class="msa-ic-font msa-mg-independ-ce msaIcCollapExpand msaMgIcCollapseExpand font-arrow-right"></span>
+                </span>
+                <div style="overflow: hidden;white-space:pre;text-overflow:ellipsis;"
+                    v-bind:style="{minWidth: StyleWithNavMenu.MainCollapseW, 
+                                maxWidth: StyleWithNavMenu.MainCollapseW }">
+                    <span class="font-14 msa-color1a box-pointer TooltipFullMaingoal"
+                          v-bind:style="[StyleNameWithNavMenu]"
+                          @mouseover="e => onMouseoverTooltipMaingoal(e)">{{goal.Name}}</span>
+                </div>
+                
+
+            </div>
+            <div class="dnbIgnoreDragDropGoal"
+                 style="display:inline-flex;margin-top:1px;" >
+                <div v-if="goal.Name"
+                     class="box-pointer" style="display: inline-flex; cursor: pointer;" 
+                     v-bind:style="{width: StyleWithNavMenu.MainCollWProd}"
+                     @click="toggleMainDetail">
+                    <div v-if="goal.ApEvaluation != null">
+                        <div evaltype="subgoal"
+                             class="maingoal-xx kpi-overview kpi-overview-goal kpi-overview-bgdown msa-mg-collapse-kpi" 
+                             v-bind:class="ColorApEvaluation">
+                            <span class="dnbIgnoreDblClickEditGoal" style="margin-top:2px">{{goal.ApEvaluation}}</span>
+                        </div>
+                    </div>
+                    <div v-else-if="goal.KpiOverViewPercent != 0" kpitype="maingoal" 
+                         class="maingoal-xx kpi-overview kpi-overview-goal msa-mg-collapse-kpi"
+                         v-bind:class="[ColorKpi, KpiOverview.ClsArrow, KpiOverview.ClsBg, KpiOverview.KpiBg]">
+                        <span class="xnxx"></span>
+                        <span class="dnbIgnoreDblClickEditGoal" style="margin-top: 2px;">{{goal.KpiOverViewPercentStr}}%</span>
+                    </div>
+                    <div v-else-if="goal.KpiOverViewIsShowPercent" kpitype="maingoal" 
+                         class="maingoal-xx kpi-overview kpi-overview-goal msa-mg-collapse-kpi"
+                         v-bind:class="[ColorKpi]">
+                        <span class="xnxx"></span>
+                        <span class="dnbIgnoreDblClickEditGoal" style="margin-top: 2px;">{{goal.KpiOverViewPercentStr}}%</span>
+                    </div>
+                     <div v-else-if="goal.KpiOverViewPercent == 0" kpitype="maingoal" class="maingoal-xx kpi-overview kpi-overview-goal msa-mg-collapse-kpi">
+                        <span class="xnxx"></span>
+                        <span style="margin-top: 2px;"></span>
+                    </div>
+                    <span class="gnav-text font-14"
+                          style="margin-left: 10px; min-width: 140px; max-height: 19px; overflow: hidden;width: 189px;">
+                        <span style="display:inline-block;min-width:172px;max-width:172px">{{StartDate}}{{EndDate}}</span>
+                        <i v-if="StartDate || EndDate" class="k-icon k-i-calendar msa-icon-calendar"></i>
+                    </span>
+                    <div style="display:inline-flex;min-width:129px;max-width:129px;">
+                        <span v-if="goal.Category" class="icon-24 icon-arrow-path-gray" style="margin-top:2px"></span>
+                        <span class="gnav-text font-14 msaMgCollapseBarCategory"
+                              style="margin-left: 5px; min-width: 100px; max-width: 100px; min-height: 19px; max-height: 20px; overflow: hidden;">{{goal.Category}}</span>
+                    </div>
+                    <div style="display: inline-flex;min-width:129px; max-width: 129px;">
+                        <span v-if="goal.ThePeople" class="icon-24 icon-arrow-path-gray" style="margin-top:2px"></span>
+                        <span class="gnav-text font-14 msaMgCollapseBarThePeople"
+                              style="margin-left: 5px; min-width: 100px; max-width: 100px; min-height: 19px; max-height: 20px; overflow: hidden;">
+                            {{goal.ThePeople}}
+                        </span>
+                    </div>
+                    <span class="nav-cell nav-border" style="display: inline-flex;" 
+                          v-bind:class="CssExceedCost.B">
+                        <span v-if="goal.Budget != null && goal.Budget > 0" class="nav-costtext">
+                            <span style="margin-right:2px;">B</span>
+                        </span>
+                        <span v-if="goal.Budget != null && goal.Budget > 0 && ViewCurrencyName"
+                              class="nav-current msa-currency-label">{{ViewCurrencyName}}</span>
+                        <span v-if="ValueCostEx" class="nav-current file-sub text-right" 
+                              style="padding-right: 6px">{{ValueCostEx}}</span>
+                    </span>
+                    <div class="nav-cell nav-border" style="display: inline-flex;"
+                         v-bind:class="CssExceedCost.Obig"
+                         v-if="(goal.IsMasterGoal || !goal.IsAssignMaster)">
+                        <span class="nav-costtext"><span style="margin-right: 2px;">O</span></span>
+                        <span class="nav-current msa-currency-label">{{goal.MasterCurrency}}</span>
+                        <span class="dnb-bopc-value text-right"
+                              style="width:100%; padding-right:6px;">{{goal.MarkBudget}}</span>
+                    </div>
+                    <div class="nav-cell nav-border" style="display: inline-flex;" 
+                         v-else-if="(goal.Budget !== null && goal.Budget > 0)"
+                         v-bind:class="CssExceedCost.o">
+                        <span v-if="goal.Budget !== null && goal.Budget > 0" class="nav-costtext">
+                            <span style="margin-right: 2px;">o</span></span>
+                        <span v-if="goal.Budget !== null && goal.Budget > 0 && ViewCurrencyName" 
+                              class="nav-current msa-currency-label">{{ViewCurrencyName}}
+                        </span>
+                        <span v-if="ValueCost" class="nav-current file-sub msaMgCollapseBarBudget text-right" 
+                              style="padding-right: 6px">{{ValueCost}}</span>
+                    </div>
+                    <div class="nav-cell nav-border" style="display: inline-flex;">
+                        <span v-if="goal.ExpectedCost" class="nav-costtext"><span style="margin-right:2px;">P</span></span>
+                        <span v-if="goal.ExpectedCost && ViewCurrencyName" class="nav-current msa-currency-label">
+                            {{ViewCurrencyName}}
+                        </span>
+                        <span class="nav-current file-sub text-right" style="padding-right: 6px">{{ExpectedCost}}</span>
+                    </div>
+                    <div class=" nav-cell nav-border" style="display: inline-flex;">
+                        <span v-if="goal.ActualCost" class="nav-costtext"><span style="margin-right:2px;">C</span></span>
+                        <span v-if="goal.ActualCost && ViewCurrencyName" 
+                              class="nav-current msa-currency-label text-right" style="text-align:left;">
+                            {{ViewCurrencyName}}
+                        </span>
+                        <span v-if="goal.ActualCost" class="nav-current file-sub text-right" style="padding-right: 6px">
+                            {{ActualCost}}
+                        </span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2px; min-width: 88px; text-align: right;">
+                    <span class="msa-grp-sum-msa" style="min-width: 66px; padding-right: 0px; align-items: center; justify-content: space-between; border-right: 0;">
+                        <span style="margin-right:6px;" v-if="goal.IsHasInvisibility" class="font-auge"></span>
+                        <span class="msa-sum-msa" style="display: inline-block;">{{goal.ChildCount}}</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

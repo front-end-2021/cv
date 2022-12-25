@@ -236,7 +236,6 @@ vmCommon.currentMarket = {};
 vmCommon.currentControl = undefined;
 vmCommon.IsWaitResult = true;
 vmCommon.clickTimeout = undefined;
-vmCommon.currentPageName = undefined;
 vmCommon.rootUrl = ``;
 vmCommon.PopupInstance = (function () {
     var checker = {};
@@ -2805,7 +2804,8 @@ vmCommon.enumPage = {
 
 vmCommon.checkCurrentPage = function (pageType) {
     var temp = pageType || "";
-    return getCurrentPageName().toLowerCase() === temp.toLowerCase();
+    return vmCommon.currentPageName.toLowerCase() === temp.toLowerCase();
+    //return getCurrentPageName().toLowerCase() === temp.toLowerCase();
 };
 
 function getCurrentPageName() {
@@ -2813,7 +2813,6 @@ function getCurrentPageName() {
     return pathName.substring(pathName.lastIndexOf("/") + 1, pathName.lastIndexOf("."));
 };
 
-//SONPT. 08/09/2015. 
 Array.prototype.contains = function (obj) {
     var i = this.length;
     while (i--) {
@@ -5261,12 +5260,10 @@ vmCommon.AddressBar = (function () {
             },
             get: clientQueryGet,
             getFullUrlEncoded: function () {
-
                 if (_clientQuery.fullUrlEncoded) return _clientQuery.fullUrlEncoded;
                 else return _fullUrl;
             },
             getActpopup: function () {
-
                 var actpp = clientQueryGet('actpopup');
                 return actpp == null ? '' : actpp;
             },

@@ -1,87 +1,3 @@
-/* Minification failed. Returning unminified contents.
-(1655,13,1701,14): run-time error JS1314: Implicit property name must be identifier: NewSouceDropdownlist() {
-                //laay landid tuf list filter
-                var items = this.filter.Items.filter(t => t.TypeValue == 23);
-                var landid, regionid;
-                var landIds = items.map(t => Number(t.ParentValue)).unique();
-                if (landIds.length == 1)
-                    landid = landIds.first();
-
-                var regionIds = items.map(t => Number(t.ChildValue)).unique();
-                if (regionIds.length == 1)
-                    regionid = regionIds.first();
-
-                //select landid
-                var olditem = this.filter.Items;
-                var market = sources.marketsegment.find(t => t.LandId == landid && t.TypeId ==1);
-                var subtitle = sources.subtitle.find(t => t.RegionId == regionid && t.TypeId == 2);
-
-                for (var i = 0; i < olditem.length; i++) {
-                    var item = olditem[i];
-                    var selectall = item.TypeSrc.find(t => t.Id == 30);
-                    if (selectall == undefined)
-                        continue;
-
-                    var marketTitle = market ? market.TitleName : kLg.lblMarktsegemente;
-                    var submartketTitle = subtitle ? subtitle.TitleName : kLg.lblSubmarket;
-
-                    selectall.set("Name", marketTitle + "/" + submartketTitle);
-                    if (item.TypeValue != 30) continue;
-
-                    //parent
-                    if (item.ParentSrc != undefined) {
-                        var bindmarket = item.ParentSrc.find(t => t.Id == 0);
-                        if (bindmarket != undefined) {
-                            bindmarket.set("Name", vmCommon.joinString(kLg.btnChoose, marketTitle));
-                            
-                        }
-                    }
-                    //child
-                    if (item.ChildSrc != undefined) {
-                        var bindmarket = item.ChildSrc.find(t => t.Id == 0);
-                        if (bindmarket != undefined) {
-                            
-                            bindmarket.set("Name", vmCommon.joinString(kLg.btnChoose, submartketTitle));
-                        }
-                    }
-                }
-            }
-(2155,13,2173,14): run-time error JS1314: Implicit property name must be identifier: onChangeShowDoneUndoneElement(e) {
-                var that = this;
-                that.set("isDisableFinishCbx", true);
-                that.onReloadData(function () {
-                    that.set("isDisableFinishCbx", false);
-                });
-                //this.onFilter(function (filterType) {
-                //    var cF = thisRef.filters.find(f => !f.Name);
-                //    if (cF) {
-                //        var ckc = cF.Items.find(i => i.TypeValue == mFilter.enumFilter.ShowFinishedElements);
-                //        if (ckc) {
-                //            var isShowD = thisRef.filter.IsShowDoneUndoneElement ? 'True' : 'False';
-                //            ckc.ParentValue = isShowD;
-                //        }; //console.log(filterType, thisRef.filters, ckc)
-                //    }
-                //    thisRef.set("isDisableFinishCbx", false);
-                //});
-
-            }
-(2174,13,2189,14): run-time error JS1314: Implicit property name must be identifier: onChangeShowNavigationMenu(e) {
-                const isShowNm = this.get('isShowNavigationMenu');
-                msFilter.dataService.showNavigation({ IsShowNavigationMenu: isShowNm },
-                    function (res) {
-                        if (MsaApp) MsaApp.IsShowNavigationMenu = isShowNm;
-                        toggleReportMenu(isShowNm);
-                        //if (isShowNm) {
-                        //    $("#lnkReport2").hide();
-                        //    $("#lnkPopActionPlanExportExcel").hide(); 
-                        //} else {
-                        //    $("#lnkReport2").show();
-                        //    $("#lnkPopActionPlanExportExcel").show();
-                        //}
-
-                    });
-            }
- */
 var msFilter = msFilter || {};
 var vmSMarket = vmSMarket || {};
 vmSMarket.filterCriteria = '';
@@ -523,14 +439,6 @@ msFilter.controlService = function () {
                 return { Id: t.Id, Name: t.Name + (isExist && landItem != null ? " (" + landItem.Name + ")" : "") };
             });
 
-            //mkSrc = Array.from(new Set(tempMkSrc.map(it => { return { Id: it.Id, LandId: it.LandId }; }).unique())).map(id => {
-            //    var mkItem = tempMkSrc.find(s => s.Id == id.Id && s.LandId == id.LandId);
-            //    var isExist = tempMkSrc.some(t => mkItem.Name == t.Name && mkItem.LandId != t.LandId);
-            //    var landItem = sources.landregion.find(t => t.Id == mkItem.LandId);
-
-            //    return { Id: id, Name: mkItem.Name + (isExist && landItem != null ? " (" + landItem.Name + ")" : "" ) };
-            //});
-
             //valid data
             var mk = mkSrc.find(t => t.Id == itemFilter.ParentValue);
             if (mk == undefined && itemFilter.ParentValue > 0) { itemFilter.ParentValue = 0; itemFilter.ChildValue = 0; }
@@ -965,16 +873,6 @@ msFilter.controlService = function () {
                     defaultItem = { Id: 0, Name: kLg.filterLabelSelect };
 
                     break;
-                //case mFilter.enumFilter.advertisingMaterial:
-                //    src = vmCommon.deepCopy(sources.advertisingMaterials);
-                //    defaultItem = { Id: 0, Name: kLg.lblNameAdvertisingMaterials };
-
-                //    break;
-                //case mFilter.enumFilter.advertiser:
-                //    src = vmCommon.deepCopy(sources.advertisers);
-                //    defaultItem = { Id: 0, Name: kLg.lblNameAdvertiser };
-
-                //break;
                 case mFilter.enumFilter.goalCategory:
                     src = vmCommon.deepCopy(sources.goalCategory);
                     defaultItem = { Id: 0, Name: kLg.filterLabelSelect };
@@ -985,11 +883,6 @@ msFilter.controlService = function () {
                     defaultItem = { Id: 0, Name: kLg.filterLabelSelect };
 
                     break;
-                //case mFilter.enumFilter.type:
-                //    src = vmCommon.deepCopy(sources.type);
-                //    defaultItem = { Id: 0, Name: kLg.filterLabelType };
-
-                //    break;
                 case mFilter.enumFilter.visibility:
                     src = vmCommon.deepCopy(sources.visibility);
                     defaultItem = { Id: 0, Name: kLg.filterLabelSelect };
@@ -1006,12 +899,6 @@ msFilter.controlService = function () {
                     defaultItem = { Id: 0, Name: (kLg.filterLabelSelect) };
 
                     break;
-
-                //case mFilter.enumFilter.lastStatus:
-                //    src = vmCommon.deepCopy(sources.protocolStatus);
-                //    defaultItem = { Id: 0, Name: kLg.gaLblStatus };
-
-                //    break;
             }
 
             //add show all
@@ -1079,19 +966,6 @@ msFilter.controlService = function () {
                     break;
                 }
             }
-
-            //for mastergoal, masterbudget, fibu
-            //0: normal, 1: and, 2: or
-            //var typies = [mFilter.enumFilter.masterGoalKpi, mFilter.enumFilter.masterGoal, mFilter.enumFilter.fibuKostenstellen];
-            //var rs = 0;
-            //if (typies.indexOf(item.TypeValue) == -1 || getBlockIndex(xitems, xposition) > 1) return rs;
-
-            //var previousItem = tempItems[xposition - 1];
-            //if (previousItem.TypeValue == mFilter.enumFilter.landregion)
-            //    return 1;
-            //else if (typies.indexOf(previousItem.TypeValue) > -1 && typies.indexOf(item.TypeValue) > -1)
-            //    return 2;
-
             return rs;
         };
 
@@ -1475,13 +1349,11 @@ msFilter.controlService = function () {
         $(".timefor").not(timeRangeDiv).addClass("hidden");
     };
 
-    var intervalFilter;
     var bindFilter = function (type, filters) {
         var temps = filters;
         var fm = buildingObjectFilter(temps);
         $("#msfilterpanel" + type).html($("#msfiltertemp").html());
 
-        if (vmCommon.checkCurrentPage(vmCommon.enumPage.ActionPlan)) toggleReportMenu(isShowNavigationMenu);
         models[type] = kendo.observable({
             isShowNavigationMenu: isShowNavigationMenu,
             IsClickToCheckChange: false,
@@ -1586,7 +1458,6 @@ msFilter.controlService = function () {
                         cF.SubFilter.IsSubPath = false;
                         cF.SubFilter.IsActionPath = false;
                     }
-                    vmCommon.getChildComponent(msRoadmapApp, "depth-filter").forEach(comp => comp.backup());
                 }
             },
             onReset: function () {
@@ -1674,14 +1545,11 @@ msFilter.controlService = function () {
                 for (var key in tempItem) {
                     item.set(key, tempItem[key]);
                 }
-                
-                //if (itemChange && (uniqueTypies.indexOf(itemChange.TypeValue) >= 0 || uniqueTypies.indexOf(tempItem.TypeValue) >= 0))
                 this.rebindUniqueType();
                 if (itemChange && (itemChange.TypeValue == mFilter.enumFilter.landregion || tempItem.TypeValue == mFilter.enumFilter.landregion)) this.rebindDependOnRegionType(itemIndex);
                 this.set("itemChange", null);
                 this.switchToDefaultFilter();
-                this.NewSouceDropdownlist();
-                
+                this.NewSouceDropdownlist();                
             },
             rebindUniqueType: function () {
                 var items = this.filter.Items;
@@ -1796,11 +1664,6 @@ msFilter.controlService = function () {
                 var tempItem = vmCommon.deepCopy(e.data);
                 var item = e.data;
                 var itemIndex = items.indexOf(item);
-
-
-
-                
-
                 bindData.bind(items, tempItem, itemIndex);                                   
                 for (var key in tempItem) {
                     item.set(key, tempItem[key]);
@@ -1964,26 +1827,6 @@ msFilter.controlService = function () {
                                 this.onFilter();
                                 break;
                         }
-
-                        //if (this.filter.TypeId == vmCommon.FilterType.RoadMap) {
-                        //    msRoadmapApp.setTimeRange(this.filter.SearchFilter.Start, this.filter.SearchFilter.End);
-                        //}
-
-                        //if (this.filter.SearchFilter.Start != null || this.filter.SearchFilter.End != null) {
-                        //    if (this.filter.TypeId == vmCommon.FilterType.Mix) {
-                        //        vmCalendar.setTimeRange(this.filter.SearchFilter.Start, this.filter.SearchFilter.End);                               
-                        //    }
-                        //    else if (this.filter.TypeId == vmCommon.FilterType.RoadMap) {
-                        //        msRoadmapApp.setTimeRange(this.filter.SearchFilter.Start, this.filter.SearchFilter.End);
-                        //    }
-                        //    else this.onFilter();
-                        //} else {
-                        //    if (this.filter.TypeId == vmCommon.FilterType.Mix)
-                        //        vmCalendar.mmFocusFirstRow();
-                        //    else if (this.filter.TypeId == vmCommon.FilterType.RoadMap) {
-                        //        //todo
-                        //    }
-                        //}
                     }
                     else this.onFilter();
                 }
@@ -2011,23 +1854,6 @@ msFilter.controlService = function () {
                                 this.onFilter();
                                 break;
                         }
-
-                        //if (this.filter.SearchFilter.Start != null || this.filter.SearchFilter.End != null) {
-                        //    if (this.filter.TypeId == vmCommon.FilterType.Mix) {
-                        //        vmCalendar.setTimeRange(this.filter.SearchFilter.Start, this.filter.SearchFilter.End);
-                        //    }
-                        //    else if (this.filter.TypeId == vmCommon.FilterType.RoadMap) {
-                        //        msRoadmapApp.setTimeRange(this.filter.SearchFilter.Start, this.filter.SearchFilter.End);
-                        //    }
-                        //    else this.onFilter();
-                        //}
-                        //else {
-                        //    if (this.filter.TypeId == vmCommon.FilterType.Mix)
-                        //        vmCalendar.mmFocusFirstRow();
-                        //    else if (this.filter.TypeId == vmCommon.FilterType.RoadMap) {
-                        //        //todo
-                        //    }
-                        //}
                     }
                     else this.onFilter();
                 }
@@ -2163,8 +1989,6 @@ msFilter.controlService = function () {
                     const actionLbling = subFilter.IsActionPath || false;
                     msRoadmapApp.setLabeling(mainLbling, subLbling, actionLbling);
                     msRoadmapApp.resetExpandPathBlocks();
-
-                    vmCommon.getChildComponent(msRoadmapApp, "depth-filter").forEach(comp => comp.backup());
                 }
 
                 var selectedFilter = convertToFilterModel(item);
@@ -2232,7 +2056,6 @@ msFilter.controlService = function () {
                 msFilter.dataService.showNavigation({ IsShowNavigationMenu: isShowNm },
                     function (res) {
                         if (MsaApp) MsaApp.IsShowNavigationMenu = isShowNm;
-                        toggleReportMenu(isShowNm);
                     });
             },
             ShowDoneUndoneElementName: kLg.ShowFinishedElements,
@@ -2308,19 +2131,6 @@ msFilter.controlService = function () {
         binded.pushx(type);
         bindingTimeRangeFilter(type);
 
-
-        //filter for redirection
-        if (vmCommon.checkCurrentPage(vmCommon.enumPage.ActionPlan)) {
-            intervalFilter = setInterval(function () {
-                if (typeof MsaApp == 'object') {
-                    MsaApp.checkGetSubmarketProductViewFirstCreate(true);
-                    clearInterval(intervalFilter);
-                } else {
-                    console.log("[redirect] waiting: MsaApp");
-                }
-            }, 100);
-        }
-
         // 18098, 19421 - Move the Date function
         let $msMoveTimeRange = $('th.ms-move-tr');
         let $timerange = $('#timerange');
@@ -2382,16 +2192,10 @@ msFilter.controlService = function () {
                     bindData.bind(temps, item, i);
                 }
                 fm.set("Items", temps);
-
-                //bindingSourceForObjectFilter(fm);
-                //model.set("filter", fm);
             }
 
             if (func instanceof Function) func();
         });
-
-        //targetFilter = undefined;
-        //init(filterType);
     };
 
     var init = function (type, callback) {
@@ -2405,53 +2209,24 @@ msFilter.controlService = function () {
             bindingTimeRangeFilter(type);
             return;
         }
-        msFilter.GetAllFilterDataPromise = new Promise(function (resolve, reject) {
-            msFilter.dataService.getAllFilterData({ TypeId: type }, function (res) {
-                if (!res.value) return;
+        msFilter.dataService.getAllFilterData({ TypeId: type }, function (res) {
+            if (!res.value) return;
 
-                var rs = res.value;
-
-                if (vmCommon.checkCurrentPage(vmCommon.enumPage.ActionPlan)) {
-                    isShowNavigationMenu = rs.IsShowNavigationMenu;
-                    if (MsaApp) MsaApp.IsShowNavigationMenu = isShowNavigationMenu;
-                }
-
-
-                if (vmCommon.AddressBar.ClientQuery.isActpopup()) {
-                    var _promise = vmCommon.AddressBar.ClientQuery.promise;
-                    if (_promise == undefined) {
-                        if (vmCommon.checkCurrentPage(vmCommon.enumPage.Dashboard) && typeof vmDashboard === 'object') {
-                            _promise = vmDashboard.AddressBar.promise;
-                        }
-                    }
-                    _promise && _promise.then(function (urlDecoded) {
-
-                        vmCommon.AddressBar.ClientQuery.query().Decode.setActpopup(urlDecoded);
-                        criterias = rs.Criterias;
-                        defaultRegion = rs.DefaultRegion;
-
-                        buildingSources(rs);
-                        bindFilter(type, rs.Filters);
-                        return urlDecoded;
-                    });
-
-                } else {
-                    criterias = rs.Criterias;
-                    defaultRegion = rs.DefaultRegion;
-
-                    buildingSources(rs);
-                    bindFilter(type, rs.Filters);
-                }
-
-                isReady = true;
-
-                if (typeof callback == 'function') {
-                    callback(rs);
-                }
-                resolve(rs);
-            });
+            var rs = res.value;
+            if (vmCommon.checkCurrentPage(vmCommon.enumPage.ActionPlan)) {
+                isShowNavigationMenu = rs.IsShowNavigationMenu;
+                if (MsaApp) MsaApp.IsShowNavigationMenu = isShowNavigationMenu;
+            }
+            criterias = rs.Criterias;
+            defaultRegion = rs.DefaultRegion;
+            buildingSources(rs);
+            if (!vmCommon.checkCurrentPage(vmCommon.enumPage.ActionPlan)) bindFilter(type, rs.Filters);
+            isReady = true;
+            if (typeof callback == 'function') {
+                callback(rs);
+            }
+            if (vmCommon.checkCurrentPage(vmCommon.enumPage.ActionPlan)) bindFilter(type, rs.Filters);
         });
-        
     };
 
     var getRegionAccountRoles = function () {

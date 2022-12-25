@@ -765,18 +765,16 @@
     vmGoalAction.popKpiMasterTopic = undefined;
     vmGoalAction.popKpiMasterIndex = undefined;
     vmGoalAction.popCrmLink = undefined;
-
     var kpi = {}, actionModel, isBindingFirstTime = true;
     var selectableTopics = [];
     var kpiUnits = [], settings = undefined, kpiFormatTypes = [], kpiMasterSettings = undefined;
-
     vmKpiAction.destroyPop = function () {
         if (vmGoalAction.popActionIndex == null) return;
 
         vmGoalAction.popActionIndex.destroy();
         vmGoalAction.popActionIndex = null;
         $(".navbar-collapse.collapse.block-nav").after("<div id='popActionIndex'></div>");
-        actionIndexApp.$destroy();
+        if(!!actionIndexApp) actionIndexApp.$destroy();
     };
 
     vmGoalAction.popActionIndex.bind("close", function (e) {
@@ -2819,7 +2817,7 @@
     var actionIndexApp;
     $(function () {
         actionModel = vmGoalAction.kpiActionOptions.actionModel;
-
+        if(!actionModel) return;
         kpi.KpiData = vmCommon.deepCopy(actionModel.KpiData);
         kpi.KpiMasterData = vmCommon.deepCopy(actionModel.KpiMasterData);
 

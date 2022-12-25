@@ -1,0 +1,118 @@
+﻿<div class="msa-column-group"
+     v-bind:class="stylereducesmall"
+     :column-mindex="item.MIndex"
+     :data-mcount="item.MCount" >
+    <div class="msa-flex msa-column-vdirection" 
+        :direction-id="'column_'+ item.Id"
+        style="height:100%;">
+        <div class="msa-subgoal-view-column divSortColumnItem">
+            <div class="msa-subgoal-column">
+                <div class="msa-subgoal-col-item">
+                    <div style="display:inline-flex;flex-direction:column;">
+                        <div class="msa-subgoal-col-item-head dnbHandleDragDropColumn" 
+                             :data-mcount="item.MCount">
+                            <span >
+                                <input v-if="IsEditColumnTitle" maxlength="50" 
+                                       class="cssInputColumnName dnbIgnoreDragDropColumn"
+                                    v-model="View_ColumnName" 
+                                    @mouseleave="hideInputEditColumnTitle"
+                                    v-on:keyup.enter="hideInputEditColumnTitle"/>
+                                <span v-else data-role="tooltip"
+                                      class="ms-tooltip"
+                                      @mouseover="e => showTooltipColumnName(e)"
+                                      @click="(e) => { onCountEditColumn(e.target) }">
+                                    <span class="cssNameColunm">{{View_ColumnName}}</span>
+                                </span>
+                            </span>
+                            
+                            <span v-if="IsShowDelete && getRole() > 0">
+                                <span class="icon-16 msa-ic-font font-delete msa-action-delete dnbIgnoreDragDropColumn" 
+                                      @click="deleteColumn"></span>
+                            </span>
+                        </div>
+                        <div class="msa-subgoal-col-item-body" :data-mcount="item.MCount">
+                            <div v-if="Columns_OneAction.length > 1" class="dnb-v-column" style="display:flex;">
+                                <draggable v-for="(lstAction, _i) in Columns_OneAction"
+                                           :key="'virtual-col' + _i"
+
+                                           :list="lstAction"
+                                           group="MIndexAction"
+                                           class="group-Action"
+                                           handle=".dnbHandleDragDropAction"
+                                           filter=".dnbIgnoreDragDropAction"
+                                           v-bind="getDragdropActionOptions()"
+                                           @start="onDragStartAction"
+                                           @change="onDragChangeAction"
+                                           @end="onDragEndAction"
+                                           :move="onDragMoveAction">
+                                    <ViewAction v-for="(act, i) in lstAction"
+                                                :key="'msa-action_' + act.Id + '_colid_' + item.Id"
+                                                ref="RefViewAction"
+                                                v-bind:drgdrp-columnid="item.Id"
+                                                :item="act" 
+                                                :hasSearchTypeCritias="hasSearchTypeCritias" v-if="act.IsShow" />
+                                </draggable>
+                                
+                            </div>
+                            <draggable v-else-if="VListAction.length"
+                                       :list="VListAction"
+                                       group="MIndexAction"
+                                       class="group-Action"
+                                       handle=".dnbHandleDragDropAction"
+                                       filter=".dnbIgnoreDragDropAction"
+                                       v-bind="getDragdropActionOptions()"
+                                       @start="onDragStartAction"
+                                       @change="onDragChangeAction"
+                                       @end="onDragEndAction"
+                                       :move="onDragMoveAction">
+                                <ViewAction v-for="(act, i) in VListAction"
+                                            :key="'msa-action_' + act.Id + '_colid_' + item.Id"
+                                            ref="RefViewAction"
+                                            v-bind:drgdrp-columnid="item.Id"
+                                            :item="act"
+                                            :hasSearchTypeCritias="hasSearchTypeCritias" v-if="act.IsShow" />
+                            </draggable>
+                            <draggable v-else
+                                       :list="VListAction"
+                                       group="MIndexAction"
+                                       class="group-Action"
+                                       handle=".dnbHandleDragDropAction"
+                                       filter=".dnbIgnoreDragDropAction"
+                                       v-bind="getDragdropActionOptions()"
+                                       @start="onDragStartAction"
+                                       @change="onDragChangeAction"
+                                       @end="onDragEndAction"
+                                       :move="onDragMoveAction">
+                                <div class="drgdrp-empty-item"
+                                     drgdrp-id="00000000-0000-0000-0000-000000000000"
+                                     drgdrp-mdf="-1"
+                                     v-bind:drgdrp-sgid="getSubgoalId()"
+                                     v-bind:drgdrp-columnid="item.Id"
+                                     v-bind:drgdrp-smpid="getSubMarketProductId()"
+                                     v-bind:drgdrp-indid="getIndependencyId()"
+                                     v-bind:drgdrp-regionid="getRegionId()"
+                                     drgdrp-mindex="0"
+                                     dragdroptype="3">
+                                </div>
+                            </draggable>
+
+                            <div v-if="VListAction.length < 1 && getRole() > 0"
+                                 class="liHideOnNoAccess dnbAddActionInColumnNoItem"
+                                 v-bind:style="{top: StyleAddActionWithNavMenu}"
+                                 style="margin:0; display:inline-block; position:absolute; left:15px;">
+                                <div class="div-add msa-action-addnocolumn msaddnewactionicon">
+                                    <span class="cursor-pointer add-action msa-add-action"
+                                          @click="showPopupAddActionInColumn">
+                                        <span class="msa-ic-font font-plus" style="font-size:10px"
+                                              @mouseover="e => showTooltipAddActionOnRight(e)"
+                                              @mouseleave="e => hideTooltipAddActionOnRight(e)"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

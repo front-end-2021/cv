@@ -202,16 +202,9 @@
             } else {
                 that.CallbackFunc != undefined && that.CallbackFunc != null && that.CallbackFunc(columnId);
             }
-
-            //setTimeout(function () {
-            //    msFilter.controlService.reLoadDataFilter();
-            //}, 1000);
-
             setTimeout(function () {
                 msFilter.controlService.reLoadDataFilter();
             }, 100);
-
-            //vmGoalAction.redirectTo(columnId);
         };
 
         if (entryData.Id == 0) {

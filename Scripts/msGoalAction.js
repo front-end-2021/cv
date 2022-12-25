@@ -36,52 +36,6 @@ vmGoalAction.SelectorId = {
     done: function (actionStr) { this.action = 'done ' + actionStr }
 }
 
-
-//ready
-$(function () {
-    vmCommon.AddressBar.Self();         // use instant object (like const variable in javascript ECMA 5-6)
-    vmGoalAction.loadSetting();
-    if (!vmCommon.checkCurrentPage(vmCommon.enumPage.ActionPlan)) {
-        return;
-    }
-    else {
-        // check currentPage để hàm khởi tạo chạy đúng vì hàm khởi tạo cũng được chạy ở page khác
-        // và file msGoalAction.js cũng được nhúng cùng ở page khác
-        msFilter.controlService.init(vmCommon.FilterType.ActionPlan);
-    }
-
-    var objQuery = new queryString(true);
-    var fromDash = objQuery.get('fromdash') || null,
-        fromSm = objQuery.get('fromsm') || null,
-        firstCreate = (objQuery.get('firstCreate')) || null;
-    if (firstCreate) firstCreate = parseInt(firstCreate);
-
-    if (firstCreate == null && fromSm == null && fromDash != 'true') {
-        if (msFilter.GetAllFilterDataPromise) {
-            msFilter.GetAllFilterDataPromise.then(function (dataValue) {
-                vmCommon.AddressBar.ClientQuery.promise.then(function (urlDecoded) {
-                    
-                    vmGoalAction.loadDataFirstTime();
-
-                    return urlDecoded;
-                });
-
-            });
-        } else {
-            vmGoalAction.loadDataFirstTime();
-        }
-    }
-
-    document.title = kLg.tabActionPlan;
-    vmGoalAction.setupLanguage();
-   
-    $('body').append($('#nprogressActionPlanDisableAll'));
-    $('#nprogressActionPlanDisableAll').on('click', function (ev) {
-        ev.stopImmediatePropagation();
-    });
-    
-});
-
 window.onresize = function onresize() {
     var windowWidth = $('body').width() - 40;
 
@@ -111,19 +65,19 @@ window.onresize = function onresize() {
 };
 
 vmGoalAction.dataservice = (function () {
-    var callAjaxGoalAction = function (divId, funcName, entryData, requestType, successCallBack) {
-       
-        var url = "../Handlers/MsGoalAction.ashx?funcName=" + funcName + "&projid=" + sHandler.ProjectId + "&strid=" + sHandler.StrategyId + "&lang=" + kLg.language;
-        
-        return callAjax(divId, url, entryData, successCallBack, requestType);
+    var callAjaxGoalAction = function (divId, funcName, entryData, requestType, successCallBack) {       
+        var url = "../Handlers/MsGoalAction.ashx?funcName=" + funcName + "&projid=" + sHandler.ProjectId + "&strid=" + sHandler.StrategyId + "&lang=" + sHandler.Lang;        
+        return callAjax(divId, url, entryData, successCallBack, requestType).then((data) => {
+            if(typeof successCallBack == 'function') successCallBack(data); return data;
+        });
     };
 
     var callAjaxByPost = function (funcName, entryData, successFunc, loadingdiv) {
-        return callAjaxGoalAction(loadingdiv || 'loading-goalaction', funcName, JSON.stringify(entryData), AjaxConst.PostRequest, successFunc);
+        return callAjaxGoalAction(loadingdiv || 'loading-goalaction', funcName, entryData, AjaxConst.PostRequest, successFunc);
     };
 
     var callAjaxByPostWithOutLoading = function (funcName, entryData, successFunc) {
-        return callAjaxGoalAction("", funcName, JSON.stringify(entryData), AjaxConst.PostRequest, successFunc);
+        return callAjaxGoalAction("", funcName, entryData, AjaxConst.PostRequest, successFunc);
     };
 
     var callAjaxByGet = function (funcName, entryData, successFunc, loadingdiv) {
@@ -134,7 +88,6 @@ vmGoalAction.dataservice = (function () {
                 url += "&" + propertyName + "=" + entryData[propertyName];
             }
         }
-
         callAjax(loadingdiv || 'loading-goalaction', url, null, successFunc, AjaxConst.GetRequest);
         
     };
@@ -507,23 +460,16 @@ vmGoalAction.loadDataFirstTime = function () {
         if (serData.Role < 0) {
             return;
         }
-
         if (typeof MsaApp == 'object') {
             MsaApp.pushLoadTimeActions('vmGoalAction.dataservice.loadDataFirstTime');
-            
-            MsaApp.setData(serData.value, 'loadDataFirstTime');      //vmGoalAction.loadDataFirstTime
+            MsaApp.setData(serData.value, 'loadDataFirstTime'); 
         }
-
         vmGoalAction.Role = serData.value.Role;
-
         vmGoalAction.simpleView = serData.value.Data.Item1;
-
         vmGoalAction.GoalActionViews = serData.value.Data.Item2;
         vmGoalAction.MsRegionRole = serData.value.MsRegionRole;
-
         vmGoalAction.IsOverdue = serData.value.IsOverdue;
         vmGoalAction.IsCheckActionDate = serData.value.IsCheckActionDate;
-
         var mgid = vmCommon.AddressBar.ClientQuery.Decode.get('mgid');
         mgid && vmGoalAction.expandService.addX(mgid, 1000); // MaingoalNav: 1000
         vmCommon.AddressBar.SubGoal && vmGoalAction.expandService.addX(vmCommon.AddressBar.SubGoal, 2000); // SubgoalNav: 2000
@@ -531,7 +477,6 @@ vmGoalAction.loadDataFirstTime = function () {
         smid && vmGoalAction.expandService.addX(smid, 1); // submarketId: 1
         var independid = vmCommon.AddressBar.ClientQuery.Decode.get('independid');
         independid != '0' && vmGoalAction.expandService.addX(independid, 2); // indItems: 2
-
     });
 };
 
@@ -547,7 +492,30 @@ vmGoalAction.getLandActionType = function () {
     var objQuery = new queryString(true);
     return parseInt(objQuery.get('landactiontype')) || null;
 };
+//ready
+$(function () {
+    vmCommon.AddressBar.Self();         // use instant object (like const variable in javascript ECMA 5-6)
+    vmGoalAction.loadSetting();
+    if (!vmCommon.checkCurrentPage(vmCommon.enumPage.ActionPlan)) {
+        return;
+    }
+    else {
+        // check currentPage để hàm khởi tạo chạy đúng vì hàm khởi tạo cũng được chạy ở page khác
+        // và file msGoalAction.js cũng được nhúng cùng ở page khác
+        msFilter.controlService.init(vmCommon.FilterType.ActionPlan, function(data){
+            vmGoalAction.loadDataFirstTime();
+        });
+    }
 
+    document.title = kLg.tabActionPlan;
+    vmGoalAction.setupLanguage();
+   
+    $('body').append($('#nprogressActionPlanDisableAll'));
+    $('#nprogressActionPlanDisableAll').on('click', function (ev) {
+        ev.stopImmediatePropagation();
+    });
+    
+});
 function updateNameMainGoal(id, text, isNav) {
     editMainGoalUnload(id, text, isNav);
 }
@@ -565,13 +533,6 @@ function editMainGoalUnload(id, text, isNav) {
 
     }, AjaxConst.PostRequest);
 }
-
-//vmGoalAction.editColunmUnload = function (id, text, isNav, cb) {
-//    var obj = { Id: id, Name: text };
-//    this.dataservice.updateColumnName(obj, function (data) {
-//        cb != null && typeof cb == 'function' && cb();
-//    });
-//}
 
 function bindSwitchSpanToInputLibTileMainGoal(updateNameMainGoal, cssSelector, removeHover, addHover, maxlength) {
 
@@ -1093,7 +1054,6 @@ vmGoalAction.getState = function (simpleView) {
     var rs = {};
     return rs;
 }
-
 vmGoalAction.compairState = function () {
     var that = this;
     if (JSON.stringify(that.getState(that.simpleViewState)) == JSON.stringify(that.getState(that.simpleView))) {
@@ -1103,7 +1063,6 @@ vmGoalAction.compairState = function () {
         return false;
     }
 }
-
 vmGoalAction.visibleIndependencyRole = function (roleId) {
     if (roleId >= vmCommon.MemberRole.Edit) {
         $("#btnAddIndependency").removeClass("bg-disable");
@@ -1117,16 +1076,12 @@ vmGoalAction.visibleIndependencyRole = function (roleId) {
         $(".overallthread").addClass("hidden");
     }
 };
-
-
 vmGoalAction.bindOverallView = function (dataEntry, firstCreate, saveFilter) {
     $('#goalActionView').empty();
     $('#regionoverview').empty();
     $('#independencyView').empty();
 
 };
-
-
 vmGoalAction.loadSetting = function () {
     var promise = new Promise(function (resolveFnc, rejectFnc) {
         vmGoalAction.dataservice.getSetting(null, function (serverData) {
@@ -1172,8 +1127,6 @@ vmGoalAction.loadSetting = function () {
         vmCommon.AddressBar.ClientQuery.promise = promise;
     }
 };
-
-
 vmGoalAction.openPopSelectRegion = function () {
     vmGoalAction.popSelectRegion = showPopup(vmGoalAction.popSelectRegion,
         $("#popActionFibu"),
@@ -1186,7 +1139,6 @@ vmGoalAction.openPopSelectRegion = function () {
         }
     );
 };
-
 vmGoalAction.openPopSubProduct = function (title) {
     vmGoalAction.popSubProduct = showPopup(vmGoalAction.popSubProduct,
         $("#popActionFibu"),
@@ -1199,7 +1151,6 @@ vmGoalAction.openPopSubProduct = function (title) {
         }
     );
 };
-
 vmGoalAction.openPopupActionFibu = function (actionId) {
     if (vmGoalAction.fibuOptions.hasData) {
         vmGoalAction.showPopFibu(kLg.titleActionFibu);
@@ -1356,246 +1307,14 @@ vmGoalAction.bindIndependencyConnection = function (res) {
     $.each(sp, function (index, item) {
         item.Id = newId++;
     });
-
     return sp;
 };
-
-//vmGoalAction.openPopAddMaingoal = function (entry) {
-//    vmGoalAction.dataservice.getGoal(entry, function (serData) {
-
-//        if (vmCommon.checkConflict(serData.value.ResultStatus)) {
-//            vmGoalAction.goalOptions = {
-//                GoalType: vmCommon.GoalType.MainGoal,
-//                IsMasterGoalKpi: serData.value.AreaInfo.IsMasterGoalKpi
-//                //,ParentId: -1
-//            };
-
-//            var info = entry.infoX;
-//            var e = entry.eX;
-
-//            vmGoalAction.currency.Name = info.CurrencyName;
-
-//            //if (info.IndependencyId) {
-//            //    vmFilter.bindIndependencyConnection(serData.value.CustomConnection);
-//            //} else {
-//            //    vmGoalAction.bindCustomConnection(e, serData.value.CustomConnection);
-//            //}
-
-//            vmGoalAction.goalOptions.customConnection = info.IndependencyId ? vmGoalAction.bindIndependencyConnection(serData.value.CustomConnection) : vmGoalAction.bindCustomConnection(e, serData.value.CustomConnection);
-
-//            vmGoalAction.goalOptions.RegionSelectable = serData.value.RegionSelectable;
-//            vmGoalAction.goalOptions.ActionPlanRegions = serData.value.ActionPlanRegions;
-//            vmGoalAction.goalOptions.KpiGoalSelectable = serData.value.KpiGoalSelectable;
-//            vmGoalAction.goalOptions.IsHasKpi = serData.value.IsHasKpi;
-//            vmGoalAction.goalOptions.MasterGoal = serData.value.MasterGoal;
-
-//            vmGoalAction.goalOptions.DefaultKpi = serData.value.DefaultKpi;
-//            //vmFilter.HasMasterGoal = serData.value.HasMasterGoal;
-//            vmGoalAction.goalOptions.HasMasterGoal = serData.value.HasMasterGoal;
-
-//            vmGoalAction.Role = serData.value.RoleId;
-//            vmGoalAction.goalOptions.isRedirect = true;
-
-//            $.extend(vmGoalAction.goalOptions, info);
-//            //var wrSDate = $('#fc-wr-startdate').data("kendoDatePicker").value();
-//            vmGoalAction.goalOptions.parentStart = new Date();//wrSDate ? wrSDate : new Date();
-//            vmGoalAction.goalOptions.parentEnd = null;
-//            vmGoalAction.goalOptions.parentMasterId = null;
-
-//            vmGoalAction.goalOptions.SubProductGroups = serData.value.SubProductGroups;
-//            vmGoalAction.goalOptions.SubClientGroups = serData.value.SubClientGroups;
-//            vmGoalAction.goalOptions.IsHasKpiReport = serData.value.IsHasKpiReport;
-
-//            //vmGoalAction.setSubProductSubClientByAddNew(vmGoalAction.addType.MainGoal, info.ProductId, info.SubMarketId);
-//            var title = $(e).closest('td').find('div:eq(0) span').text() || kLg.labelMainGoalName;
-//            //var smkId = info.SubMarketProductId, inpId = info.IndependencyId, spanId = "";
-//            //if (inpId == undefined) {
-//            //    spanId = smkId + "tmg";
-//            //} else {
-//            //    spanId = inpId + "tmg";
-//            //}
-//            //title = $('#' + spanId).text();
-//            //if (title == "" || title == undefined) {
-//            //    title = kLg.labelMainGoalName;
-//            //}
-
-//            vmGoalAction.showAddGoalPopup(kLg.titlepAddMainGoalNew1 + htmlEscape(title) + kLg.titlepAddMainGoalNew2);
-//        }
-//    });
-//};
-
-//vmGoalAction.openPopUpFileAssignFromDisplay = function (goalId, type) {
-//    // bind lại bằng vuejs nên comment lại truyền type và goalid ừ vuejs sang
-    
-//    vmFile.objectId = goalId;
-//    var url = "../Handlers/DFolderHandler.ashx?funcName=getoldassignedfile&projid=" + projectId + "&strid=" + strategyId;
-//    callAjax("file-loading", url, JSON.stringify({ assignidu: goalId, type: type }), function (res) {
-//        vmFile.oldAssignedFile = res.Data;
-//        vmFile.CurrentRole = res.Role;
-
-//        vmFile.idFileAssigned.fileids = [];
-//        vmFile.idFileAssigned.contents = [];
-//        vmFile.contentFileAssigned = [];
-//        vmGoalAction.checkOpenPopup = true;
-
-//        if (vmFile.oldAssignedFile) {
-//            vmCommon.pushApply(vmFile.idFileAssigned.fileids, vmFile.oldAssignedFile, function (item) { return "cbx" + item.Id; });
-//            vmCommon.pushApply(vmFile.idFileAssigned.contents, vmFile.oldAssignedFile);
-//            vmCommon.pushApply(vmFile.contentFileAssigned, vmFile.oldAssignedFile);
-
-//            if (vmFile.oldAssignedFile.length > 0 || vmFile.CurrentRole === vmCommon.MemberRole.View) {
-//                vmFile.openPopUpFileAssign();
-//            } else {
-//                vmFile.openPopUpToAssign('openassign');
-//            }
-//        }
-//    }, AjaxConst.PostRequest);
-//};
-
-//vmGoalAction.redirectToRoadmap = function () {
-//    var queue = []
-//    var flag = true;
-//    var goalId = queue.pop();
-//    if (queue.length === 0) {
-//        flag = false;
-//    }
-//    if (goalId) {
-//        var url = '/Pages/MsRoadmap.aspx?lang=' + kLg.language + '&projid=' + projectId + '&strid=' + strategyId;
-//        url += '&gotomix=1';
-//        vmGoalAction.dataservice.cloneFilterToMix({ goalid: goalId }, function (res) {
-//            window.open(url, "_blank");
-//        });
-//    }
-//};
-
-//vmGoalAction.duplicateMainGoal = function (entryData,e, startdate, enddate) {
-//    var $parentElement = $(e).parents('td[isgoal=true]'),
-//        mstype = $(e).attr('data-mstype') || $parentElement.attr('mstype'),
-//        message = kLg.msgConfirmDuplicateMG,
-//        masterIds = [];
-//    var info = vmGoalAction.getChildElem(e);
-//    var goalId = $(e).attr('data-id') || $parentElement.attr('data-id'),
-//        mdf = $(e).attr('data-mdf') || $parentElement.attr('mdf');
-//    var mainGoalName = "", maingoalId;
-//    //truyền entry từ vuejs nên bỏ entry cũ
-//    //var entryData = { goalId: goalId, mdf: mdf, startdate: null, enddate: null, isMainGoal: true };
-
-//    if (mstype === "mainGoal") {
-//        //task: 7382
-//        var maingoal = vmGoalAction.findGoalById(goalId, vmGoalAction.getSourceByInfo(info));
-//        if (maingoal == undefined) {
-//            return;
-//        }
-//        mainGoalName = maingoal.Name;
-//        maingoalId = maingoal.Id;
-
-//        if (maingoal.MasterId) {
-//            masterIds.push(maingoal.MasterId);
-//        }
-
-//        for (var i = 0; i < maingoal.ListSubGoal.length; i++) {
-//            var subgoal = maingoal.ListSubGoal[i];
-
-//            if (subgoal.MasterId) {
-//                if (masterIds.indexOf(subgoal.MasterId) === -1) {
-//                    masterIds.push(subgoal.MasterId);
-//                }
-//            }
-
-//            for (var j = 0; j < subgoal.ListAction.length; j++) {
-//                var action = subgoal.ListAction[j];
-//                if (action.MasterId) {
-//                    if (masterIds.indexOf(action.MasterId) === -1) {
-//                        masterIds.push(action.MasterId);
-//                    }
-//                }
-//            }
-//        }
-
-//    } else if (mstype === "subGoal") {
-//        entryData.isMainGoal = false;
-//        maingoalId = $parentElement.attr('parentId');
-//        var _list = vmGoalAction.getSourceByInfo(info);
-//        var maingoal2 = vmGoalAction.findGoalById(maingoalId, _list);
-//        if (maingoal2 == undefined) {
-//            return;
-//        }
-
-//        var subgoal2 = vmGoalAction.findSubGoalById(goalId, maingoal2.ListSubGoal);
-//        if (subgoal2 == undefined) {
-//            return;
-//        }
-
-//        if (subgoal2.MasterId) {
-//            masterIds.push(subgoal2.MasterId);
-//        }
-
-//        for (var k = 0; k < subgoal2.ListAction.length; k++) {
-//            var action2 = subgoal2.ListAction[k];
-//            if (action2.MasterId) {
-//                if (masterIds.indexOf(action2.MasterId) === -1) {
-//                    masterIds.push(action2.MasterId);
-//                }
-//            }
-//        }
-//    }
-
-//    ynConfirmDuplicate(message, startdate, enddate).then(function () {
-//        var sdate = $('#txtCopyStartDate').data("kendoDatePicker").value();
-//        var edate = $('#txtCopyEndDate').data("kendoDatePicker").value();
-//        if ($("#txtCopyStartDate").data("kendoDatePicker").enable() !== false) {
-//            entryData.startdate = vmCommon.tryToServerDate(sdate);
-//        }
-//        if ($("#txtCopyEndDate").data("kendoDatePicker").enable() !== false) {
-//            entryData.enddate = vmCommon.tryToServerDate(edate);
-//        }
-
-//        vmGoalAction.dataservice.duplicateGoal(entryData, function (serData) {
-//            if (!serData.value.MainGoalId) {
-//                pAlert(kLg.msgConflickData).then(function () {
-//                    vmGoalAction.reloadOpenMasterGoalArea({ smpIds: [info.SubMarketProductId], indIds: [info.IndependencyId] });
-//                });
-//                return;
-//            }
-//            else {
-//                var maingoalId = serData.value.MainGoalId;
-//                var goalIdArr = serData.value.GoalId;
-
-//                vmGoalAction.expandService.addX(maingoalId, 1000);
-
-//                if (goalIdArr.length > 0) {
-//                    goalIdArr.forEach(item => {
-//                        vmGoalAction.expandService.addX(item, 2000);
-//                    })
-//                }
-
-//                if (entryData.isMainGoal) {
-//                    vmGoalAction.redirectTo(maingoalId);
-//                }
-//                else {
-//                    vmGoalAction.redirectTo(goalIdArr[0]);
-//                }
-
-//                if (mainGoalName !== "") {
-//                    vmGoalAction.goalFilterService.updateItemFilter(info.SubMarketProductId ? info.SubMarketProductId : info.IndependencyId, { Id: serData.value.GoalId, Name: mainGoalName });
-//                }
-
-//                if (mstype === "subGoal")
-//                    vmGoalAction.expandService.addSubgoalNavItem(goalId);
-
-//                if (info.IsMasterGoal)
-//                    msFilter.controlService.reLoadDataFilter();//vmFilter.reBindFilter();
-//            }
-//        });
-//    });
-//};
 
 vmGoalAction.showAddSubGoal = function (e, selfElmName) {
     vmGoalAction.getOpenArea(e);
     var $parentElem = $(e).parents('td[mstype=mainGoal]'),
      info = vmGoalAction.getChildElem(e);
-    var mainGoalId = $(e).attr('data-id') || $parentElem.attr('goalId');
-        
+    var mainGoalId = $(e).attr('data-id') || $parentElem.attr('goalId');        
     var entryData = {
         goalId: vmCommon.emptyGuid,
         independencyId: info.IndependencyId,
@@ -1616,7 +1335,6 @@ vmGoalAction.showAddSubGoal = function (e, selfElmName) {
             };
 
             vmGoalAction.currency.Name = info.CurrencyName;
-
             vmGoalAction.goalOptions.customConnection = info.IndependencyId ? vmGoalAction.bindIndependencyConnection(serData.value.CustomConnection) : vmGoalAction.bindCustomConnection(e, serData.value.CustomConnection);
 
             vmGoalAction.goalOptions.RegionSelectable = serData.value.RegionSelectable;
@@ -4597,10 +4315,7 @@ vmGoalAction.deleteColumn = function (e) {
             vmGoalAction.dataservice.deleteColumn(entryData, function (serData) {
 
                 msFilter.controlService.reLoadDataFilter(vmCommon.FilterType.ActionPlan, function () {
-                    var info = vmGoalAction.getChildElem(e);
-                    that.bindChild(info.SubMarketProductId, info.IndependencyId);
-
-                    vmGoalAction.ReloadOpenArea({ smp: [info.SubMarketProductId], ind: [info.IndependencyId] });
+                    
                 });
             });
         });
@@ -4944,10 +4659,7 @@ vmGoalAction.DeleteIndependency = function (e, type) {
                             var childs = $parent.find("div[mstype=childArea]");
                             if (childs.length === 0) {
                                 $parent.remove();
-                                var pId = $parent.attr("parentId");
-
                             } else {
-
                                 if (isMasterGoal) {
                                     if ($parent.find("div[mstype='childArea'] span[class='master-title']").length === 0) {
                                         var temp = $parent.find("div[class~='panel-heading-mass-parent']")[0];
@@ -4956,12 +4668,8 @@ vmGoalAction.DeleteIndependency = function (e, type) {
                                 }
                             }
                         }
-
                         vmGoalAction.reloadMasterFilter();
                     }
-
-                    vmGoalAction.ReloadOpenArea();
-                    //vmGoalAction.reLoadOpenIndependencyMaster();
                     vmGoalAction.reloadMasterGoalKpiTitle();
                 }
             });
@@ -5520,10 +5228,6 @@ vmGoalAction.GoalUpdateMaster = function (goalId, smpId, indId) {
 
         if (maingoal == undefined) {
             return;
-        }
-
-        if ($.grep(maingoal.ListSubGoal, function (it) { return it.MasterId != null && it.MasterId !== vmCommon.emptyGuid }).length > 0) {
-            vmGoalAction.ReloadOpenArea({ smp: [smpId], ind: [indId] });
         }
     }
 };
@@ -6341,80 +6045,8 @@ vmGoalAction.reloadOpenMasterGoalArea = function (except) {
     //independency
     $("#independencyView span.master-title[type='child']").not(".hidden").each(function () { var childid = isNaN($(this).attr("tid")) ? 0 : parseInt($(this).attr("tid")); if ($("#collapseChildIndepend" + childid).data("hasData") && except.indIds && except.indIds.indexOf(childid) == -1) indIds.push(childid); })
 
-    //smpIds.forEach(function (id) {
-    //    vmGoalAction.bindChild(id, null);
-    //});
-
-    //indIds.forEach(function (id) {
-    //    vmGoalAction.bindChild(null, id);
-    //});
 };
 
-vmGoalAction.ReloadOpenArea = function (expects) {      // thay thế = hàm reloadOpenProduct và hàm reLoadOpenIndependencyMaster
-    var temps = expects || { smp: [], ind: [] };
-
-    var smpArea = $("#goalActionView div[mstype='child']");
-    var smpView = $("#regionoverview div[mstype='child']");
-    var indArea = $("#independencyView div[mstype='child']");
-
-    //independency
-    var independencies = [];
-    for (var i = 0; i < indArea.length; i++) {
-        var iselector = indArea[i];
-        var id = Number($(iselector).attr("independencyid"));
-        if ($(iselector).hasClass("in") || $(iselector).data("hasData")) {
-            if (independencies.indexOf(id) === -1 && temps.ind.indexOf(id) === -1) {
-                independencies.push(id);
-            }
-        }
-    }
-
-    if (independencies.length > 0) {
-        vmGoalAction.bindChildMaster(independencies);
-    }
-
-    //submarketproduct
-    var submarketproducts = [];
-    for (var j = 0; j < smpArea.length; j++) {
-        var selector = smpArea[j];
-        var sid = $(selector).attr("submarketproductid");
-        if ($(selector).hasClass("in") || $(selector).data('hasData')) {
-            if (submarketproducts.indexOf(sid) === -1 && temps.smp.indexOf(sid) === -1) {
-                submarketproducts.push(sid);
-            }
-        }
-    }
-
-    for (var j = 0; j < smpView.length; j++) {
-        var selector = smpView[j];
-        var sid = $(selector).attr("submarketproductid");
-        if ($(selector).hasClass("in") || $(selector).data('hasData')) {
-            if (submarketproducts.indexOf(sid) === -1 && temps.smp.indexOf(sid) === -1) {
-                submarketproducts.push(sid);
-            }
-        }
-    }
-
-    //for (var k = 0; k < submarketproducts.length; k++) {
-    //    vmGoalAction.bindChild(submarketproducts[k], null);
-    //}
-};
-//vmGoalAction.reloadOverview = function () {    
-//    var smpInd = {};
-//    if (vmGoalAction.goalOptions) {
-//        smpInd = {
-//            smp: [vmGoalAction.goalOptions.SubMarketProductId],
-//            ind: [vmGoalAction.goalOptions.IndependencyId]
-//        };
-//    } else if (vmGoalAction.actionOptions) {
-//        smpInd = {
-//            smp: [vmGoalAction.actionOptions.SubMarketProductId],
-//            ind: [vmGoalAction.actionOptions.IndependencyId]
-//        };
-//    };
-//    vmGoalAction.bindChild(smpInd.smp[0], smpInd.ind[0], true);
-//    vmGoalAction.ReloadOpenArea(smpInd);
-//};
 vmGoalAction.expandService = (function () {
     "use strict";
 
@@ -7060,16 +6692,6 @@ vmGoalAction.checkFitSubProductSubClientV3 = function (item, typeFilter, addOpti
                 msFilter.controlService.removeItemFilter(mFilter.enumFilter.market);
 
             return isResetSubClient;
-        //case vmFilter.enumFilter.marketScope:
-        //var itemFilters = msFilter.controlService.getItemFilters(mFilter.enumFilter.marketScope);
-        //for (var i = 0; i < itemFilters.length; i++) {
-        //filter = itemFilters[i];
-        //if (filter.TypeValue === vmFilter.enumFilter.marketScope) {
-        //vmGoalAction.fitCriterias.push({ TypeValue: vmFilter.enumFilter.marketScope, ParentValue: filter.ParentValue, ChildValue: filter.ChildValue, ChildValue1: filter.ChildValue1 });
-        //}
-        //}
-
-        //return isResetSubClient;
         default:
             return false;
     }
@@ -7461,7 +7083,6 @@ vmGoalAction.getCustomerJourneyColumn = function (colId, mainGoalId) {
 };
 
 vmGoalAction.hasResultsFilter = function (id, parentId, smkId, indId) {
-    //var isHasProduct = msFilter.controlService.hasCriteria(mFilter.enumFilter.productGroup);
     var areaId = smkId || indId;
 
     if (!id || id === vmCommon.emptyGuid) {
@@ -7473,17 +7094,6 @@ vmGoalAction.hasResultsFilter = function (id, parentId, smkId, indId) {
     if (typeof areaCpn.getGoalActionResult != 'function') return [];
     var rsIds = areaCpn.getGoalActionResult(id);
     return !rsIds.some(t => t != id);
-    //var isResult = $("#" + id).is("[result]");
-    //var mgroup = $("#" + id).attr("mgroup");
-
-    //if (isResult) {
-    //    var collapeId = (smkId ? "collapseProd" : "collapseChildIndepend") + areaId;
-    //    var count = $("#" + collapeId).find("div[result][mgroup=" + mgroup + "]").length;
-
-    //    return !(count > 1);
-    //} else {
-    //    return false;
-    //}
 };
 
 vmGoalAction.isActionFitFilterMaster = function (id, parentId, firstIds, lastIds) {
@@ -8485,6 +8095,8 @@ vmGoalAction.openPopUpAction2 = function (info) {
 };
 
 vmGoalAction.checkEnableSI = function (action) {
+    if(!action) return;
+    if(!action.ActionCosts) return;
     var costs = $.grep(action.ActionCosts, function (it) { return it.DataState !== dataState.Deleted; });
     var todos = action.ActionTodos;
 

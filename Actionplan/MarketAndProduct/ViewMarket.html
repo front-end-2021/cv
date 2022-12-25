@@ -1,0 +1,27 @@
+﻿<section v-bind:type="itemtype">
+    <div class="market-title-vue box-pointer"
+         v-if="CheckShowMarketLabel.IsShowMarketLabel"
+         v-bind:class="[UiStyle.ClassBg]">
+        <span :class="[IcToggleClass]" style="cursor:pointer;"
+              @click="onClickToggleShow"></span>
+        <span class="text-hover-underline font-16" style="margin-left: 10px;cursor:pointer" 
+              @click="onClickToggleShow">{{item.Name}}</span>
+    </div>
+    <div class="market-content-vue"
+         v-bind:style="[CheckShowMarketLabel.Style]" v-if="IsExpand">
+        <MsaViewMarket v-if="children != undefined" 
+                       style="box-shadow: 0 0 10px #00000029; margin-top:-5px;"
+                       v-for="(pg, i) in children"
+                      :key="'list-product-group-' + pg.Id + '_' + i + '_key-force-update-' + 1"
+                       ref="RefViewProductGroup"
+                      :products="pg.Products" :item="pg" 
+                      bg="5cc8fb" itemtype="ProductGroup" />
+
+        <MsaViewProduct v-if="products != undefined" v-for="(p, i) in products"
+                        :key="'list-product-' + p.Id + '_' + i + '_key-force-update-' + 1"
+                        ref="RefViewProduct"
+                        :item="p"
+                        itemtype="Product" />
+
+    </div>
+</section>

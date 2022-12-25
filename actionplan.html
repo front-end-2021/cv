@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title>Road Map</title>
+    <title>Action plan</title>
     <meta name="robots" content="noindex, nofollow" />
     <link href="css/bootstrap.css" rel="stylesheet" />
     <meta http-equiv='cache-control' content='no-cache' />
@@ -15,11 +15,12 @@
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
     <link href="css/calendar.css" rel="stylesheet" />
     <link rel="stylesheet" href="css/popupeditboard.css">
-    <link href="css/msRoadmap.css" rel="stylesheet" />
+    <link href="css/msGoalAction.css" rel="stylesheet" />
+    <link href="css/style-actionplan.css" rel="stylesheet" />
 
     <script src="Language/en.js"></script>
     <script src="Scripts/commonService.js"></script>
-    <script src="Scripts/rmService.js"></script>
+    <script src="Scripts/acService.js"></script>
     <script src="Scripts/jquery.js"></script>
     <script src="Scripts/bootstrap.js"></script>
     <script src="Scripts/kendo.js"></script>
@@ -717,7 +718,6 @@
             <!--/.nav-collapse -->
 
         </div>
-
     </div>
     <div class="clear"></div>
     <div id="divloading" class="loading"></div>
@@ -727,11 +727,11 @@
             </li>
             <li><a class="cursor-pointer menu_max_width" id="linkSubMarketSegment">Teilmarkt Produktstrategie</a><div class="arrow-top"></div>
             </li>
-            <li><a class="cursor-pointer menu_max_width" id="linkActionGoal">Action Plan</a><div class="arrow-top"></div>
+            <li class="active-li-top"><a class="cursor-pointer menu_max_width" id="linkActionGoal">Action Plan</a><div class="arrow-top"></div>
             </li>
             <li><a class="cursor-pointer menu_max_width" id="linkMarketingCalendar">Marketingmix/Einasatzplanung</a><div class="arrow-top"></div>
             </li>
-            <li class="active-li-top"><a class="cursor-pointer menu_max_width" id="linkRoadmap">Roadmap</a><div class="arrow-top"></div>
+            <li><a class="cursor-pointer menu_max_width" id="linkRoadmap">Roadmap</a><div class="arrow-top"></div>
             </li>
             <li><a class="cursor-pointer menu_max_width" id="linkTeamboard">Team board</a><div class="arrow-top"></div>
             </li>
@@ -745,7 +745,6 @@
     <div class="clear"></div>
     <script>
         var vmDefaultMaster = vmDefaultMaster || {};
-
         vmDefaultMaster.updateScreen = function () {
             var docHeight = $(window).height();
             $('.body-content').css('height', docHeight - 135 + 'px');
@@ -762,20 +761,15 @@
 
             });
         };
-
         vmDefaultMaster.setupResize = function () {
             $(window).resize(function () {
                 vmDefaultMaster.updateScreen();
             });
         };
-
         $(function () {
             vmDefaultMaster.updateScreen();
-
             vmDefaultMaster.setupResize();
         });
-
-
     </script>
 
     <script id="kpigoalviewtemplate" type="text/html">
@@ -871,6 +865,11 @@
         #var times = data[d].KpiOutcomeTimes;#
         #var indexes = data[d].KpiIndexes;#
         
+        <%--<div class="dnb-kpi-av-tmp-head">
+            <span class="icon-28 icon-network-gray"></span>
+            <span style="margin-left:6px;">#: data[d].AdvertiserName #</span>
+        </div>--%>
+        
         <div class="kpidivview" style="width: 100%;">
             <table style="margin-bottom: 20px;">
                 <thead>
@@ -956,37 +955,154 @@
     </script>
     <div class="clear"></div>
     <div class="body-content">
+        <script src="Scripts/msGoalAction.js"></script>
+        <script id="template-x-goal" type="text/html">
+            <span>abc</span>
+        </script>
         <div id="nprogressActionPlanDisableAll"></div>
-        <div id="loadingRoadmap" class="loading"></div>
+        <div id="popEditMainGoal"></div>
+        <div id="popEditAction"></div>
+        <div id="popEditIndependence"></div>
+        <div id="popEditName"></div>
+        <div id="popEditOverallThread"></div>
         <div id="popkpigoal"></div>
         <div id="popkpigoaltopic"></div>
         <div id="popkpigoalindex"></div>
         <div id="popkpigoalaction"></div>
         <div id="popConnectionOverview"></div>
+        <div id="popDescriptionMarket" style="overflow: auto hidden;"></div>
+        <div id="popSubmarketEval"></div>
         <div id="popGoalActionEval"></div>
-        <div id="popExportRoadmap"></div>
+        <div id="popCustomerJourneySeAssignColunm"></div>
+        <div id="popimport"></div>
         <div class="div-info-measuresplan">
-            <div id="msfilterpanel14"></div>
+            <div>
+                <div id="msfilterpanel2"></div>
+            </div>
+            <div class="clear"></div>
+            <section id="goalactionApp" class="goalaction-vue-wrap"></section>
+            <script src="Scripts/msGoalActionVue.js"></script>
+            <script src="Actionplan/NavigationMenu/NavigationMenu.js"></script>
+            <script src="Actionplan/Actionplan.js"></script>
         </div>
-        <div class="clear"></div>
-
-        <script src="Scripts/msGoalAction.js"></script>
-
-        <div id="RoadmapApp"></div>
-        <script src="Scripts/msRoadmap.js"></script>
-        <script src="MsRoadmap/RoadmapApp.js"></script>
-        <script src="MsRoadmap/Navigator/RoadMapNavigator.js"></script>
-
     </div>
     <script src="Scripts/raphael-min.js"></script>
-
+    
+    <script type="text/html" id="tempShowDescription">
+        <div style="min-width: 50px; max-width: 300px" >
+            <div class="row-wrapper">            
+                <div class="content-break-word" style="text-align: center; color:black;font-size: 14px">#:data#</div>
+                <div class="clear"></div>
+            </div>
+        </div>
+   </script>
+    <script src="Scripts/jquery.ui.touch-punch.min.js"></script>
 
     <script type="text/javascript">
-        $(function () {
-            document.title = kLg.captiontabRoadmap;
-            msFilter.controlService.init(vmCommon.FilterType.RoadMap, function (data) {
-                msRoadmapApp.setLabeling();
-            });
+        var vmGoalActionDragDrop = vmGoalActionDragDrop || {};
+        vmGoalActionDragDrop.ErrorsState = {
+            NoRole: -6,
+            Conflict: -3
+        };
+        $('#goalactionbound').on('keydown', function (e) {
+            if (e.keyCode === 9) {
+                e.preventDefault();
+                return;
+            }
         });
+        var actionClone = null;
+
+        function GetMovingType(moving) {
+            if (!moving.SourceThemaId && moving.DesThemaId) {
+                return movingType.SubmarketProductToIndependency;
+            }
+            if (moving.SourceThemaId && !moving.DesThemaId) {
+                return movingType.IndependencyToSubmarketProduct;
+            }
+            if ((!moving.SourceSmpId && !moving.DesSmpId) && (moving.SourceThemaId != moving.DesThemaId)) {
+                return movingType.IndependencyToIndependency;
+            }
+            if ((!moving.SourceThemaId && !moving.DesThemaId) && (moving.SourceSmpId != moving.DesSmpId)) {
+                return movingType.SubmarketProductToSubmarketProduct;
+            }
+            return movingType.Other;
+        };
+
+        var movingType = {
+            Other: 0,
+            SubmarketProductToIndependency: 1,
+            IndependencyToSubmarketProduct: 2,
+            IndependencyToIndependency: 3,
+            SubmarketProductToSubmarketProduct: 4
+        };
+
+        function widthGroupActionView(isMarket) {
+
+            var substract = isMarket ? (vmSetting.ProjectInfo.IsShowMarketLabel ? 50 : 3) : 0;
+
+            var windowWidth = $('#goalactionbound').width() - 42 - 286 * 2 - substract;;
+            return 'width:' + windowWidth + 'px';
+        }
+        function styleColumnScroll(kpiLength) {
+            var kpiWidth = kpiLength < 3 ? kpiLength * 268 : 2 * 268;
+            var width = $('#goalActionView').width() - 661 - kpiWidth;
+            if ($('#independencyView').length > 0) {
+                width = $('#independencyView').width() - 661 - kpiWidth;
+            }
+            if (kpiLength < 2) width += 466;
+            else {
+                width -= 28;
+            }
+            return 'max-width:' + width + 'px';
+        };
+        function styleActionViewGroup(kpiLength) {
+            var kpiWidth = kpiLength < 3 ? kpiLength * 268 : 2 * 268;
+            var width = $('#goalActionView').width() - 666 - kpiWidth;
+            if ($('#independencyView').length > 0) {
+                width = $('#independencyView').width() - 666 - kpiWidth;
+            }
+            return 'min-width:' + width + 'px';
+        }
+
+        vmGoalAction.bindingTemplate = function (tempId, data) {
+            var templateContent = $("#" + tempId).html();
+            data = data || {};
+
+            var template = kendo.template(templateContent);
+            return template(data);
+        };
+
+        function getSubmarketIndependencySelector(smpId, indId) {
+            return vmCommon.getSubmarketIndependencySelector(smpId, indId);
+        }
+
+        function invalidDragDropTable(selector) {
+            if (!selector) return true;
+            var invalid = false;
+            invalid = $(selector.closest("div[mstype='parentArea']")).height() < 50 || $(selector.closest("div[mstype='child']")).height() < 30;
+            return invalid;
+        }
+
+        $("#goalactionbound").on("click", ".todo-overview", function (e) {
+            let actionId = $(e.currentTarget).attr("actionid");
+            if (!actionId) return;
+
+            var action = vmGoalAction.getGoalActions(vmCommon.GoalActionContentType.Action).find(t => t.Id == actionId);
+            if (!action) return;
+
+            let todos = action.ActionTodos;
+            let tooltipContent = buildSubActionDescription({ ActionTodos: todos, IsShowFinish: true });
+            if (tooltipContent) {
+                $(e.target).kendoTooltip({
+                    autoHide: true,
+                    hide: function (e) { e.sender.destroy(); },
+                    position: "top",
+                    content: tooltipContent
+                });
+
+                $(e.target).trigger('mouseenter');
+            }
+        });
+
     </script>
 </body>

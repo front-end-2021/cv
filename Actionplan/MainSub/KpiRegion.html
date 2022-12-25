@@ -1,0 +1,36 @@
+﻿<div class="kpiregion msa-kpiregion">
+    <div style="overflow: hidden;height: 23px;">
+        <span style="font-weight: bold;font-size: 16px;max-height:28px;display:inline-block;overflow:hidden;text-overflow:ellipsis;max-width:184px;white-space:nowrap"
+              class="msa-kpiregion-name">{{kpiRegion.Name}}</span>
+        <span class="icon-20 icon-url pull-right pointer kpiregionurl msa-kpiregionurl" style="margin-top: 2px;" urltype="-1" @click="onOpenLink(-1)"></span>
+    </div>
+    <div class="clear"></div>
+    <div style="margin-top: 24px;height:20px;margin-bottom:30px">
+        <div class="kpiregionpercent">
+            <div style="position:relative;" v-bind:style="{left: percent + '%'}">
+                <span style="position:absolute;color:black;font-size:13px;top:-18px;" v-bind:style="{left: left + 'px'}">{{krPercent}}%</span>
+            </div>
+            <div style="position:relative">
+                <span class="msa-kpipoint" v-bind:style="{width: width  + '%'}"></span>
+                <img class="kpiregionbg" src="../Images/bg-kpiregion.png" />
+            </div>
+        </div>
+        <span class="icon-20 kpi-arrow-right" style="float: left;margin-left: 10px; display:none;"></span>
+    </div>
+    <div v-for="pitem in kpiRegion.PercentItems">
+        <hr class="clear" style="margin-top: 8px;margin-bottom: 9px;opacity:0">
+        <div>
+            <div style="height:20px;">
+                <div class="pull-left" v-bind:class="percentItemStyle(pitem).bg" style="width: 46px;height: 18px;border-radius: 0;margin-right:10px;text-align:center;color:white;font-size: 13px ">
+                    {{percentItemStyle(pitem).range}}%
+                </div>
+                <div class="pull-left msa-color1a" style="width: 130px;overflow: hidden;height: 20px;">
+                    <span class="msa-text-bold" style="margin-right:5px;margin-left:8px">{{pitem.Count}}</span>
+                    <span>{{pitem.Count > 1 ? kLg.textActions: kLg.textAction}}</span>
+                </div>
+                <span class="icon-20 pull-right pointer kpiregionurl" style="margin-right: 0;margin-top: -2px;"
+                      v-bind:class="{'icon-url-disabled msa-kpiregionurl-0': pitem.Count == 0, 'icon-url msa-kpiregionurl': pitem.Count > 0}" @click="onOpenLink(pitem.Count > 0 ? pitem.TypeId : null)"></span>
+            </div>
+        </div>
+    </div>
+</div>

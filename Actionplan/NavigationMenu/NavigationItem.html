@@ -1,0 +1,187 @@
+﻿<div v-bind:focus-id="FocusAttr.Id" 
+     v-bind:focus-parentid="FocusAttr.ParentId"
+     v-bind:focus-typeid="FocusAttr.TypeId">
+    <div class="msa-menu-item-wrap"
+         v-bind:class="[ClassSelect]"
+         v-bind:style="{display: StyleShow, backgroundColor: StyleBgFocus.bg}"
+         style="width: 303px; clip-path: polygon(0 0, 95% 0, 100% 50%, 95% 100%, 0 100%);">
+        <!--Item Land-->
+        <div v-if="menuType == 'Land'"
+             class="msa-menu-head-color msaNavMenuNameTooltip navmenu-style1line font-16"
+             @mouseover="mouseOverShowTooltip"
+             v-bind:class="[ClassHover]"
+             style="width:255px;max-width:255px;"
+             @click="onClickSelect">
+            <span class="msaNavMenuName">{{item.Name}}</span>
+        </div>
+        <!--Item Independence-->
+        <!--@mouseover="onMouseoverShowMenu"-->
+        <div v-else-if="menuType == 'Independence'"
+             class="msa-menu-head-color msaNavMenuNameTooltip navmenu-style1line font-16"
+             @mouseover="mouseOverShowTooltip"
+             @mouseleave="onHideMenu"
+             v-bind:class="[ClassHover]"
+             style="width:255px;max-width:255px;"
+             @click="onClickSelect">
+            <span class="msaNavMenuName">{{item.Name}}</span>
+        </div>
+        <!--Item Region-->
+        <div v-else-if="menuType == 'Region'"
+             class="msa-menu-head-color msaNavMenuNameTooltip navmenu-style1line font-16" style="width: 256px; max-width: 256px;"
+             @mouseover="mouseOverShowTooltip"
+             @click="onClickSelect">
+            <span class="msaNavMenuName">&#8212; {{item.Name}}</span>
+        </div>
+        <!--Item Main goal-->
+        <!--@mouseover="onMouseoverShowMenu"-->
+        <div v-else-if="menuType == 'Maingoal'"
+             class="msa-menu-head-color msa-menu-head-goal navmenu-style1line"
+             @mouseleave="onHideMenu"
+             v-bind:class="[ClassHover]"
+             style="padding-left: 25px;display:inline-flex">
+            <span>&nbsp;</span>
+            <div class="msa-menu-item-maingoal">
+                <span class="rm-icon-maingoal msa-menu-head-color"
+                      style="cursor: pointer; margin-right: 5px;padding-left:0;margin-bottom:5px;"></span>
+                <div @click="onClickSelect"
+                     @mouseover="mouseOverShowTooltip"
+                     style="min-width: 150px; display: inline-block; height: 18px; text-overflow: ellipsis; width: 186px; overflow: hidden;"
+                     class="msa-menu-item-name tb-disable-select dnbDblclickMenuItemName msaNavMenuNameTooltip">
+                    <span class="msaNavMenuName">{{item.Name}}</span>
+                </div>
+            </div>
+        </div>
+        <!--Item Sub goal-->
+        <div v-else-if="menuType == 'Subgoal'"
+             class="msa-menu-head-color msa-menu-head-goal navmenu-style1line"
+             v-bind:class="[ClassHover]"
+             style="padding-left: 35px;display:inline-flex">
+            <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <div class="msa-menu-item-maingoal" style="display:flex;align-items:center;">
+                <span style="display: inline-block;height: 15px;margin-top: -5px;margin-right: 4px;">
+                    <span class="rm-icon-subgoal"
+                          style="cursor: pointer; margin-right: 5px;display:inline-block;min-width:6px;width:6px;min-height:6px;height:6px;"></span>
+                </span>
+                <div @click="onClickSelect"
+                     @mouseover="mouseOverShowTooltip"
+                     style="min-width: 150px; display: inline-block; height: 20px; text-overflow: ellipsis; width: 169px; overflow: hidden;"
+                     class="msa-menu-item-name tb-disable-select dnbDblclickMenuItemName msaNavMenuNameTooltip">
+                    <span class="msaNavMenuName">{{item.Name}}</span>
+                </div>
+            </div>
+        </div>
+        <!--Item Product || Theme-->
+        <!--@mouseover="onMouseoverShowMenu"-->
+        <div v-else-if="menuType == 'Product' || menuType == 'Theme'"
+             style="width: 256px; max-width: 256px;"
+             class="msa-menu-head-color msaNavMenuNameTooltip navmenu-style1line"
+             @mouseover="mouseOverShowTooltip"
+             @mouseleave="onHideMenu"
+             @click="onClickSelect">
+            <span class="msaNavMenuName">&#8212; {{item.Name}}</span>
+        </div>
+        <!-- Item Stakeholdergroup -->
+        <div v-else
+             class="msa-menu-head-color msaNavMenuNameTooltip navmenu-style1line" style="width: 256px; max-width: 256px;"
+             @mouseover="mouseOverShowTooltip"
+             @click="onClickSelect">
+            <span class="msaNavMenuName">&#8212; {{item.Name}}</span>
+        </div>
+
+        <div class="msa-menu-item-f-arrow" style="padding-right:15px;">
+            <span v-if="menuType == 'Independence' || menuType == 'Theme' || menuType == 'Product' || menuType == 'Maingoal' || menuType == 'Subgoal'"
+                  @click="onMouseoverShowMenu"
+                  class="msa-menu-head-color font-nav-menu-filter"
+                  style="padding-left:0;padding-right:12px;font-size:10px;padding-top:3px;">
+            </span>
+            <div v-if="IsShowArrowExpand"
+                 @click="expandCloseIcon"
+                 class="msaNavMenuNameIgnoreTooltip"
+                 style="width: 32px; height: 40px; justify-content: center;display:flex; align-items: center; cursor: pointer;">
+
+                <!--@mouseover="onMouseoverShowMenu"-->
+                <span v-bind:class="[ClassExpand]"
+                      class="msa-menu-head-color msaNavMenuNameIgnoreTooltip"
+                      @mouseleave="onHideMenu"
+                      style="width:14px;height:14px;font-size:11px;padding-left:0;"></span>
+            </div>
+            <div v-else style="width:32px;height:20px;"></div>
+        </div>
+
+    </div>
+    <!--Item Land IsExpand-->
+    <section v-if="menuType == 'Land'" menuType="Region"
+             v-show="IsExpand == true" 
+             v-for="(region, i) in item.Childs"
+             v-bind:navmenu-region-id="region.Id"
+             v-bind:region-expand="isExpandRegion(region.Id)"
+             style="background-color: #0bbaff">
+        <NavigationItemRegion menuType="Region"
+                              :key="'region_' + region.Id"
+                              :item="region" />
+    </section>
+    <!--Item Region IsExpand-->
+    <section v-if="menuType == 'Region'" menuType="Stakeholdergroup"
+             v-show="IsExpand == true" 
+             v-for="(shlGroup, i) in item.Childs"
+             v-bind:style="{backgroundColor: shlGroup.Type == 5 ? '#f2f2ef' : 'white'}">
+             <!--style="background-color: #f2f2ef">-->
+        <NavigationItemStakeholdergroup menuType="Stakeholdergroup"
+                                        :key="'stakeholder-group_' + shlGroup.Id"
+                                        :item="shlGroup" />
+    </section>
+    <!--Item Independence IsExpand-->
+    <section v-if="menuType == 'Independence'" menuType="Theme"
+             v-show="IsExpand == true" 
+             v-for="(theme, i) in getChilds(item.Id)"
+             v-bind:region-expand="theme.IsExpand == true"
+             style="background-color: white">
+        <NavigationItemTheme menuType="Theme"
+                             :key="'theme_' + theme.Id"
+                             :item="theme" />
+    </section>
+    <!--Item Stakeholdergroup IsExpand-->
+    <section v-if="menuType == 'Stakeholdergroup'" menuType="Product"
+             v-show="IsExpand == true" 
+             v-for="(product, i) in item.Childs"
+             v-bind:style="{backgroundColor: product.Type == 5 ? '#f2f2ef' : 'white'}">
+             <!--style="background-color: white">-->
+        <NavigationItemProduct menuType="Product"
+                               :key="'product_' + product.Id"
+                               :item="product" />
+    </section>
+    <!--Item Product IsExpand-->
+    <section v-if="menuType == 'Product'" 
+             v-show="IsExpand == true" 
+             menuType="Maingoal"
+             v-for="(maingoal, i) in ListGoalItem"
+             style="background-color: white">
+        <NavigationItemMaingoal menuType="Maingoal"
+                                ref="RefNavMenuMaingoal"
+                                :key="'maingoal_' + maingoal.Id"
+                                :item="maingoal" />
+    </section>
+    <!--Item Theme IsExpand-->
+    <section v-if="menuType == 'Theme'" 
+             v-show="IsExpand == true" 
+             menuType="Maingoal"
+             v-for="(maingoal, i) in ListGoalItem"
+             style="background-color: white">
+        <NavigationItemMaingoal menuType="Maingoal"
+                                ref="RefNavMenuMaingoal"
+                                :key="'maingoal_' + maingoal.Id"
+                                :item="maingoal" />
+
+    </section>
+    <!--Item Main goal IsExpand Va co Subgoal (Childs)-->
+    <section v-if="menuType == 'Maingoal' && item.Childs"
+             v-show="IsExpand == true || !IsExpandHideMain"
+             menuType="Subgoal"
+             v-for="(subgoal, i) in ListGoalItem"
+             style="background-color: white">
+        <NavigationItemSubgoal menuType="Subgoal"
+                               :key="'subgoal_' + subgoal.Id"
+                               :item="subgoal" />
+
+    </section>
+</div>

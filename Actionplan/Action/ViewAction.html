@@ -1,0 +1,499 @@
+﻿<div class="msa-virtual-item-action-warp msaVirtualActionWarp"
+     v-bind:drgdrp-id="item.Id"
+     v-bind:drgdrp-mdf="item.Mdf"
+     v-bind:drgdrp-sgid="item.GoalId"
+     v-bind:drgdrp-smpid="item.SubMarketProductId"
+     v-bind:drgdrp-indid="item.IndependencyId"
+     v-bind:drgdrp-regionid="getRegionId()"
+     v-bind:drgdrp-mindex="item.MIndex"
+     dragdroptype="3">
+    <div class="msa-virtual-item-action divDragVirtualAction" v-if="!is_ReduceSize()">
+        <div v-if="item.Id != undefined"
+             class="divDropVirtualAction msa-virtual-item-wrap divrela row-child2 td-hover wrapper-goalaction"
+             style="margin-right:0px; padding-top:0px!important"
+             v-bind:actionid="item.Id">
+            <div mstype="action" class="msa-box-shadow dnbHandleDragDropAction frame-drgdrp-act"
+                 v-bind:class="[ContainFilterResult, LastActiveClass]"
+                 v-bind:id="IdDirect"
+                 v-bind:direction-id="IdDirect" direction-type="action"
+                 v-bind:actionid="item.Id"
+                 v-bind:mindex="item.MIndex"
+                 v-on:dblclick="(e) => {dblclickEditAction(e.target) }"
+                 style="display: inline-block; width: 248px; margin: 24px 0 0 24px;background-color:white">
+
+                <span class="icon-16 icon-arow-towway-vertical-w margin-left2 msa-action-dragdrop-ic"></span>
+
+                <div class="icon-left-block text-child2 posRelative"
+                     style="margin-top:10px;width:208px">
+
+                    <div class="ms-tooltip font-14 action-name TooltipFullAction" style="width:195px"
+                         @mouseover="onHoverShowTooltipNameDes">
+                        <div class="ms-dropdow dnbIgnoreShowTooltipNameDes" style="float:none; position:absolute">
+                            <span class="icon-16 msa-ic-font icon-dropdow margin-right4 msa-action-menu-icon dnbIgnoreShowTooltipNameDes"
+                                  data-toggle="dropdown"
+                                  style="float:left;margin-top:6px!important; margin-right: 38px"></span>
+                            <ul aria-labelledby="btnGroupVerticalDrop1" role="menu"
+                                class="popup-menu dropdown-menu ms-popup-menu posAbsolute botIni msa-action-menu dnbIgnoreShowTooltipNameDes"
+                                @mouseleave="onMouseLeaveMenuAction"
+                                style=" margin-right: -12px; margin-top: -6px;">
+                                <li>
+                                    <a class="dropdow-menu-li-a dnb--ov-mli--edit-direction"
+                                       @click="clickEditAction" v-bind:data-id="item.Id" ftype="edit">
+                                        <span class="icon-24  icon-left-block icon-edit"></span>{{kLg.edit}}
+                                    </a>
+                                </li>
+
+                                <li role="presentation" class="divider"></li>
+                                <li v-if="getRole() > 0">
+                                    <a class="dropdow-menu-li-a" @click="onMenuDuplicateAction">
+                                        <span class="icon-24  icon-left-block icon-copy"></span>{{kLg.titleDuplicate}}
+                                    </a>
+                                </li>
+
+                                <li role="presentation" class="divider" v-if="getRole() > 0"></li>
+                                <li>
+                                    <a class="dropdow-menu-li-a" v-bind:data-id="item.Id" data-type="action" @click="GetFileDOCXAction">
+                                        <span class="icon-24 icon-left-block icon-export"></span>{{kLg.ExportDOCX}}
+                                    </a>
+                                </li>
+                                <li role="presentation" class="divider" v-if="getRole() > 0"></li>
+                                <li v-if="getRole() > 0">
+                                    <a class="dropdow-menu-li-a" @click="DeleteAction">
+                                        <span class="icon-24  icon-left-block icon-delete"></span>{{kLg.lblDelete}}
+                                    </a>
+                                </li>
+                            </ul>
+                            <div style="position:absolute;right:-15px; float:right"
+                                 class="action-evaluation dnbIgnoreShowTooltipNameDes">
+                                <div evaltype="action" style="width:50px;" v-if="item.ApEvaluation !=null"
+                                     v-on:dblclick="(e) => {dblclickApEvarluation(e.target) }"
+                                     v-on:click="(e) => {clickApEvarluation(e.target) }"
+                                     class="pull-right kpi-overview kpi-overview-goal msa-action-kpi"
+                                     v-bind:class="ColorApEvaluation">
+                                    <span class="kpi-percent"
+                                          style="max-width:48px">{{item.ApEvaluation | round}}</span>
+                                </div>
+                                <div kpitype="action"
+                                     style="width: 50px; display: inline-flex; justify-content: space-between; margin-right: 3px;"
+                                     v-else-if="item.KpiOverViewIsShowPercent"
+                                     class="pull-right kpi-overview"
+                                     v-bind:class="[Kpi.Arrow, Kpi.Bg, Kpi.Color]">
+                                    <span class="xnxx"></span>
+                                    <span class="kpi-percent" @click="onclickDetailkpiAction"
+                                          style="max-width:44px;min-width:34px">{{item.KpiOverViewPercentStr | round}}%</span>
+                                </div>
+                                <div style="width:50px;display:inline-flex;justify-content:space-between;margin-right: 5px !important;"
+                                     v-else-if="item.TodoPercent != null"
+                                     @click="onTooltipkpiTodo"
+                                     class="pull-right kpi-overview" :actionid="item.Id" v-bind:class="ColorTodoPercent">
+                                    <span class="xnxx"></span>
+                                    <span class="kpi-percent" style="max-width:44px;width:44px">{{item.TodoPercent | round}}%</span>
+                                </div>
+                                <div class="ms-assignfile-action msa-action-assignfile" v-if="item.AssignFile > 0">
+                                    <span class="icon-16 msa-img-assignfile dnbIgnoreShowTooltipNameDes" type="action"
+                                          @click="openPopUpFileAssignAction"
+                                          v-bind:class="{'icon-assignfile-finish': HasFileAssigned}"></span>
+                                </div>
+                                <div class="ms-reminder-action msa-action-reminder" v-if="IsReminder">
+                                    <span class="icon-16 icon-remindergray msa-img-reminder dnbIgnoreShowTooltipNameDes"
+                                          type="action"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="action-sub msa-action-name">
+                            <span class="dnb_fix-float-firefox dnb_run-float-firefox dnbIgnoreShowTooltipNameDes"
+                                  @mouseleave="onMouseLeaveMenuAction"
+                                  style="width:55px;height:66px;float:right;"></span>
+                            <span v-bind:class="cssActionFinished">{{item.Name}}</span>
+                        </p>
+
+                        <p class="msa-action-description font-14" v-if="DescriptionTexEditor != ''"
+                           v-bind:class="cssActionFinished">{{DescriptionTexEditor}}</p>
+                    </div>
+                    <hr class="hr-mass-casenet msa-subgoal-hr-top dnbIgnoreShowTooltipNameDes">
+                    <div class="gv-rowinfo truncate msa-color1a font-14 dnbIgnoreShowTooltipNameDes"
+                         v-bind:class="cssActionFinished">{{item.ThePeople}}</div>
+                    <hr class="hr-mass-casenet msa-subgoal-hr-top dnbIgnoreShowTooltipNameDes">
+                    <div class="gv-rowinfo truncate msa-color1a font-14 dnbIgnoreShowTooltipNameDes"
+                         v-bind:class="cssActionFinished">{{item.Category}}</div>
+                    <hr class="hr-mass-casenet msa-subgoal-hr-top dnbIgnoreShowTooltipNameDes">
+                    <div class="gv-rowinfo truncate msa-color1a font-14 dnbIgnoreShowTooltipNameDes"
+                         v-bind:class="cssActionFinished">{{item.Field}}</div>
+                    <hr class="hr-mass-casenet msa-subgoal-hr-top dnbIgnoreShowTooltipNameDes">
+
+                    <div class="gv-rowinfo truncate">
+                        <span class="pull-left status-overdue font-14">
+                            <span class="msa-text-bold" v-if="item.ExpectedCost">P:&nbsp;</span><span mstype="currency" v-if="item.ExpectedCost">{{item.CurrencyName}}&nbsp;</span><span v-if="item.ExpectedCost">{{item.ExpectedCost | formatcost}}&nbsp;</span>
+                        </span>
+                        <span class="pull-right font-14">
+                            <span class="msa-text-bold" v-if="item.ActualCost">C:&nbsp;</span><span mstype="currency" v-if="item.ActualCost">{{item.CurrencyName}}&nbsp;</span><span v-if="item.ActualCost">{{item.ActualCost | formatcost}}&nbsp;</span>
+                        </span>
+                    </div>
+
+                    <hr class="hr-mass-casenet msa-subgoal-hr-top">
+                    <div class="gv-rowinfo truncate action-date msa-inbox-duedate"
+                         v-bind:class="cssActionFinished">
+                        <span class="dnbOnOverCheckShowWrongdate" v-bind:class="[cssDate]" @mouseover="e => onMouseOverCheckShowWrongdate(e.target)">
+                            <span class="font-calendar" style="font-size: 11px;margin-top: 3px;margin-right:3px;" v-if="StartDate || EndDate"></span>
+                            <span class="font-14">{{StartDate}}</span>
+                            <span v-if="StartDate && EndDate"> &nbsp;&mdash;&nbsp; </span>
+                            <span class="font-14">{{EndDate}}</span>
+                        </span>
+                        <span class="icon-16 icon-exclamation icon-overdue"
+                              v-if="IsActionOverdue" style="bottom:9px;top:initial;"
+                              @mouseover="e => onMouseOverShowOverdue(e.target)"
+                              v-bind:title="kLg.msgExceededActionDate">
+                        </span>
+                    </div>
+                </div>
+
+                <div class="clear"></div>
+                <div class="child2-footer">
+                    <span v-if="item.Finish" @click="UpdateActionFinish">
+                        <span class="icon-left-block msa-action-done icon-new-w">
+                            <span class="msa-action-uicon-done-finish"> <span></span> </span>
+                        </span>
+                    </span>
+                    <span v-else-if="!item.IsColor" @click="UpdateActionFinish">
+                        <span class="icon-left-block msa-action-done icon-new-gray">
+                            <span class="msa-action-uicon-done"> <span></span> </span>
+                        </span>
+                    </span>
+                    <span v-else-if="!item.Finish && item.IsColor" @click="UpdateActionFinish">
+                        <span class="icon-left-block msa-action-done icon-deactivate-w">
+                            <span class="msa-action-uicon-done"> <span></span> </span>
+                        </span>
+                    </span>
+
+                    <span class="float-left font-14 msa-text-bold msa-act-done-color msa-action-done-text">{{kLg.labelFinishAction}}</span>
+
+                    <span class="icon-24 icon-left-block icon-subaction-description-click" v-if="item.IsDisplayActionCostDescription"
+                          style="margin-left: -8px;background-position: -34px -908px" @click="showSubActionDescription">
+                    </span>
+                    <span style="display:inline-block;width:24px;height:24px;float:left" v-else="item.IsDisplayActionCostDescription"></span>
+
+                    <span class="icon-20 pull-right pointer aplink-overview-url " @click="gotoConnectionLink"
+                          v-bind:class="setcoloricon" v-if="item.HasLink"
+                          style="margin-right: 5px;"
+                          v-bind:connectionlink="item.Id" typeid="3"></span>
+
+                    <div class="text-check-right gv-action-status text-right" style="max-width: 72px;margin-right:12px;">
+                        <span class="ms-tooltip msa-last-status-tooltip" data-tooltip="">
+                            <span class="truncate pull-right font-14" v-if="item.LastStatus"
+                                  @mouseover="e => HoverTooltipStatusProtocol(item, e)"
+                                  style="max-width:86px;min-height:20px;max-height:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                                {{item.LastStatus}}
+                            </span>
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        <div v-else class="divDropVirtualAction msa-virtual-item-empty"
+             v-bind:style="{width: item.Width + 'px', height: item.Height + 'px'}"></div>
+    </div>
+
+
+    <!--div reduce size-->
+
+
+
+    <div v-if="(item.Id != undefined) && is_ReduceSize()"
+         class="col-item-display col-reduce" style="width:344px;" v-on:dblclick="(e) => {dblclickEditAction(e.target) }">
+        <div class="col-item-head head-reduce dnbHandleDragDropAction"
+             v-bind:id="IdDirect"
+             v-bind:direction-id="IdDirect" direction-type="action"
+             v-bind:class="[ContainFilterResult,LastActiveClass]" style="border-radius: 5px;"
+             @mouseover="mouseoverReduce" @mouseleave="mouseleaveReduce">
+            <div style="flex-grow:1">
+                <div class="col-item-head-top teamboard-flex flex-space-between flex-align-top top-reduce" style="display: flex; padding-top: 3px; padding-bottom: 3px;" v-bind:style="{'border-color':item.Color}">
+                    <div class="dnb-css-firefox">
+                        <span class="action" style="float: left; width: 7px; height: 7px; margin-top: 3px;" v-bind:style="{'background-color':item.Color}"></span>
+                        <div style="margin-left: 12px; width: 200px;" class="TooltipFullAction">
+                            <strong @mouseover="onHoverShowTooltipNameDes" class="name-reduce-tooltip"
+                                    style="font-size: 14px; color: #1a1a1a; overflow: hidden; text-overflow: ellipsis; display: -webkit-inline-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; max-width: 200px; min-height: 43px; max-height: 43px; margin-top: -5px;"
+                                    v-bind:class="cssActionFinished">{{item.Name}}</strong>
+                        </div>
+                    </div>
+
+                    <div class="d-inline-flex tb-disable-select" style="height:30px;">
+                        <div class="col-item-menu-icon" @mouseleave="mouseleaveMenuReduce" style="margin-top: -22px;">
+                            <span class="colorc1 iconmenu-reduce pointer" style="margin-left: -8px;vertical-align: unset;" @click="toggleMenu"></span>
+                            <div class="boardname-hmenu-expand" v-show="isShowMenu" style="min-width:160px; margin-left:-144px">
+                                <div class="bnhmenu-expand-wrap">
+                                    <ul class="list-group" style="border-radius: 4px;">
+                                        <li @click="clickEditAction">
+                                            <a class="list-group-item tb-disable-select child-menu-reduce" style="padding: 6px 6px 6px 8px;">
+                                                <div>
+                                                    <span class="icon-24 icon-left-block icon-edit" style="margin-top: -3px"></span>
+                                                    <span>{{ kLg.edit }}</span>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li @click="onMenuDuplicateAction" v-if="getRole() > 0">
+                                            <a class="list-group-item tb-disable-select child-menu-reduce" style="padding: 6px 6px 6px 8px;">
+                                                <div>
+                                                    <span class="icon-24 icon-left-block icon-copy" style="margin-top: -3px"></span>
+                                                    <span>{{ kLg.titleDuplicate }}</span>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li @click="GetFileDOCXAction">
+                                            <a class="list-group-item tb-disable-select child-menu-reduce" style="padding: 6px 6px 6px 8px;">
+                                                <div>
+                                                    <span class="icon-24 icon-left-block icon-export" style="margin-top: -3px"></span>
+                                                    <span>{{ kLg.ExportDOCX }}</span>
+                                                </div>
+                                            </a>
+                                        </li>
+
+                                        <li @click="DeleteAction" v-if="getRole() > 0">
+                                            <a class="list-group-item tb-disable-select child-menu-reduce" style="padding: 6px 6px 6px 8px;">
+                                                <div>
+                                                    <span class="icon-24 icon-left-block icon-delete" style="margin-top: -3px"></span>
+                                                    <span>{{ kLg.lblDelete }}</span>
+                                                </div>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <span>
+
+                        </span>
+                        <div class="msa-direct-icon-reduce" style="margin-bottom:10px;margin-right: 10px !important;">
+
+                            <div class="ic-direction">
+                                <div class="line-top-reduce"></div>
+                                <div class="line-reduce"></div>
+                                <div class="line-reduce"></div>
+                                <div class="line-top-reduce"></div>
+                            </div>
+                            <div class="tb-ic-color maingoal"
+                                 :typeid="1"></div>
+                            <div class="tb-ic-color subgoal"
+                                 :typeid="2"></div>
+                            <div class="tb-ic-color action" style="bottom: -3px; right: -4px;" v-bind:style="{'background-color': item.Color}"></div>
+                        </div>
+                        <div evaltype="action" style="width:42px; margin-top: -10px;" v-if="item.ApEvaluation !=null"
+                             v-on:dblclick="(e) => {dblclickApEvarluation(e.target) }"
+                             v-on:click="(e) => {clickApEvarluation(e.target) }"
+                             class="pull-right kpi-overview kpi-overview-goal msa-action-kpi" v-bind:class="ColorApEvaluation">
+                            <span style="max-width:48px">{{item.ApEvaluation | round}}</span>
+                        </div>
+                        <div kpitype="action" style="max-width: 50px; margin-top: -10px; display: inline-flex; justify-content: space-between; width: initial;"
+                             v-else-if="item.KpiOverViewIsShowPercent"
+                             class="pull-right kpi-overview" v-bind:class="[Kpi.Arrow, Kpi.Bg, Kpi.Color]" @click="onclickDetailkpiAction">
+                            <span class="xnxx"></span>
+                            <span style="max-width: 44px; min-width: 34px;">{{item.KpiOverViewPercentStr | round}}%</span>
+                        </div>
+                        <div style="width:42px; margin-top: -10px;display:inline-flex;justify-content:space-between;margin-right: 5px !important;"
+                             v-else-if="item.TodoPercent != null" @click="onTooltipkpiTodo"
+                             class="pull-right kpi-overview" actionid="#:action.Id#" v-bind:class="ColorTodoPercent">
+                            <span class="xnxx"></span>
+                            <span style="max-width:44px;width:44px">{{item.TodoPercent | round}}%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-item-head-bot tb-disable-select">
+                    <div class="teamboard-flex flex-space-between flex-align-top colorc1" style="display: flex; color: #C1C1C1;">
+                        <ul class="lst-respositility" style="margin-bottom: 0;float:left;width: 112px;list-style: none;padding-left: 0;color: #C1C1C1;min-height: 20px;">
+                            <li v-for="p in item.People">
+                                <p class="lst-resp-item" style="margin-bottom: 0;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;">{{p}}</p>
+                            </li>
+                        </ul>
+                        <div class="tb-start-end-date teamboard-flex" style="width: 180px; margin-left: 14px;">
+                            <div class="teamboard-flex" style="font-size: 13px; margin-top: 1px; display: flex;">
+                                <div style="display: flex;" @mouseover="e => onMouseOverCheckShowWrongdate(e.target)" class="dnbOnOverCheckShowWrongdate"
+                                     v-bind:class="[cssDate]">
+                                    <div style="width: 10px; margin-right: 5px;">
+                                        <span class="font-calendar" style="font-size: 11px;margin-top: 3px;" v-if="StartDate || EndDate"></span>
+                                    </div>
+                                    <div style="min-width: 56px;max-width: 72px; ">
+                                        <span>{{StartDate}}</span>
+                                    </div>
+                                    <div style="width: 10px;">
+                                        <span v-if="StartDate && EndDate"> &mdash; </span>
+                                    </div>
+                                    <div style="width:73px">
+                                        <span>{{EndDate}}</span>
+                                    </div>
+                                </div>
+                                <div style="width:15px">
+                                    <span class="icon-16 icon-exclamation"
+                                          v-if="IsActionOverdue" style="margin-top:-1px;"
+                                          @mouseover="e => onMouseOverShowOverdue(e.target)"
+                                          v-bind:title="kLg.msgExceededActionDate">
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="btn-toggle-view font-arrow-down colorc1 expand-reduce pointer"
+                                  v-bind:class="{ 'arrow-reduce-expand': isExpandReduce, 'arrow-reduce-collapse': !isExpandReduce }"
+                                  @click="toggleExpandReduce"
+                                  style="margin-right: 0 !important;"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tb-disable-select" style="position:relative">
+
+            </div>
+        </div>
+
+        <div class="col-item-content tb-disable-select dnbIgnoreDragDropAction"
+             v-if="isExpandReduce" style="padding-top:6px;padding-bottom:6px;">
+            <p style="font-size: 12px;" class="col-item-description description-reduce" v-show="item.Description">
+                {{item.Description | striphtml}}
+            </p>
+            <div style="margin-top:0"
+                 class="col-item-foot teamboard-flex flex-space-between flex-align-stretch colitem-borderbot">
+                <div class="colorc1" style="padding-right: 22px; flex-grow: 1; text-align: right">
+
+                </div>
+            </div>
+
+            <div class="col-item-foot teamboard-grid tb-grid-2cols down-reduce">
+                <div class="colorc1" style="color: #C1C1C1;">
+                    <strong class="tb-text-elipse d-block color1a color1a-reduce">
+                        {{kLg.InvolvedPeople }}
+                    </strong>
+                    <div class="d-block" style="max-width:154px">
+                        <ul style="list-style: none; padding-left: 10px;">
+                            <li v-for="ip in item.ListInvolvedPeople">
+                                <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 146px;margin-bottom: 0;">{{ip}}</p>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <strong class="tb-text-elipse d-block color1a color1a-reduce">
+                            {{ kLg.lblCategory }}
+                        </strong>
+                        <div class="d-block" style="max-width:154px">
+                            <ul style="list-style: none; padding-left: 10px;">
+                                <li v-for="cat in item.ListCategory">
+                                    <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 146px;margin-bottom: 0;">{{cat}}</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="colorc1" style="color: #C1C1C1;">
+                    <strong class="tb-text-elipse d-block color1a color1a-reduce">
+                        {{ kLg.gaLblField }}
+                    </strong>
+
+                    <div class="d-block" style="max-width:154px">
+                        <ul style="list-style: none; padding-left: 10px;">
+                            <li v-for="f in item.ListField">
+                                <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 146px;margin-bottom: 0;">{{f}}</p>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+                <div style="margin-left:10px">
+
+                </div>
+                <div style="text-align: right;display:flex;">
+                    <div style="width: 74px;height:20px;margin-right: 3px;">
+                        <span v-if="item.Finish" @click="UpdateActionFinish">
+                            <span class="icon-left-block msa-action-done icon-new-w">
+                                <span class="msa-action-uicon-done-finish"><span></span></span>
+                            </span>
+                        </span>
+                        <span v-else-if="!item.IsColor" @click="UpdateActionFinish">
+                            <span class="icon-left-block msa-action-done icon-new-gray">
+                                <span class="msa-action-uicon-done"><span></span></span>
+                            </span>
+                        </span>
+                        <span v-else-if="!item.Finish && item.IsColor" @click="UpdateActionFinish">
+                            <span class="icon-left-block msa-action-done icon-deactivate-w">
+                                <span class="msa-action-uicon-done"><span></span></span>
+                            </span>
+                        </span>
+                        <span class="float-left font-14 msa-text-bold msa-act-done-color msa-action-done-text" style="margin: -2px -1px -3px 6px;font-size:12px;">{{kLg.labelFinishAction}}</span>
+                    </div>
+
+                    <div style="width: 20px;height:20px;margin-right: 3px;">
+                        <span v-if="item.IsDisplayActionCostDescription" class="icon-24 d-inline-block tb-item-todo cursor-pointer"
+                              style="height:18px;width:18px;background-position: -38px -908px"
+                              @click="showSubActionDescription"></span>
+                    </div>
+
+                    <div style="width: 20px;height:20px;margin-right: 3px;">
+                        <span v-if="IsReminder" class="icon-16 icon-remindergray msa-img-reminder d-inline-block"
+                              style="margin-left:-4px"></span>
+                    </div>
+                    <div style="width: 20px;height:20px;margin-right: 3px;">
+                        <span v-if="item.AssignFile > 0" class="icon-16 msa-img-assignfile icon-assignfile-finish cursor-pointer"
+                              style="display:inline-block;margin-top:-1px"
+                              @click="openPopUpFileAssignAction" v-bind:class="{'icon-assignfile-finish': HasFileAssigned}"></span>
+                    </div>
+                    <div style="width: 20px; height: 20px; margin-right: 3px; margin-top: -2px;">
+                        <span v-if="item.HasLink" class="icon-20 pull-right pointer aplink-overview-url"
+                              @click="gotoConnectionLink"
+                              v-bind:class="setcoloricon"
+                              v-bind:connectionlink="item.Id" typeid="3"></span>
+                    </div>
+                </div>
+                <div v-if="item.LastStatus"></div>
+                <div style="text-align:right;margin-top:5px" v-if="item.LastStatus">
+                    <span class="laststatus-reduce" @mouseover="e => HoverTooltipStatusProtocol(item, e)">{{item.LastStatus}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Dành cho trường hợp action k column và k tick check box isReduce-->
+    <div v-if="hasAddNewBtn(item.Id) && !is_ReduceSize() && item.ActionPlanColumnId < 1 && getRole() > 0"
+         class="liHideOnNoAccess dnbIgnoreDragDropAction"
+         style="margin:0;display:inline-block;position:absolute;left:126px;z-index: 1;"
+         v-bind:style="{'left': StyleIconAddAction.left, 'bottom': StyleIconAddAction.bottom}">
+        <div class="div-add msa-action-addnocolumn">
+            <span class="cursor-pointer add-action msa-add-action" @click="showPopupAddActionInAction">
+                <span class="msa-ic-font font-plus" style="font-size:10px"
+                      @mouseover="e => onHoverShowTooltipAddAction(e)"></span>
+            </span>
+        </div>
+    </div>
+    <!--Dành cho trường hợp action k column và có tick check box isReduce-->
+    <div v-if="hasAddNewBtn(item.Id) && is_ReduceSize() && item.ActionPlanColumnId < 1 && getRole() > 0"
+         class="liHideOnNoAccess dnbIgnoreDragDropAction"
+         style="margin: 0; display: inline-block; position: absolute; left: 365px; z-index: 1; bottom: 32px; bottom: -47px; left: 164px;">
+        <div class="div-add msa-action-addnocolumn">
+            <span class="cursor-pointer add-action msa-add-action" @click="showPopupAddActionInAction">
+                <span class="msa-ic-font font-plus" style="font-size:10px"
+                      @mouseover="e => onHoverShowTooltipAddAction(e)"></span>
+            </span>
+        </div>
+    </div>
+    <!--dành cho trường hợp có column và có tick check box isReduce-->
+    <div v-if="hasAddNewBtn(item.Id) && item.ActionPlanColumnId > 0 && is_ReduceSize() && getRole() > 0"
+         class="liHideOnNoAccess dnbIgnoreDragDropAction"
+         style="margin:0;display:inline-block;position:absolute;z-index: 1;bottom: -47px;left:164px">
+        <div class="div-add msa-action-addnocolumn ">
+            <span class="cursor-pointer add-action msa-add-action" @click="showPopupAddActionInAction">
+                <span class="msa-ic-font font-plus" style="font-size:10px"
+                      @mouseover="e => onHoverShowTooltipAddAction(e)"></span>
+            </span>
+        </div>
+    </div>
+    <!--dành cho trường hợp có clumn nhưng k tick check box-->
+    <div v-if="hasAddNewBtn(item.Id) && item.ActionPlanColumnId > 0 && !is_ReduceSize() && getRole() > 0"
+         class="liHideOnNoAccess dnbIgnoreDragDropAction"
+         style="margin:0;display:inline-block;position:absolute;left:128px;z-index: 1;bottom: -36px;">
+        <div class="div-add msa-action-addnocolumn">
+            <span class="cursor-pointer add-action msa-add-action" @click="showPopupAddActionInAction">
+                <span class="msa-ic-font font-plus" style="font-size:10px"
+                      @mouseover="e => onHoverShowTooltipAddAction(e)"></span>
+            </span>
+        </div>
+    </div>
+</div>
+
+

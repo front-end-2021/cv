@@ -1,0 +1,203 @@
+﻿<article class="msa-navigation-menu"
+         style="position:relative;z-index:12;">
+    <div class="hidescrlbar dnb-navmenu-scroll navMenuHandleScroll"
+         style="padding-bottom: 1px; position: sticky; top: 6px;z-index:3;overflow-y:scroll;width:308px;">
+        <section v-for="(land, i) in NavMenuLand" menuType="Land"
+                 v-bind:land-expand="land.IsExpand == true"
+                 v-bind:navmenu-land-id="land.Id"
+                 v-bind:style="{marginBottom: i == NavMenuLand.length - 1 ? '99px' : '0'}"
+                 style="background-color: #195d81; width: 288px; box-shadow: rgb(0 0 0 / 16%) 0px 0px 10px;">
+            <NavigationItemLand menuType="Land"
+                                :key="'land_' + land.Id"
+                                :item="land" />
+        </section>
+
+        <div style="background-color:white;display:flex; margin-top:1px; margin-bottom:1px;margin-right:20px;">
+            <button type="button" class="msa-v-button" @click="showPopupAddIndependence"
+                    v-bind:class="{ 'bg-disable': getCurrentRole() < 1 }"
+                    style="width: 100%; margin-top: 0; margin-left: 0; margin-right: 0; border-radius: 0; margin-bottom: 0; height: 36px;">
+                <span class="icon-16 icon-plus margin-right6"></span><span>{{kLg.gaTitleAddOverallThread}}</span>
+            </button>
+        </div>
+
+        <div>
+            <section v-for="(ind, i) in NavMenuIndependency" menuType="Independence"
+                     v-bind:ind-expand="ind.IsExpand == true"
+                     v-bind:navmenu-ind-id="ind.Id"
+                     style="background-color: #195d81; width: 288px; box-shadow: rgb(0 0 0 / 16%) 0px 0px 10px;">
+                <NavigationItemIndependence menuType="Independence"
+                                            :key="'independence_' + ind.Id"
+                                            :item="ind" />
+            </section>
+        </div>
+
+    </div>
+
+    <div v-if="!MenuFilter.IsHideFMenu" @mouseleave="onMouseLeaveHideMenu" class="msa-menu-filter-wrap" v-bind:style="{top: PosMenuFilter}">
+        <div class="msa-menu-filter">
+            <div v-if="MenuFilter.RoleId > 0 && (((MenuFilter.Type == 5 ||MenuFilter.Type == 6) && !MenuFilter.IsRegionOverView) || MenuFilter.Type == 9)"
+                 @click="onAddNewMaingoal"
+                 style="padding-left: 20px; display: flex; justify-content: space-between; padding-right: 9px; cursor: pointer;">
+                <span style="max-width: 180px; white-space: pre; overflow: hidden; text-overflow: ellipsis; display: inline-block; 
+                        color:#76838a;">{{kLg.titlepAddMainGoalNew1 + kLg.labelMainGoalName + kLg.titlepAddMainGoalNew2}}</span>
+                <span class="msa-ic-font font-plus" style="width: 19px; color: #76838a;"></span>
+                <!--<a class="icon-28 icon-add-small" style="display:inline-block;"></a>-->
+            </div>
+            <div v-if="MenuFilter.Type == 8"
+                 @click="onAddNewTheme"
+                 style="display: flex; justify-content: space-between; cursor:pointer; padding: 6px 9px 6px 20px;">
+                <span style="max-width: 180px; white-space: pre; overflow: hidden; text-overflow: ellipsis; display: inline-block; 
+                    color: #76838a;">{{kLg.gaTitleAddThread}}</span>
+                <span class="msa-ic-font font-plus" style="width: 19px; color: #737372;"></span>
+            </div>
+
+            <!--Menu Maingoal item-->
+            <div v-if="MenuFilter.RoleId > -1 && MenuFilter.Type == 10"
+                 class="drp-menu-main-goal" 
+                 style="padding-right: 9px; border-left: 1px solid white;height:0;width:0;">
+                
+                <ul role="menu" class="popup-menu dropdown-menu ms-popup-menu msa-goal-menu navMenuGoal"
+                    style="display: block; left: -2px !important; right: initial !important; top: -2px !important;"
+                    @mouseleave="onMouseLeaveHideMenu">
+                    <li><a class="dropdow-menu-li-a dnb--ov-mli--edit-direction" 
+                           @click="e => onMenuMaingoal().onClickMenuEditMain(e)">
+                            <span class="icon-24 icon-left-block icon-edit"></span>
+                            <span>{{kLg.edit}}</span>
+                        </a>
+                    </li>
+                    <li v-if="onMenuMaingoal().getRole() > 0" 
+                        class="liHideOnNoAccess"><a class="dropdow-menu-li-a dnb--ov-mli--edit-direction" 
+                           @click="e => onMenuMaingoal().onClickMenuAddSubGoal(e)"><span class="icon-24 icon-left-block icon-add-region"></span>
+                            <span>{{onMenuMaingoal().MenuTxtAddSubgoal}}</span>
+                        </a>
+                    </li>
+                    <li v-if="onMenuMaingoal().getRole() > 0"
+                        class="liHideOnNoAccess" @click="e => onMenuMaingoal().onClickMenuDuplicateMain(e)">
+                        <a class="dropdow-menu-li-a">
+                            <span class="icon-24 icon-left-block icon-copy"></span> <span>{{kLg.titleDuplicate}}</span>
+                        </a>
+                    </li>
+                    <li v-if="MenuFilter.Name" 
+                        class="liHideOnNoAccess" @click="e => onMenuMaingoal().getFileDOCX(e)">
+                        <a class="dropdow-menu-li-a">
+                            <span class="icon-24 icon-left-block icon-export"></span> <span>{{kLg.ExportDOCX}}</span>
+                        </a>
+                    </li>
+                    <li class="liHideOnNoAccess" v-if="!onMenuMaingoal().isRegionOverview() && onMenuMaingoal().isCalendar()" 
+                        @click="e => onMenuMaingoal().gotoMix(e)">
+                        <a class="dropdow-menu-li-a link-gotoMix">
+                            <span class="icon-24 icon-left-block icon-open"></span> <span>{{kLg.GotoLink}} {{kLg.tabMarketingmix}}</span>
+                        </a>
+                    </li>
+                    <li class="liHideOnNoAccess" v-if="!onMenuMaingoal().isRegionOverview()" @click="e => onMenuMaingoal().gotoRoadmap(e)">
+                        <a class="dropdow-menu-li-a link-Roadmap">
+                            <span class="icon-24 icon-left-block icon-open"></span> <span>{{kLg.GotoLink}} {{kLg.tabRoadmap}}</span>
+                        </a>
+                    </li>
+                    <li v-if="onMenuMaingoal().getRole() > 0" 
+                        class="liHideOnNoAccess" 
+                        @click="e => onMenuMaingoal().deleteMainGoal(e)">
+                        <a class="dropdow-menu-li-a">
+                            <span class="icon-24 icon-left-block icon-delete"></span>
+                            <span>{{kLg.lblDelete}}</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div v-if="(MenuFilter.Type == 5 || MenuFilter.Type == 6 || MenuFilter.Type == 9) && (MenuFilter.IsMainGoalHidden == true || MenuFilter.IsMainGoalHidden == false)"
+                 class="checkbox-inline" style="margin-left:0;">
+                <label style="width: 100%; padding-left: 0;cursor:pointer;margin-bottom:0;"
+                       @click="onClickShowHideMain">
+                    <span style="max-width: 176px; white-space: pre; overflow: hidden; text-overflow: ellipsis; font-weight: normal; 
+                        display: inline-block; color: #76838a;margin-top:3px;">{{kLg.labelMainGoalName}}</span>
+                    <input type="checkbox" v-model="MenuFilter.IsMainGoalHidden">
+                    <span class="checkmarkd" style="right: 15px; left: initial; top: 5px;"></span>
+                </label>
+            </div>
+            <div v-if="(MenuFilter.Type == 5 ||MenuFilter.Type == 6 || MenuFilter.Type == 9) && (MenuFilter.IsSubGoalHidden == true || MenuFilter.IsSubGoalHidden == false)"
+                 class="checkbox-inline" style="margin-left:0;">
+                <label style="width: 100%; padding-left: 0; cursor: pointer;margin-bottom:0;" 
+                       @click="onClickShowHideSub">
+                    <span style="max-width: 176px; white-space: pre; overflow: hidden; text-overflow: ellipsis; font-weight: normal; 
+                        display: inline-block; color: #76838a;margin-top:3px;">{{kLg.labelSubGoalName}}</span>
+                    <input type="checkbox" v-model="MenuFilter.IsSubGoalHidden">
+                    <span class="checkmarkd" style="right: 15px; left: initial; top: 5px;"></span>
+                </label>
+            </div>
+
+            <!--Menu Subgoal Item-->
+            <div v-if="MenuFilter.RoleId > -1 && MenuFilter.Type == 11" class="drp-menu-main-goal" 
+                 style="padding-right: 9px; border-left: 1px solid white;height:0;width:0;">
+                <ul class="popup-menu dropdown-menu ms-popup-menu msa-goal-menu navMenuGoal"
+                    style="display: block; left: -2px !important; right: initial !important; top: -2px !important;"
+                    @mouseleave="onMouseLeaveHideMenu">
+                    <li><a class="dropdow-menu-li-a dnb--ov-mli--edit-direction"
+                           @click="e => onMenuSubgoal().clickEditSub(e)">
+                            <span class="icon-24 icon-left-block icon-edit"></span>
+                            <span>{{kLg.edit}}</span>
+                        </a>
+                    </li>
+                    <li v-if="onMenuSubgoal().getRole() > 0" 
+                        class="liHideOnNoAccess"><a class="dropdow-menu-li-a dnb--ov-mli--edit-direction" 
+                           @click="e => onMenuSubgoal().clickAddAction(e)">
+                            <span class="icon-24 icon-left-block icon-add-region"></span>
+                            <span>{{onMenuSubgoal().MenuTxtAddAction}}</span>
+                        </a>
+                    </li>
+                    <li v-if="onMenuSubgoal().getRole() > 0" 
+                        class="liHideOnNoAccess" @click="e => onMenuSubgoal().clickSortAction(e)">
+                        <a class="dropdow-menu-li-a">
+                            <span class="icon-24 icon-left-block icon-sort"></span>
+                            <span>{{kLg.textSort}}</span>
+                        </a>
+                    </li>
+                    <li v-if="onMenuSubgoal().getRole() > 0 && MenuFilter.Name" 
+                        class="liHideOnNoAccess" @click="e => onMenuSubgoal().clickDuplicateSub(e)">
+                        <a class="dropdow-menu-li-a">
+                            <span class="icon-24 icon-left-block icon-copy"></span> <span>{{kLg.titleDuplicate}}</span>
+                        </a>
+                    </li>
+                    <li class="liHideOnNoAccess" v-if="MenuFilter.Name" 
+                        @click="e => onMenuSubgoal().clickExportDocxMenu(e)">
+                        <a class="dropdow-menu-li-a">
+                            <span class="icon-24 icon-left-block icon-export"></span> <span>{{kLg.ExportDOCX}}</span>
+                        </a>
+                    </li>
+                    <li v-if="!onMenuSubgoal().isRegionOverview() && onMenuSubgoal().isCalendar()" class="liHideOnNoAccess" 
+                        @click="e => onMenuSubgoal().GotoMixfromMenu(e)">
+                        <a class="dropdow-menu-li-a link-gotoMix">
+                            <span class="icon-24 icon-left-block icon-open"></span> <span>{{kLg.GotoLink}} {{kLg.tabMarketingmix}}</span>
+                        </a>
+                    </li>
+                    <li v-if="!onMenuSubgoal().isRegionOverview()" class="liHideOnNoAccess" @click="e => onMenuSubgoal().GotoRoadmapfromMenu(e)">
+                        <a class="dropdow-menu-li-a link-Roadmap">
+                            <span class="icon-24 icon-left-block icon-open"></span> <span>{{kLg.GotoLink}} {{kLg.tabRoadmap}}</span>
+                        </a>
+                    </li>
+                    <li v-if="onMenuSubgoal().getRole() > 0" class="liHideOnNoAccess" 
+                        @click="e => onMenuSubgoal().deleteSubGoal(e)">
+                        <a class="dropdow-menu-li-a">
+                            <span class="icon-24 icon-left-block icon-delete"></span><span>{{kLg.lblDelete}}</span>
+                        </a>
+                    </li>
+                    <li v-if="onMenuSubgoal().getRole() > 0"
+                        class="liHideOnNoAccess" @click="e => onMenuSubgoal().AddnewColumn(e.target)">
+                        <a class="dropdow-menu-li-a">
+                            <span class="icon-24 icon-left-block icon-add-region"></span><span>{{kLg.addNewColumn}}</span>
+                        </a>
+                    </li>
+                    <li class="liHideOnNoAccess pointer">
+                        <a class="dropdow-menu-li-a">
+                            <input style="margin-left: 4px; margin-top: 4px;" type="checkbox"
+                                   @click="e => onMenuSubgoal().onToggleReduceSize(e)"
+                                   v-model="MenuFilter.IsReduceSize" class="pointer" />
+                            <span style="margin-left: 6px">{{kLg.toggleViewSmall}}</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</article>

@@ -1,0 +1,228 @@
+﻿<div v-bind:class="classFinished"
+     v-on:dblclick="(e) => {onMenuEditMainSub(e) }"
+     style="padding-left:27px;width:255px;">
+    <div class="ms-tooltip font-14 goal-name TooltipFullMaingoal" data-role="tooltip"
+         @mouseleave="onMouseleaveHideMenu">
+        <div class="ms-dropdow msa-mg-hover-arrow-drp"
+             @mouseover="e => onMouseOverHideTooltip(e)"
+             style="margin-bottom: -66px; margin-top: 6px;width:20px;height:20px;"
+             v-if="item.IsShow">
+            <div class="icon-16 msa-ic-font msa-maingoal-menu icon-dropdow font-arrow-down"
+                 data-toggle="dropdown" style="text-indent: unset;"
+                 @click="(e) => { onClickOpenMenu(e.target) }">
+            </div>
+            <ul aria-labelledby="btnGroupVerticalDrop1" role="menu"
+                @mouseleave="onMouseleaveHideMenu"
+                class="popup-menu dropdown-menu ms-popup-menu posAbsolute botIni msa-goal-menu-inside">
+                <li>
+                    <a class="dropdow-menu-li-a dnb--ov-mli--edit-direction" @click="onMenuEditMainSub">
+                        <span class="icon-24 icon-left-block icon-edit"></span>
+                        <span>{{kLg.edit}}</span>
+                    </a>
+                </li>
+                <li class="liHideOnNoAccess" v-if="getRole() > 0 && IsMain">
+                    <!--add Sub-->
+                    <a class="dropdow-menu-li-a dnb--ov-mli--edit-direction" @click="MainOverViewAddSubGoal">
+                        <span class="icon-24 icon-left-block icon-add-region"></span>
+                        <span>{{MenuTxtAddSubgoal}}</span>
+                    </a>
+                </li>
+                <li class="liHideOnNoAccess" v-if="getRole() > 0 && !IsMain">
+                    <!--add Action-->
+                    <a class="dropdow-menu-li-a" @click="(e) => { onMenuShowPopupAddAction(e) }">
+                        <span class="icon-24 icon-left-block icon-add-region"></span>
+                        <span>{{MenuTxtAddAction}}</span>
+                    </a>
+                </li>
+                <li class="liHideOnNoAccess" @click="onMenuSortAction" v-if="!IsMain && getRole() > 0">
+                    <a class="dropdow-menu-li-a">
+                        <span class="icon-24 icon-left-block icon-sort"></span>
+                        <span>{{kLg.textSort}}</span>
+                    </a>
+                </li>
+                <li class="liHideOnNoAccess" @click="duplicateMainSub"
+                    v-if="getRole() > 0 && isShow">
+                    <a class="dropdow-menu-li-a">
+                        <span class="icon-24 icon-left-block icon-copy"></span> <span>{{kLg.titleDuplicate}}</span>
+                    </a>
+                </li>
+                <li class="liHideOnNoAccess" @click="pExportDocxMainSub"
+                    v-if="isShow">
+                    <a class="dropdow-menu-li-a">
+                        <span class="icon-24 icon-left-block icon-export"></span> <span>{{kLg.ExportDOCX}}</span>
+                    </a>
+                </li>
+                <li class="liHideOnNoAccess" @click="pGotoMixfromMainSub"
+                    v-if="item.IsCalendar && !isRegionOverView()">
+                    <a class="dropdow-menu-li-a link-gotoMix">
+                        <span class="icon-24 icon-left-block icon-open"></span> <span>{{kLg.GotoLink}} {{kLg.tabMarketingmix}}</span>
+                    </a>
+                </li>
+                <li class="liHideOnNoAccess" @click="pGotoRoadmapfromMainSub"
+                    v-if="!isRegionOverView()">
+                    <a class="dropdow-menu-li-a link-Roadmap">
+                        <span class="icon-24 icon-left-block icon-open"></span> <span>{{kLg.GotoLink}} {{kLg.tabRoadmap}}</span>
+                    </a>
+                </li>
+                <li class="liHideOnNoAccess" v-if="getRole() > 0" @click="deleteGoal">
+                    <a class="dropdow-menu-li-a">
+                        <span class="icon-24 icon-left-block icon-delete"></span>
+                        <span>{{kLg.lblDelete}}</span>
+                    </a>
+                </li>
+                <li class="liHideOnNoAccess" @click="addNewColumn" v-if="getRole() > 0 && !IsMain">
+                    <a class="dropdow-menu-li-a">
+                        <span class="icon-24 icon-left-block icon-add-region"></span><span>{{kLg.addNewColumn}}</span>
+                    </a>
+                </li>
+                <li class="liHideOnNoAccess" v-if="!IsMain">
+                    <input style="margin-left: 14px; margin-top: 6px;" type="checkbox" v-model="item.IsReduceSize"
+                           @click="onToggleReduceSize" class="pointer" />
+                    <span style="margin-left: 6px">{{kLg.toggleViewSmall}}</span>
+                </li>
+            </ul>
+        </div>
+        <div v-if="isShow" class="dnb_goal-name-des" 
+             @mouseover="e => onMouseOverShowTooltip(e)"
+             style="width:228px;height:260px;display:inline-block;overflow:hidden">
+            <h5 class="dnb_goal-name" 
+                v-bind:style="[StyleSafari.H5, StyleFinish]">
+                <span class="dnb_fix-float-firefox" 
+                      v-bind:style="[StyleSafari.FixFloat]"
+                      style="display: inline-block;"></span>
+                {{item.Name}}
+            </h5>
+            <p class="dnb_goal-des" v-bind:style="[StyleFinish]">
+                {{TextDescription}}
+            </p>
+        </div>
+
+        <!--<h5 v-if="isShow" class="goal-sub"
+            v-bind:style="[StyleSafari.H5]"
+            style="width:174px;">
+            <span class="dnb_fix-float-firefox"
+                  v-bind:style="[StyleSafari.FixFloat] "></span>
+            <span ></span>
+        </h5>
+        <p v-if="isShow" class="msa-goal-desc"
+           style="max-width:222px;width:222px;"
+           @mouseover="e => onMouseOverShowTooltip(e)"></p>-->
+    </div>
+    
+    <div v-if="isShow"
+         style="margin-top: 0; padding-top: 4px; margin-bottom: 0; padding-bottom: 4px; width: 100%; display: inline-block;height:24px;"
+         class="gv-rowinfo truncate dnb_lst_people">{{item.ThePeople}}</div>
+    
+    <div v-if="isShow"
+         style="margin-top: 0; padding-top: 4px; margin-bottom: 0; padding-bottom: 4px; width: 100%; display: inline-block;height:24px;"
+         class="gv-rowinfo truncate dnb_lst_category">{{item.Category}}</div>
+    
+    <div v-if="isShow"
+         style="margin-top: 0; padding-top: 4px; margin-bottom: 0; padding-bottom: 4px; width: 100%; display: inline-block;height:24px;"
+         class="gv-rowinfo truncate dnb_lst_evaluation">{{item.Evaluation}}</div>
+    
+    <div v-if="isShow"
+         style="margin-top: 0; padding-top: 4px; margin-bottom: 0; padding-bottom: 4px; width: 100%; display: flex; height: 30px;
+       justify-content: space-between;"
+         class="dnb_show_b-o">
+        <div class="dnb_lst_budget">
+            <span v-if="item.Budget != null && item.Budget > 0" style="display:flex;" 
+                  class="msa-color00 msa-goal-currency-ellipse dnbOnOverCheckShowExceedCost"
+                  v-bind:class="getCssExceedCost().B"
+                  @mouseover="e => onMouseOverCheckShowExceededCost(e.target)">
+                <span class="msa-text-bold msa-currency-symbol">B:&nbsp;</span>
+                <span mstype="currency">{{ViewCurrencyName}} &nbsp;</span> 
+                <span class="dnb-bopc-value">{{ViewBudget}}</span>
+            </span>
+        </div>
+        <span v-if="(item.IsMasterGoal || !item.IsAssignMaster)">
+            <span v-if="item.MasterCurrency" style="display:flex;"
+                  class="pull-right msa-color00 msa-goal-currency-ellipse dnbOnOverCheckShowExceedCost" 
+                  @mouseover="e => onMouseOverCheckShowExceededCost(e.target)"
+                  v-bind:class="[CssMarkBudget, getCssExceedCost().Obig]">
+                <span class="msa-text-bold msa-currency-symbol">O:&nbsp;</span>
+                <span mstype="currency">{{item.MasterCurrency}} &nbsp;</span>
+                <span class="dnb-bopc-value">{{ViewMarkBudget}}</span>
+            </span>
+        </span>
+        <span v-else>
+            <span v-if="(item.Budget !== null && item.Budget > 0)" style="display:flex;"
+                  class="pull-right msa-color00 msa-goal-currency-ellipse dnbOnOverCheckShowExceedCost" 
+                  @mouseover="e => onMouseOverCheckShowExceededCost(e.target)"
+                  v-bind:class="getCssExceedCost().o">
+                <span class="msa-text-bold msa-currency-symbol">o:&nbsp;</span>
+                <span mstype="currency">{{ViewCurrencyName}} &nbsp;</span> 
+                <span class="dnb-bopc-value">{{ValueCosto}}</span>
+            </span>
+        </span>
+    </div>
+    
+    <div v-if="isShow"
+         style="margin-top: 0px; padding-top: 4px; margin-bottom: 0; padding-bottom: 0; width: 100%; display: flex; justify-content: space-between;height:26px;"
+         class="gv-rowinfo truncate font-14 dnb_show_p-c">
+        <span v-if="isEditMain()" style="display:flex;"
+              class="navP msa-color00 msa-goal-currency-ellipse">
+            <span v-if="item.ExpectedCost != null && item.ExpectedCost != 0"
+                  class="msa-text-bold msa-currency-symbol">P:&nbsp;</span>
+            <span v-if="item.ExpectedCost != null && item.ExpectedCost != 0">{{ViewCurrencyName}} &nbsp;</span>
+            <span class="dnb-bopc-value">{{ViewExpectedCost}}</span>
+        </span>
+        <span v-else style="display:flex;"
+              class="navP msa-color00 msa-goal-currency-ellipse">
+            <span v-if="item.ExpectedCost != null && item.ExpectedCost != 0"
+                  class="msa-text-bold msa-currency-symbol">P:&nbsp;</span>
+            <span v-if="item.ExpectedCost != null && item.ExpectedCost != 0">{{ViewCurrencyName}} &nbsp;</span>
+            <span class="dnb-bopc-value">{{ViewExpectedCost}}</span>
+        </span>
+
+        <div v-if="item.ActualCost != null && item.ActualCost != 0">
+            <span v-if="isEditMain()" style="display:flex;"
+                  class="msa-color00 msa-goal-currency-ellipse">
+                <span class="msa-text-bold msa-currency-symbol">C:&nbsp;</span>
+                <span v-if="item.ActualCost != null && item.ActualCost != 0">{{ViewCurrencyName}} &nbsp;</span>
+                <span class="dnb-bopc-value">{{ViewActualCost}}</span>
+            </span>
+            <span v-else style="display:flex;"
+                  class="msa-color00 msa-goal-currency-ellipse">
+                <span class="msa-text-bold msa-currency-symbol">C:&nbsp;</span>
+                <span v-if="item.ActualCost != null && item.ActualCost != 0">{{ViewCurrencyName}} &nbsp;</span>
+                <span class="dnb-bopc-value">{{ViewActualCost}}</span>
+            </span>
+        </div>
+    </div>
+    
+    <div v-if="isShow"
+         class="msa-margin-t14 dnb_show_start-end"
+         style="margin-top: 0px; padding-top: 15px; margin-bottom: 0px; padding-bottom: 4px; width: 100%; display: inline-block;">
+        <span class="msamg-start-end-date dnbOnOverCheckShowWrongdate" 
+              v-bind:class="CssWrongDate"
+              @mouseover="e => onMouseOverCheckShowWrongdate(e.target)"
+              style="margin-right:3px">
+            <i class="k-icon k-i-calendar msa-goal-cal"></i>
+            <span>{{ViewStartDate}}</span>
+            <span>{{ViewEndDate}}</span>
+        </span>
+        <span class="icon-16 icon-exclamation goal-overdue"
+              v-if="IsGoalOverDue"
+              v-bind:title="kLg.msgExceededGoalDate"
+              @mouseover="e => onMouseOverShowOverdue(e.target)"></span>
+    </div>
+    
+    <div v-if="isShow"
+         class="dnb_show_url-status"
+         style="margin-top: 0px; padding-top: 4px; margin-bottom: 6px; padding-bottom: 0px; width: 100%; display: flex; justify-content: end;">
+        <div class="gv-goal-status text-right truncate msa-goal-status">
+            <span class="ms-tooltip msa-last-status-tooltip" data-role="tooltip"
+                  @mouseover="e => HoverTooltipStatusProtocol(item, e)">
+                <span class="truncate pull-right msa-last-status">{{item.LastStatus}} </span>
+            </span>
+        </div>
+        <div>
+            <span v-if="item.HasLink" class="icon-20 pointer aplink-overview-url"
+                  style="margin:0 5px;" 
+                  v-bind:typeid="TypeId"
+                  @click="expandApLinkOverviewUrl"
+                  v-bind:class="classLinkMasterLink"></span>
+        </div>
+    </div>
+</div>

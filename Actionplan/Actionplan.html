@@ -1,0 +1,187 @@
+﻿<div class="actionplan-vuejs-view" v-cloak style="overflow:initial !important;margin-top:18px;">
+    <div class="kpigapopover-sticky">
+        <div class="icon-kr-goal">
+            <div class="icon-kr-item" v-if="kpiRegionControl.isCollapse">
+                <span style="border-radius: 50%; border: 2px solid white; background-position: -150px -871px;" @click="kpiRegionService().reOpen()"
+                      class="icon-36 arrow-next-blue onexpandkr-sticky pointer"></span>
+                <span class="icon-20 icon-close-blue closeexpan onclosekr-sticky pointer" @click="kpiRegionService().clear()"
+                      style="background-color: rgba(255, 255, 255, 1); border-radius: 2px;"></span>
+            </div>
+            <div class='icon-link-item tlt_link-sticky' v-if="apLinkControl.isCollapse">
+                <span style="border-radius: 50%; border: 2px solid white; background-position: -150px -871px;" @click="apLinkService().reOpen()"
+                      class="icon-36 arrow-next-blue onexpandlink-sticky pointer"></span>
+                <span class="icon-20 icon-close-blue closeexpan oncloselink-sticky pointer" @click="apLinkService().clear()"
+                      style="background-color: rgba(255, 255, 255, 1); border-radius: 2px;"></span>
+            </div>
+        </div>
+    </div>
+
+    <div style="display:flex;position:relative;">
+        <NavigationMenu v-show="IsShowNavigationMenu" :navigationMenu="DataNavigationMenu"
+                        ref="RefNavigationMenu"
+                        style="width: 288px; min-width: 288px; margin-top: 5px; margin-right: 21px;" />
+
+        <section v-if="NavigationMenuView.length > 0"
+                 v-show="IsShowNavigationMenu"
+                 class="msa-view-right"
+                 style="width: calc(100% - 303px); position: relative;">
+            <div id="loading-goalaction" class="loading"></div>
+
+            <NavigationDetail :items="NavigationMenuView" ref="RefNavigationDetail" />
+        </section>
+
+        <!--Default View (Chuong trinh hien thi nhu cu)-->
+        <section v-show="!IsShowNavigationMenu"
+                 class="msa-view-right-default"
+                 style="width:100%;">
+            <div v-if="ListSubmarketProductGroup.length > 0"
+                 v-for="(spg, i) in ListSubmarketProductGroup"
+                 :key="'list-submarket-product-group_' + i + '_' + spg.LandId"
+                 style="margin-bottom: 21px;margin-top:3px;">
+                <div style="display:flex;color: #666"
+                     v-bind:class="classLabel">
+                    <div v-for="(pth) in getPath2(spg.NamePaths).Lst1stPath"
+                         v-bind:style="{color: pth.Color}"
+                         style="display:inline-flex">
+                        {{pth.Txt}}
+                        <span class="icon-32 arrow-thingray-right" style="height: 25px;width: 28px;margin-left: -5px;"></span>
+                    </div>
+                    <span style="font-weight:bold">{{getPath2(spg.NamePaths).RegionName}}</span>
+                </div>
+
+                <MsaViewMarket v-for="(mt, i) in spg.MarketSegmentGroups"
+                               :key="'list-market-' + mt.Id + '_' + i + '_key-force-update-' + 1"
+                               ref="RefViewMarket"
+                               itemtype="Market"
+                               :landid="spg.LandId"
+                               :item="mt" :children="mt.ListSubmarketProduct" />
+            </div>
+            <div v-if="SubMarketProductViewGroup.length > 0"
+                 v-for="(spg, i) in SubMarketProductViewGroup"
+                 :key="'regionoverview_list-submarket-product-group_' + i + '_' + spg.LandId"
+                 style="margin-bottom: 21px;margin-top:3px;">
+                <div style="display:flex;color: #666"
+                     v-bind:class="LabelRegionOverview">
+                    <div v-for="(pth) in getPath2(spg.RegionViewPaths).Lst1stPath"
+                         v-bind:style="{color: pth.Color}"
+                         style="display:inline-flex">
+                        {{pth.Txt}}
+                        <span class="icon-32 arrow-thingray-right" style="height: 25px;width: 28px;margin-left: -5px;"></span>
+                    </div>
+                    <span style="font-weight:bold">{{getPath2(spg.RegionViewPaths).RegionName}}</span>
+                </div>
+
+                <MsaViewMarket v-for="(mt, i) in spg.MarketSegmentGroups"
+                               :key="'list-market-' + mt.Id + '_' + i + '_key-force-update-' + 1"
+                               ref="RefViewMarket"
+                               itemtype="Market"
+                               :isregionview="spg.IsRegionView"
+                               :landid="spg.LandId"
+                               :item="mt" :children="mt.ListSubmarketProduct" />
+            </div>
+
+            <div style="padding-bottom:20px;">
+                <h2>{{kLg.filterLabelIndependencyGoal}}</h2>
+                <hr class="noMarginTop">
+                <button type="button" class="msa-v-button" @click="showPopupAddIndependence" v-bind:class="{ 'bg-disable': Role < 1 }">
+                    <span class="icon-16 icon-plus margin-right6"></span>
+                    <span>{{kLg.gaTitleAddOverallThread}}</span>
+                </button>
+
+                <draggable :list="ListIndependence"
+                           group="MIndexIndependence"
+                           class="MindexIndipendence"
+                           handle=".dnbHandleDragDrop"
+                           v-bind="DragDropIndependence.Options"
+                           @start="onDragStartIndependence"
+                           @change="onDragChangeIndependence"
+                           @end="onDragEndIndependence">
+                    <ViewIndependence v-for="(inde, i) in ListIndependence"
+                                      :key="'list-independence-' + inde.Id + '_' + i + '_key-force-update-' + 1"
+                                      ref="RefViewIndependence"
+                                      v-bind:independence-scrolly-id="inde.Id"
+                                      :item="inde" itemtype="Independence"
+                                      style="margin-top:3px;border-radius: 0;border: 0;box-shadow: 0px 0px 10px #00000029;" />
+                </draggable>
+            </div>
+        </section>
+
+    </div>
+
+    <script id="tbHoverNameShowDetailTooltip" type="text/x-kendo-template" style="width:380px;max-width:920px;">
+        <div class="dnbActionplanTooltipWrapModify23Jun2022"
+            style="display:flex;flex-flow:column nowrap;text-align:left;padding-left:8px;padding-right:8px">
+         #if(data.Name) {#
+            <div style="margin-bottom:5px">#:kLg.gaLblName#</div>
+            <div class="pDesContent dnbDesHtmlFormat">#=data.Name#</div>
+            <div class="clearx2"></div>
+           #}#
+           #if(data.Description) {#
+            <div style="margin-bottom:5px">#:kLg.labelDes#</div>
+            <div class="pDesContent dnbDesHtmlFormat">#=data.Description#</div>
+            <div class="clearx2"></div>
+           #}#
+           #if(data.Purpose){#
+            #if(data.Description) {##}#
+            <div style="margin-bottom:5px">#:kLg.labelPurpose#</div>
+            <div class="pDesContent dnbDesHtmlFormat">#=data.Purpose#</div>
+            <div class="clearx2"></div>
+           #}#
+           #if(data.Effect){#
+            #if(data.Description || data.Purpose) {##}#
+            <div style="margin-bottom:5px">#:kLg.labelEstimate#</div>
+            <div class="pDesContent dnbDesHtmlFormat">#=data.Effect#</div>
+            <div class="clearx2"></div>
+           #}#
+           #if(data.Arrived){#
+            #if(data.Description || data.Purpose || data.Effect) {##}#
+            <div style="margin-bottom:5px">#:kLg.labelArrived#</div>
+            <div class="pDesContent dnbDesHtmlFormat">#=data.Arrived#</div>
+            <div class="clearx2"></div>
+           #}#
+           #if(data.ExpectedEffect){#
+            #if(data.Description || data.Purpose || data.Effect || data.Arrived) {##}#
+            <div style="margin-bottom:5px">#:kLg.gaLblExpectedEffect#</div>
+            <div class="pDesContent dnbDesHtmlFormat">#=data.ExpectedEffect#</div>
+            <div class="clearx2"></div>
+           #}#
+
+        #if(data.ActionActualEffect){#
+            #if(data.Description || data.Purpose || data.Effect || data.Arrived || data.ExpectedEffect) {##}#
+            <div style="margin-bottom:5px">#:kLg.gaLblActualEffect#</div>
+            <div class="pDesContent dnbDesHtmlFormat">#=data.ActionActualEffect#</div>
+            <div class="clearx2"></div>
+           #}#
+        </div>
+    </script>
+    <script id="tbHoverStatusProtocol" type="text/x-kendo-template" style="width:380px">
+        <div style="display:flex;flex-flow:column nowrap;text-align:left;padding-left:8px;padding-right:8px">
+          #if(data.LastStatusDate){#
+           <div class="pDesTitle" style="margin-bottom:10px">#:kLg.labelDate#</div>
+           <div class="pDesContent dnbDesHtmlFormat"style="margin-bottom:10px">#=data.LastStatusDate#</div>
+          #}#
+           <div class="pDesTitle"style="margin-bottom:10px">#:kLg.labelComment#</div>
+           <div class="pDesContent dnbDesHtmlFormat"style="margin-bottom:10px">#=data.LastStatusDescription#</div>
+        </div>
+    </script>
+    <script id="tbHoverShowChartEvaluation" type="text/x-kendo-template" style="min-width:450px">
+        <div style="position: relative;">
+           #if(data.TemplateName != null){#
+            <div style="text-align:center;white-space: nowrap;overflow: hidden; text-overflow: ellipsis;">#:data.TemplateName#</div>
+           #}#
+            <div id="DnbTlpChartEvalXYZ_#:data.Id#" style="margin-left: 60px;"></div>
+            <div style="position: absolute; top: 50%; left: -201px; transform: rotate(270deg);width: 417px;" 
+                 class="dnb-chart-titlexy-tlptip">#:data.TitleY#</div>
+            <div style="left: 76px;text-align: left;" class="dnb-chart-titlex-tlptip">#:data.TitleNegativeX#</div>
+            <div style="left: calc(50% + 21px); transform: translateX(-50%); text-align: center;" 
+                 class="dnb-chart-titlex-tlptip">#:data.TitleNeutralX#</div>
+            <div style="text-align: right; right: 34px;" class="dnb-chart-titlex-tlptip">#:data.TitlePositiveX#</div>
+            <div style="text-align: center; margin-top: 25px;margin-left: 46px;" 
+                 class="dnb-chart-titlexy-tlptip">#:data.TitleX#</div>
+            <div style="text-align: left; bottom: 108px;" class="dnb-chart-titley-tlptip">#:data.TitleNegativeY#</div>
+            <div style="text-align: center; top: calc(50% + -21px);" 
+                 class="dnb-chart-titley-tlptip">#:data.TitleNeutralY#</div>
+            <div style="text-align: right; top: 84px;" class="dnb-chart-titley-tlptip">#:data.TitlePositiveY#</div>
+        </div>
+    </script>
+</div>

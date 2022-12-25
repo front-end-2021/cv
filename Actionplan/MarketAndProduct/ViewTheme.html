@@ -1,0 +1,120 @@
+﻿<section v-if="ViewByNavigationMenu"
+         :navmenu-directid="item.Id"
+         v-bind:type="itemtype">
+    <div class="panel-heading panel-heading-common panel-heading panel-heading-mass dnbHandleDragDropTheme"
+         style="padding-left: 15px; display: flex; justify-content: space-between; padding-right: 4px;">
+        <div style="display:flex">
+            <h4 class="panel-title box-pointer" style="white-space:nowrap;min-width:232px; max-width:232px;">
+                <span v-if="item.ViewRightType != 'SubgoalTheme'"
+                      :class="[IcToggleClass]" style="cursor:pointer;"
+                      @click="onClickToggleShow"></span>
+                <span class="msa-text-ellips msa-product-name text-hover-underline"
+                      v-bind:style="{paddingLeft: item.ViewRightType == 'SubgoalTheme' ? '0' : ''}"
+                      style="padding-top:1px;cursor:pointer" :title="item.Name" 
+                      @click="onClickToggleShow">{{item.Name}}</span>
+                <span class="msa-ic-font msa-toggle-expand-mg"
+                      v-bind:class="[IcCloseAllMaingoal]" style="margin-left: 6px"
+                      @click="(e) => {ToggelExpandAllMailGoalTheme(e.target) }"></span>
+            </h4>
+            <div v-show="item.RoleId > 0" style="display: inline-flex; width: 327px; justify-content: space-between; ">
+                <span class="msa-grp-btn-add-item">
+                    <span class="icon-16 icon-right-block icon-plus smAddGoal" 
+                          @mouseover="e => onHoverShowTooltipAddGoalAction(e.target, 1)"
+                          @click ="addMaingoalByNavTheme"></span>
+                </span>
+                <span class="msa-grp-btn-add-item">
+                    <span class="icon-16 icon-right-block icon-plus" mstype="noGoal" 
+                          @mouseover="e => onHoverShowTooltipAddGoalAction(e.target, 2)"
+                          @click="showAddSubGoalWithoutMainTheme"></span>
+                </span>
+            </div>
+
+        </div>
+        <div style="display:flex;padding-right:7px;">
+            <span :tid="item.Id" type="child"
+                  class="master-title" :status="item.MasterGoalStatus">{{MasterStatus}}</span>
+            <span style="display:inline-flex">
+
+                <span v-show="item.RoleId > 0" 
+                      style="margin: 0 14px 0 0; padding: 0 5px; height:22px; border-right: 1px solid white;padding-top:1px;">
+                    <span class="icon-16 icon-right-block icon-plus" x
+                          @mouseover="e => onHoverShowTooltipAddGoalAction(e.target, 3)"
+                          @click="showAddActionTheme"></span>
+                </span>
+
+            </span>
+            <div v-if="item.RoleId > 0"
+                 style="position:relative" class="msa-menu-override-uleft">
+                <span class="icon-right-block cursor-pointer msa-ic-font font-edit2 overallthread"
+                      data-toggle="dropdown" style="font-size:13px;padding-top:1px;"></span>
+                <ul role="menu" class="popup-menu dropdown-menu ms-popup-menu-left " 
+                    style="position:absolute;top:18px;right:-1px;">
+                    <li><a class="dropdow-menu-li-a" @click="showEditTheme">
+                        <span class="icon-24 icon-left-block icon-edit"></span>{{kLg.edit}}</a></li>
+
+                    <li v-if="item.IsEdit || item.RoleId > 0" role="presentation" class="divider"></li>
+                    <li v-if="item.IsEdit || item.RoleId > 0">
+                        <a class="dropdow-menu-li-a" @click="onMenuDeleteTheme">
+                        <span class="icon-24 icon-left-block icon-delete"></span>{{kLg.lblDelete}}</a></li>
+                    <li v-if="item.IsEdit || item.RoleId > 0" role="presentation" class="divider"></li>
+                    <li v-if="item.IsEdit || item.RoleId > 0" >
+                        <a class="dropdow-menu-li-a" @click="gaExportService">
+                            <span class="icon-24 icon-left-block icon-export"></span>{{kLg.exportFragenset}}
+                        </a>
+                    </li>
+                    <li v-if="item.IsEdit || item.RoleId > 0" role="presentation" class="divider"></li>
+                    <li v-if="item.IsEdit || item.RoleId > 0" >
+                        <a class="dropdow-menu-li-a" @click="gaImportService">
+                            <span class="icon-24 icon-left-block icon-import"></span>{{kLg.importFragenset}}
+                        </a>
+                    </li>
+
+                    <li role="presentation" class="divider" style="display:none"></li>
+                    <li style="display:none">
+                        <input type="checkbox" :navid="item.Id" mstype="independence" checked class="cbxMaingoalNav" 
+                               style="float: left;margin-left: 12px;margin-top: 6px;margin-right: 10px;">
+                        <a class="dropdow-menu-li-a"><span>{{kLg.textMaingoalNav}}</span></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div v-if="IsExpand" 
+         class="msa-product-overview-list-maingoal dnbDraggGoalWr">
+        <div v-if="ListMain.length" class="msa-theme-list-maingoal"
+             data-queue-reload="false" :theme-id="item.Id">
+            <draggable :list="ListMainDragDrop"
+                       v-bind:group="getGroupMain()"
+                       class="MIndexMaingoal"
+                       handle=".dnbHandleDragDropMaingoal"
+                       v-bind="DragdropOptions"
+                       @start="onDragStartMaingoal"
+                       @change="onDragChangeMaingoal"
+                       @end="onDragEndMaingoal"
+                       :move="onDragMoveGoal">
+                <MsaMainGoalOverView v-for="(mg, i) in ListMainDragDrop"
+                                     :key="'mg-theme_' + mg.Id + '_' + mg.Mdf"
+                                     ref="RefViewMainGoal"
+                                     :goal="mg" itemtype="maingoal" bg="78BF52" />
+            </draggable>
+        </div>
+        <draggable v-else
+               :list="ListMain"
+               v-bind:group="getGroupMain()"
+               class="MIndexMaingoal"
+               handle=".dnbHandleDragDropMaingoal"
+               v-bind="DragdropOptions"
+               @start="onDragStartMaingoal"
+               @change="onDragChangeMaingoal"
+               @end="onDragEndMaingoal"
+               :move="onDragMoveGoal">
+            <div class="drgdrpEmptyMain drgdrp-empty-item"
+                    drgdrp-id="00000000-0000-0000-0000-000000000000"
+                    drgdrp-mdf="-1"
+                    drgdrp-regionid="-1"
+                    v-bind:drgdrp-indid="item.Id"
+                    dragdroptype="1"></div>
+        </draggable>
+    </div>
+</section>

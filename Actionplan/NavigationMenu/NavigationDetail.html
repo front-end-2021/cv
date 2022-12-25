@@ -1,0 +1,23 @@
+﻿<div class="navigation-menu-detail">
+    <div v-for="(item, i) in items"
+         class="nav-menu-detail-block">
+        <NavMenuViewMaingoal v-if="item.ListSubGoal" :goal="item"
+                             ref="RefNavMenuView"
+                             itemtype="maingoal" />
+        <NavMenuViewProduct v-else-if="item.ViewRightType == 'SubgoalProduct'"
+                            :item="item"
+                            ref="RefNavMenuView"
+                            itemtype="Product" />
+        <NavMenuViewTheme v-else-if="item.ViewRightType == 'SubgoalTheme'"
+                            :item="item"
+                            ref="RefNavMenuView"
+                            itemtype="Theme" />
+        <!--<NavMenuViewProductM v-else-if="item.ViewRightType == 'SubgoalTheme' || item.ViewRightType == 'SubgoalProduct'"
+                            :item="item"
+                            ref="RefNavMenuView"
+                            itemtype="productTheme" />-->
+        <NavMenuViewSubgoal v-else-if="item.ListAction" :item="item"
+                            ref="RefNavMenuView"
+                            itemtype="subgoal" />
+    </div>
+</div>

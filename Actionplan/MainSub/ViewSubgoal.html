@@ -1,0 +1,377 @@
+﻿<div v-if="ViewVisible.IsShowSubgoalName"
+     v-bind:navmenu-directid="SgId"
+     v-bind:drgdrp-id="item.Id"
+     v-bind:drgdrp-pid="MaingoalId"
+     v-bind:drgdrp-mdf="item.Mdf"
+     v-bind:drgdrp-smpid="item.SubMarketProductId"
+     v-bind:drgdrp-regionid="getRegionId()"
+     v-bind:drgdrp-indid="item.IndependencyId"
+     dragdroptype="2"
+     v-bind:sum-action="item.ListAction.length"
+     
+     class="msa-vue-subgoal-overview" >
+    <div v-if="!IsExpand" class="msaSubgoalWrapVue msa-vue-subgoal-collapse frame-drgdrp">
+        <div class="msa-vue-subgoal-wrap msa-collapse-subgoal dnbHandleDragDropSubgoal handleResize"
+             style="height:41px;">
+            <div class="msa-vue-subgoal-name_kpi"
+                 v-bind:style="{width: StyleWithNavMenu.NameKpi}">
+                <div @click="onToggleExpand" style="display: flex;padding-top:3px;"
+                     v-bind:style="{width: StyleWithNavMenu.SubCollapseW}">
+                    <span class="msa-ic-font msa-colorc1 font-arrow-right" style="margin: 2px 7px 0 10px;"></span>
+                    <span class="name-subgoal-toggle msa-colorc1 TooltipNameSub"
+                          @mouseover="e => onMouseoverTooltipNameSub(e)"
+                          style="margin-right: 0px;display: inline-block;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;"
+                          v-bind:style="{minWidth: StyleWithNavMenu.NameSub}"
+                          v-bind:class="ContainFilterResult">{{item.Name}}</span>
+                </div>
+                <div v-if="item.Name"
+                     style="width: 60px">
+                    <div v-if="item.ApEvaluation != null" kpitype="subgoal"
+                         class="maingoal-xx kpi-overview kpi-overview-goal kpi-overview-bgdown msa-mg-collapse-kpi "
+                         v-bind:class="ColorApEvaluation">
+                        <span class="xnxx"></span>
+                        <span class="dnbIgnoreDblClickEditGoal" v-if="ApEvaluation" style="margin-top: 2px;">{{item.ApEvaluation}}</span>
+                    </div>
+                    <div v-if="item.ApEvaluation == null && item.KpiOverViewIsShowPercent" kpitype="subgoal"
+                         class="maingoal-xx kpi-overview kpi-overview-goal kpi-overview-bgdown msa-mg-collapse-kpi "
+                         v-bind:class="[ColorKpi, KpiOverview.ClsArrow, KpiOverview.ClsBg, KpiOverview.KpiBg]">
+                        <span class="xnxx"></span>
+                        <span style="margin-top:1px;max-width:50px"
+                              class="dnbIgnoreDblClickEditGoal" @click="">{{item.KpiOverViewPercentStr}}%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div v-if="item.Name" class="box-pointer"
+                 style="display:inline-flex; margin-top: 6px;" @click="onToggleExpand" 
+                 v-bind:style="{width: StyleWithNavMenu.WDateCurrency}">
+                <div style="min-width: 197px;">
+                    <div class="date-collapse msa-colorc1" style=" width: 170px;top:4px">
+                        <span>{{StartDate}}{{EndDate}}</span>
+                    </div>
+                    <i v-if="StartDate || EndDate" class="k-icon k-i-calendar"
+                       style="color: #C1C1C1; margin-top: 6px; font-size:14px;margin-left: 3px;"></i>
+                </div>
+                <div v-show="StyleWithNavMenu.IsShowCate"
+                     style="display:inline-flex;min-width:170px;max-width:170px;">
+                    <span v-show="item.Category" class="icon-24 icon-arrow-path-gray" style="margin-top:2px"></span>
+                    <span class="gnav-text font-14 msaMgCollapseBarCategory msa-colorc1"
+                          style="margin-left: 5px; min-width: 142px; max-width: 142px; min-height: 19px; max-height: 20px; overflow: hidden;">{{item.Category}}</span>
+                </div>
+
+                <div style="display: inline-flex;min-width:166px; max-width: 166px;">
+                    <span v-show="item.ThePeople" class="icon-24 icon-arrow-path-gray" style="margin-top:2px"></span>
+                    <span class="gnav-text font-14 msaMgCollapseBarThePeople msa-colorc1"
+                          style="margin-left: 5px; min-width: 138px; max-width: 138px; min-height: 19px; max-height: 20px; overflow: hidden;">
+                        {{item.ThePeople}}
+                    </span>
+                </div>
+
+                <span class="nav-cell nav-border" style="display: inline-flex;width:126px!important"
+                      v-bind:class="CssExceedCost.B">
+                    <span v-if="item.Budget != null && item.Budget > 0" class="nav-costtext">
+                        <span style="margin-right:2px;">B</span>
+                    </span>
+                    <span v-if="item.Budget != null && item.Budget > 0" class="nav-current msa-currency-label">
+                        {{ViewCurrencyName}}
+                    </span>
+                    <span v-if="ValueCostEx" class="nav-current file-sub text-right" style="padding-right: 6px">{{ValueCostEx}}</span>
+                </span>
+
+                <div class="nav-cell nav-border msaMgCollapseBarOverdueCostPrt"
+                     v-bind:class="CssExceedCost.o"
+                     style="display: inline-flex;width:126px!important">
+                    <span v-if="item.Budget !== null && item.Budget > 0" class="nav-costtext">
+                        <span style="margin-right:2px;">o</span></span>
+                    <span v-if="item.Budget !== null && item.Budget > 0" class="nav-current msa-currency-label">
+                        {{ViewCurrencyName}}
+                    </span>
+                    <span v-if="ValueCost" class="nav-current file-sub msaMgCollapseBarBudget text-right" style="padding-right: 6px">{{ValueCost}}</span>
+                </div>
+
+                <div class="nav-cell nav-border" style="display: inline-flex;width:126px!important">
+                    <span v-if="item.ExpectedCost" class="nav-costtext"><span style="margin-right: 2px;">P</span></span>
+                    <span v-if="item.ExpectedCost" class="nav-current msa-currency-label">
+                        {{ViewCurrencyName}}
+                    </span>
+                    <span class="nav-current file-sub text-right" style="padding-right: 6px">{{ExpectedCost}}</span>
+                </div>
+
+                <div class=" nav-cell nav-border" style="display: inline-flex;width:126px!important">
+                    <span v-if="item.ActualCost" class="nav-costtext"><span style="margin-right:2px;">C</span></span>
+                    <span v-if="item.ActualCost" class="nav-current msa-currency-label text-right" style="text-align:left;">
+                        {{ViewCurrencyName}}
+                    </span>
+                    <span v-if="item.ActualCost" class="nav-current file-sub text-right" style="padding-right: 6px">
+                        {{ActualCost}}
+                    </span>
+                </div>
+            </div>
+
+            <div class="handleResizeCount" style="display: inline-flex; margin-left: -15px;margin-top: 10px;">
+                <span class="msa-grp-sum-msa" style="border-right-color: rgb(193, 193, 193);" @click="onToggleExpand" v-bind:class="{'no-border' : item.IsShow == 0 }">
+                    <span v-if="item.IsHasInvisibility" class="font-auge" style="margin-left:-20px;"></span>
+                    <span class="msa-sum-msa" style="display: inline-block;">{{item.ChildCount}}</span>
+                </span>
+                <div class="drp-menu-main-goal" style=" margin-right:10px;margin-top:-5px;width:25px;">
+                    <span data-toggle="dropdown" class="icon-right-block cursor-pointer msa-mg-menu-icon msa-ic-font font-edit2" style="padding-top: 1px; height: 21px;" v-if="item.IsShow > 0"></span>
+                    <ul role="menu" class="popup-menu dropdown-menu ms-popup-menu msa-goal-menu">
+                        <li class="liHideOnNoAccess" @click="(e) => {AddnewColumn(e.target) }" v-if="getRole() > 0">
+                            <a class="dropdow-menu-li-a">
+                                <span class="icon-24 icon-left-block icon-add-region"></span> <span>{{kLg.addNewColumn}}</span>
+                            </a>
+                        </li>
+                        <li class="liHideOnNoAccess">
+                            <a class="dropdow-menu-li-a">
+                                <input style="margin-left: 4px; margin-top: 4px;" type="checkbox" 
+                                       v-model="item.IsReduceSize" class="pointer" />
+                                <span style="margin-left: 6px">{{kLg.toggleViewSmall}}</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div v-if="IsExpand" class="msaSubgoalWrapVue msa-vue-subgoal-expand frame-drgdrp" 
+         v-bind:class="[ViewRightType == 'SubgoalNavMenu' ? 'nav_menu_viewright-subgoal_expand' : '']"
+         style="display: flex;height:100%; border-bottom: 1px solid #dedede;">
+        <div v-if="ViewRightType == 'SubgoalDefault'"
+             style="min-width:286px;max-width:286px;display:inline-flex;color:white;flex-direction:column;padding-bottom: 9px;">
+            <div @click="(e) => {onToggleExpand(e.target) }" class="toggleAllsubgoal"
+                 style="display: flex; align-items: center; align-items: center; background-color: #006398; height: 40px; ">
+                <div style="display: inline-block; width: 32px; height: 21px; padding-left: 12px;">
+                    <span class="msa-ic-font font-arrow-down text-before-color-white"></span>
+                </div>
+                <span @mouseover="e => onMouseoverTooltipNameSub(e)"
+                      class="TooltipNameSub dnbHandleDragDropSubgoal"
+                      style="max-width: 234px; overflow: hidden; display: inline-block; white-space: nowrap; text-overflow: ellipsis;">{{item.Name}}</span>
+            </div>
+            <div class="msaTriggerResizeSg" style="min-height:420px;">
+                <ItemMainSub v-if="ViewVisible.ShowOverview"
+                             class="dnbHandleDragDropSubgoal"
+                             v-bind:sum-action="item.ListAction.length"
+                             :item="item"
+                             :Datemain="Datemain"
+                             :StartDatemain="StartDatemain" />            <!--ItemMainSub component-->
+
+            </div>
+        </div>
+        <div class="msa-vue-subgoal_view-children dnbIgnoreDragDropGoal"
+             v-bind:class="[ClassWidthNavMenu]"
+             v-bind:toggle-view-small="item.IsReduceSize">
+            <div v-if="ViewRightType == 'SubgoalNavMenu' || ViewRightType == 'SubgoalProduct' || ViewRightType == 'SubgoalTheme'"
+                 style="height: 40px; background-color: #78bf52; display: flex; align-items: center; color: white; justify-content: space-between;border-bottom:1px solid white;">
+                <div v-if="ViewRightType == 'SubgoalProduct' || ViewRightType == 'SubgoalTheme'" style="padding-left:12px;display: inline-flex;">
+                    <span style="max-width: 213px; white-space: pre; overflow: hidden; text-overflow: ellipsis; display: inline-block;"
+                          class="TooltipNameSub">{{item.HeadTitle}}</span>
+                    
+                </div>
+                <div v-else-if="ViewRightType == 'SubgoalNavMenu'"
+                     style="padding-left: 12px; font-size:14px;display:flex;">
+                    <span style="max-width: 207px; white-space: pre; overflow: hidden; text-overflow: ellipsis;cursor:pointer;"
+                          class="dnbTooltipParentName"
+                          @mouseover="e => onMouseoverTooltipNameSub(e)">{{item.ParentName}}</span>
+                    <span>&nbsp; <span class="msa-ic-font msa-toggle-expand-mg font-arrow-right" style="margin-left: 0; cursor: default;"></span> &nbsp;</span>
+                    <span @mouseover="e => onMouseoverTooltipNameSub(e)"
+                          style="max-width: 274px; white-space: pre; overflow: hidden; text-overflow: ellipsis; display: inline-block;"
+                          class="TooltipNameSub">{{item.Name}}</span>
+                    
+                </div>
+
+                <!--View Right Navigation SubgoalNavMenu -->
+                <div v-if="ViewRightType == 'SubgoalNavMenu' && !item.IsRegionOverView && getRole() > 0"
+                     style="display: flex; min-width: 1023px; justify-content: space-between;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span class="msa-grp-btn-add-item">
+                            <span class="icon-16 icon-right-block icon-plus" mstype="noGoal"
+                                  @mouseover="e => onHoverShowTooltipAddGoalAction(e.target, 2)"
+                                  @click="addSubGoalWithoutMain"></span>
+                        </span>
+                    </div>
+                    <div style="display:flex;">
+                        <span class="msa-grp-btn-add-item" style="border-right: none;">
+                            <span class="icon-16 icon-right-block icon-plus"
+                                  @mouseover="e => onHoverShowTooltipAddGoalAction(e.target, 3)"
+                                  @click="addActionWithoutSub"></span>
+                        </span>
+                        
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="msa-viewsubgoal-titl_eaction">
+                    <span v-if="item.ListColunm.length > 0"></span>
+                    <input v-else-if="IsEditActionTitle && getRole() > 0"
+                           class="span-to-input dnbIgnoreDragDropGoal" v-model="View_TitleAction" maxlength="19"
+                           @mouseleave="hideInputEditActionTitle"
+                           v-on:keyup.enter="hideInputEditActionTitle" />
+                    <span v-else
+                          class="cssNameAction dnbIgnoreDragDropGoal" style="padding-left:9px;font-weight:700; cursor: auto;"
+                          @click="showInputEditActionTitle">{{View_TitleAction}}</span>
+                    <div v-if="item.IsShow > 0 && ViewRightType != 'SubgoalNavMenu'"
+                         style="display: inline-flex; margin-left: 25px; padding-right: 9px; z-index: 6; background-color: #7eb4d1;height:40px;align-items:center;">
+                        <span class="msa-grp-sum-msa" style="border-right-color: white;height:18px;top:0;"></span>
+                        <div class="drp-menu-main-goal">
+                            <span class="icon-right-block cursor-pointer msa-mg-menu-icon msa-ic-font font-edit2" data-toggle="dropdown"
+                                  style="padding-top: 1px; height: 21px;color:white"></span>
+                            <ul role="menu" class="popup-menu dropdown-menu ms-popup-menu msa-goal-menu">
+                                <li v-if="getRole() > 0 && !(ViewRightType == 'SubgoalProduct' || ViewRightType == 'SubgoalTheme')"
+                                    class="liHideOnNoAccess" @click="(e) => {AddnewColumn(e.target) }">
+                                    <a class="dropdow-menu-li-a">
+                                        <span class="icon-24 icon-left-block icon-add-region"></span><span>{{kLg.addNewColumn}}</span>
+                                    </a>
+                                </li>
+                                <li class="liHideOnNoAccess pointer">
+                                    <a class="dropdow-menu-li-a">
+                                        <input style="margin-left: 4px; margin-top: 4px;" type="checkbox"
+                                               v-model="item.IsReduceSize"
+                                               @click="onToggleReduceSize" class="pointer" />
+                                        <span style="margin-left: 6px">{{kLg.toggleViewSmall}}</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dnbViewWidthAction" style="display: flex; height: calc(100% - 40px); height: initial;">
+                    <div v-if="item.KpiRegions.length > 0"
+                         class="msaKPIView msa-kpi-view"
+                         style="padding-top:5px;"
+                         v-bind:style="[StyleKpiRegionViewAction.Regions]">
+                        <KpiRegion v-for="kpiRegion in item.KpiRegions" :kpiRegion="kpiRegion" :key="kpiRegion.Id + '-' + kpiRegion.MasterSubGoalId"></KpiRegion>
+                    </div>
+                    <div v-if="item.ListColunm.length > 0"
+                         class="msaVueSubgoalColWrap"
+                         @mouseover="e => onMouseoverCheckScrollWheel(e.target)"
+                         @mouseleave="e => onMouseleaveCheckScrollWheel(e.target)"
+                         style="position: relative; margin-top: -38px;overflow-x:hidden;">
+                        <div style="display:flex;overflow-x:hidden;height: 100%;"
+                             v-bind:style="[StyleKpiRegionViewAction.Section]"
+                             v-bind:sum-col="getLenColumn()"
+                             v-bind:class="[ScrollColumnX.ClassScrollX, ClassSubId]"
+                             class="msa-vue-subgoal-col-wrap">
+
+                            <draggable :list="item.ListColunm"
+                                       class="group-Column"
+                                       group="Column"
+                                       handle=".dnbHandleDragDropColumn"
+                                       v-bind="DragdropOptions.Column"
+                                       filter=".dnbIgnoreDragDropColumn"
+                                       @start="onDragStartColumn"
+                                       @change="onDragChangeColumn"
+                                       @end="onDragEndColumn"
+                                       :move="onDragMoveColumn">
+                                <ColumnItem v-for="(col, i) in item.ListColunm"
+                                            :key="'msa-column_' + col.Id + '_' + col.MIndex"
+                                            :item="col"
+                                            :Date="Date"
+                                            v-bind:drgdrp-id="col.Id"
+                                            v-bind:drgdrp-pid="item.Id"
+                                            v-bind:drgdrp-smpid="item.SubMarketProductId"
+                                            v-bind:drgdrp-indid="item.IndependencyId"
+                                            :hasSearchTypeCritias="hasSearchTypeCritias" />
+                            </draggable>
+                        </div>
+
+                        <button class="msa-btn-scroll-left font-arrow-right2 mms-round mss-shadow mms-active mk-icon-add mms-circle mms-btn-scroll"
+                                v-bind:class="[ClassSubId]"
+                                v-if="ScrollColumnX.IsShow"
+                                @click="(e) => { onScrollColumnView(true) }"
+                                style="z-index: 5; visibility: visible;"></button>
+                        <button class="msa-btn-scroll-right font-arrow-right2 mms-round mss-shadow mms-active mk-icon-add mms-circle mms-btn-scroll"
+                                v-bind:class="[ClassSubId]"
+                                v-if="ScrollColumnX.IsShow"
+                                @click="(e) => { onScrollColumnView(false) }"
+                                style="margin-top: 24px; display: block; z-index: 5; visibility: visible"></button>
+                    </div>
+                    <section v-else
+                             class="msa-vue-subgoal_view-action-wrap"
+                             ref="sectionShowAllActions"
+                             style="height:100%;background-color:transparent;position:relative;"
+                             v-bind:style="[StyleKpiRegionViewAction.Section]">
+                        <div v-if="VColumns_OneAction.length > 1" style="display:flex;">
+                            <draggable v-for="(lstAction, _i) in VColumns_OneAction"
+                                       :key="'virtual-col' + _i"
+                                       :list="lstAction"
+                                       group="MIndexAction"
+                                       v-bind="DragdropOptions.Action"
+                                       class="group-Action msa-vue-grp-action dnb-vcolumn-col"
+                                       handle=".dnbHandleDragDropAction"
+                                       filter=".dnbIgnoreDragDropAction"
+                                       @start="onDragStartAction"
+                                       @change="onDragChangeAction"
+                                       @end="onDragEndAction"
+                                       :move="onDragMoveAction">
+                                <ViewAction v-for="(act, i) in lstAction"
+                                            :key="'msa-action_' + act.Id + '_sgid_' + item.Id"
+                                            ref="RefViewAction"
+                                            :item="act"
+                                            :hasSearchTypeCritias="hasSearchTypeCritias" v-if="act.IsShow" />
+                            </draggable>
+                        </div>
+                        <draggable v-if="VColumns_OneAction.length < 2 && VListAction.length"
+                                   :list="VListAction"
+                                   group="MIndexAction"
+                                   v-bind="DragdropOptions.Action"
+                                   class="group-Action msa-vue-grp-action"
+                                   handle=".dnbHandleDragDropAction"
+                                   filter=".dnbIgnoreDragDropAction"
+                                   @start="onDragStartAction"
+                                   @change="onDragChangeAction"
+                                   @end="onDragEndAction"
+                                   :move="onDragMoveAction">
+                            <ViewAction v-for="(act, i) in VListAction"
+                                        :key="'msa-action_' + act.Id + '_sgid_' + item.Id"
+                                        ref="RefViewAction"
+                                        :item="act"
+                                        :hasSearchTypeCritias="hasSearchTypeCritias" v-if="act.IsShow" />
+
+                        </draggable>
+                        <draggable v-if="!VListAction.length"
+                                   :list="VListAction"
+                                   group="MIndexAction"
+                                   v-bind="DragdropOptions.Action"
+                                   class="group-Action msa-vue-grp-action msa-vue-grp-act-empty-action"
+                                   handle=".dnbHandleDragDropAction"
+                                   filter=".dnbIgnoreDragDropAction"
+                                   @start="onDragStartAction"
+                                   @change="onDragChangeAction"
+                                   @end="onDragEndAction"
+                                   :move="onDragMoveAction">
+                            <div class="drgdrp-empty-item"
+                                 drgdrp-id="00000000-0000-0000-0000-000000000000"
+                                 drgdrp-mdf="-1"
+                                 v-bind:drgdrp-sgid="item.Id"
+                                 v-bind:drgdrp-smpid="item.SubMarketProductId"
+                                 v-bind:drgdrp-indid="item.IndependencyId"
+                                 v-bind:drgdrp-regionid="getRegionId()"
+                                 drgdrp-mindex="0"
+                                 dragdroptype="3">
+                            </div>
+                        </draggable>
+
+                        <div v-if="HasBtnAddNewAction && getRole() > 0"
+                             class="liHideOnNoAccess"
+                             v-bind:style="{top: StyleTopAddActionWhenEmpty}"
+                             style="margin:0;display:inline-block;position:absolute;left:10px;">
+                            <div class="div-add msa-action-addnocolumn">
+                                <span class="cursor-pointer add-action msa-add-action"
+                                      @click="(e) => { showPopupAddAction(e) }">
+                                    <span class="msa-ic-font font-plus" style="font-size:10px"
+                                          @mouseover="e => onMouseoverShowTooltipAddAction(e)"
+                                          @mouseleave="e => mouseleaveAddActionbysub(e)"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

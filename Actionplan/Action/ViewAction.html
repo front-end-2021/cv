@@ -51,8 +51,8 @@
                                 </li>
 
                                 <li role="presentation" class="divider" v-if="getRole() > 0"></li>
-                                <li>
-                                    <a class="dropdow-menu-li-a" v-bind:data-id="item.Id" data-type="action" @click="GetFileDOCXAction">
+                                <li><a class="dropdow-menu-li-a" v-bind:data-id="item.Id" data-type="action"
+                                     @click="GetFileDOCXAction">
                                         <span class="icon-24 icon-left-block icon-export"></span>{{kLg.ExportDOCX}}
                                     </a>
                                 </li>
@@ -446,7 +446,7 @@
     </div>
 
     <!--Dành cho trường hợp action k column và k tick check box isReduce-->
-    <div v-if="hasAddNewBtn(item.Id) && !is_ReduceSize() && item.ActionPlanColumnId < 1 && getRole() > 0"
+    <!-- <div v-if="hasAddNewBtn(item.Id) && !is_ReduceSize() && item.ActionPlanColumnId < 1 && getRole() > 0"
          class="liHideOnNoAccess dnbIgnoreDragDropAction"
          style="margin:0;display:inline-block;position:absolute;left:126px;z-index: 1;"
          v-bind:style="{'left': StyleIconAddAction.left, 'bottom': StyleIconAddAction.bottom}">
@@ -456,9 +456,9 @@
                       @mouseover="e => onHoverShowTooltipAddAction(e)"></span>
             </span>
         </div>
-    </div>
+    </div> -->
     <!--Dành cho trường hợp action k column và có tick check box isReduce-->
-    <div v-if="hasAddNewBtn(item.Id) && is_ReduceSize() && item.ActionPlanColumnId < 1 && getRole() > 0"
+    <!-- <div v-if="hasAddNewBtn(item.Id) && is_ReduceSize() && item.ActionPlanColumnId < 1 && getRole() > 0"
          class="liHideOnNoAccess dnbIgnoreDragDropAction"
          style="margin: 0; display: inline-block; position: absolute; left: 365px; z-index: 1; bottom: 32px; bottom: -47px; left: 164px;">
         <div class="div-add msa-action-addnocolumn">
@@ -467,9 +467,9 @@
                       @mouseover="e => onHoverShowTooltipAddAction(e)"></span>
             </span>
         </div>
-    </div>
+    </div> -->
     <!--dành cho trường hợp có column và có tick check box isReduce-->
-    <div v-if="hasAddNewBtn(item.Id) && item.ActionPlanColumnId > 0 && is_ReduceSize() && getRole() > 0"
+    <!-- <div v-if="hasAddNewBtn(item.Id) && item.ActionPlanColumnId > 0 && is_ReduceSize() && getRole() > 0"
          class="liHideOnNoAccess dnbIgnoreDragDropAction"
          style="margin:0;display:inline-block;position:absolute;z-index: 1;bottom: -47px;left:164px">
         <div class="div-add msa-action-addnocolumn ">
@@ -478,9 +478,9 @@
                       @mouseover="e => onHoverShowTooltipAddAction(e)"></span>
             </span>
         </div>
-    </div>
+    </div> -->
     <!--dành cho trường hợp có clumn nhưng k tick check box-->
-    <div v-if="hasAddNewBtn(item.Id) && item.ActionPlanColumnId > 0 && !is_ReduceSize() && getRole() > 0"
+    <!-- <div v-if="hasAddNewBtn(item.Id) && item.ActionPlanColumnId > 0 && !is_ReduceSize() && getRole() > 0"
          class="liHideOnNoAccess dnbIgnoreDragDropAction"
          style="margin:0;display:inline-block;position:absolute;left:128px;z-index: 1;bottom: -36px;">
         <div class="div-add msa-action-addnocolumn">
@@ -489,7 +489,7 @@
                       @mouseover="e => onHoverShowTooltipAddAction(e)"></span>
             </span>
         </div>
-    </div>
+    </div> -->
 </div>
 
 

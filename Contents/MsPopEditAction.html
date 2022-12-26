@@ -2159,8 +2159,7 @@
 
             // building source
             const lstAllAdsingId = vmGoalAction.setting.ActAdvertisingMaterial.filter(a => a.Id > 0).map(a => a.Id);
-            if (viewModel.isMultipleAdvertiser) {
-                
+            if (viewModel.isMultipleAdvertiser) {                
                 switch (true) {
                     case (defaultAdvertising == null):
                     // #region instrument 0 tick Advsing
@@ -2421,8 +2420,7 @@
         }
 
         if (customViewOption.HasProduct == false || vmGoalAction.actionOptions.isDisordered) {
-            //viewModel.set("labeSubSrc", []);
-
+            
             var labeSrc = viewModel.labeSubSrc;
             for (var i = labeSrc.length - 1; i >= 0; i--) {
                 var item = labeSrc[i];
@@ -2439,25 +2437,21 @@
         }
 
         if (customViewOption.HasCustomerJourney == false || vmGoalAction.actionOptions.isDisordered) {
-            //viewModel.set("labeCusSrc", []);
-
+            
             var labeCusSrc = viewModel.labeCusSrc;
             for (var i = labeCusSrc.length - 1; i >= 0; i--) {
                 var item = labeCusSrc[i];
 
-                //item.Id = null;
                 item.IsSelect = false;
                 item.set("DataState", item.Id > 0 ? dataState.Deleted : dataState.Unchanged);
                 viewModel.autoCusSrc.push(item);
                 labeCusSrc.splice(i, 1);
             }
-
             viewModel.set("isVisibleSelectedCus", false);
         }
 
         if (customViewOption.HasMarket == false || vmGoalAction.actionOptions.isDisordered) {
-            //viewModel.set("labeClientSrc", []);
-
+            
             var labeSrc = viewModel.labeClientSrc;
             for (var i = labeSrc.length - 1; i >= 0; i--) {
                 var item = labeSrc[i];
@@ -2542,47 +2536,35 @@
     vmEditAction.setupLanguageCustomView = function () {
         if (customViews == undefined || customViewOption == undefined) return;
 
-       // if (customViewOption.HasDescription) {
-           // var labelDescription = customViews[vmCommon.ActionCustomViewType.DESCRIPTION];
-            //$('#area-edit-action #lblDescription').text(labelDescription && labelDescription.Label ? labelDescription.Label : kLg.labelDes);
-       // }
-
         if (customViewOption.HasActualEffect) {
             var labelActual = customViews[vmCommon.ActionCustomViewType.ACTUALEFFECT];
             $('#area-edit-action #lblActualEffect').text(labelActual && labelActual.Label ? labelActual.Label : kLg.gaLblActualEffect);
         }
-
         if (customViewOption.HasExpectedEffect) {
             var labelExpected = customViews[vmCommon.ActionCustomViewType.EXPECTEDEFFECT];
             $('#area-edit-action #lblExpectedEffect').text(labelExpected && labelExpected.Label ? labelExpected.Label : kLg.gaLblExpectedEffect);
         }
-
         if (customViewOption.HasField) {
             var labelField = customViews[vmCommon.ActionCustomViewType.FIELD];
             $('#area-edit-action #lblField').text(labelField && labelField.Label ? labelField.Label : kLg.gaLblField);
         }
-
         if (customViewOption.HasCategory && language !== 'pm') {
             var labelField = customViews[vmCommon.ActionCustomViewType.CATEGORY];
             $('#area-edit-action #lblCategory').text(labelField && labelField.Label ? labelField.Label : kLg.lblNameAction);
         }
-
         if (customViewOption.HasAdvertising) {
             var labelAdvertising = customViews[vmCommon.ActionCustomViewType.ADVERTISING];
             $('#area-edit-action #lblAdvertisingMaterial').text(labelAdvertising && labelAdvertising.Label ? labelAdvertising.Label : kLg.lblNameAdvertisingMaterials);
         }
-
         if (customViewOption.HasAdvertiser) {
             var labelAdvertiser = customViews[vmCommon.ActionCustomViewType.ADVERTISER];
             $('#area-edit-action #lblAdvertiser').text(labelAdvertiser && labelAdvertiser.Label ? labelAdvertiser.Label : kLg.lblNameAdvertiser);
         }
-
         if (customViewOption.HasRegion) {
             var labelRegion = customViews[vmCommon.ActionCustomViewType.REGION];
             vmGoalAction.RegionTitle = labelRegion && labelRegion.Label ? labelRegion.Label : kLg.lblRegions;
             $('#area-edit-action #lblRegion').text(vmGoalAction.RegionTitle);
         }
-
         if (customViewOption.HasCustomerJourney) {
             var labelCustomerJourney = customViews[vmCommon.ActionCustomViewType.CUSTOMERJOURNEY];
             vmGoalAction.CustomerJourneyTitle = labelCustomerJourney && labelCustomerJourney.Label ? labelCustomerJourney.Label : kLg.vtextCustomerJourney;
@@ -3429,17 +3411,29 @@
             vmEditAction.theAction.ActionPlanColumnId = columnId;
             vmEditAction.theAction.SubMarketProductId = vmGoalAction.actionOptions.subMarketProductId;
             vmEditAction.theAction.IndependencyId = vmGoalAction.actionOptions.independencyId;
-
             oldPeople = vmCommon.pushApply([], vmEditAction.theAction.People, function (item) { return { AccountId: item.AccountId, Email: item.Email, FirstName: item.FirstName, LastName: item.LastName }; });
-
             if (vmEditAction.theAction.ActionCosts.length === 0) {
                 vmEditAction.theAction.ActionCosts.push(new ActionCost(new Date()));
             }
-
             if (vmGoalAction.actionOptions.fromBoard) {
                 vmEditAction.theAction.Color = color;
             }
-
+            if(!!vmCommon.ObjEditAction) {
+                vmEditAction.theAction.Id = vmCommon.ObjEditAction.Id;
+                vmEditAction.theAction.GetId = vmCommon.ObjEditAction.Id;
+                vmEditAction.theAction.Name = vmCommon.ObjEditAction.Name;
+                vmEditAction.theAction.Description = vmCommon.ObjEditAction.Description;
+                vmEditAction.theAction.ExpectedEffect = vmCommon.ObjEditAction.ExpectedEffect;
+                vmEditAction.theAction.ActionActualEffect = vmCommon.ObjEditAction.ActionActualEffect;
+                vmEditAction.theAction.MaingoalId = vmCommon.ObjEditAction.MaingoalId;
+                vmEditAction.theAction.GoalId = vmCommon.ObjEditAction.GoalId;
+                vmEditAction.theAction.ActualCost = vmCommon.ObjEditAction.ActualCost;
+                vmEditAction.theAction.ExpectedCost = vmCommon.ObjEditAction.ExpectedCost;
+                vmEditAction.theAction.AdvertiserName = vmCommon.ObjEditAction.AdvertiserName;
+                vmEditAction.theAction.AdvertisingName = vmCommon.ObjEditAction.AdvertisingName;
+                vmEditAction.theAction.Start = vmCommon.ObjEditAction.Start ? vmCommon.ObjEditAction.Start.jsonToDate():null;
+                vmEditAction.theAction.End = vmCommon.ObjEditAction.End ? vmCommon.ObjEditAction.End.jsonToDate():null;
+            }
         } else {
             vmEditAction.theAction = {
                 Name: '',
@@ -3486,19 +3480,6 @@
                 Links: [],
                 CreatedDate: new Date(),
                 BoardColumnId: vmGoalAction.actionOptions.isDisordered ? vmGoalAction.actionOptions.boardColumnId : null
-                //ActionPlanEvalData: {
-                //    APEvaluationData:
-                //    {
-                //        APEvaluations: [],
-                //        APEvaluationsY: [],
-                //        APEvaluationsZ: [],
-                //        TitleX: null,
-                //        TitleY: null,
-                //        TitleZ: null
-                //    },
-                //    ApSwotanalyses: [],
-                //    TargetData: {}
-                //}
             };
 
             void function validCreatedDate() {
@@ -3584,13 +3565,9 @@
         if (actionSelect == null && vmEditAction.theAction.ActionUpStreamConnectionAction != null) {
             actionSelect = { Name: vmEditAction.theAction.ActionUpStreamConnectionAction.ActionName };
         }
-
         var isSelect = false;
-
         //subproduct
         var subProductGroups = vmGoalAction.actionOptions.subProductGroups;
-        //var isVisibleSub = true;
-
         var autoSubSrc = vmEditAction.getSourceForSub(subProductGroups, false),
             labeSubSrc = vmEditAction.getSourceForSub(subProductGroups, true);
 
@@ -3713,52 +3690,39 @@
             checkHasOutSideConnect: function () {
                 return this.isHasKpi && (this.labeRegionSrc.length > 0 || this.labeSubSrc.length > 0 || this.labeClientSrc.length > 0);
             },
-
             setVisibleKpi: function () {
                 this.set("isVisibleKpi", this.isHasKpi && this.action.AdvertisingMaterial != null && this.action.AdvertisingMaterial > 0 && this.action.Advertiser != null && this.action.Advertiser > 0);
             },
-
             customViewOption: customViewOption,
             isVisibleKpi: isVisibleKpi,
-
             isVisibleSelectedRegion: labeRegionSrc.length > 0,
             isVisibleSelectedSub: labeSubSrc.length > 0,
             isVisibleSelectedClient: labeClientSrc.length > 0 || crmClientItem,
             isVisibleSelectedCus: labeCusSrc.length > 0,
-
             crmClientItem: crmClientItem,
             actionSelectName: actionSelect == null ? null : actionSelect.Name,
             actionSelect: actionSelect,
             actionStream: vmGoalAction.actionOptions.actionStream,
-
             autoRegionValue: null,
             tempRegionValue: null,
-
             autoSubValue: null,
             tempSubValue: null,
-
             autoClientValue: null,
             tempClientValue: null,
-
             autoCusValue: null,
             tempCusValue: null,
-
             budgetInfo: findMasterGoalInfo(1, vmGoalAction.actionOptions.masterGoal, vmEditAction.theAction.MasterId),
             etCostInfo: findMasterGoalInfo(2, vmGoalAction.actionOptions.masterGoal, vmEditAction.theAction.MasterId),
             atCostInfo: findMasterGoalInfo(3, vmGoalAction.actionOptions.masterGoal, vmEditAction.theAction.MasterId),
 
             autoRegionSrc: autoRegionSrc,
             labeRegionSrc: labeRegionSrc,
-
             autoSubSrc: autoSubSrc,
             labeSubSrc: labeSubSrc,
-
             autoClientSrc: autoClientSrc,
             labeClientSrc: labeClientSrc,
-
             autoCusSrc: autoCusSrc,
             labeCusSrc: labeCusSrc,
-
             displaySrc: [],
             displayClientSrc: [],
             displayCusSrc: [],
@@ -3902,14 +3866,11 @@
                     vmEditAction.closePopTemplate();
                 });
             },
-
             listTodoPersons: vmGoalAction.actionOptions.actionTodoDataX,
-
             addActionTodos: function () {
                 if (this.roleEdit) {
                     return;
                 }
-
                 var todos = {
                     Id: vmCommon.getNewId(this.action.ActionTodos),
                     Name: '',
@@ -3965,7 +3926,6 @@
                     
                 }
             },
-            
             removeActionTodos: function (e) {
                 if (this.roleEdit) {
                     return;
@@ -5087,7 +5047,6 @@
 
                 this.visibleUpStream();
             },
-
             dateChange: function (e) {
                 var elem = e.sender.element[0];
 
@@ -5177,7 +5136,6 @@
                     this.action.ActionCosts = actionLocal.ActionCosts;
                 }
                 vmEditAction.AutoWidthByTodoCost(this.action);
-                //this.styleButtonTodoActionCost();
                 bindStartDateAutoformat();
                 bindEndDateAutoformat();
 
@@ -5220,25 +5178,19 @@
                 }
 
                 vmEditAction.visibleCostField(customViewOption.HasCost);
-
-
                 this.updateTotalCost();
                 vmEditAction.changeKpiActionBySI(this.action);
 
                 this.set("enableRemoveCost", this.action.ActionCosts.filter(t => t.IsShow).length > 1);
 
                 this.visibleUpStream();
-
                 this.updateVisibleLastAddActionCost();
-
                 vmEditAction.AutoWidthByTodoCost(this.action);
-
                 setPopupHeight();
                 //Fix auto-complete can not select case 1
                 var tempScroll = $("#area-edit-action").scrollTop();
                 $("#area-edit-action").scrollTop(0);
-                $("#area-edit-action").scrollTop(tempScroll);
-                //<!--
+                $("#area-edit-action").scrollTop(tempScroll);                
                 vmEditAction.initTabIndex();
                 setTimeout(function () {
                     setBlurChangeDate();
@@ -5369,7 +5321,6 @@
                 });
 
                 var isChangeConection = false;
-
                 var tempSubPro = vmCommon.pushApply([], this.oldConnections, function (it) { return it.Id });
                 var subproducts = [];
                 for (var m = 0; m < tempSubPro.length; m++) {
@@ -5472,7 +5423,6 @@
                         }
                         theAction.Status = sStatus;
                     }
-
                     if (isChangeConection) {
                         if (subproducts.length === 0) {
                             theAction.SubProducts.forEach(function (item) {
@@ -5541,15 +5491,14 @@
                                         vmGoalAction.isActionFitFilterMaster(theAction.Id, theAction.GoalId, vmGoalAction.GoalMaster.FirstIds, vmGoalAction.GoalMaster.LastIds))
                                         isResetByResults = true;
 
-                                    if (typeof MsaApp == 'object') {
-                                        MsaApp.pushExpand(theAction.GoalId, 'subgoal');
-
-                                        const aid = theAction.Id;
-                                        MsaApp.setLastActiveElement(aid);
-                                        MsaApp.pushLoadTimeActions('vmEditActionDataserviceUpdateAction');
-
+                                    MsaApp.pushExpand(theAction.GoalId, 'subgoal');
+                                    const aid = theAction.Id;
+                                    MsaApp.setLastActiveElement(aid);
+                                    MsaApp.pushLoadTimeActions('vmEditActionDataserviceUpdateAction');
+                                    if(typeof vmCommon.updateActionClient == 'function') {
+                                        vmCommon.updateActionClient(theAction);
+                                        delete vmCommon.ObjEditAction;
                                     }
-                                    
                                     if (isReset) {
                                         msFilter.controlService.reLoadData();
                                     } else {
@@ -5570,12 +5519,6 @@
                                     if ((theAction.subProductGroups.length > 0 || theAction.subClientGroups.length > 0) || theAction.customerJourneyGroups.length > 0) {
                                         msFilter.controlService.reLoadDataFilter();
                                     }
-                                }
-
-                                if (typeof MsaApp == 'object') {
-                                    MsaApp.reloadAllDataOfPage('MsPopEditAction_updateAction').then(() => {
-                                        console.log('action ====> onUpdate from MsPopEditAction.html');
-                                    });
                                 }
                             }
                             else if (vmCommon.checkCurrentPage(vmCommon.enumPage.TeamBoard)) {
@@ -5667,7 +5610,12 @@
                             nSg.ParentId = nMg.Id;
                             nMg.ListSubGoal.push(nSg);
                             vmCommon.RefLstGa.push(nMg);
+                        } else if(vmCommon.RefAddTypeStr == 'refPopupAddAction'){
+                            let cAct = sHandler.getNewAction(act);
+                            vmCommon.RefLstGa.push(cAct);
                         }
+                        delete vmCommon.RefAddTypeStr;
+                        delete vmCommon.RefLstGa;
                         if (vmGoalAction.popEditAction)
                             vmGoalAction.popEditAction.close();
                         return;

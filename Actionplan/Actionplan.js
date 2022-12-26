@@ -30,7 +30,7 @@ $.get('Actionplan/Actionplan.html').done(template => {
                 ChangeGoalEvent: '',      // dung keo tha main->sub | sub->main
                 Src: null, Des: null,
                 Pos: 0,
-                GroupMain: 'MIndexMainSubgoal', GroupSub: 'MIndexMainSubgoal', GroupMainExpand: 'MIndexMainSubgoal',
+                GroupMain: 'MIndexMainGoal', GroupSub: 'MIndex_Subgoal', GroupMainExpand: 'MIndexMainSubgoal',
             },
             CanDragDrop: true, IsViewer: false,
             DragDropColumn: {

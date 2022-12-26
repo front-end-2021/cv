@@ -2868,6 +2868,8 @@
                                             }
                                         }
                                         vmCommon.RefLstGa.push(cGoal);
+                                        delete vmCommon.RefAddTypeStr;
+                                        delete vmCommon.RefLstGa;
                                        if (vmGoalAction.popEditMainGoal) {
                                             vmGoalAction.popEditMainGoal.close();
                                         }

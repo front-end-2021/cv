@@ -132,7 +132,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 
     <div v-if="IsExpand" class="msaSubgoalWrapVue msa-vue-subgoal-expand frame-drgdrp" 
@@ -292,9 +291,16 @@
                     <section v-else
                              class="msa-vue-subgoal_view-action-wrap"
                              ref="sectionShowAllActions"
+                             v-bind:drgdrp-smpid="item.SubMarketProductId"
+                             v-bind:drgdrp-indid="item.IndependencyId"
+                             v-bind:drgdrp-goalid="item.Id"
                              style="height:100%;background-color:transparent;position:relative;"
                              v-bind:style="[StyleKpiRegionViewAction.Section]">
-                        <div v-if="VColumns_OneAction.length > 1" style="display:flex;">
+                        <div v-if="VColumns_OneAction.length > 1" 
+                            v-bind:drgdrp-smpid="item.SubMarketProductId"
+                             v-bind:drgdrp-indid="item.IndependencyId"
+                             v-bind:drgdrp-goalid="item.Id"
+                            style="display:flex;">
                             <draggable v-for="(lstAction, _i) in VColumns_OneAction"
                                        :key="'virtual-col' + _i"
                                        :list="lstAction"
@@ -354,7 +360,7 @@
                                  dragdroptype="3">
                             </div>
                         </draggable>
-
+<!-- 
                         <div v-if="HasBtnAddNewAction && getRole() > 0"
                              class="liHideOnNoAccess"
                              v-bind:style="{top: StyleTopAddActionWhenEmpty}"
@@ -367,7 +373,7 @@
                                           @mouseleave="e => mouseleaveAddActionbysub(e)"></span>
                                 </span>
                             </div>
-                        </div>
+                        </div> -->
                     </section>
                 </div>
             </div>

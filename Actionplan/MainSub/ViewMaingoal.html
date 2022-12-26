@@ -138,6 +138,9 @@
                     <div class="msa-subgoal-td divDropSubGoalVue msa-showall-subgoal msaSubgoalWrapVue">
                         <div v-if="ViewVisible.IsShowSubgoalName"
                              class="msa-sg-wrap-zebrabg"
+                             v-bind:drgdrp-smpid="goal.SubMarketProductId"
+                             v-bind:drgdrp-indid="goal.IndependencyId"
+                             v-bind:drgdrp-goalid="goal.Id"
                              style="margin-top: -1px; background-color: white; height: 100%; cursor: pointer; border-bottom: 1px solid #f7f7f4; ">
                             <draggable v-if="goal.ListSubGoal.length"
                                        :list="goal.ListSubGoal"
@@ -151,6 +154,8 @@
                                        @end="onDragEndSubgoal"
                                        :move="onDragMoveGoal">
                                 <ViewSubGoalOverView v-for="(sg, i) in goal.ListSubGoal"
+                                                v-bind:drpgrp-i="i"
+                                                v-bind:drpgrp-maing-id="goal.Id"
                                                      :key="'sg-' + sg.Id"
                                                      ref="RefViewSubGoal"
                                                      :item="sg"

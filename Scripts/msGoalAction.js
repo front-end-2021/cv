@@ -4323,9 +4323,7 @@ vmGoalAction.openPopEditColumn = function (id, goalId, mainGoalId, isExpand) {
         });
 
     var title = id == 0 ? kLg.addNewColumn : kLg.editColumn;
-
     vmCommon.popEditType.title(htmlDecode(title));
-
     vmCommon.popEditType.CallbackFunc = function (columnId) {       // delegate/callback
         if (typeof MsaApp == 'object') {
             if (isExpand == false && id == 0) {
@@ -4343,11 +4341,10 @@ vmGoalAction.openPopEditColumn = function (id, goalId, mainGoalId, isExpand) {
                     });
                 });
             }
-            MsaApp.reloadAllDataOfPage(id != 0 ? 'openPopEditColumn_updateColumn' : 'openPopEditColumn_addColumn').then(() => {
-                console.log('a ====> callback from MsPopCustomerJourneySeAssignColunm.html', columnId);
-                
-                MsaApp.canReaction();
-            });
+            // MsaApp.reloadAllDataOfPage(id != 0 ? 'openPopEditColumn_updateColumn' : 'openPopEditColumn_addColumn').then(() => {
+            //     console.log('a ====> callback from MsPopCustomerJourneySeAssignColunm.html', columnId);                
+                 MsaApp.canReaction();
+            // });
         }
     };
 };

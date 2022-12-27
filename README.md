@@ -147,7 +147,7 @@ The project is not open source.
 
 ## License
 
-Distributed under company License, with ISO9001 and ISO27001.
+Distributed under company's License, with ISO9001 and ISO27001.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

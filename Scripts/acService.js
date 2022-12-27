@@ -11363,7 +11363,7 @@ sHandler.getgoalactionmenubyarea = function(entry){
 
 sHandler.getHandler = function(url, entryData) {
     if(typeof url != 'string') return {value: {}};
-    console.log(url);
+    //console.log(url);
     if(url.includes(`funcName=getGoalViewWithoutFilter`)){
         return sHandler.getGoalViewWithoutFilter(entryData);
     }

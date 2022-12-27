@@ -8,7 +8,7 @@
      v-bind:drgdrp-indid="item.IndependencyId"
      dragdroptype="2"
      v-bind:sum-action="item.ListAction.length"
-     
+     v-bind:class="[IsExpand ? 'dnbIgnoreDragDropGoal' : '']"
      class="msa-vue-subgoal-overview" >
     <div v-if="!IsExpand" class="msaSubgoalWrapVue msa-vue-subgoal-collapse frame-drgdrp">
         <div class="msa-vue-subgoal-wrap msa-collapse-subgoal dnbHandleDragDropSubgoal handleResize"

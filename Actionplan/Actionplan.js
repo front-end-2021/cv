@@ -30,7 +30,7 @@ $.get('Actionplan/Actionplan.html').done(template => {
                 ChangeGoalEvent: '',      // dung keo tha main->sub | sub->main
                 Src: null, Des: null,
                 Pos: 0,
-                GroupMain: 'MIndexMainGoal', GroupSub: 'MIndex_Subgoal', GroupMainExpand: 'MIndexMainSubgoal',
+                GroupMain: 'MIndexMainGoal', GroupMainExpand: 'MIndexMainGoal',GroupSub: 'MIndex_Subgoal', 
             },
             CanDragDrop: true, IsViewer: false,
             DragDropColumn: {
@@ -197,7 +197,11 @@ $.get('Actionplan/Actionplan.html').done(template => {
 
                 // dragdrop
                 onDragMoveGoal: this.onDragMoveGoal,
-                isDraggable: () => { return this.CanDragDrop; },
+                isDraggable: () => { 
+                    if(window.mobileAndTabletcheck()){
+                        return false;
+                    }
+                    return this.CanDragDrop; },
                 onDragStartMaingoal: this.onDragStartMaingoal,
                 onDragChangeMaingoal: this.onDragChangeMaingoal,
                 onDragEndMaingoal: this.onDragEndMaingoal,
@@ -2153,8 +2157,6 @@ $.get('Actionplan/Actionplan.html').done(template => {
                 }, AjaxConst.PostRequest);
             },
             onDragMoveGoal(evt, originalEvent) {     //console.log('onDragMoveGoal', evt, originalEvent);
-                    //const from = evt.from;// div.MIndexMaingoal
-                    //const to = evt.to;  // div.MIndexSubgoal
                 const dragged = evt.dragged;//div.msa-maingoal-item (from)
                 const related = evt.related;//div.msa-vue-subgoal-overview (to)
                 const id1 = dragged.getAttribute('drgdrp-id');
@@ -2273,6 +2275,7 @@ $.get('Actionplan/Actionplan.html').done(template => {
                     if (evt.added) {
                         MsaApp.DragDropGoal.iTo = evt.added.newIndex;
                         MsaApp.DragDropGoal.LastEvent = 'onDragChangeMaingoal_added';
+                        vmCommon.DrgDrpMaingoal = evt.added.element;
                     }
                     if (evt.removed) {
                         MsaApp.DragDropGoal.iFrom = evt.removed.oldIndex;
@@ -2282,85 +2285,23 @@ $.get('Actionplan/Actionplan.html').done(template => {
             },
             onDragEndMaingoal(evt) {            //console.log('onDragEndMaingoal', evt);
                 if (this.isViewer()) return;
-                const sumAction = evt.item.getAttribute('sum-action');
-                if (sumAction > 0) {
-                    MsaApp.DragDropGoal.GroupSub = 'MIndexMainSubgoal';
+                if(!!vmCommon.DrgDrpMaingoal) {
+                    const smpIdTo = evt.to.parentNode.getAttribute('smk-product-id');
+                    const indIdTo = evt.to.parentNode.getAttribute('theme-id');
+                    vmCommon.DrgDrpMaingoal.SubMarketProductId = smpIdTo;
+                    vmCommon.DrgDrpMaingoal.IndependencyId = indIdTo;
+                    vmCommon.DrgDrpMaingoal.ListSubGoal.filter(s => {
+                        s.SubMarketProductId = smpIdTo;
+                        s.IndependencyId = indIdTo;
+                        s.ListAction.filter(a => {
+                            a.SubMarketProductId = smpIdTo;
+                            a.IndependencyId = indIdTo;
+                        return true;
+                        });
+                        return true;
+                    });
                 }
-                if (MsaApp.DragDropGoal.GroupMainExpand == 'MIndexMaingoalExpand') {
-                    MsaApp.DragDropGoal.GroupMainExpand = 'MIndexMainSubgoal';
-                }
-                
-                if (MsaApp.DragDropGoal.ChangeGoalEvent == 'ChangeGoalLevel') {     // onDragEndMaingoal
-                    if (sumAction < 1)
-                        MsaApp.changeGoalLevel();
-                    return;
-                }
-
-                if (MsaApp.DragDropGoal.LastEvent == 'onDragChangeMaingoal_moved' && MsaApp.DragDropGoal.iFrom == MsaApp.DragDropGoal.iTo) {
-                    MsaApp.clearDragDropGoal();
-                    return;
-                }
-
-                switch (true) {
-                    case MsaApp.DragDropGoal.LastEvent == 'onDragChangeMaingoal_moved':
-                        // dragdrop cung product || theme
-                        MsaApp.changePositionGoal();
-                        return;
-                    case MsaApp.DragDropGoal.LastEvent == 'onDragChangeMaingoal_removed' || MsaApp.DragDropGoal.LastEvent == 'onDragChangeMaingoal_added':
-                        if (MsaApp.DragDropGoal.Des != null && MsaApp.DragDropGoal.Src != null) {
-                            // dragdrop khac product (cung region hoac sang vung independence)
-                            const mgId = evt.item.getAttribute('drgdrp-expand') == 'true' ? MsaApp.DragDropGoal.Src.Id : undefined;
-                            MsaApp.changePositionGoal(mgId);
-                        } else {
-                            MsaApp.clearDragDropGoal();
-                            const lstMain = evt.to.__vue__.$parent.$data.ListMain.filter(m => m.Id);
-                            evt.to.__vue__.$parent.$data.ListMain = lstMain;
-                        }
-                        return;
-                    default:
-                        MsaApp.clearDragDropGoal();
-                        break;
-                }
-            },
-            changeGoalLevel() {     // doi main => sub || sub => main
-                var source = MsaApp.DragDropGoal.Src;
-                if (!source) return;
-                var des = MsaApp.DragDropGoal.Des;
-                if (!des) return;
-                if (des.Id == source.Id) return;
-
-                var moving = {
-                    SourceActionGoalId: source.Id,
-                    SrcParentId: source.ParentId,
-                    SourceMdf: source.Mdf,
-                    SourceSmpId: source.SmpId,
-                    SrcRegionId: source.RegionId,
-                    SourceThemaId: source.IndId,
-                    SrcType: source.Type,
-
-                    DesActionGoalId: des.Id,
-                    DesParentId: des.ParentId,
-                    DesMdf: des.Mdf,
-                    DesSmpId: des.SmpId,
-                    DesRegionId: des.RegionId,
-                    DesThemaId: des.IndId,
-                    DesType: des.Type,
-
-                    Type: source.Type
-                };
-
-                if (!moving.DesActionGoalId) {     // fix crash
-                    MsaApp.clearDragDropGoalAndReloadData();
-                    return;
-                }
-
-                MsaApp.pushLoadTimeActions('changeGoalLevel_Main_Sub');
-                MsaApp.CanDragDrop = false;
-                vmGoalAction.dataservice.changeGoalLevel(moving, function () {
-                    MsaApp.setLastActiveElement(moving.SourceActionGoalId);
-                    MsaApp.clearDragDropGoalAndReloadData();
-
-                });
+                MsaApp.clearDragDropGoal();
             },
             clearDragDropGoal() {
                 MsaApp.DragDropGoal.Src = null;
@@ -2369,19 +2310,10 @@ $.get('Actionplan/Actionplan.html').done(template => {
                 MsaApp.DragDropGoal.iTo = -1;
                 MsaApp.DragDropGoal.LastEvent = '';
                 MsaApp.DragDropGoal.ChangeGoalEvent = '';   //clearDragDropGoal
+                MsaApp.CanDragDrop = true;
             },
             clearDragDropGoalAndReloadData() {
                 MsaApp.clearDragDropGoal();
-
-                MsaApp.updateListGoalNavMenu();
-                MsaApp.updateDataProductOrTheme_Expand_InView_Observer();           // changeGoalLevel
-                if (this.IsShowNavigationMenu) {
-                    MsaApp.loadOpenProducts();
-                    // MsaApp.loadOpenIndependencies();
-                }
-
-                MsaApp.CanDragDrop = true;
-               
             },
             clearDragDropColumn() {
                 this.DragDropColumn.Obj = null;

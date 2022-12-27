@@ -5405,12 +5405,9 @@
                 } else {
                     theAction.ActionAdvertisers = [];
                 }
-
                 if (vmGoalAction.actionOptions.isEdit) { //Update action
                     isChangeConection = !oldConnection.equals(tempSubPro);
-
                     this.action.ActionUpStreamConnectionAction = vmEditAction.theAction.ActionUpStreamConnectionAction;
-
                     if (vmEditAction.viewModel.get("templateId") != null && theAction.Status.length > 0) {
                         var sStatus = [];
                         for (var sidx = 0; sidx < theAction.Status.length; sidx++) {
@@ -5439,7 +5436,6 @@
                                     }
                                 }
                             }
-
                             for (var i = 0; i < subproducts.length; i++) {
                                 var tempSub = subproducts[i];
                                 if (!vmEditAction.FindById(theAction.SubProducts, tempSub.Id)) {
@@ -5448,7 +5444,6 @@
                             }
                         }
                     }
-
                     if (theAction.IsFromTemplate == undefined) theAction.IsFromTemplate = false;
                     var entryData = {
                         Action: theAction,
@@ -5459,7 +5454,6 @@
                         PathParentId: vmGoalAction.actionOptions.pathParentId,
                         PathParentMdf: vmGoalAction.actionOptions.pathParentMdf
                     };
-
                     vmEditAction.dataservice.updateAction(entryData, function (serData) {
                         vmEditAction.modelChanged = false;
                         if (!vmGoalAction.checkRole(serData)) return;
@@ -5538,9 +5532,7 @@
 
                         } else {
                             alert(kLg.msgConflictData);
-
                         }
-
                     });
                 } else { //Add new action
                     theAction.GoalId = vmGoalAction.actionOptions.goalId;
@@ -5677,11 +5669,11 @@
                                     msFilter.controlService.reLoadDataFilter();
                                 }
 
-                                if (typeof MsaApp == 'object' && MsaApp) {
-                                    MsaApp.reloadAllDataOfPage('MsPopEditAction_addNewAction').then(() => {
+                                // if (typeof MsaApp == 'object' && MsaApp) {
+                                //     MsaApp.reloadAllDataOfPage('MsPopEditAction_addNewAction').then(() => {
                                         
-                                    });
-                                }
+                                //     });
+                                // }
                             }
                             if (vmGoalAction.popEditAction)
                                 vmGoalAction.popEditAction.close();

@@ -91,7 +91,7 @@
              v-bind:class="[ClassExpand]"
              style="width:100%;margin-left: 0px;border-bottom:0;">
             <draggable v-if="ListMain.length"
-                       :list="ListMainDragDrop"
+                       :list="ListMain"
                        v-bind:group="getGroupMain()"
                        class="MIndexMaingoal"
                        handle=".dnbHandleDragDropMaingoal"
@@ -101,7 +101,7 @@
                        @change="onDragChangeMaingoal"
                        @end="onDragEndMaingoal"
                        :move="onDragMoveGoal">
-                <MsaMainGoalOverView v-for="(mg, i) in ListMainDragDrop"
+                <MsaMainGoalOverView v-for="(mg, i) in ListMain"
                                      :key="'mg-product_' + mg.Id + '_' + mg.Mdf"
                                      ref="RefViewMainGoal"
                                      :goal="mg" itemtype="maingoal" bg="78BF52" />

@@ -12,10 +12,6 @@
                             :item="item"
                             ref="RefNavMenuView"
                             itemtype="Theme" />
-        <!--<NavMenuViewProductM v-else-if="item.ViewRightType == 'SubgoalTheme' || item.ViewRightType == 'SubgoalProduct'"
-                            :item="item"
-                            ref="RefNavMenuView"
-                            itemtype="productTheme" />-->
         <NavMenuViewSubgoal v-else-if="item.ListAction" :item="item"
                             ref="RefNavMenuView"
                             itemtype="subgoal" />

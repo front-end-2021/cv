@@ -84,7 +84,7 @@
          class="msa-product-overview-list-maingoal dnbDraggGoalWr">
         <div v-if="ListMain.length" class="msa-theme-list-maingoal"
              data-queue-reload="false" :theme-id="item.Id">
-            <draggable :list="ListMainDragDrop"
+            <draggable :list="ListMain"
                        v-bind:group="getGroupMain()"
                        class="MIndexMaingoal"
                        handle=".dnbHandleDragDropMaingoal"
@@ -93,7 +93,7 @@
                        @change="onDragChangeMaingoal"
                        @end="onDragEndMaingoal"
                        :move="onDragMoveGoal">
-                <MsaMainGoalOverView v-for="(mg, i) in ListMainDragDrop"
+                <MsaMainGoalOverView v-for="(mg, i) in ListMain"
                                      :key="'mg-theme_' + mg.Id + '_' + mg.Mdf"
                                      ref="RefViewMainGoal"
                                      :goal="mg" itemtype="maingoal" bg="78BF52" />

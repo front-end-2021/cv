@@ -1642,11 +1642,28 @@
 
             //config goal from board
             if (vmGoalAction.goalOptions.FromBoard) {
-                //vmEditGoal.theGoal.StartDate = new Date();
-                //vmEditGoal.theGoal.Date = new Date();
                 vmEditGoal.theGoal.MColor = "#B8C92E";
             }
-
+            if(!!vmCommon.ObjEditGoal) {
+                vmEditGoal.theGoal.Id = vmCommon.ObjEditGoal.Id;
+                vmEditGoal.theGoal.GetId = vmCommon.ObjEditGoal.Id;
+                vmEditGoal.theGoal.ParentId = vmCommon.ObjEditGoal.ParentId;
+                vmEditGoal.theGoal.Name = vmCommon.ObjEditGoal.Name;
+                vmEditGoal.theGoal.Description = vmCommon.ObjEditGoal.Description;
+                vmEditGoal.theGoal.Effect = vmCommon.ObjEditGoal.Effect;
+                vmEditGoal.theGoal.Purpose = vmCommon.ObjEditGoal.Purpose;
+                vmEditGoal.theGoal.Arrived = vmCommon.ObjEditGoal.Arrived;
+                vmEditGoal.theGoal.Color = vmCommon.ObjEditGoal.Color;
+                vmEditGoal.theGoal.Budget = vmCommon.ObjEditGoal.Budget;
+                vmEditGoal.theGoal.ActualCost = vmCommon.ObjEditGoal.ActualCost;
+                vmEditGoal.theGoal.ExpectedCost = vmCommon.ObjEditGoal.ExpectedCost;
+                vmEditGoal.theGoal.Date = vmCommon.ObjEditGoal.Date ? vmCommon.ObjEditGoal.Date.jsonToDate() : null;
+                vmEditGoal.theGoal.StartDate = vmCommon.ObjEditGoal.StartDate ? vmCommon.ObjEditGoal.StartDate.jsonToDate() : null;
+                if(Array.isArray(vmCommon.ObjEditGoal.ListSubGoal)) vmEditGoal.theGoal.ListSubGoal = vmCommon.ObjEditGoal.ListSubGoal;
+                vmEditGoal.theGoal.SubMarketProductId = vmCommon.ObjEditGoal.SubMarketProductId;
+                vmEditGoal.theGoal.IndependencyId = vmCommon.ObjEditGoal.IndependencyId;
+                delete vmCommon.ObjEditGoal;
+            }
         } else {
             vmEditGoal.theGoal = {
                 Name: "",
@@ -2557,7 +2574,6 @@
                 var newPeople = vmCommon.pushApply([], this.goal.People, function (it) { return it.AccountId });
 
                 //region save template
-
                 if (vmEditGoal.optionTemp.Template) {
                     var iStatus = theGoal.Status.length;
                     while (iStatus--) {
@@ -2741,9 +2757,6 @@
                                                     var pid = vmGoalAction.goalOptions.SubMarketProductId || vmGoalAction.goalOptions.IndependencyId;
                                                     vmGoalAction.goalFilterService.updateItemFilter(pid, { Id: theGoal.Id, Name: theGoal.Name });
                                                 };
-
-                                                MsaApp.updateDataProductOrTheme_Expand_InView_Observer();   // isReset false, !isConnection, !isSubConnection, ...
-                                                
                                             }
                                         }
 
@@ -2753,26 +2766,20 @@
                                             }, 200);
                                         }
 
-                                        if (typeof MsaApp == 'object') {
-                                            if (vmGoalAction.goalOptions.GoalType != vmCommon.GoalType.MainGoal) {
-                                                MsaApp.pushExpand(theGoal.Id, 'subgoal');
-                                            }
-                                            else {
-                                                MsaApp.pushExpand(theGoal.Id, 'maingoal');
-                                            }
-
-                                            const goalId = theGoal.Id;
-                                            MsaApp.setLastActiveElement(goalId);
-                                            MsaApp.pushLoadTimeActions('vmEditGoalDataserviceUpdateGoal');
-
+                                        if (vmGoalAction.goalOptions.GoalType != vmCommon.GoalType.MainGoal) {
+                                            MsaApp.pushExpand(theGoal.Id, 'subgoal');
                                         }
-                                    }
+                                        else {
+                                            MsaApp.pushExpand(theGoal.Id, 'maingoal');
+                                        }
 
-                                    if (typeof MsaApp == 'object') {
-                                        MsaApp.reloadAllDataOfPage('MsPopEditGoal_updateGoal').then(vals => {
-                                            MsaApp.updateNavigationMenu(theGoal);
-                                        });
+                                        const goalId = theGoal.Id;
+                                        MsaApp.setLastActiveElement(goalId);
+                                        MsaApp.pushLoadTimeActions('vmEditGoalDataserviceUpdateGoal');
                                     }
+                                    MsaApp.updateNavigationMenu(theGoal);
+                                    if(typeof vmCommon.updateGoalClient == 'function') 
+                                        vmCommon.updateGoalClient(theGoal);
                                 }
                                 else if (vmCommon.checkCurrentPage(vmCommon.enumPage.TeamBoard)) {
                                     teamBoardVM.reloadBoardLineAfterUpdateElement({
@@ -2948,9 +2955,7 @@
                                     }
 
                                     if (typeof MsaApp == 'object' && MsaApp) {
-                                        MsaApp.reloadAllDataOfPage('MsPopEditGoal_addNewGoal').then((vals) => {
-                                            MsaApp.updateNavigationMenu(theGoal);
-                                        });
+                                        MsaApp.updateNavigationMenu(theGoal);
                                     }
                                 }
                                 

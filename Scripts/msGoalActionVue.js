@@ -22,6 +22,88 @@ MsaComponent = (function () {
     const _GoalOverview_ = `${_MainSubFolder_}/ItemOverview`;
     const _ActionFolder_ = 'Action';
 
+const mixinProductThemeClient = {
+    data() {            // chay sau ham beforeCreate()
+        return {
+            IsExpand: true,
+            ListMain: [],
+        };
+    },
+    provide(){
+        return {
+            updateActionClient: (a) => {
+                const lstM = this.ListMain;
+                const lstNewM = vmCommon.deepCopy(lstM);
+                let i = -1;
+                const newM = lstNewM.find((m, _i) => {
+                    const sg = m.ListSubGoal.find(s => s.Id == a.GoalId);
+                    if(sg) {
+                        const act = sg.ListAction.find(x => x.Id == a.Id);
+                        if(act) {
+                            act.Name = a.Name;
+                            act.Start = a.Start ? `/Date(${new Date(a.Start).getTime()})/`: null;
+                            act.End = a.End ? `/Date(${new Date(a.End).getTime()})/`: null;
+                            act.Description = a.Description;
+                            act.ExpectedEffect = a.ExpectedEffect;
+                            act.ActionActualEffect = a.ActionActualEffect;
+                            act.ActualCost = a.ActualCost;
+                            act.ExpectedCost = a.ExpectedCost;
+                            act.AdvertiserName = a.AdvertiserName;
+                            act.AdvertisingName = a.AdvertisingName;
+                            i = _i;
+                            return true;
+                        }
+                    }
+                });
+                if(i > -1 && newM) {
+                    this.ListMain.splice(i, 1, newM);
+                }
+            },
+            updateGoalClient: (g) => {
+                const lstM = this.ListMain;
+                const lstNewM = vmCommon.deepCopy(lstM);
+                let i = -1, j = -1, newG;
+                lstNewM.find((m, _i) => {
+                    if(!g.ParentId) {       // main
+                        if(m.Id == g.Id) {
+                            i = _i;
+                            newG = m;
+                        }
+                    } else {    // sub
+                        m.ListSubGoal.find((s, _j) => {
+                            if(s.Id == g.Id) {
+                                newG = s;
+                                i = _i;
+                                j = _j;
+                                return !!newG;    // exit ListSubGoal.find
+                            }
+                        });
+                    }
+                    return !!newG;
+                });
+                if(newG) {
+                    newG.Name = g.Name;
+                    newG.Description = g.Description;
+                    newG.Effect = g.Effect;
+                    newG.Purpose = g.Purpose;
+                    newG.Arrived = g.Arrived;
+                    newG.Color = g.Color;
+                    newG.Budget = g.Budget;
+                    newG.ActualCost = g.ActualCost;
+                    newG.ExpectedCost = g.ExpectedCost;
+                    newG.StartDate = g.StartDate ? `/Date(${new Date(g.StartDate).getTime()})/`: null;
+                    newG.Date = g.Date ? `/Date(${new Date(g.Date).getTime()})/`: null;
+                    if(i > -1 && j < 0) {
+                        lstM.splice(i, 1, newG);
+                    } 
+                    else if(i > -1 && j > -1) {
+                        this.ListMain[i].ListSubGoal.splice(j ,1, newG);
+                    }
+                }
+            },
+        }
+    }
+}
     Vue.component('ViewIndependence', (resolve) => {
         $.get(`${__rootFolder__}/${_marketProductFolder_}/ViewIndependence.html`, template => {
             resolve({
@@ -181,7 +263,7 @@ MsaComponent = (function () {
 
                                     if (vmCommon.checkConflict(serData.value)) {
                                         MsaApp.removeExpand(id, 'Independence');
-                                        MsaApp.reloadAllDataOfPage('ViewIndependence_onMenuDeleteIndependency');
+                                      //  MsaApp.reloadAllDataOfPage('ViewIndependence_onMenuDeleteIndependency');
                                     }
                                 }
                                     
@@ -244,7 +326,7 @@ MsaComponent = (function () {
 
     /* Dùng chung cho Components 
      * ViewTheme,
-     * NavMenuViewTheme, NavMenuViewProductM
+     * NavMenuViewTheme
      */
     const mixinTheme = {
         inject: ['isViewer', 'handlerLoadding', 'canReaction'],
@@ -327,7 +409,7 @@ MsaComponent = (function () {
 
                         if (vmCommon.checkConflict(serData.value)) {
                             thisRef.removeTheme(thisRef.item);
-                            MsaApp.reloadAllDataOfPage('ViewTheme_onMenuDeleteTheme');
+                          //  MsaApp.reloadAllDataOfPage('ViewTheme_onMenuDeleteTheme');
                         }
                     });
                 });
@@ -335,6 +417,7 @@ MsaComponent = (function () {
         }       // end methods
     }
     const mixinThemeDefault = {
+        mixins: [mixinProductThemeClient],
         props: ['item', 'itemtype'],        // chay truoc ham beforeCreate()
         inject: ['onDragMoveGoal', 'isDraggable', 'onHoverShowTooltipAddGoalAction',
             'onDragStartMaingoal', 'onDragChangeMaingoal', 'onDragEndMaingoal', 'getGroupMain', "getViewType"],
@@ -362,9 +445,9 @@ MsaComponent = (function () {
         //beforeCreate() { },
         data() {            // chay sau ham beforeCreate()
             return {
-                IsExpand: true,
+                // IsExpand: true,
+                // ListMain: [],
                 IsDataSending: false,
-                ListMain: [],
                 HasRefsExpand: false,       // dung cho tinh toan khi DOM cua Main da duoc render
             };
         },
@@ -395,14 +478,6 @@ MsaComponent = (function () {
             ViewByNavigationMenu() {        //ViewTheme
                 if (MsaApp.IsShowNavigationMenu) return false;
                 return true;
-            },
-            ListMainDragDrop() {
-                if (!this.ListMain) return [];
-                const a = [...this.ListMain];
-                a.push({
-                    Id: vmCommon.emptyGuid, Mdf: -1, IndependencyId: this.item.Id
-                });
-                return a;
             },
         },
         created() {
@@ -1398,11 +1473,11 @@ MsaComponent = (function () {
                 },
                 methods: {
                     checkLastActiveAndScrollY2Goal() {
-                        switch (true) {
-                            case MsaApp.isLastLoadTimeAction('vmGoalAction.dataservice.loadDataFirstTime'): // tai trang lan dau tien
-                            case MsaApp.isLastLoadTimeAction('vmEditGoalDataserviceCreateGoal'):            // Tao moi goal
-                            case MsaApp.isLastLoadTimeAction('vmGoalActionDataserviceDuplicateGoal'):       // duplicate goal
-                            case MsaApp.isLastLoadTimeAction('changeGoalLevel_Main_Sub'):             // drag drop sub => main
+                        if(
+                            MsaApp.isLastLoadTimeAction('vmGoalAction.dataservice.loadDataFirstTime') // tai trang lan dau tien
+                         || MsaApp.isLastLoadTimeAction('vmEditGoalDataserviceCreateGoal')            // Tao moi goal
+                         || MsaApp.isLastLoadTimeAction('vmGoalActionDataserviceDuplicateGoal')       // duplicate goal
+                            ){
                                 const lstId = MsaApp.getLastActiveElementId();
                                 if (lstId == this.item.Id) {
                                     const slt = !MsaApp.IsShowNavigationMenu ? `[direction-id=${lstId}]` : `[direction-id=nav_${lstId}]`;
@@ -1416,7 +1491,6 @@ MsaComponent = (function () {
                                         MsaApp.pushLoadTimeActions('isElementHtmlIntofViewY');
                                     }
                                 }
-                                break;
                         }
                     },
                     onMouseleaveHideMenu(e) {
@@ -1800,7 +1874,6 @@ MsaComponent = (function () {
     /* Dung chung cho cac components
      * ViewSubGoalOverView,
      * NavMenuViewSubgoal,
-     * NavMenuViewProductM (Product/Theme) // component này là hiểu sai ý khách hàng, để lại chưa xóa đi
      */
     const mixinSubGoalOverView = {
         props: ['item', 'hasSearchTypeCritias'],
@@ -2032,10 +2105,8 @@ MsaComponent = (function () {
                         }).length : 0;
                     }
                 }
-                //isShowOverView = subgoal == 1;
                 if (Array.isArray(goal.ListAction) && action < goal.ListAction.length) hasHiddenItem = true;
-                //if (!isShowAll && !isHide && goal.Visibility) isShowOverView = true;
-
+                
                 if (isShowAll) {
                     isShowOverView = true;
                     hasHiddenItem = false;
@@ -2046,10 +2117,6 @@ MsaComponent = (function () {
                     IsInVisible: false, ShowOverview: this.item.IsShow > 0,
                     IsShowSubgoalName: true,
                 }
-
-                //var isShowSubName = action < 1 ? false : true;
-                //if (goal.Visibility) isShowSubName = true;
-
                 return {
                     ViewCount: `${maingoal} | ${subgoal} | ${action}`,
                     ClassVisible: 'font-auge', IsInVisible: !isHide,
@@ -2087,8 +2154,7 @@ MsaComponent = (function () {
                 return MsaApp.getKpiOverview(this.item);
             },
             DragdropOptions() {                             //ViewSubGoalOverView
-                const isDrg = this.isDraggable();
-
+                let isDrg = false;//this.isDraggable();
                 const opts = {
                     animation: 100, sort: true,
                     disabled: !isDrg,
@@ -2103,13 +2169,11 @@ MsaComponent = (function () {
                 if (-1 < lenCol && lenCol < 2) {        // view column
                     optCol.disabled = true;
                 }
-
                 const optAct = vmCommon.deepCopy(opts);
                 optAct.ghostClass = 'ghost-action';// sub overview
                 if (lenCol == -1 && this.item.ListAction.length < 2) {     // view Action
                     optAct.disabled = true;
                 }
-
                 return {
                     Column: optCol, Action: optAct
                 }
@@ -3337,7 +3401,7 @@ MsaComponent = (function () {
      */
     const mixinMainGoalOverView = {        // dung mixin de ke thua cho navigation menu
         props: ['goal', 'bg', 'itemtype'],
-        inject: ['getIsExpand', 'onDragMoveGoal', 'isDraggable', 'getChildrenGaPrd',
+        inject: ['getIsExpand', 'onDragMoveGoal', 'isDraggable', 'getChildrenGaPrd', 'updateGoalClient',
             'onDragStartMaingoal', 'onDragChangeMaingoal', 'onDragEndMaingoal', 'onDragMoveGoal',
             'getGroupSub', 'getGroupMainExpand'],
         provide() {
@@ -3450,11 +3514,19 @@ MsaComponent = (function () {
             MgId() { return this.goal.Id; },
             DragdropOptions() {                     //MsaMainGoalOverView
                 const isDrg = this.isDraggable();
-
                 return {
                     animation: 100, sort: true,
                     disabled: !isDrg,
                     ghostClass: "ghost-subgoal",            // maingoal overview
+                    chosenClass: "chosenClass"
+                }
+            },
+            DragdropOptionsExpnd() {
+                const isDrg = false;//this.isDraggable();
+                return {
+                    animation: 100, sort: true,
+                    disabled: !isDrg,
+                    ghostClass: "ghost-subgoal",                // maingoal
                     chosenClass: "chosenClass"
                 }
             },
@@ -3627,6 +3699,8 @@ MsaComponent = (function () {
                     parentId: parentid,
                     goalType: !parentid ? vmCommon.GoalActionContentType.MainGoal : vmCommon.GoalActionContentType.SubGoal
                 };
+                vmCommon.ObjEditGoal = vmCommon.deepCopy(item);
+                vmCommon.updateGoalClient = this.updateGoalClient;
                 MsaApp.editGoal(entryData, info,
                     kLg.titlepEditMainGoalNew1 + htmlEscape(title) + kLg.titlepEditMainGoalNew2, act);
 
@@ -3748,14 +3822,16 @@ MsaComponent = (function () {
                 if (sumAction > 0) {
                     MsaApp.DragDropGoal.GroupMain = 'MIndexMainGoal';
                 }
+                if(!!vmCommon.DrgDrpSubgoal) {
+                    const smpIdTo = evt.to.parentNode.getAttribute('drgdrp-smpid');
+                    const indIdTo = evt.to.parentNode.getAttribute('drgdrp-indid');
+                    const goalIdTo = evt.to.parentNode.getAttribute('drgdrp-goalid');
+                    vmCommon.DrgDrpSubgoal.SubMarketProductId = smpIdTo;
+                    vmCommon.DrgDrpSubgoal.IndependencyId = indIdTo;
+                    vmCommon.DrgDrpSubgoal.ParentId = goalIdTo;
+                    delete vmCommon.DrgDrpSubgoal;
+                }                
                 MsaApp.clearDragDropGoal();
-                const smpIdTo = evt.to.parentNode.getAttribute('drgdrp-smpid');
-                const indIdTo = evt.to.parentNode.getAttribute('drgdrp-indid');
-                const goalIdTo = evt.to.parentNode.getAttribute('drgdrp-goalid');
-                vmCommon.DrgDrpSubgoal.SubMarketProductId = smpIdTo;
-                vmCommon.DrgDrpSubgoal.IndependencyId = indIdTo;
-                vmCommon.DrgDrpSubgoal.ParentId = goalIdTo;
-                delete vmCommon.DrgDrpSubgoal;
             },
         },
     }
@@ -3957,7 +4033,16 @@ MsaComponent = (function () {
                                 return this.item.RegionId;
                             },
                             getSubMarketId: () => { return this.item.Id },
-                            getViewType: () => false
+                            getViewType: () => false,
+                            setMasterGoal: (itm) => {
+                                this.products.find(p => {
+                                    if(p.SubMarketProductId == itm.SubMarketProductId) {
+                                        p.IsMasterGoalKpi = itm.IsMasterGoalKpi;
+                                        return true;
+                                    }
+                                    return false;
+                                });
+                            },
                         }
                     } else {        // Market
                         return {
@@ -4064,7 +4149,7 @@ MsaComponent = (function () {
 
     /* Dùng cho các components
      * MsaViewProduct,
-     * NavMenuViewProduct, NavMenuViewProductM
+     * NavMenuViewProduct
      */
     const mixinProduct = {
         inject: ['isViewer', 'handlerLoadding'],
@@ -4076,14 +4161,15 @@ MsaComponent = (function () {
         },      // end methods
     }
     const mixinProductDefault = {
+        mixins: [mixinProductThemeClient],        
         props: ['item', 'itemtype'],
-        inject: ['getBgColorByAvgEvaluation', 'getViewRightWidth', 'onDragStartMaingoal', 'onDragChangeMaingoal',
+        inject: ['getBgColorByAvgEvaluation', 'getViewRightWidth', 'onDragStartMaingoal', 'onDragChangeMaingoal','setMasterGoal',
             'onDragEndMaingoal', 'onDragMoveGoal', 'isDraggable', 'getGroupMain', 'onHoverShowTooltipAddGoalAction', 'getViewType'],
         data() {
             return {
-                IsExpand: true,
+                // IsExpand: true,
+                // ListMain: [],
                 IsMenuOpen: false,
-                ListMain: [],
                 TotalMainCollapse: 0,
                 HasRefsExpand: false,
             };
@@ -4126,17 +4212,18 @@ MsaComponent = (function () {
                     chosenClass: "chosenClass"
                 }
             },
+            DragdropOptionsExpnd() {
+                const isDrg = false;//this.isDraggable();
+                return {
+                    animation: 100, sort: true,
+                    disabled: !isDrg,
+                    ghostClass: "ghost-maingoal",                // maingoal
+                    chosenClass: "chosenClass"
+                }
+            },
             ViewByNavigationMenu() {        //MsaViewProduct
                 if (MsaApp.IsShowNavigationMenu) return false;
                 return true;
-            },
-            ListMainDragDrop() {
-                if (!this.ListMain) return [];
-                const a = [...this.ListMain];
-                a.push({
-                    Id: vmCommon.emptyGuid, Mdf: -1, SubMarketProductId: this.item.SubMarketProductId
-                });
-                return a;
             },
         },
         provide() {
@@ -4155,34 +4242,7 @@ MsaComponent = (function () {
                 getChildrenGaPrd: () => {return this.ListMain},
                 setCollapExpandAllMain: this.setCollapExpandAllMain,
                 getRole: () => this.item.RoleId,        // NavMenuViewProduct, MsaViewProduct
-                updateActionClient: (a) => {
-                    const lstM = this.ListMain;
-                    const lstNewM = vmCommon.deepCopy(lstM);
-                    let i = -1;
-                    const newM = lstNewM.find((m, _i) => {
-                        const sg = m.ListSubGoal.find(s => s.Id == a.GoalId);
-                        if(sg) {
-                            const act = sg.ListAction.find(x => x.Id == a.Id);
-                            if(act) {
-                                act.Name = a.Name;
-                                act.Start = a.Start ? `/Date(${new Date(a.Start).getTime()})/`: null;
-                                act.End = a.End ? `/Date(${new Date(a.End).getTime()})/`: null;
-                                act.Description = a.Description;
-                                act.ExpectedEffect = a.ExpectedEffect;
-                                act.ActionActualEffect = a.ActionActualEffect;
-                                act.ActualCost = a.ActualCost;
-                                act.ExpectedCost = a.ExpectedCost;
-                                act.AdvertiserName = a.AdvertiserName;
-                                act.AdvertisingName = a.AdvertisingName;
-                                i = _i;
-                                return true;
-                            }
-                        }
-                    });
-                    if(i > -1 && newM) {
-                        this.ListMain.splice(i, 1, newM);
-                    }
-                },
+                
             }
         },
         methods: {
@@ -4237,7 +4297,7 @@ MsaComponent = (function () {
             },
             onChangeMasterGoalKpi(e) { //Tham khao: $("#goalactionbound").on("change", "input.cbxMasterSub", function (e)
                 if (MsaApp.isViewer()) return;
-
+                this.setMasterGoal(this.item);
                 var that = this;
                 var state = this.item.IsMasterGoalKpi;
                 const smpId = this.SubMarketProductId;
@@ -4245,9 +4305,9 @@ MsaComponent = (function () {
                 MsaApp.handlerLoadding();
 
                 vmGoalAction.dataservice.changeMasterSub({ id: smpId, isMasterGoalKpi: state }, function (res) {
-                    if (that.item.ChildCount) {
-                        MsaApp.reloadAllDataOfPage('onChange_MasterGoalKpi');
-                    }
+                    // if (that.item.ChildCount) {
+                    //     MsaApp.reloadAllDataOfPage('onChange_MasterGoalKpi');
+                    // }
 
                     if (!state) {
                         msFilter.controlService.reLoadDataFilter();
@@ -4531,9 +4591,9 @@ MsaComponent = (function () {
                         const smpId = this.item.Id;
                         this.handlerLoadding();
                         vmGoalAction.dataservice.changeMasterSub({ id: smpId, isMasterGoalKpi: state }, function (res) {
-                            if (lstMLen) {
-                                MsaApp.reloadAllDataOfPage('onChange_MasterGoalKpi');
-                            }
+                            // if (lstMLen) {
+                            //     MsaApp.reloadAllDataOfPage('onChange_MasterGoalKpi');
+                            // }
                             if (!state) {
                                 msFilter.controlService.reLoadDataFilter();
                             }

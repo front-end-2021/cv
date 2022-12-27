@@ -2930,7 +2930,7 @@ sHandler.getdataassesment = function(){
 
 sHandler.getHandler = function(url, entryData) {
     if(typeof url != 'string') return {value: {}};
-    console.log(url)
+    //console.log(url);
     if(url.includes(`.ashx?funcName=getdatawithoutfilter`))
         return sHandler.getdatawithoutfilter(entryData);
     if(url.includes(`.ashx?funcName=getSetting`))

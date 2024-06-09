@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
+
 <head>
     <title>Action plan</title>
     <meta name="robots" content="noindex, nofollow" />
@@ -31,7 +32,9 @@
     <script src="Scripts/msFilter.js"></script>
     <script src="Scripts/clampjs.js"></script>
     <script src="Scripts/rmexceljs.js"></script>
-    <script src="Scripts/vuejs/vue.min.js"></script>
+    <script src="Scripts/vuejs/vue.js"></script>
+    <!-- <script src="Scripts/vuejs/vue.min.js"></script> -->
+    <script src="Scripts/vuejs/4.1.0_dist_vuex.global.js"></script>
     <script src="Scripts/vuejs/vuesortable.js"></script>
     <script src="Scripts/vuejs/vue-observe-visibility.min.js"></script>
     <script src="Scripts/vuejs/lodash.min.js"></script>
@@ -581,135 +584,142 @@
                     <!-- icon -->
                     <div class="block-menu-icon" id="icon">
                         <div id="div-loading-ucaccount" class="loading"></div>
-                            <div id="pop-changePassword"></div>
-                            <div id="pop-changeInfo"></div>
-                            <div id="pop-showQrCode"></div>
-                            <span class="ms-icon ms-usercon cursor-pointer" href="#msModal" id="iconUser"></span>
-                            <div id="msModal" class="msModal1">
-                                <div class="md-title">
-                                    <span class="text-title title-info-sub" id="titleUcAccount">Address Schulz </span>
-                                    <span class="arrow-top1"></span>
-                                    <figure id="ms-icon-close"></figure>
-                                    <figure id="ms-icon-edit" onclick="vmUser.showPopUpChangeInfomation()"></figure>
-                                </div>
-                                <div class="md-content">
-                                    <table class="table">
-                                        <tr>
-                                            <td class="left no-border"><span id="lblEmainUcAccount">E-Mail</span></td>
-                                            <td class="right no-border">
-                                                <div style="width: 188px; margin-left: 2px"><span id="emailUcAccount" class="file-sub" style="height: 20px">abc@gmail.com</span></div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="left"><span id="lblFirmUcAccount">Firma</span></td>
-                                            <td class="right">
-                                                <div style="width: 188px; margin-left: 2px"><span id="firmUcAccount" class="file-sub" style="height: 20px">analog.eins|Grafikdesign</span></div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="left"><span id="lblDepartmentUcAccount">Abteilung</span> </td>
-                                            <td class="right">
-                                                <div style="width: 188px; margin-left: 2px"><span id="departmentUcAccount" class="file-sub" style="height: 20px">Kreation</span></div>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </div>
-                                <div class="md-footer">
-                                    <input type="button" class="btn-user" style="float: left; margin-left: 10px;" value="QR Code" id="genQrCode" onclick="vmUser.genQrCode()" />
-                                    <input type="button" class="btn-user" value="Abmelden" id="signOutButtonUcAccount" onclick="vmUser.logOut()" />
-                                    <input type="button" class="btn-user" id="passButtonUcAccount" onclick="vmUser.showPopUpChangePassword()" value="Passwort andern" />
-                                </div>
+                        <div id="pop-changePassword"></div>
+                        <div id="pop-changeInfo"></div>
+                        <div id="pop-showQrCode"></div>
+                        <span class="ms-icon ms-usercon cursor-pointer" href="#msModal" id="iconUser"></span>
+                        <div id="msModal" class="msModal1">
+                            <div class="md-title">
+                                <span class="text-title title-info-sub" id="titleUcAccount">Address Schulz </span>
+                                <span class="arrow-top1"></span>
+                                <figure id="ms-icon-close"></figure>
+                                <figure id="ms-icon-edit" onclick="vmUser.showPopUpChangeInfomation()"></figure>
                             </div>
-                            <script>
-                                var vmUser = vmUser || {};
-                                vmUser.displayUserInfo = function () {
-                                    $('#msModal #titleUcAccount').text(vmUser.currentAccount.Name);
-                                    $('#msModal #emailUcAccount').text(vmUser.currentAccount.Email);
-                                    $('#msModal #firmUcAccount').text(vmUser.currentAccount.Firm == null ? '' : vmUser.currentAccount.Firm);
-                                    $('#msModal #departmentUcAccount').text(vmUser.currentAccount.Department == null ? '' : vmUser.currentAccount.Department);
-                         
-                                    $('#msModal #passButtonUcAccount').val(kLg.changePassTitle);
-                                    $('#msModal #lblEmainUcAccount').text(kLg.emailAddressloginview + ": ");
-                                    $('#msModal #lblFirmUcAccount').text(kLg.firm + ": ");
-                                    $('#msModal #lblDepartmentUcAccount').text(kLg.lblFunction + ": ");
-                                    $('#msModal #signOutButtonUcAccount').val(kLg.signOut);
-                         
-                                    $('#msModal #emailUcAccount').attr("title", vmUser.currentAccount.Email);
-                                    $('#msModal #firmUcAccount').attr("title", vmUser.currentAccount.Firm);
-                                    $('#msModal #departmentUcAccount').attr("title", vmUser.currentAccount.Department);
-                                };
-                         
-                                vmUser.logOut = function () {
-                                    var url = "Handlers/AccountHandler.ashx?funcName=signOut";
-                                    callAjax("div-loading-ucaccount", url, null, vmUser.signOutCallBack, AjaxConst.GetRequest);
-                                };
-                         
-                                vmUser.genQrCode = function () {
-                                    vmUser.showPopUpQrCode();
-                                };
-                         
-                                vmUser.signOutCallBack = function (data) {
-                                    window.location.href = '../Login.aspx?lang=' + kLg.language;
-                                };
-                         
-                                vmUser.getCurrentAccount = function () {
-                                    var objQuery = new queryString(true);
-                                    var strid = objQuery.get("strid") || 0;
-                         
-                                    if (!vmUser.currentAccount) {
-                                        var url = "Handlers/AccountHandler.ashx?funcName=getcurrentaccount&strid=" + strid;
-                                        return callAjaxPromise(url).then(function (data) {
-                                            vmUser.currentAccount = data.value;
-                                            vmUser.currentAccount.Name = data.value.FirstName + " " + data.value.LastName;
-                                            vmUser.displayUserInfo();
-                         
-                                            return Promise.resolve(vmUser.currentAccount);
-                                        });
-                                    }
-                                };
-                         
-                                vmUser.popUpChangePassword = undefined;
-                                vmUser.showPopUpChangePassword = function () {
-                                    vmUser.popUpChangePassword = showPopup(vmUser.popUpChangePassword,
-                                        $('.ms-header #pop-changePassword'),
-                                        vmCommon.rootUrl + 'Contents/popChangePassword.html',
-                                        {
-                                            title: kLg.changePassTitle,
-                                            height: 295,
-                                            width: 500,
-                                            resizable: false
-                                        });
-                                };
-                         
-                                vmUser.popUpChangeInfomation = undefined;
-                                vmUser.showPopUpChangeInfomation = function () {
-                                    vmUser.popUpChangeInfomation = showPopup(vmUser.popUpChangeInfomation,
-                                        $('.ms-header #pop-changeInfo'), vmCommon.rootUrl + 'Contents/popEditUserInfomation.html',
-                                        {
-                                            title: kLg.changeInforTitle,
-                                            height: 410,
-                                            width: 710,
-                                            resizable: false
-                                        });
-                                };
-                         
-                                vmUser.popUpQrCode = undefined;
-                                vmUser.showPopUpQrCode = function () {
-                                    vmUser.popUpQrCode = showPopup(vmUser.popUpQrCode,
-                                        $('.ms-header #pop-showQrCode'), vmCommon.rootUrl + 'Contents/popQrCode.html',
-                                        {
-                                            title: kLg.titleQrCode,
-                                            height: 350,
-                                            width: 400,
-                                            resizable: false
-                                        });
-                                };
-                         
-                                $(document).ready(function () {
-                                    vmUser.getCurrentAccount();
-                                });
-                         </script>
-                        
+                            <div class="md-content">
+                                <table class="table">
+                                    <tr>
+                                        <td class="left no-border"><span id="lblEmainUcAccount">E-Mail</span></td>
+                                        <td class="right no-border">
+                                            <div style="width: 188px; margin-left: 2px"><span id="emailUcAccount"
+                                                    class="file-sub" style="height: 20px">abc@gmail.com</span></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="left"><span id="lblFirmUcAccount">Firma</span></td>
+                                        <td class="right">
+                                            <div style="width: 188px; margin-left: 2px"><span id="firmUcAccount"
+                                                    class="file-sub"
+                                                    style="height: 20px">analog.eins|Grafikdesign</span></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="left"><span id="lblDepartmentUcAccount">Abteilung</span> </td>
+                                        <td class="right">
+                                            <div style="width: 188px; margin-left: 2px"><span id="departmentUcAccount"
+                                                    class="file-sub" style="height: 20px">Kreation</span></div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="md-footer">
+                                <input type="button" class="btn-user" style="float: left; margin-left: 10px;"
+                                    value="QR Code" id="genQrCode" onclick="vmUser.genQrCode()" />
+                                <input type="button" class="btn-user" value="Abmelden" id="signOutButtonUcAccount"
+                                    onclick="vmUser.logOut()" />
+                                <input type="button" class="btn-user" id="passButtonUcAccount"
+                                    onclick="vmUser.showPopUpChangePassword()" value="Passwort andern" />
+                            </div>
+                        </div>
+                        <script>
+                            var vmUser = vmUser || {};
+                            vmUser.displayUserInfo = function () {
+                                $('#msModal #titleUcAccount').text(vmUser.currentAccount.Name);
+                                $('#msModal #emailUcAccount').text(vmUser.currentAccount.Email);
+                                $('#msModal #firmUcAccount').text(vmUser.currentAccount.Firm == null ? '' : vmUser.currentAccount.Firm);
+                                $('#msModal #departmentUcAccount').text(vmUser.currentAccount.Department == null ? '' : vmUser.currentAccount.Department);
+
+                                $('#msModal #passButtonUcAccount').val(kLg.changePassTitle);
+                                $('#msModal #lblEmainUcAccount').text(kLg.emailAddressloginview + ": ");
+                                $('#msModal #lblFirmUcAccount').text(kLg.firm + ": ");
+                                $('#msModal #lblDepartmentUcAccount').text(kLg.lblFunction + ": ");
+                                $('#msModal #signOutButtonUcAccount').val(kLg.signOut);
+
+                                $('#msModal #emailUcAccount').attr("title", vmUser.currentAccount.Email);
+                                $('#msModal #firmUcAccount').attr("title", vmUser.currentAccount.Firm);
+                                $('#msModal #departmentUcAccount').attr("title", vmUser.currentAccount.Department);
+                            };
+
+                            vmUser.logOut = function () {
+                                var url = "Handlers/AccountHandler.ashx?funcName=signOut";
+                                callAjax("div-loading-ucaccount", url, null, vmUser.signOutCallBack, AjaxConst.GetRequest);
+                            };
+
+                            vmUser.genQrCode = function () {
+                                vmUser.showPopUpQrCode();
+                            };
+
+                            vmUser.signOutCallBack = function (data) {
+                                window.location.href = '../Login.aspx?lang=' + kLg.language;
+                            };
+
+                            vmUser.getCurrentAccount = function () {
+                                var objQuery = new queryString(true);
+                                var strid = objQuery.get("strid") || 0;
+
+                                if (!vmUser.currentAccount) {
+                                    var url = "Handlers/AccountHandler.ashx?funcName=getcurrentaccount&strid=" + strid;
+                                    return callAjaxPromise(url).then(function (data) {
+                                        vmUser.currentAccount = data.value;
+                                        vmUser.currentAccount.Name = data.value.FirstName + " " + data.value.LastName;
+                                        vmUser.displayUserInfo();
+
+                                        return Promise.resolve(vmUser.currentAccount);
+                                    });
+                                }
+                            };
+
+                            vmUser.popUpChangePassword = undefined;
+                            vmUser.showPopUpChangePassword = function () {
+                                vmUser.popUpChangePassword = showPopup(vmUser.popUpChangePassword,
+                                    $('.ms-header #pop-changePassword'),
+                                    vmCommon.rootUrl + 'Contents/popChangePassword.html',
+                                    {
+                                        title: kLg.changePassTitle,
+                                        height: 295,
+                                        width: 500,
+                                        resizable: false
+                                    });
+                            };
+
+                            vmUser.popUpChangeInfomation = undefined;
+                            vmUser.showPopUpChangeInfomation = function () {
+                                vmUser.popUpChangeInfomation = showPopup(vmUser.popUpChangeInfomation,
+                                    $('.ms-header #pop-changeInfo'), vmCommon.rootUrl + 'Contents/popEditUserInfomation.html',
+                                    {
+                                        title: kLg.changeInforTitle,
+                                        height: 410,
+                                        width: 710,
+                                        resizable: false
+                                    });
+                            };
+
+                            vmUser.popUpQrCode = undefined;
+                            vmUser.showPopUpQrCode = function () {
+                                vmUser.popUpQrCode = showPopup(vmUser.popUpQrCode,
+                                    $('.ms-header #pop-showQrCode'), vmCommon.rootUrl + 'Contents/popQrCode.html',
+                                    {
+                                        title: kLg.titleQrCode,
+                                        height: 350,
+                                        width: 400,
+                                        resizable: false
+                                    });
+                            };
+
+                            $(document).ready(function () {
+                                vmUser.getCurrentAccount();
+                            });
+                        </script>
+
                     </div>
                     <!-- end icon -->
                 </div>
@@ -723,22 +733,29 @@
     <div id="divloading" class="loading"></div>
     <div class="submenu">
         <ul class="horizontal-menu sub-menu" id="submenu">
-            <li><a class="cursor-pointer menu_max_width" id="linkMarketSegment">Market segment strategy</a><div class="arrow-top"></div>
+            <li><a class="cursor-pointer menu_max_width" id="linkMarketSegment">Market segment strategy</a>
+                <div class="arrow-top"></div>
             </li>
-            <li><a class="cursor-pointer menu_max_width" id="linkSubMarketSegment">Sub-market/Product Strategy</a><div class="arrow-top"></div>
+            <li><a class="cursor-pointer menu_max_width" id="linkSubMarketSegment">Sub-market/Product Strategy</a>
+                <div class="arrow-top"></div>
             </li>
-            <li class="active-li-top"><a class="cursor-pointer menu_max_width" id="linkActionGoal">Action Plan</a><div class="arrow-top"></div>
+            <li class="active-li-top"><a class="cursor-pointer menu_max_width" id="linkActionGoal">Action Plan</a>
+                <div class="arrow-top"></div>
             </li>
-            <li><a class="cursor-pointer menu_max_width" id="linkMarketingCalendar">Marketingmix/Einasatzplanung</a><div class="arrow-top"></div>
+            <li><a class="cursor-pointer menu_max_width" id="linkMarketingCalendar">Marketingmix/Einasatzplanung</a>
+                <div class="arrow-top"></div>
             </li>
-            <li><a class="cursor-pointer menu_max_width" id="linkRoadmap" href="./roadmap.html">Roadmap</a><div class="arrow-top"></div>
+            <li><a class="cursor-pointer menu_max_width" id="linkRoadmap" href="./roadmap.html">Roadmap</a>
+                <div class="arrow-top"></div>
             </li>
-            <li><a class="cursor-pointer menu_max_width" id="linkTeamboard">Team board</a><div class="arrow-top"></div>
+            <li><a class="cursor-pointer menu_max_width" id="linkTeamboard">Team board</a>
+                <div class="arrow-top"></div>
             </li>
-            <li><a class="cursor-pointer menu_max_width" id="linkDashboard">Dashboard</a><div class="arrow-top"></div>
+            <li><a class="cursor-pointer menu_max_width" id="linkDashboard">Dashboard</a>
+                <div class="arrow-top"></div>
             </li>
         </ul>
-    
+
         <div id="timerange" class="pull-left"></div>
         <div id="auswertung" style="position:relative"></div>
     </div>
@@ -987,7 +1004,7 @@
         </div>
     </div>
     <script src="Scripts/raphael-min.js"></script>
-    
+
     <script type="text/html" id="tempShowDescription">
         <div style="min-width: 50px; max-width: 300px" >
             <div class="row-wrapper">            

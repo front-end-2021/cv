@@ -11,6 +11,7 @@
         <MsaViewMarket v-if="itemtype == 'Market'" 
                        v-bind:type="itemtype"
                        v-for="(pg, i) in children"
+                       :key="'p_' + i"
                       style="box-shadow: 0 0 10px #00000029; margin-top:-5px;"
                        ref="RefViewProductGroup"
                       :products="pg.Products" :item="pg" 

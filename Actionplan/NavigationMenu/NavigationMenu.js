@@ -1511,7 +1511,8 @@
                     return {
                         getRole: () => { return 1; },
                         loadAllGoalActionInOpenArea: () => { },
-                        
+                        getChildrenGaPrd: () => {return []},
+                        updateGoalClient:(goal) => {},
                         // view sub
                         getMaingoalStartDate: () => { },
                         pEditMenuGoal: () => { },

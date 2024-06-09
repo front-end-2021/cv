@@ -1845,19 +1845,6 @@
     var cF = (msCurrency ? msCurrency : "").encodeDola() + " ##,#.00";
     var pF = "# \\\%", isAutoPercent = false, maxMasterIndex = 0;
 
-    //vmEditAction.checkEnableSI = function () {
-    //    var action = vmEditAction.viewModel.action;
-
-    //    var costs = $.grep(action.ActionCosts, function (it) { return it.DataState !== dataState.Deleted; });
-    //    var todos = action.ActionTodos;
-
-    //    var isFinish = costs.every(function (it) { return it.Finish; }) && todos.every(function (it) { return it.Finish; });
-
-    //    var maxDate = vmEditAction.getIndexOfMaxDate(action.ActionCosts).MaxDate;
-    //    //return action.AdvertisingMaterial != null && action.Advertiser != null && maxDate != null && (isFinish || (vmCommon.compareDate2(maxDate, new Date()) <= 0));
-    //    return maxDate != null && (isFinish || (vmCommon.compareDate2(maxDate, new Date()) <= 0));
-    //};
-
     var srcIndex = 0, desIndex = 0, isChangePosition = false, maxIndex = 0;
 
     vmEditAction.popTemplate = undefined;
@@ -2016,12 +2003,6 @@
     function createEvaluationIcon() {
         var s = "margin-left: 4px; margin-top: 4px; line-height:4px;";
 
-        //if (!$("#popEditAction_wnd_title")
-        //    .next().children().hasClass('rpkpi')) {
-        //    $("#popEditAction_wnd_title")
-        //        .next()
-        //        .prepend('<a role="button" href="javascript:vmGoalAction.showPopupGoalActionEval(3);" class="pull-left rpkpi" style="' + s + '"><span role="presentation" class="font-focus"></span></a>');
-        //}
     }
 
     $(document).ready(function () {
@@ -3616,7 +3597,6 @@
 
             }
         }
-
         vmEditAction.theAction.ExpectedCost = totalExpCost;
         vmEditAction.theAction.ActualCost = totalActCost;
 
@@ -5310,7 +5290,6 @@
                 };
                 var theAction = vmCommon.deepCopy(this.action);
 
-                // convert Id to emptyGuid because addStatus: (Id: '' + Date.now() + '_' + vmCommon.emptyGuid);
                 theAction.Status.forEach(el => {
                     if (el.Date) el.Date = changeHourOfDate(el.Date);
 

@@ -21,89 +21,107 @@ MsaComponent = (function () {
     const _MainSubFolder_ = 'MainSub';
     const _GoalOverview_ = `${_MainSubFolder_}/ItemOverview`;
     const _ActionFolder_ = 'Action';
+    const mxUpdateAction = {
+        methods: {
+            updateActionVw(act, a) {
+                act.Name = a.Name;
+                act.Start = a.Start ? `/Date(${new Date(a.Start).getTime()})/` : null;
+                act.End = a.End ? `/Date(${new Date(a.End).getTime()})/` : null;
+                act.Description = a.Description;
+                act.ExpectedEffect = a.ExpectedEffect;
+                act.ActionActualEffect = a.ActionActualEffect;
+                act.ActualCost = a.ActualCost;
+                act.ExpectedCost = a.ExpectedCost;
+                act.AdvertiserName = a.AdvertiserName;
+                act.AdvertisingName = a.AdvertisingName;
+                if (1 == act.ActionCosts.length) {
+                    act.ActionCosts[0].ExpectedCost = a.ExpectedCost
+                    act.ActionCosts[0].ActualCost = a.ActualCost
+                }
+            },
+        },
+    }
 
-const mixinProductThemeClient = {
-    data() {            // chay sau ham beforeCreate()
-        return {
-            IsExpand: true,
-            ListMain: [],
-        };
-    },
-    provide(){
-        return {
-            updateActionClient: (a) => {
-                const lstM = this.ListMain;
-                const lstNewM = vmCommon.deepCopy(lstM);
-                let i = -1;
-                const newM = lstNewM.find((m, _i) => {
-                    const sg = m.ListSubGoal.find(s => s.Id == a.GoalId);
-                    if(sg) {
-                        const act = sg.ListAction.find(x => x.Id == a.Id);
-                        if(act) {
-                            act.Name = a.Name;
-                            act.Start = a.Start ? `/Date(${new Date(a.Start).getTime()})/`: null;
-                            act.End = a.End ? `/Date(${new Date(a.End).getTime()})/`: null;
-                            act.Description = a.Description;
-                            act.ExpectedEffect = a.ExpectedEffect;
-                            act.ActionActualEffect = a.ActionActualEffect;
-                            act.ActualCost = a.ActualCost;
-                            act.ExpectedCost = a.ExpectedCost;
-                            act.AdvertiserName = a.AdvertiserName;
-                            act.AdvertisingName = a.AdvertisingName;
-                            i = _i;
-                            return true;
-                        }
-                    }
-                });
-                if(i > -1 && newM) {
-                    this.ListMain.splice(i, 1, newM);
-                }
-            },
-            updateGoalClient: (g) => {
-                const lstM = this.ListMain;
-                const lstNewM = vmCommon.deepCopy(lstM);
-                let i = -1, j = -1, newG;
-                lstNewM.find((m, _i) => {
-                    if(!g.ParentId) {       // main
-                        if(m.Id == g.Id) {
-                            i = _i;
-                            newG = m;
-                        }
-                    } else {    // sub
-                        m.ListSubGoal.find((s, _j) => {
-                            if(s.Id == g.Id) {
-                                newG = s;
+    const mixinProductThemeClient = {
+        mixins: [mxUpdateAction],
+        data() {            // chay sau ham beforeCreate()
+            return {
+                IsExpand: true,
+                ListMain: [],
+            };
+        },
+        provide() {
+            return {
+                updateActionClient: (a) => {
+                    // if (typeof vmEditAction == 'object' && !Object.is(vmEditAction, null)) {
+                    //     Object.keys(vmEditAction).forEach(key => delete object[key]);
+                    //     vmEditAction = undefined
+                    //     delete vmGoalAction.actionOptions.action
+                    // }
+                    const lstM = this.ListMain;
+                    const lstNewM = vmCommon.deepCopy(lstM);
+                    let i = -1;
+                    const newM = lstNewM.find((m, _i) => {
+                        const sg = m.ListSubGoal.find(s => s.Id == a.GoalId);
+                        if (sg) {
+                            const act = sg.ListAction.find(x => x.Id == a.Id);
+                            if (act) {
+                                this.updateActionVw(act, a)
                                 i = _i;
-                                j = _j;
-                                return !!newG;    // exit ListSubGoal.find
+                                return true;
                             }
-                        });
+                        }
+                    });
+                    if (i > -1 && newM) {
+                        this.ListMain.splice(i, 1, newM);
                     }
-                    return !!newG;
-                });
-                if(newG) {
-                    newG.Name = g.Name;
-                    newG.Description = g.Description;
-                    newG.Effect = g.Effect;
-                    newG.Purpose = g.Purpose;
-                    newG.Arrived = g.Arrived;
-                    newG.Color = g.Color;
-                    newG.Budget = g.Budget;
-                    newG.ActualCost = g.ActualCost;
-                    newG.ExpectedCost = g.ExpectedCost;
-                    newG.StartDate = g.StartDate ? `/Date(${new Date(g.StartDate).getTime()})/`: null;
-                    newG.Date = g.Date ? `/Date(${new Date(g.Date).getTime()})/`: null;
-                    if(i > -1 && j < 0) {
-                        lstM.splice(i, 1, newG);
-                    } 
-                    else if(i > -1 && j > -1) {
-                        this.ListMain[i].ListSubGoal.splice(j ,1, newG);
+                },
+                updateGoalClient: (g) => {
+                    const lstM = this.ListMain;
+                    const lstNewM = vmCommon.deepCopy(lstM);
+                    let i = -1, j = -1, newG;
+                    lstNewM.find((m, _i) => {
+                        if (!g.ParentId) {       // main
+                            if (m.Id == g.Id) {
+                                i = _i;
+                                newG = m;
+                            }
+                        } else {    // sub
+                            m.ListSubGoal.find((s, _j) => {
+                                if (s.Id == g.Id) {
+                                    newG = s;
+                                    i = _i;
+                                    j = _j;
+                                    return !!newG;    // exit ListSubGoal.find
+                                }
+                            });
+                        }
+                        return !!newG;
+                    });
+                    if (newG) {
+                        newG.Name = g.Name;
+                        newG.Description = g.Description;
+                        newG.Effect = g.Effect;
+                        newG.Purpose = g.Purpose;
+                        newG.Arrived = g.Arrived;
+                        newG.Color = g.Color;
+                        newG.Budget = g.Budget;
+                        newG.ActualCost = g.ActualCost;
+                        newG.ExpectedCost = g.ExpectedCost;
+                        newG.StartDate = g.StartDate ? `/Date(${new Date(g.StartDate).getTime()})/` : null;
+                        newG.Date = g.Date ? `/Date(${new Date(g.Date).getTime()})/` : null;
+                        if (i > -1 && j < 0) {
+                            lstM.splice(i, 1, newG);
+                        }
+                        else if (i > -1 && j > -1) {
+                            this.ListMain[i].ListSubGoal.splice(j, 1, newG);
+                        }
                     }
-                }
-            },
+                },
+                getChildrenGaPrd: () => { return this.ListMain },
+            }
         }
     }
-}
     Vue.component('ViewIndependence', (resolve) => {
         $.get(`${__rootFolder__}/${_marketProductFolder_}/ViewIndependence.html`, template => {
             resolve({
@@ -118,7 +136,7 @@ const mixinProductThemeClient = {
                     return {
                         IsExpand: isExpand,
                         IsDataSending: false,
-                        
+
                     };
                 },
                 provide() {
@@ -174,13 +192,13 @@ const mixinProductThemeClient = {
                     },
                 },
                 mounted() {
-                    MsaApp.componentService(false).set(this.item.Id, this);                    
+                    MsaApp.componentService(false).set(this.item.Id, this);
                 },
                 updated() {
                     MsaApp.componentService(false).set(this.item.Id, this);
                 },
                 methods: {
-                    removeTheme (theme) {
+                    removeTheme(theme) {
                         MsaApp.removeExpand(theme.Id, 'Theme');
                         const index = this.item.ListSubIndependency.indexOf(theme);
                         if (index > -1) this.item.ListSubIndependency.splice(index, 1);
@@ -249,7 +267,7 @@ const mixinProductThemeClient = {
 
                         const item = this.item;
                         var cMain = this.countAllMain();
-                        
+
                         pConfirm(kLg.confirmDeleteIndependence).then(function () {
                             var entryData = { id: id, mdf: mdf };
                             vmGoalAction.dataservice.deleteIndependency(entryData, function (serData) {
@@ -263,10 +281,10 @@ const mixinProductThemeClient = {
 
                                     if (vmCommon.checkConflict(serData.value)) {
                                         MsaApp.removeExpand(id, 'Independence');
-                                      //  MsaApp.reloadAllDataOfPage('ViewIndependence_onMenuDeleteIndependency');
+                                        //  MsaApp.reloadAllDataOfPage('ViewIndependence_onMenuDeleteIndependency');
                                     }
                                 }
-                                    
+
                             });
                         });
                     },
@@ -297,7 +315,7 @@ const mixinProductThemeClient = {
                     },
                     onDragEndTheme(evt) {
                         if (MsaApp.DragDropIndependence.LastEvent == 'onDragChangeTheme') {
-                            
+
                             const lstThe = vmCommon.deepCopy(MsaApp.DragDropIndependence.LstTheme);
                             const parentId = this.item.Id;
                             MsaApp.DragDropIndependence.IndId = parentId;
@@ -316,7 +334,7 @@ const mixinProductThemeClient = {
                         }
 
                         MsaApp.DragDropIndependence.LastEvent = 'onDragEndIndependence';
-                    }, 
+                    },
 
                 },
                 //watch: { },
@@ -409,7 +427,7 @@ const mixinProductThemeClient = {
 
                         if (vmCommon.checkConflict(serData.value)) {
                             thisRef.removeTheme(thisRef.item);
-                          //  MsaApp.reloadAllDataOfPage('ViewTheme_onMenuDeleteTheme');
+                            //  MsaApp.reloadAllDataOfPage('ViewTheme_onMenuDeleteTheme');
                         }
                     });
                 });
@@ -692,11 +710,11 @@ const mixinProductThemeClient = {
                             const lst_Main = this.ListMain;         // REF
                             const updateListEvalXYZ = this.$root.updateListEvalXYZ; // ref function
                             vmGoalAction.dataservice.getGoalViewByIndependencyWithoutFilter(entry, function (theData) {
-                                if(!theData) return;
+                                if (!theData) return;
                                 const sData = theData.value
                                 if (typeof updateListEvalXYZ == 'function') updateListEvalXYZ(sData.ListEval);
                                 var lstMain = sData.ListMain;       // ref
-                                if(!lstMain.length) return;
+                                if (!lstMain.length) return;
                                 lst_Main.splice(0);
                                 lstMain.forEach(m => {
                                     lst_Main.push(m);
@@ -804,7 +822,7 @@ const mixinProductThemeClient = {
                         isShowMenu: false,
                     };
                 },
-                created() {                    
+                created() {
                 },
                 computed: {
                     kLg() {
@@ -813,7 +831,7 @@ const mixinProductThemeClient = {
                     LastActiveClass() {
                         var isLastFocus = MsaApp.getLastActiveElementId() == this.item.Id;
                         if (isLastFocus) return 'last-active-element';
-                        
+
                         return '';
                     },
                     ContainFilterResult() {
@@ -919,7 +937,7 @@ const mixinProductThemeClient = {
                             endDate = this.item.End;
                         if (!startDate && !endDate) return '';
                         const parentSDate = this.getParentStartDate().jsonToDate();
-              
+
                         var isStart = !startDate ? true : vmCommon.compareDate2(startDate.jsonToDate(), parentSDate) >= 0,
                             isEnd = true;
                         let isGoalEndDate = true;
@@ -956,7 +974,7 @@ const mixinProductThemeClient = {
                         }
                         return iconAssignfile;
                     },
-                    
+
                     setcoloricon() {
                         return this.item.HasMasterLink ? "icon-url-red" : "icon-url";
                     },
@@ -980,7 +998,7 @@ const mixinProductThemeClient = {
                 updated() {
                     MsaApp.componentService(this.getViewType()).set(this.item.Id, this);
                     this.reloadConnection();
-                   // Tinh toan get elemnt DOM view o day
+                    // Tinh toan get elemnt DOM view o day
 
                     if (MsaApp.isLastLoadTimeAction('vmEditActionDataserviceUpdateAction')) {
                         const lstId = MsaApp.getLastActiveElementId();
@@ -1052,12 +1070,12 @@ const mixinProductThemeClient = {
                     },
                     onMouseLeaveMenuAction(e) {
                         MsaApp.hideAllMenuDropdown();
-                    }, 
+                    },
                     getCustomConnect(element, connections) {
                         var e = Object.assign({
                             productid: 0, parentid: 0
                         }, element);
-                        
+
                         var temp;
                         if (!this.item.IndependencyId) {
                             temp = $.grep(connections, function (item) {
@@ -1102,13 +1120,13 @@ const mixinProductThemeClient = {
                         //call handler/api
                     },
                     DeleteAction(e) {
-                        var actionId = this.item.Id;                      
+                        var actionId = this.item.Id;
                         var titleAction = "";
                         const lstAct = this.getChildrenGa();    // ref array
                         pConfirm(kLg.confirmDeleteAc1 + titleAction + kLg.confirmDeleteAc2).then(function () {
                             const lstAcId = lstAct.map(a => a.Id);
                             const i = lstAcId.indexOf(actionId);
-                            if(i > -1) {
+                            if (i > -1) {
                                 lstAct.splice(i, 1);
                             }
                             if (vmCommon.checkCurrentPage(vmCommon.enumPage.ActionPlan)) {
@@ -1116,7 +1134,7 @@ const mixinProductThemeClient = {
                             }
                             // call handler/api
                         });
-                        
+
                     },
                     GetFileDOCXAction(e) {
                         this.isShowMenu = false;
@@ -1141,7 +1159,7 @@ const mixinProductThemeClient = {
                     },
                     openPopUpFileAssignAction() {
                         vmFile.openFileAsignCrm(this.item.Id, "action");
-                    },                    
+                    },
                     showSubActionDescription(e) {
                         var item = this.item || {};
                         var currency = this.item.CurrencyName || '';
@@ -1178,7 +1196,7 @@ const mixinProductThemeClient = {
                     onclickDetailkpiAction(e) {
                         return;
                     },
-                    onTooltipkpiTodo(e) {                        
+                    onTooltipkpiTodo(e) {
                         let tooltipContent = buildSubActionDescription({ ActionTodos: this.item.ActionTodos, IsShowFinish: true });
                         if (tooltipContent) {
                             $(e.target).kendoTooltip({
@@ -1208,7 +1226,7 @@ const mixinProductThemeClient = {
                         const that = this;
                         var entryData = { actionId: actionId, independencyId: IndependencyId, subMarketProductId: info.SubMarketProductId };
                         var objectType = vmCommon.GoalActionContentType.Action;
-                        
+
                         vmGoalAction.dataservice.getAction(entryData, function (serData) {
                             if (vmCommon.checkConflict(serData.value.ResultStatus)) {
                                 vmGoalAction.showPopupGoalActionEval_Edit(serData.value, objectType);
@@ -1237,7 +1255,7 @@ const mixinProductThemeClient = {
                     mouseoverReduce(e) {
                         var $k = $(e.target).find('.iconmenu-reduce');
                         $k.addClass('font-arrow-down');
-                        
+
                     },
                     mouseleaveReduce(e) {
                         var $k = $(e.target).find('.iconmenu-reduce');
@@ -1266,7 +1284,7 @@ const mixinProductThemeClient = {
                         const isLongName = item.Name.length > 50 && this.is_ReduceSize();
 
                         var isEmptyB = !isLongName && !item.Description && !item.ExpectedEffect && !item.ActualEffect && !item.OccuredEffect && !item.ActionActualEffect;
-                        
+
                         if ($elm.hasClass('dnbIgnoreShowTooltipNameDes') || $elm.closest('.dnbIgnoreShowTooltipNameDes').length || isEmptyB) {
                             if (tt) tt.destroy();
                             return;
@@ -1301,7 +1319,7 @@ const mixinProductThemeClient = {
                     'pGotoMixfromMainSub', 'pGotoRoadmapfromMainSub', 'AddnewColumn', 'getIsMaster',
                     'deleteGoal', 'expandApLinkOverviewUrl', 'isEditMain', 'checkRegionView',
                     'getView_TitleSubAction', 'showPopupAddAction', 'getColumnId', 'getRole',
-                    'onMouseOverCheckShowExceededCost', 'getCssExceedCost', 'showTooltipMainSub', 
+                    'onMouseOverCheckShowExceededCost', 'getCssExceedCost', 'showTooltipMainSub',
                     'getIsOverdue', 'getIsCheckActionDate', 'getParentMainStartDate', 'getMainEndDate',
                     'onClickOpenMenu', 'setSubgoalReduceSize', 'isRegionOverView',
                     'getMaingoalValueCosto', 'getMaingoalId'],
@@ -1310,7 +1328,7 @@ const mixinProductThemeClient = {
                         IsMenuShow: false
                     };
                 },
-               // created() { },
+                // created() { },
                 computed: {
                     isShow() {
                         return this.item.Name && this.item.IsShow > 0;
@@ -1326,7 +1344,7 @@ const mixinProductThemeClient = {
                         return vmCommon.TexEditor.stripHtml(txt);
                     },
                     ViewCurrencyName() {
-                       // if (this.item.MasterCurrency) return this.item.MasterCurrency;
+                        // if (this.item.MasterCurrency) return this.item.MasterCurrency;
                         return this.item.CurrencyName;
                     },
                     ViewBudget() {
@@ -1363,13 +1381,13 @@ const mixinProductThemeClient = {
                     },
                     MenuTxtAddSubgoal() {               // kLg.titlepAddSubGoal
                         if (!this.IsMain) return '';        // Subgoal => return;
-                        
+
                         var title = this.getView_TitleSubAction();
                         return kLg.strAddFormat.format(title);
                     },
                     MenuTxtAddAction() {               // kLg.titlepAddAction
                         if (this.IsMain) return '';     // Maingoal => return
-                        
+
                         var title = this.getColumnId() > 0 ? kLg.labelActionName : this.getView_TitleSubAction();
                         return kLg.strAddFormat.format(title);
                     },
@@ -1403,7 +1421,7 @@ const mixinProductThemeClient = {
                             endDate = this.item.Date;
                         if (!startDate && !endDate) return '';
                         const parentSDate = this.getParentMainStartDate().jsonToDate();
-                 
+
                         var isStart = !startDate ? true : vmCommon.compareDate2(startDate.jsonToDate(), parentSDate) >= 0,
                             isEnd = true;
                         let isGoalEndDate = true;
@@ -1423,7 +1441,7 @@ const mixinProductThemeClient = {
                     },
                     StyleFinish() {
                         if (this.item.Finish) {
-                            return { color: '#c1c1c1'}
+                            return { color: '#c1c1c1' }
                         }
                     },
                     StyleSafari() {
@@ -1447,13 +1465,13 @@ const mixinProductThemeClient = {
                         }
                     },
                 },
-                mounted() { 
+                mounted() {
                     this.checkLastActiveAndScrollY2Goal();
                 },
                 beforeUpdate() {
-                   // set data o day
+                    // set data o day
                 },
-                updated() {                     
+                updated() {
                     if (MsaApp.isLastLoadTimeAction('vmEditGoalDataserviceUpdateGoal')) {
                         const lstId = MsaApp.getLastActiveElementId();
                         if (lstId == this.item.Id) {
@@ -1473,24 +1491,24 @@ const mixinProductThemeClient = {
                 },
                 methods: {
                     checkLastActiveAndScrollY2Goal() {
-                        if(
+                        if (
                             MsaApp.isLastLoadTimeAction('vmGoalAction.dataservice.loadDataFirstTime') // tai trang lan dau tien
-                         || MsaApp.isLastLoadTimeAction('vmEditGoalDataserviceCreateGoal')            // Tao moi goal
-                         || MsaApp.isLastLoadTimeAction('vmGoalActionDataserviceDuplicateGoal')       // duplicate goal
-                            ){
-                                const lstId = MsaApp.getLastActiveElementId();
-                                if (lstId == this.item.Id) {
-                                    const slt = !MsaApp.IsShowNavigationMenu ? `[direction-id=${lstId}]` : `[direction-id=nav_${lstId}]`;
-                                    if (!$(slt).length) return;
-                                    if (MsaApp.isElementHtmlOutofViewY(slt)) {
-                                        MsaApp.scrollY(slt, /* GoalOverview.mounted */
-                                            function scrollDone() {
-                                                MsaApp.pushLoadTimeActions('MsaApp_Done_scrollXY2Element');
-                                            });
-                                    } else {
-                                        MsaApp.pushLoadTimeActions('isElementHtmlIntofViewY');
-                                    }
+                            || MsaApp.isLastLoadTimeAction('vmEditGoalDataserviceCreateGoal')            // Tao moi goal
+                            || MsaApp.isLastLoadTimeAction('vmGoalActionDataserviceDuplicateGoal')       // duplicate goal
+                        ) {
+                            const lstId = MsaApp.getLastActiveElementId();
+                            if (lstId == this.item.Id) {
+                                const slt = !MsaApp.IsShowNavigationMenu ? `[direction-id=${lstId}]` : `[direction-id=nav_${lstId}]`;
+                                if (!$(slt).length) return;
+                                if (MsaApp.isElementHtmlOutofViewY(slt)) {
+                                    MsaApp.scrollY(slt, /* GoalOverview.mounted */
+                                        function scrollDone() {
+                                            MsaApp.pushLoadTimeActions('MsaApp_Done_scrollXY2Element');
+                                        });
+                                } else {
+                                    MsaApp.pushLoadTimeActions('isElementHtmlIntofViewY');
                                 }
+                            }
                         }
                     },
                     onMouseleaveHideMenu(e) {
@@ -1571,12 +1589,12 @@ const mixinProductThemeClient = {
                 inject: ['getMaingoalId', 'getSubgoalId', 'getLenColumn',
                     'is_ReduceSize', 'getSubMarketProductId', 'getIndependencyId', 'getRegionId',
                     'onDragStartAction', 'onDragMoveAction', 'onDragChangeAction', 'onDragEndAction', 'getDragdropActionOptions',
-                    'showPopupAddAction', 'getView_TitleSubAction', 'loadAllGoalActionInOpenArea','getRole' ],
+                    'showPopupAddAction', 'getView_TitleSubAction', 'loadAllGoalActionInOpenArea', 'getRole'],
                 data() {
-                    return {                        
+                    return {
                         IsEditColumnTitle: false,
                         View_ColumnName: this.item.Name,
-                        
+
                     };
                 },
                 computed: {
@@ -1656,7 +1674,7 @@ const mixinProductThemeClient = {
                         if (_lstA.length < 1) return true;
                         return false;
                     },
-                    
+
                 },
                 watch: {
                     'item.Name'(nVal) {
@@ -1681,11 +1699,11 @@ const mixinProductThemeClient = {
                     }
                 },
                 methods: {
-                    
+
                     deleteColumn(e) {
                         var goalId = this.item.GoalId;//this.getSubgoalId();
                         var columnId = this.item.Id;
-                        
+
                         pConfirm(kLg.confirmDeleteAc1 + kLg.confirmDeleteAc2).then(function () {
                             var entryData = { ActionPlanColunmId: columnId, GoalId: goalId };
                             vmGoalAction.dataservice.deleteColumn(entryData, function (serData) {
@@ -1723,7 +1741,7 @@ const mixinProductThemeClient = {
                         if (typeof MsaApp.ClcTimerEditColumn == 'undefined')
                             MsaApp.ClcTimerEditColumn = setTimeout(function () {
                                 if (MsaApp.ClcCountEditColumn > 1) {        // dblclick
-                                    
+
                                     const columnId = that.item.Id;
                                     var maingoalid = that.getMaingoalId();
                                     var subgoalId = that.getSubgoalId();
@@ -1741,7 +1759,7 @@ const mixinProductThemeClient = {
                                         $(that.$el).find('.cssInputColumnName').focus();
                                     });
                                 }
-                                
+
                                 MsaApp.ClcCountEditColumn = 0;          // xóa click count
                                 clearTimeout(MsaApp.ClcTimerEditColumn);// xóa timmer 
                                 MsaApp.ClcTimerEditColumn = undefined;  // set timmer về updefinded để chạy lệnh if (typeof MsaApp.ClcTimerEditColumn == 'undefined')
@@ -1770,13 +1788,13 @@ const mixinProductThemeClient = {
             });
         });
     });
-    
+
     Vue.component("KpiRegion", (resolve) => {
         $.get(`${__rootFolder__}/${_MainSubFolder_}/KpiRegion.html`, template => {
             resolve({
                 template: template,
                 props: ["kpiRegion"],
-                inject: ['getIndependencyId','getSubMarketProductId'],
+                inject: ['getIndependencyId', 'getSubMarketProductId'],
                 computed: {
                     kLg() {
                         return kLg;
@@ -1790,7 +1808,7 @@ const mixinProductThemeClient = {
                     width() {
                         var per = this.krPercent;
                         var w = 100 - (per > 0 ? per : 0);
-                        return w < 0 ? 0 : w > 100 ? 100: w;
+                        return w < 0 ? 0 : w > 100 ? 100 : w;
                     },
                     left() {
                         return this.krPercent > 99 ? -28 : -8;
@@ -1879,7 +1897,7 @@ const mixinProductThemeClient = {
         props: ['item', 'hasSearchTypeCritias'],
         inject: ['getMaingoalStartDate', 'pEditMenuGoal', 'isDraggable',
             'getIsExpand', 'isShowMainOverview', 'updateListSubExpand', 'setSubgoalReduceSize',
-            'onMouseOverCheckShowExceededCost', 'isKeyBoardCode', 'countSub', 'getIsVisible', 
+            'onMouseOverCheckShowExceededCost', 'isKeyBoardCode', 'countSub', 'getIsVisible',
             'getDragdropSubOptions', 'onDragStartSubgoal', 'onDragChangeSubgoal', 'onDragEndSubgoal', 'onDragMoveGoal',
             'updateTitleAction', 'getViewRightWidth', "getViewType"],
         provide() {
@@ -1924,7 +1942,7 @@ const mixinProductThemeClient = {
                     }
                 },
                 countAction: () => { return this.item.ListAction.length; },
-                getChildrenGa: () => {return this.item.ListAction},
+                getChildrenGa: () => { return this.item.ListAction },
             }
         },
         data() {
@@ -1952,7 +1970,7 @@ const mixinProductThemeClient = {
         },
         computed: {
             kLg() { return kLg; },
-            ViewCurrencyName() { return this.item.CurrencyName;},
+            ViewCurrencyName() { return this.item.CurrencyName; },
             WidthAction() {
                 if (this.item.IsReduceSize) {
                     return 359;
@@ -2106,7 +2124,7 @@ const mixinProductThemeClient = {
                     }
                 }
                 if (Array.isArray(goal.ListAction) && action < goal.ListAction.length) hasHiddenItem = true;
-                
+
                 if (isShowAll) {
                     isShowOverView = true;
                     hasHiddenItem = false;
@@ -2217,7 +2235,7 @@ const mixinProductThemeClient = {
                     Obig: ''
                 }
             },
-            
+
             ContainFilterResult() {
                 return this.item.IsContainFilterResult ? "ms-contain-rs" : "";
             },
@@ -2312,18 +2330,18 @@ const mixinProductThemeClient = {
                 vmCommon.DrgDrpAction.GoalId = goalIdTo;
                 const iF = MsaApp.DragDropAction.iFrom;
                 const iT = MsaApp.DragDropAction.iTo;
-                if(MsaApp.DragDropAction.LastEvent == 'onDragChangeAction_moved' && Array.isArray(vmCommon.DrgDrpListAction)) {
+                if (MsaApp.DragDropAction.LastEvent == 'onDragChangeAction_moved' && Array.isArray(vmCommon.DrgDrpListAction)) {
                     const actF = vmCommon.deepCopy(vmCommon.DrgDrpListAction[iF]);
-                    if(iF < iT) {
-                        for(let i = iF + 1; i <= iT; i++) {
+                    if (iF < iT) {
+                        for (let i = iF + 1; i <= iT; i++) {
                             const actI = vmCommon.deepCopy(vmCommon.DrgDrpListAction[i]);
-                            vmCommon.DrgDrpListAction.splice(i-1, 1, actI); // replace
+                            vmCommon.DrgDrpListAction.splice(i - 1, 1, actI); // replace
                         }
                         vmCommon.DrgDrpListAction.splice(iT, 1, actF);
-                    } else if(iF > iT) {
-                        for(let i = iT; i <= iF-1; i++) {
+                    } else if (iF > iT) {
+                        for (let i = iT; i <= iF - 1; i++) {
                             const actI = vmCommon.deepCopy(vmCommon.DrgDrpListAction[i]);
-                            vmCommon.DrgDrpListAction.splice(i+1, 1, actI); // replace
+                            vmCommon.DrgDrpListAction.splice(i + 1, 1, actI); // replace
                         }
                         vmCommon.DrgDrpListAction.splice(iT, 1, actF);
                     }
@@ -2848,7 +2866,7 @@ const mixinProductThemeClient = {
 
         },
         updated() {
-            MsaApp.componentService(this.getViewType()).set(this.item.Id, this);            
+            MsaApp.componentService(this.getViewType()).set(this.item.Id, this);
             if (this.IsExpand) {        // tinh toan (get value) tu DOM
                 const a = this.getDOM2Scroll();
                 this.ColumnView.WidthAllColumn = a.WidthAllColumn;
@@ -2860,7 +2878,7 @@ const mixinProductThemeClient = {
             MsaApp.updateVisibleBrnScrollX();
         },
         mounted() {
-            MsaApp.componentService(this.getViewType()).set(this.item.Id, this);            
+            MsaApp.componentService(this.getViewType()).set(this.item.Id, this);
             window.addEventListener('resize', this.onResizeView);
             this.onResizeView();
             MsaApp.getWidthUpdated();
@@ -2879,13 +2897,23 @@ const mixinProductThemeClient = {
         $.get(`${__rootFolder__}/${_MainSubFolder_}/ViewSubgoal.html`, template => {
             resolve({
                 template: template,
-                mixins: [mixinSubGoalOverView],       // dung mixin de ke thua cho navigation menu 
+                mixins: [mixinSubGoalOverView, mxUpdateAction],       // dung mixin de ke thua cho navigation menu 
                 props: ['StartDatemain', 'Datemain'],
                 inject: ['getMaingoalId', 'getRegionId', 'getProductId', 'getIsMaster', "getRole"],
                 provide() {
                     return {
                         getSubMarketProductId: () => this.item.SubMarketProductId,
                         getIndependencyId: () => this.item.IndependencyId,
+                        updateActionClient: (a) => {
+                            // if (typeof vmEditAction == 'object' && !Object.is(vmEditAction, null)) {
+                            //     Object.keys(vmEditAction).forEach(key => delete object[key]);
+                            //     vmEditAction = undefined
+                            //     delete vmGoalAction.actionOptions.action
+                            // }
+                            const act = this.item.ListAction.find(x => x.Id == a.Id)
+                            if (!act) return
+                            this.updateActionVw(act, a)
+                        },
                     }
                 },
                 data() {
@@ -2939,7 +2967,7 @@ const mixinProductThemeClient = {
                 props: ['item', 'StartDatemain', 'Datemain'],
                 inject: ['HoverTooltipStatusProtocol', 'getMaingoalId', 'getRole', 'getChildrenGaSg', 'getChildrenGaPrd',
                     'loadAllGoalActionInOpenArea', 'pEditMenuGoal', 'checkRegionView', 'MainOverViewAddSubGoal',
-                    'deleteMainGoal', 'isEditMain', 'getIndependencyId', 'getIsMaster', 
+                    'deleteMainGoal', 'isEditMain', 'getIndependencyId', 'getIsMaster',
                     'getProductId', 'getRegionId', 'getSubMarketId', 'getSubMarketProductId', 'countSub',
                     'setApLinkOverviewUrl', 'isShowMainOverview'],
                 data() {
@@ -2950,7 +2978,7 @@ const mixinProductThemeClient = {
                         Effect: '',
                         Arrived: '',
                         ExpectedEffect: '',
-                        ActualEffect: '',                        
+                        ActualEffect: '',
                         delay: 700,
                         clicks: 0,
                         timer: null,
@@ -3021,7 +3049,7 @@ const mixinProductThemeClient = {
                         const goal = this.item;
                         return MsaApp.getKpiOverview(goal);   // { ClsArrow, ClsBg, KpiBg }
                     },
-                    
+
                     HasFileAssigned() {
                         var isShowFile = (!this.item.Finish && this.item.IsColor) || (this.item.Finish || !this.item.IsColor);
                         return isShowFile && this.item.AssignFile > 0;
@@ -3081,13 +3109,13 @@ const mixinProductThemeClient = {
                         onClickOpenMenu: this.onClickOpenMenu,
                         expandApLinkOverviewUrl: this.expandApLinkOverviewUrl,
                         // export computed value to children
-                        TypeId: this.Typeid,                        
+                        TypeId: this.Typeid,
                     }
                 },
                 updated() {
                     this.reloadConnection();
                 },
-                mounted() { 
+                mounted() {
                     this.reloadConnection();
                 },
                 methods: {
@@ -3115,7 +3143,7 @@ const mixinProductThemeClient = {
 
                         if (!this.IsMain) {     // subgoal
                             const $target = $(elm).closest('.dnbWrapperGoal');//onMouseleaveHideMenu
-                            $target.css({'z-index' : '6'});
+                            $target.css({ 'z-index': '6' });
                         }
 
                         if (this.isMenuShowTop(elm)) {
@@ -3222,12 +3250,12 @@ const mixinProductThemeClient = {
                             isMainGoal: isMain,
                             mdf: this.item.Mdf,
                             startdate: this.item.StartDate
-                        }                        
+                        }
                         var message = kLg.msgConfirmDuplicateMG;
                         var mainGoalName = isMain ? this.item.Name : '';
                         const lstSM = isMain ? this.getChildrenGaPrd() : this.getChildrenGaSg();     // ref array
                         const refMS = vmCommon.deepCopy(this.item);
-                        return ynConfirmDuplicate(message, entryData.startdate, entryData.enddate).then(function () {                            
+                        return ynConfirmDuplicate(message, entryData.startdate, entryData.enddate).then(function () {
                             var sdate = $('#txtCopyStartDate').data("kendoDatePicker").value();
                             var edate = $('#txtCopyEndDate').data("kendoDatePicker").value();
                             if ($("#txtCopyStartDate").data("kendoDatePicker").enable() !== false) {
@@ -3237,8 +3265,8 @@ const mixinProductThemeClient = {
                                 entryData.enddate = vmCommon.tryToServerDate(edate);
                             }
                             console.log(entryData.startdate, entryData.enddate)
-                            if(!!entryData.startdate) refMS.StartDate = `/Date(${new Date(entryData.startdate).getTime()})/`;
-                            if(!!entryData.enddate) refMS.Date = `/Date(${new Date(entryData.enddate).getTime()})/`;
+                            if (!!entryData.startdate) refMS.StartDate = `/Date(${new Date(entryData.startdate).getTime()})/`;
+                            if (!!entryData.enddate) refMS.Date = `/Date(${new Date(entryData.enddate).getTime()})/`;
                             else refMS.Date = null;
                             lstSM.push(refMS);
                             return;
@@ -3268,7 +3296,7 @@ const mixinProductThemeClient = {
                                             });
                                         } else
                                             MsaApp.pushExpand(maingoalId, 'maingoal');
-                                        
+
                                         if (goalIdArr.length > 0) {
                                             MsaApp.setLastActiveElement(goalIdArr[0]);
                                             MsaApp.pushLoadTimeActions('vmGoalActionDataserviceDuplicateGoal');
@@ -3327,7 +3355,7 @@ const mixinProductThemeClient = {
                         };
                         var smkId = info.SubMarketProductId;
                         var inpId = info.IndependencyId;
-                        var maingoalId = this.getMaingoalId(); 
+                        var maingoalId = this.getMaingoalId();
                         var titleSubGoal = MsaApp.getSubgoalTitle(maingoalId);
 
                         MsaApp.hideAllMenuDropdown();
@@ -3336,7 +3364,7 @@ const mixinProductThemeClient = {
                         pConfirm(kLg.confirmDeleteSG1 + titleSubGoal + kLg.confirmDeleteSG2).then(function () {
                             const lstSgId = lstSg.map(s => s.Id);
                             const i = lstSgId.indexOf(goalId);
-                            if(i > -1) {
+                            if (i > -1) {
                                 lstSg.splice(i, 1);
                                 MsaApp.deleteEvalXYZ(entryData.goalId)
                             }
@@ -3358,7 +3386,7 @@ const mixinProductThemeClient = {
                             SubMarketProductId: SubMarketProductId
                         };
                         var objectType = !this.item.ParentId ? vmCommon.GoalActionContentType.MainGoal : vmCommon.GoalActionContentType.SubGoal;
-                        var entryData = { goalType: objectType,goalId: goalId, independencyId: IndependencyId, regionId: info.RegionId, productId: info.productId, subMarketId: info.SubMarketId, subMarketProductId: info.SubMarketProductId };
+                        var entryData = { goalType: objectType, goalId: goalId, independencyId: IndependencyId, regionId: info.RegionId, productId: info.productId, subMarketId: info.SubMarketId, subMarketProductId: info.SubMarketProductId };
                         vmGoalAction.dataservice.getGoal(entryData, function (serData) {
                             if (vmCommon.checkConflict(serData.value.ResultStatus)) {
                                 vmGoalAction.showPopupGoalActionEval_Edit(serData.value, objectType);
@@ -3381,7 +3409,7 @@ const mixinProductThemeClient = {
                         }
                     },
                     onHoverShowTooltipAddSub(target) {
-                        var maingoalId = this.getMaingoalId(); 
+                        var maingoalId = this.getMaingoalId();
                         var title = MsaApp.getSubgoalTitle(maingoalId);
                         var des = kLg.strAddFormat.format(title);
                         MsaApp.onHoverShowTooltipAddGoalAction(target, des, 'top');
@@ -3449,7 +3477,7 @@ const mixinProductThemeClient = {
                 pEditMenuGoal: this.pEditMenuGoal,
                 getIsVisible: () => { return this.ViewVisible.ShowOverview; },
                 getView_TitleSubAction: () => { return this.View_TitleSubgoal; },
-                MainOverViewAddSubGoal: this.overViewAddSubGoal,                
+                MainOverViewAddSubGoal: this.overViewAddSubGoal,
                 onMouseOverCheckShowExceededCost: (target) => {
                     var $target = $(target);
                     if (!$target.hasClass('dnbOnOverCheckShowExceedCost')) {
@@ -3475,11 +3503,11 @@ const mixinProductThemeClient = {
                 onDragEndSubgoal: this.onDragEndSubgoal,
                 getDragdropSubOptions: () => { return this.DragdropOptions; },
                 isRegionOverView: this.isRegionOverView,
-                getChildrenGaSg: () => {return this.goal.ListSubGoal; },
+                getChildrenGaSg: () => { return this.goal.ListSubGoal; },
             }
         },
         data() {
-            var isExp =  this.getIsExpand(this.goal.Id, this.itemtype);
+            var isExp = this.getIsExpand(this.goal.Id, this.itemtype);
             return {
                 IsExpand: isExp,
                 IsMenuShow: false,
@@ -3640,9 +3668,9 @@ const mixinProductThemeClient = {
                             // xử lý sự kiện single click
                             const isE = thisR.IsExpand;
                             thisR.IsExpand = !isE;
-                            if (thisR.IsExpand) {                                
+                            if (thisR.IsExpand) {
                                 MsaApp.pushExpand(goalId, 'maingoal');
-                            } else {                                
+                            } else {
                                 MsaApp.removeExpand(goalId, 'maingoal');
                             }
                         }
@@ -3783,7 +3811,7 @@ const mixinProductThemeClient = {
                 vmCommon.RefLstGa = this.goal.ListSubGoal;  // ref Array
                 MsaApp.editGoal(entryData, info,
                     kLg.titlepAddMainGoalNew1 + htmlEscape(titlesub) + kLg.titlepAddMainGoalNew2,
-                    'vmGoalAction.showAddSubgoalFromMainOverview', vmCommon.deepCopy(this.goal));                    
+                    'vmGoalAction.showAddSubgoalFromMainOverview', vmCommon.deepCopy(this.goal));
             },
             deleteMainGoal(e) {
                 var goalId = this.goal.Id;
@@ -3792,7 +3820,7 @@ const mixinProductThemeClient = {
                 pConfirm(kLg.confirmDeleteMG1 + titleMainGoal + kLg.confirmDeleteMG2).then(function () {
                     const lstMgId = lstMg.map(m => m.Id);
                     let i = lstMgId.indexOf(goalId);
-                    if(i > -1) lstMg.splice(i, 1); // remove
+                    if (i > -1) lstMg.splice(i, 1); // remove
                 });
             },
             onDragStartSubgoal(evt) {    //onDragStartTheme
@@ -3822,7 +3850,7 @@ const mixinProductThemeClient = {
                 if (sumAction > 0) {
                     MsaApp.DragDropGoal.GroupMain = 'MIndexMainGoal';
                 }
-                if(!!vmCommon.DrgDrpSubgoal) {
+                if (!!vmCommon.DrgDrpSubgoal) {
                     const smpIdTo = evt.to.parentNode.getAttribute('drgdrp-smpid');
                     const indIdTo = evt.to.parentNode.getAttribute('drgdrp-indid');
                     const goalIdTo = evt.to.parentNode.getAttribute('drgdrp-goalid');
@@ -3830,7 +3858,7 @@ const mixinProductThemeClient = {
                     vmCommon.DrgDrpSubgoal.IndependencyId = indIdTo;
                     vmCommon.DrgDrpSubgoal.ParentId = goalIdTo;
                     delete vmCommon.DrgDrpSubgoal;
-                }                
+                }
                 MsaApp.clearDragDropGoal();
             },
         },
@@ -3933,7 +3961,7 @@ const mixinProductThemeClient = {
                         if (vRW < 1920) {
                             sV -= 202;  // //246
                         }
-                        
+
                         return {
                             MainCollapseW: `${sV}px`,
                             MainCollWProd: `${sVp}px`
@@ -3960,7 +3988,7 @@ const mixinProductThemeClient = {
                     //actionPlanComponents[this.goal.Id] = this;
                 },
                 updated() {
-                    MsaApp.componentService(this.getViewType()).set(this.goal.Id, this);                    
+                    MsaApp.componentService(this.getViewType()).set(this.goal.Id, this);
                     // tinh toan get element tu DOM
 
                     this.setCollapExpandAllMain();
@@ -4012,10 +4040,10 @@ const mixinProductThemeClient = {
                             this.dataservice().changeTitleSubGoal(entryData);
                         }
                     },
-                    
-                    
+
+
                 },      // end method
-            }); 
+            });
         });
     });
 
@@ -4036,7 +4064,7 @@ const mixinProductThemeClient = {
                             getViewType: () => false,
                             setMasterGoal: (itm) => {
                                 this.products.find(p => {
-                                    if(p.SubMarketProductId == itm.SubMarketProductId) {
+                                    if (p.SubMarketProductId == itm.SubMarketProductId) {
                                         p.IsMasterGoalKpi = itm.IsMasterGoalKpi;
                                         return true;
                                     }
@@ -4064,7 +4092,7 @@ const mixinProductThemeClient = {
                         if (!isExpd) {
                             isExpd = this.getIsExpand(this.item.Id, this.itemtype);
                         }
-                        
+
                         return {
                             IsExpand: isExpd,
                             IsDataSending: false,
@@ -4140,7 +4168,7 @@ const mixinProductThemeClient = {
                             });
                         }
                     },
-                    
+
                 }
             });
         });
@@ -4161,9 +4189,9 @@ const mixinProductThemeClient = {
         },      // end methods
     }
     const mixinProductDefault = {
-        mixins: [mixinProductThemeClient],        
+        mixins: [mixinProductThemeClient],
         props: ['item', 'itemtype'],
-        inject: ['getBgColorByAvgEvaluation', 'getViewRightWidth', 'onDragStartMaingoal', 'onDragChangeMaingoal','setMasterGoal',
+        inject: ['getBgColorByAvgEvaluation', 'getViewRightWidth', 'onDragStartMaingoal', 'onDragChangeMaingoal', 'setMasterGoal',
             'onDragEndMaingoal', 'onDragMoveGoal', 'isDraggable', 'getGroupMain', 'onHoverShowTooltipAddGoalAction', 'getViewType'],
         data() {
             return {
@@ -4227,7 +4255,7 @@ const mixinProductThemeClient = {
             },
         },
         provide() {
-            return {                
+            return {
                 getProductId: () => { return this.item.Id },
                 getIsMaster: () => {
                     const isMsterGoal = !!this.item.IsMasterGoal;
@@ -4239,10 +4267,10 @@ const mixinProductThemeClient = {
                 getIndependencyId: () => { return null },
                 countMain: () => { return this.ListMain.length },
                 getListMain: (id) => { return this.ListMain.filter(m => m.Id == id); },
-                getChildrenGaPrd: () => {return this.ListMain},
+                getChildrenGaPrd: () => { return this.ListMain },
                 setCollapExpandAllMain: this.setCollapExpandAllMain,
                 getRole: () => this.item.RoleId,        // NavMenuViewProduct, MsaViewProduct
-                
+
             }
         },
         methods: {
@@ -4332,7 +4360,7 @@ const mixinProductThemeClient = {
                     isEdit: false,
                     goalType: vmCommon.GoalActionContentType.MainGoal,
                     parentStart: new Date()
-                };                
+                };
                 vmCommon.RefLstGa = this.ListMain;  // ref Array
                 vmCommon.RefAddTypeStr = 'addMaingoalByNav';
                 vmGoalAction.openPopUpGoal2(info);
@@ -4347,7 +4375,7 @@ const mixinProductThemeClient = {
                     parentId: null,
                     parentStart: new Date(),
                     parentEnd: new Date(),
-                };                
+                };
                 vmCommon.RefLstGa = this.ListMain;  // ref Array
                 vmCommon.RefAddTypeStr = 'addSubgoalByNav';
                 vmGoalAction.openPopUpGoal2(info);
@@ -4394,7 +4422,7 @@ const mixinProductThemeClient = {
                 }
 
             },
-            
+
         }
     }
     Vue.component('MsaViewProduct', (resolve) => {
@@ -4420,7 +4448,7 @@ const mixinProductThemeClient = {
                 computed: {
                     StyleWithNavMenu() {
                         if (this.getViewRightWidth() < 1920) {
-                          return '100%';
+                            return '100%';
                         }
                     },
                 },
@@ -4429,11 +4457,11 @@ const mixinProductThemeClient = {
                 },
                 mounted() {
                     // sau ham beforeMount da tao DOM
-                    MsaApp.componentService(this.getViewType()).set(this.item.SubMarketProductId, this);                    
+                    MsaApp.componentService(this.getViewType()).set(this.item.SubMarketProductId, this);
                 },
                 updated() {
                     MsaApp.componentService(this.getViewType()).set(this.item.SubMarketProductId, this);
-                    
+
                     if (this.IsExpand)
                         this.setCollapExpandAllMain();
                 },
@@ -4443,7 +4471,7 @@ const mixinProductThemeClient = {
                         const isExpand = !this.IsExpand;
                         this.IsExpand = isExpand;
                         MsaApp.handlerLoadding();
-                        
+
                         // call handler
                         if (isExpand) {
                             MsaApp.pushExpand(this.item.SubMarketProductId, this.itemtype).then(function () {
@@ -4469,17 +4497,17 @@ const mixinProductThemeClient = {
                         const updateListEvalXYZ = this.$root.updateListEvalXYZ; // ref function
                         return new Promise((resv) => {
                             vmGoalAction.dataservice.getGoalViewWithoutFilter(entry, function (theData) {
-                                if(!theData) return;
+                                if (!theData) return;
                                 const serData = theData.value;
                                 if (typeof updateListEvalXYZ == 'function') updateListEvalXYZ(serData.ListEval);
                                 var lstMain = serData.ListMain;       // ref
-                                if(!lstMain.length) return;
+                                if (!lstMain.length) return;
                                 lst_Main.splice(0);
                                 lstMain.forEach(m => {
                                     lst_Main.push(m);
                                 });
                                 if (!MsaApp.MapListMain.has(subMarketProductId)) {
-                                    MsaApp.MapListMain.set(subMarketProductId, lstMain);                                    
+                                    MsaApp.MapListMain.set(subMarketProductId, lstMain);
                                 } else {
                                     const mL = MsaApp.MapListMain.get(subMarketProductId);
                                     mL.splice(0);       // remove all item
@@ -4542,7 +4570,7 @@ const mixinProductThemeClient = {
                     getRegionId() { return this.item.RegionId; },
                     getSubMarketId() { return this.item.SubMarketId; },
                     pushExpand() { },
-                    onClickToggleShow() {},
+                    onClickToggleShow() { },
                     checkRegionView() { return this.item.IsRegionOverView; },
                     addMaingoalByNav() {
                         var info = {

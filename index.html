@@ -52,13 +52,11 @@
                 <img class="cursor-pointer" src="images/stratsigner_logo.png" />
             </span>
             <div class="navbar-collapse collapse block-nav">
-                <!-- Start dropdown 1 -->
-                <!--Title 1-->
+                
                 <div id="combobox-project-place"></div>
-                <!-- End dropdown 1 -->
-                <!-- Start dropdown 2 -->
+                
                 <div id="combobox-strategy-place"></div>
-                <!-- End dropdown 2 -->
+                
                 <div id="popActionIndex"></div>
                 <div id="pop-add-project-place"></div>
                 <div id="pop-file-management-place"></div>
@@ -80,7 +78,7 @@
                 <div id="popEditTemplate"></div>
 
                 <div id="activity-loading" class="loading"></div>
-                <script type="text/html" id="template-project">
+    <script type="text/html" id="template-project">
         <div class="navbar-header"><span class="navbar-brand nv-br">#:kLg.FilterProject#</span></div>
         <ul class="nav navbar-nav navb1">
             <li class="dropdown">
@@ -102,7 +100,7 @@
 
     </script>
 
-                <script type="text/html" id="template-strategy">
+    <script type="text/html" id="template-strategy">
         <div class="navbar-header"><span class="navbar-brand nv-br">#:kLg.menuStrategy#</span></div>
         <!--Title 2 -->
         <ul class="nav navbar-nav navb2">
@@ -120,7 +118,7 @@
         </ul>
     </script>
 
-                <script id="save-filter" type="text/html">
+    <script id="save-filter" type="text/html">
         <div class="margin-bottom-4px pointer" data-bind="visible: IsShow, events: { click: onSelectFilter }" 
             style="overflow: hidden; margin-right: 0px; height: 28px;">
             <span class="icon-16 icon-left-block icon-filter-tick title-tick-icon" data-bind="visible: IsUsing"></span>
@@ -129,7 +127,7 @@
         </div>
     </script>
 
-                <script type="text/html" id="msfiltertemp">
+    <script type="text/html" id="msfiltertemp">
         <div class="msfilterpanel">
             <div style="position: absolute;top: 5px;left: 8px;z-index: 2;height: 31px;"
                 data-bind="visible: IsNotShowOnDashboard">
@@ -233,11 +231,11 @@
         </div>
     </script>
 
-                <script id="typeSrcTemp" type="text/html">
+    <script id="typeSrcTemp" type="text/html">
         <span class="#: data.IsDisable ? 'k-state-disabled' : ''#">#: data.Name#</span>
     </script>
 
-                <script type="text/html" id="itemfiltertemp">
+    <script type="text/html" id="itemfiltertemp">
         <tr>
             <td>
                 <input data-role="dropdownlist" style="width: 100px"
@@ -285,7 +283,7 @@
         </tr>
     </script>
 
-                <script type="text/html" id="timerangetemp">
+    <script type="text/html" id="timerangetemp">
         <div>
             <div class="pull-left">
                 <input data-role="dropdownlist" style="width: 100px;"
@@ -326,7 +324,9 @@
                             vmProjectStrategy.ListProject = data.value.ListProject;
                             if (vmProjectStrategy.ListProject.length > 0) {
                                 vmProjectStrategy.ProjectGroupId = vmProjectStrategy.ListProject[0].ProjectGroupId;
-                                vmProjectStrategy.BindTemplateProjectStrategy(data.value);
+                                
+                                bindTemplate('combobox-project-place', 'template-project', data.value);
+                                
                                 vmProjectStrategy.SetComboBoxProject(parseFloat(sHandler.ProjectId));
                             }
                             if (typeof updatePaletteFrom == 'function') {
@@ -341,11 +341,6 @@
                         }
                         return name;
                     };
-
-                    vmProjectStrategy.BindTemplateProjectStrategy = function (data) {
-                        bindTemplate('combobox-project-place', 'template-project', data);
-                    };
-
                     function findStrategiesByType(type, listSt) {
                         var str = null;
                         for (var i = 0; i < listSt.length; i++) {

@@ -322,7 +322,9 @@
                             vmProjectStrategy.ListProject = data.value.ListProject;
                             if (vmProjectStrategy.ListProject.length > 0) {
                                 vmProjectStrategy.ProjectGroupId = vmProjectStrategy.ListProject[0].ProjectGroupId;
-                                vmProjectStrategy.BindTemplateProjectStrategy(data.value);
+                                
+                                bindTemplate('combobox-project-place', 'template-project', data.value);
+
                                 vmProjectStrategy.SetComboBoxProject(parseFloat(sHandler.ProjectId));
                             }
                             if (typeof updatePaletteFrom == 'function') {
@@ -336,10 +338,6 @@
                             name = name.substring(0, 25) + '... ';
                         }
                         return name;
-                    };
-
-                    vmProjectStrategy.BindTemplateProjectStrategy = function (data) {
-                        bindTemplate('combobox-project-place', 'template-project', data);
                     };
 
                     function findStrategiesByType(type, listSt) {

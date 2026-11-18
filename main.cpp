@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cmath>
 #include "camera/camera.h"
+#include "entity/selectable.h"
 #include "Utils.h"
 
 constexpr int kWindowW = 1280;
@@ -35,11 +36,10 @@ constexpr int kMap[kMapRows][kMapCols] = {
 
 constexpr float kWorldW = kMapCols * kTileSize;
 constexpr float kWorldH = kMapRows * kTileSize;
-constexpr float kTargetX = 12.0f * kTileSize + kTileSize / 2.0f;
-constexpr float kTargetY = 6.0f * kTileSize + kTileSize / 2.0f;
+Target target{ 12.0f * kTileSize + kTileSize / 2.0f , 6.0f * kTileSize + kTileSize / 2.0f, kSquareSize };
+Player player{ kWorldW / 2.0f, kWorldH / 2.0f, kSquareSize }; // Tọa độ thế giới, không phải tọa độ màn hình.
 
 struct GameState {
-    float x = kWorldW / 2.0f, y = kWorldH / 2.0f; // Tọa độ thế giới, không phải tọa độ màn hình.
     Camera camera{ 0.0f, 0.0f };                    // Camera: góc trên-trái của vùng nhìn thấy, tính theo tọa độ thế giới
     bool touchingTarget = false;
 
@@ -50,13 +50,8 @@ struct GameState {
     float selectEndWorldX = 0.0f;
     float selectEndWorldY = 0.0f;
 
-    bool playerSelected = false;
-    bool targetSelected = false;
-
     // ---- Trạng thái di chuyển theo lệnh chuột phải ----
     bool hasMoveOrder = false;
-    float moveTargetX = 0.0f;
-    float moveTargetY = 0.0f;
 };
 
 struct App {
@@ -85,43 +80,43 @@ static void Update(GameState& g, const Input& in, float dt, int windowW, int win
         // Nếu người chơi bấm WASD, hủy lệnh di chuyển bằng chuột hiện tại
         g.hasMoveOrder = false;
         Utils::NormalizeDirection(wasdX, wasdY);
-        g.x += wasdX * kSpeed * dt;
-        g.y += wasdY * kSpeed * dt;
+        player.x += wasdX * kSpeed * dt;
+        player.y += wasdY * kSpeed * dt;
     }
     else if (g.hasMoveOrder) {
         // Tính vector khoảng cách từ vị trí hiện tại tới điểm đích
-        float toTargetX = g.moveTargetX - g.x;
-        float toTargetY = g.moveTargetY - g.y;
+        float toTargetX = player.moveX - player.x;
+        float toTargetY = player.moveY - player.y;
         float dist = std::sqrt(toTargetX * toTargetX + toTargetY * toTargetY);
         float stepDist = kSpeed * dt;
 
         // Nếu khoảng cách còn lại nhỏ hơn quãng đường đi được trong 1 frame -> Đặt thẳng vào đích (chống rung)
         if (dist <= stepDist) {
-            g.x = g.moveTargetX;
-            g.y = g.moveTargetY;
+            player.x = player.moveX;
+            player.y = player.moveY;
             g.hasMoveOrder = false;
         }
         else {
-            g.x += (toTargetX / dist) * stepDist;
-            g.y += (toTargetY / dist) * stepDist;
+            player.x += (toTargetX / dist) * stepDist;
+            player.y += (toTargetY / dist) * stepDist;
         }
     }
 
     // Giới hạn trong toàn bộ bản đồ.
-    g.x = std::clamp(g.x, half, kWorldW - half);
-    g.y = std::clamp(g.y, half, kWorldH - half);
+    player.x = std::clamp(player.x, half, kWorldW - half);
+    player.y = std::clamp(player.y, half, kWorldH - half);
 
     // Va chạm với ô vuông mục tiêu được tính trong tọa độ thế giới.
     g.touchingTarget =
-        std::abs(g.x - kTargetX) < kSquareSize &&
-        std::abs(g.y - kTargetY) < kSquareSize;
+        std::abs(player.x - target.x) < kSquareSize &&
+        std::abs(player.y - target.y) < kSquareSize;
 
     // ---- Camera: độc lập với ô vuông vàng ----
     g.camera.UpdateCamera(in, dt, windowW, windowH, kWorldW, kWorldH);
 
     // Space: đưa camera về chỗ ô vuông vàng (đỡ bị lạc khi cuộn xa).
     if (in.keys[SDL_SCANCODE_SPACE]) {
-        g.camera.ClampCamera(g.x - windowW / 2.0f, g.y - windowH / 2.0f, windowW, windowH, kWorldW, kWorldH);
+        g.camera.ClampCamera(player.x - windowW / 2.0f, player.y - windowH / 2.0f, windowW, windowH, kWorldW, kWorldH);
     }
 
     // ---- Cập nhật vùng quét chuột (nếu đang giữ chuột trái) ----
@@ -141,12 +136,12 @@ static void Update(GameState& g, const Input& in, float dt, int windowW, int win
         }
 
         // Hình chữ nhật thế giới của Mục tiêu và Người chơi
-        SDL_FRect targetWorldRect = { kTargetX - half, kTargetY - half, kSquareSize, kSquareSize };
-        SDL_FRect playerWorldRect = { g.x - half, g.y - half, kSquareSize, kSquareSize };
+        SDL_FRect targetWorldRect = { target.x - half, target.y - half, kSquareSize, kSquareSize };
+        SDL_FRect playerWorldRect = { player.x - half, player.y - half, kSquareSize, kSquareSize };
 
         // Kiểm tra giao nhau
-        g.targetSelected = SDL_HasRectIntersectionFloat(&selectionWorldRect, &targetWorldRect);
-        g.playerSelected = SDL_HasRectIntersectionFloat(&selectionWorldRect, &playerWorldRect);
+        target.selected = SDL_HasRectIntersectionFloat(&selectionWorldRect, &targetWorldRect);
+        player.selected = SDL_HasRectIntersectionFloat(&selectionWorldRect, &playerWorldRect);
     }
 }
 
@@ -192,10 +187,10 @@ static void Render(SDL_Renderer* r, const GameState& g, int windowW, int windowH
     }
     // Vẽ điểm đích và đường dẫn nếu ô vuông vàng đang di chuyển theo lệnh chuột phải
     if (g.hasMoveOrder) {
-        float startScreenX = g.x - camX;
-        float startScreenY = g.y - camY;
-        float destScreenX = g.moveTargetX - camX;
-        float destScreenY = g.moveTargetY - camY;
+        float startScreenX = player.x - camX;
+        float startScreenY = player.y - camY;
+        float destScreenX = player.moveX - camX;
+        float destScreenY = player.moveY - camY;
 
         // Vẽ đường thẳng nối từ ô vuông vàng tới điểm đích
         SDL_SetRenderDrawColor(r, 100, 255, 120, 140);
@@ -208,39 +203,10 @@ static void Render(SDL_Renderer* r, const GameState& g, int windowW, int windowH
     }
 
     // Mục tiêu đứng yên trong thế giới; camera khiến nó cuộn theo bản đồ.
-    SDL_FRect targetRect = {
-        kTargetX - kSquareSize / 2.0f - camX,
-        kTargetY - kSquareSize / 2.0f - camY,
-        kSquareSize, kSquareSize };
-    SDL_SetRenderDrawColor(r, 70, 150, 230, 255);
-    SDL_RenderFillRect(r, &targetRect);
-
-    // Viền xanh lá sáng nếu Mục tiêu đang được chọn
-    if (g.targetSelected) {
-        SDL_FRect outline = { targetRect.x - 3.0f, targetRect.y - 3.0f, targetRect.w + 6.0f, targetRect.h + 6.0f };
-        SDL_SetRenderDrawColor(r, 50, 255, 80, 255);
-        SDL_RenderRect(r, &outline);
-    }
+    target.Render(r, camX, camY);
 
     // Ô vuông vàng (người chơi).
-    SDL_FRect playerRect = {
-        g.x - kSquareSize / 2.0f - camX,
-        g.y - kSquareSize / 2.0f - camY,
-        kSquareSize, kSquareSize };
-    if (g.touchingTarget) {
-        SDL_SetRenderDrawColor(r, 240, 70, 70, 255); // chạm mục tiêu đổi màu đỏ
-    }
-    else {
-        SDL_SetRenderDrawColor(r, 230, 200, 60, 255); // màu mặc định vàng
-    }
-    SDL_RenderFillRect(r, &playerRect);
-
-    // Viền xanh lá sáng nếu Người chơi đang được chọn
-    if (g.playerSelected) {
-        SDL_FRect outline = { playerRect.x - 3.0f, playerRect.y - 3.0f, playerRect.w + 6.0f, playerRect.h + 6.0f };
-        SDL_SetRenderDrawColor(r, 50, 255, 80, 255);
-        SDL_RenderRect(r, &outline);
-    }
+    player.Render(r, g.touchingTarget, camX, camY);
 
     // Vẽ khung quét chuột RTS (chuyển từ tọa độ thế giới về tọa độ màn hình)
     if (g.isSelecting) {
@@ -310,8 +276,8 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
             g.selectEndWorldX = g.selectStartWorldX;
             g.selectEndWorldY = g.selectStartWorldY;
             // Bỏ chọn cũ khi bắt đầu vùng quét mới
-            g.playerSelected = false;
-            g.targetSelected = false;
+            player.selected = false;
+            target.selected = false;
         }
         break;
     case SDL_EVENT_MOUSE_BUTTON_UP: // THẢ CHUỘT
@@ -322,12 +288,12 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
         }
         case SDL_BUTTON_RIGHT: {
             // Chuột phải: Ra lệnh di chuyển nếu ô vuông vàng đang được chọn
-            if (g.playerSelected) {
+            if (player.selected) {
                 const float half = kSquareSize / 2.0f;
                 g.hasMoveOrder = true;
                 // Quy đổi tọa độ click trên cửa sổ sang tọa độ thế giới và kẹp trong bản đồ
-                g.moveTargetX = std::clamp(event->button.x + g.camera.x, half, kWorldW - half);
-                g.moveTargetY = std::clamp(event->button.y + g.camera.y, half, kWorldH - half);
+                player.moveX = std::clamp(event->button.x + g.camera.x, half, kWorldW - half);
+                player.moveY = std::clamp(event->button.y + g.camera.y, half, kWorldH - half);
             }
             break;
         }

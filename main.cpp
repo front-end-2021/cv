@@ -7,32 +7,31 @@
 #include "camera/camera.h"
 #include "Utils.h"
 
-constexpr int   kWindowW = 1280;
-constexpr int   kWindowH = 720;
+constexpr int kWindowW = 1280;
+constexpr int kWindowH = 720;
 constexpr float kTileSize = 64.0f;
 constexpr float kSquareSize = 40.0f;
-constexpr float kSpeed = 300.0f;          // tốc độ ô vuông vàng (pixel/giây)
+constexpr float kSpeed = 300.0f; // tốc độ ô vuông vàng (pixel/giây)
 
 // 0 = cỏ, 1 = đất, 2 = nước
 constexpr int kMapRows = 15;
 constexpr int kMapCols = 24;
 constexpr int kMap[kMapRows][kMapCols] = {
-    { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-    { 0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-    { 0,0,0,0,0,0,0,1,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-    { 0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-    { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-    { 0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0 },
-    { 0,0,0,0,0,0,0,0,0,0,0,1,2,2,1,0,0,0,0,0,0,0,0,0 },
-    { 0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0 },
-    { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-    { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0 },
-    { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,1,0,0,0,0 },
-    { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0 },
-    { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-    { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
-    { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
-};
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 1, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
 
 constexpr float kWorldW = kMapCols * kTileSize;
 constexpr float kWorldH = kMapRows * kTileSize;
@@ -41,7 +40,7 @@ constexpr float kTargetY = 6.0f * kTileSize + kTileSize / 2.0f;
 
 struct GameState {
     float x = kWorldW / 2.0f, y = kWorldH / 2.0f; // Tọa độ thế giới, không phải tọa độ màn hình.
-    Camera camera{ 0.0f, 0.0f }; // Camera: góc trên-trái của vùng nhìn thấy, tính theo tọa độ thế giới
+    Camera camera{ 0.0f, 0.0f };                    // Camera: góc trên-trái của vùng nhìn thấy, tính theo tọa độ thế giới
     bool touchingTarget = false;
 
     // ---- Trạng thái quét chuột chọn (lưu bằng tọa độ thế giới) ----
@@ -133,8 +132,7 @@ static void Update(GameState& g, const Input& in, float dt, int windowW, int win
 
         SDL_FRect selectionWorldRect = GetNormalizedRect(
             g.selectStartWorldX, g.selectStartWorldY,
-            g.selectEndWorldX, g.selectEndWorldY
-        );
+            g.selectEndWorldX, g.selectEndWorldY);
 
         // Nếu chỉ click nhẹ (vùng kéo quá nhỏ < 3px), mở rộng nhẹ để hỗ trợ click chọn trực tiếp
         if (selectionWorldRect.w < 3.0f && selectionWorldRect.h < 3.0f) {
@@ -172,13 +170,18 @@ static void Render(SDL_Renderer* r, const GameState& g, int windowW, int windowH
                 col * kTileSize - camX,
                 row * kTileSize - camY,
                 kTileSize,
-                kTileSize
-            };
+                kTileSize };
 
             switch (kMap[row][col]) {
-                case 1:  SDL_SetRenderDrawColor(r, 145, 105, 65, 255); break; // đất nâu
-                case 2:  SDL_SetRenderDrawColor(r, 55, 115, 190, 255); break; // nước xanh dương
-                default: SDL_SetRenderDrawColor(r, 75, 145, 75, 255);  break; // cỏ xanh lá
+            case 1:
+                SDL_SetRenderDrawColor(r, 145, 105, 65, 255); // đất nâu
+                break;
+            case 2:
+                SDL_SetRenderDrawColor(r, 55, 115, 190, 255); // nước xanh dương
+                break;
+            default:
+                SDL_SetRenderDrawColor(r, 75, 145, 75, 255); // cỏ xanh lá
+                break;
             }
             SDL_RenderFillRect(r, &tile);
 
@@ -208,8 +211,7 @@ static void Render(SDL_Renderer* r, const GameState& g, int windowW, int windowH
     SDL_FRect targetRect = {
         kTargetX - kSquareSize / 2.0f - camX,
         kTargetY - kSquareSize / 2.0f - camY,
-        kSquareSize, kSquareSize
-    };
+        kSquareSize, kSquareSize };
     SDL_SetRenderDrawColor(r, 70, 150, 230, 255);
     SDL_RenderFillRect(r, &targetRect);
 
@@ -224,10 +226,9 @@ static void Render(SDL_Renderer* r, const GameState& g, int windowW, int windowH
     SDL_FRect playerRect = {
         g.x - kSquareSize / 2.0f - camX,
         g.y - kSquareSize / 2.0f - camY,
-        kSquareSize, kSquareSize
-    };
+        kSquareSize, kSquareSize };
     if (g.touchingTarget) {
-        SDL_SetRenderDrawColor(r, 240, 70, 70, 255);  // chạm mục tiêu đổi màu đỏ
+        SDL_SetRenderDrawColor(r, 240, 70, 70, 255); // chạm mục tiêu đổi màu đỏ
     }
     else {
         SDL_SetRenderDrawColor(r, 230, 200, 60, 255); // màu mặc định vàng
@@ -245,8 +246,7 @@ static void Render(SDL_Renderer* r, const GameState& g, int windowW, int windowH
     if (g.isSelecting) {
         SDL_FRect selectScreenRect = GetNormalizedRect(
             g.selectStartWorldX - camX, g.selectStartWorldY - camY,
-            g.selectEndWorldX - camX, g.selectEndWorldY - camY
-        );
+            g.selectEndWorldX - camX, g.selectEndWorldY - camY);
 
         // Nền xanh lá bán trong suốt kiểu game RTS
         SDL_SetRenderDrawColor(r, 50, 220, 80, 50);
@@ -292,17 +292,16 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
 SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
     (void)appstate;
 
-    if (event->type == SDL_EVENT_QUIT) {
-        return SDL_APP_SUCCESS;
-    }
+    if (event->type == SDL_EVENT_QUIT) { return SDL_APP_SUCCESS; }
     if (event->type == SDL_EVENT_KEY_DOWN && event->key.key == SDLK_ESCAPE) {
         return SDL_APP_SUCCESS;
     }
 
     App* app = static_cast<App*>(appstate);
     GameState& g = app->game;
-    // ---- Bắt sự kiện nhấn chuột trái để bắt đầu quét ----
-    if (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+
+    switch (event->type) {
+    case SDL_EVENT_MOUSE_BUTTON_DOWN: // NHẤN CHUỘT
         if (event->button.button == SDL_BUTTON_LEFT) {
             g.isSelecting = true;
             // Lưu tọa độ theo không gian thế giới (cộng thêm tọa độ camera)
@@ -314,22 +313,27 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
             g.playerSelected = false;
             g.targetSelected = false;
         }
-    }
-    // Chuột phải: Ra lệnh di chuyển nếu ô vuông vàng đang được chọn
-    else if (event->button.button == SDL_BUTTON_RIGHT) {
-        if (g.playerSelected) {
-            const float half = kSquareSize / 2.0f;
-            g.hasMoveOrder = true;
-            // Quy đổi tọa độ click trên cửa sổ sang tọa độ thế giới và kẹp trong bản đồ
-            g.moveTargetX = std::clamp(event->button.x + g.camera.x, half, kWorldW - half);
-            g.moveTargetY = std::clamp(event->button.y + g.camera.y, half, kWorldH - half);
+        break;
+    case SDL_EVENT_MOUSE_BUTTON_UP: // THẢ CHUỘT
+        switch (event->button.button) {
+        case SDL_BUTTON_LEFT: {
+            if (g.isSelecting) g.isSelecting = false;
+            break;
         }
-    }
-    // ---- Thả chuột trái để kết thúc quét ----
-    else if (event->type == SDL_EVENT_MOUSE_BUTTON_UP) {
-        if (event->button.button == SDL_BUTTON_LEFT && g.isSelecting) {
-            g.isSelecting = false;
+        case SDL_BUTTON_RIGHT: {
+            // Chuột phải: Ra lệnh di chuyển nếu ô vuông vàng đang được chọn
+            if (g.playerSelected) {
+                const float half = kSquareSize / 2.0f;
+                g.hasMoveOrder = true;
+                // Quy đổi tọa độ click trên cửa sổ sang tọa độ thế giới và kẹp trong bản đồ
+                g.moveTargetX = std::clamp(event->button.x + g.camera.x, half, kWorldW - half);
+                g.moveTargetY = std::clamp(event->button.y + g.camera.y, half, kWorldH - half);
+            }
+            break;
         }
+        default: break;
+        }
+    default: break;
     }
 
     return SDL_APP_CONTINUE;
@@ -343,8 +347,7 @@ SDL_AppResult SDL_AppIterate(void* appstate) {
     app->lastTicks = now;
     if (dt > 0.1f) dt = 0.1f;
 
-    int windowW = 0;
-    int windowH = 0;
+    int windowW = 00, windowH = 0;
     SDL_GetWindowSize(app->window, &windowW, &windowH);
 
     // Gom input của khung hình này.
@@ -354,8 +357,7 @@ SDL_AppResult SDL_AppIterate(void* appstate) {
 
     // Chỉ cuộn bằng mép khi chuột đang ở trong vùng nội dung của cửa sổ.
     const bool hasMouseFocus = (SDL_GetWindowFlags(app->window) & SDL_WINDOW_MOUSE_FOCUS) != 0;
-    input.mouseInWindow =
-        hasMouseFocus &&
+    input.mouseInWindow = hasMouseFocus &&
         input.mouseX >= 0.0f && input.mouseY >= 0.0f &&
         input.mouseX < static_cast<float>(windowW) &&
         input.mouseY < static_cast<float>(windowH);

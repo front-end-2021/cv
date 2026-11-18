@@ -4,8 +4,10 @@
 
 #include <algorithm>
 #include <cmath>
+#include <vector>
 #include "camera/camera.h"
 #include "entity/selectable.h"
+#include "Pathfinder.h"
 #include "Utils.h"
 
 constexpr int kWindowW = 1280;
@@ -37,21 +39,25 @@ constexpr int kMap[kMapRows][kMapCols] = {
 constexpr float kWorldW = kMapCols * kTileSize;
 constexpr float kWorldH = kMapRows * kTileSize;
 Target target{ 12.0f * kTileSize + kTileSize / 2.0f , 6.0f * kTileSize + kTileSize / 2.0f, kSquareSize };
-Player player{ kWorldW / 2.0f, kWorldH / 2.0f, kSquareSize }; // Tọa độ thế giới, không phải tọa độ màn hình.
+
+// Khởi tạo danh sách 6 ô vuông vàng xếp sẵn trên bản đồ
+std::vector<Player> players = {
+    { 300.0f, 300.0f, kSquareSize },
+    { 360.0f, 300.0f, kSquareSize },
+    { 420.0f, 300.0f, kSquareSize },
+    { 300.0f, 360.0f, kSquareSize },
+    { 360.0f, 360.0f, kSquareSize },
+    { 420.0f, 360.0f, kSquareSize }
+};
 
 struct GameState {
     Camera camera{ 0.0f, 0.0f };                    // Camera: góc trên-trái của vùng nhìn thấy, tính theo tọa độ thế giới
-    bool touchingTarget = false;
-
     // ---- Trạng thái quét chuột chọn (lưu bằng tọa độ thế giới) ----
     bool isSelecting = false;
     float selectStartWorldX = 0.0f;
     float selectStartWorldY = 0.0f;
     float selectEndWorldX = 0.0f;
     float selectEndWorldY = 0.0f;
-
-    // ---- Trạng thái di chuyển theo lệnh chuột phải ----
-    bool hasMoveOrder = false;
 };
 
 struct App {
@@ -71,57 +77,147 @@ static SDL_FRect GetNormalizedRect(float x1, float y1, float x2, float y2) {
     return r;
 }
 
+// Hàm chia vị trí đội hình cho các Player đang được chọn
+static void IssueFormationMoveOrder(std::vector<Player>& unitList, float targetWorldX, float targetWorldY) {
+    std::vector<Player*> selectedUnits;
+    for (auto& p : unitList) {
+        if (p.selected) selectedUnits.push_back(&p);
+    }
+    if (selectedUnits.empty()) return;
+
+    const int count = static_cast<int>(selectedUnits.size());
+    const int cols = static_cast<int>(std::ceil(std::sqrt(count)));
+    const int rows = static_cast<int>(std::ceil(static_cast<float>(count) / cols));
+    const float spacing = kSquareSize + 14.0f;
+
+    const float totalWidth = (cols - 1) * spacing;
+    const float totalHeight = (rows - 1) * spacing;
+    const float startX = targetWorldX - totalWidth / 2.0f;
+    const float startY = targetWorldY - totalHeight / 2.0f;
+    const float half = kSquareSize / 2.0f;
+
+    for (int i = 0; i < count; ++i) {
+        int r = i / cols;
+        int c = i % cols;
+        int unitsInThisRow = (r == rows - 1) ? (count - r * cols) : cols;
+        float rowOffsetX = (cols - unitsInThisRow) * spacing / 2.0f;
+
+        float destX = std::clamp(startX + c * spacing + rowOffsetX, half, kWorldW - half);
+        float destY = std::clamp(startY + r * spacing, half, kWorldH - half);
+
+        // Tìm đường A* vòng qua nước tới ô vị trí đội hình
+        selectedUnits[i]->path = Pathfinder::FindPath(
+            selectedUnits[i]->x, selectedUnits[i]->y,
+            destX, destY,
+            kMapRows, kMapCols, kTileSize, &kMap[0][0]);
+    }
+}
+
+// Hàm đẩy nhẹ các ô vuông ra nếu chúng đè lên nhau
+static void ResolveUnitCollisions(std::vector<Player>& unitList) {
+    const float minDist = kSquareSize;// +1.0f;
+    for (size_t i = 0; i < unitList.size(); ++i) {
+        if (!unitList[i].path.empty()) return; // !iIdle
+
+        for (size_t j = i + 1; j < unitList.size(); ++j) {
+            bool jIdle = unitList[j].path.empty();// && !(unitList[j].selected);
+            if (!jIdle) return;
+
+            float dx = unitList[j].x - unitList[i].x;
+            float dy = unitList[j].y - unitList[i].y;
+            float dist = dx * dx + dy * dy;
+            if (minDist * minDist <= dist) { continue; }
+            
+            if(dist < 0.001f) { dx = 1.0f; dy = 0.0f; dist = 1.0f; }
+            else { dist = std::sqrt(dist); }
+            // Đẩy toàn bộ phần chồng lấn sang đơn vị j để giữ nguyên vị trí đơn vị i
+            float overlap = (minDist - dist);
+            float nx = dx / dist;
+            float ny = dy / dist;
+
+            float nextJX = unitList[j].x + nx * overlap;
+            float nextJY = unitList[j].y + ny * overlap;
+            if (Pathfinder::CanBoxStandAt(nextJX, nextJY, kSquareSize, kMapRows, kMapCols, kTileSize, &kMap[0][0])) {
+                unitList[j].x = std::floor(nextJX);
+                unitList[j].y = std::floor(nextJY);
+            }
+        }
+    }
+}
+
 static void Update(GameState& g, const Input& in, float dt, int windowW, int windowH) {
     const float half = kSquareSize / 2.0f;
     // ---- Ô vuông vàng: chỉ di chuyển bằng WASD ----
     float wasdX = Utils::Axis(in.keys, SDL_SCANCODE_A, SDL_SCANCODE_D);
     float wasdY = Utils::Axis(in.keys, SDL_SCANCODE_W, SDL_SCANCODE_S);
-    if (wasdX != 0.0f || wasdY != 0.0f) {
+    bool hasWasd = (wasdX != 0.0f || wasdY != 0.0f);
+    if (hasWasd) {
         // Nếu người chơi bấm WASD, hủy lệnh di chuyển bằng chuột hiện tại
-        g.hasMoveOrder = false;
         Utils::NormalizeDirection(wasdX, wasdY);
-        player.x += wasdX * kSpeed * dt;
-        player.y += wasdY * kSpeed * dt;
     }
-    else if (g.hasMoveOrder) {
-        // Tính vector khoảng cách từ vị trí hiện tại tới điểm đích
-        float toTargetX = player.moveX - player.x;
-        float toTargetY = player.moveY - player.y;
-        float dist = std::sqrt(toTargetX * toTargetX + toTargetY * toTargetY);
-        float stepDist = kSpeed * dt;
+    // 1. Cập nhật di chuyển cho từng Player
+    for (auto& p : players) {
+        if (hasWasd && p.selected) {
+            p.path.clear(); // Hủy đường A* nếu người chơi tự lái bằng WASD
+            float nextX = p.x + wasdX * kSpeed * dt;
+            float nextY = p.y + wasdY * kSpeed * dt;
 
-        // Nếu khoảng cách còn lại nhỏ hơn quãng đường đi được trong 1 frame -> Đặt thẳng vào đích (chống rung)
-        if (dist <= stepDist) {
-            player.x = player.moveX;
-            player.y = player.moveY;
-            g.hasMoveOrder = false;
+            // Tách trục X và Y để trượt dọc mép hồ nước
+            if (Pathfinder::CanBoxStandAt(nextX, p.y, kSquareSize, kMapRows, kMapCols, kTileSize, &kMap[0][0])) {
+                p.x = nextX;
+            }
+            if (Pathfinder::CanBoxStandAt(p.x, nextY, kSquareSize, kMapRows, kMapCols, kTileSize, &kMap[0][0])) {
+                p.y = nextY;
+            }
         }
-        else {
-            player.x += (toTargetX / dist) * stepDist;
-            player.y += (toTargetY / dist) * stepDist;
+        else if (!p.path.empty()) {
+            // Di chuyển lần lượt qua từng điểm mốc trong path
+            Waypoint targetWp = p.path.front();
+            float toTargetX = targetWp.x - p.x;
+            float toTargetY = targetWp.y - p.y;
+            float dist = std::sqrt(toTargetX * toTargetX + toTargetY * toTargetY);
+            float stepDist = kSpeed * dt;
+
+            if (dist <= stepDist) {
+                p.x = targetWp.x;
+                p.y = targetWp.y;
+                p.path.erase(p.path.begin()); // Đã tới mốc -> chuyển sang mốc kế tiếp
+            }
+            else {
+                p.x += (toTargetX / dist) * stepDist;
+                p.y += (toTargetY / dist) * stepDist;
+            }
         }
     }
 
-    // Giới hạn trong toàn bộ bản đồ.
-    player.x = std::clamp(player.x, half, kWorldW - half);
-    player.y = std::clamp(player.y, half, kWorldH - half);
+    // 2. Xử lý tách va chạm để các ô không đè lên nhau trên đường đi
+    ResolveUnitCollisions(players);
 
-    // Va chạm với ô vuông mục tiêu được tính trong tọa độ thế giới.
-    g.touchingTarget =
-        std::abs(player.x - target.x) < kSquareSize &&
-        std::abs(player.y - target.y) < kSquareSize;
+    // 3. Kẹp biên bản đồ và kiểm tra chạm Target cho từng Player
+    for (auto& p : players) {
+        p.x = std::clamp(p.x, half, kWorldW - half);
+        p.y = std::clamp(p.y, half, kWorldH - half);
 
-    // ---- Camera: độc lập với ô vuông vàng ----
+        p.touchingTarget =
+            std::abs(p.x - target.x) < kSquareSize &&
+            std::abs(p.y - target.y) < kSquareSize;
+    }
+    // 4. Cập nhật Camera
     g.camera.UpdateCamera(in, dt, windowW, windowH, kWorldW, kWorldH);
 
-    // Space: đưa camera về chỗ ô vuông vàng (đỡ bị lạc khi cuộn xa).
-    if (in.keys[SDL_SCANCODE_SPACE]) {
-        g.camera.ClampCamera(player.x - windowW / 2.0f, player.y - windowH / 2.0f, windowW, windowH, kWorldW, kWorldH);
+    if (in.keys[SDL_SCANCODE_SPACE] && !players.empty()) {
+        // Đưa camera về ô vuông đầu tiên đang được chọn (hoặc ô đầu danh sách)
+        const Player* focusUnit = &players[0];
+        for (const auto& p : players) {
+            if (p.selected) {
+                focusUnit = &p;
+                break;
+            }
+        }
+        g.camera.ClampCamera(focusUnit->x - windowW / 2.0f, focusUnit->y - windowH / 2.0f, windowW, windowH, kWorldW, kWorldH);
     }
-
-    // ---- Cập nhật vùng quét chuột (nếu đang giữ chuột trái) ----
+    // 5. Cập nhật quét chuột chọn hàng loạt
     if (g.isSelecting) {
-        // Cập nhật liên tục theo vị trí chuột + camera (hỗ trợ vừa kéo vừa cuộn map)
         g.selectEndWorldX = in.mouseX + g.camera.x;
         g.selectEndWorldY = in.mouseY + g.camera.y;
 
@@ -129,19 +225,19 @@ static void Update(GameState& g, const Input& in, float dt, int windowW, int win
             g.selectStartWorldX, g.selectStartWorldY,
             g.selectEndWorldX, g.selectEndWorldY);
 
-        // Nếu chỉ click nhẹ (vùng kéo quá nhỏ < 3px), mở rộng nhẹ để hỗ trợ click chọn trực tiếp
         if (selectionWorldRect.w < 3.0f && selectionWorldRect.h < 3.0f) {
             selectionWorldRect.w = 3.0f;
             selectionWorldRect.h = 3.0f;
         }
 
-        // Hình chữ nhật thế giới của Mục tiêu và Người chơi
         SDL_FRect targetWorldRect = { target.x - half, target.y - half, kSquareSize, kSquareSize };
-        SDL_FRect playerWorldRect = { player.x - half, player.y - half, kSquareSize, kSquareSize };
-
-        // Kiểm tra giao nhau
         target.selected = SDL_HasRectIntersectionFloat(&selectionWorldRect, &targetWorldRect);
-        player.selected = SDL_HasRectIntersectionFloat(&selectionWorldRect, &playerWorldRect);
+
+        // Duyệt qua toàn bộ vector players để chọn những ô nằm trong khung quét
+        for (auto& p : players) {
+            SDL_FRect playerWorldRect = { p.x - half, p.y - half, kSquareSize, kSquareSize };
+            p.selected = SDL_HasRectIntersectionFloat(&selectionWorldRect, &playerWorldRect);
+        }
     }
 }
 
@@ -185,28 +281,33 @@ static void Render(SDL_Renderer* r, const GameState& g, int windowW, int windowH
             SDL_RenderRect(r, &tile);
         }
     }
-    // Vẽ điểm đích và đường dẫn nếu ô vuông vàng đang di chuyển theo lệnh chuột phải
-    if (g.hasMoveOrder) {
-        float startScreenX = player.x - camX;
-        float startScreenY = player.y - camY;
-        float destScreenX = player.moveX - camX;
-        float destScreenY = player.moveY - camY;
+    // Vẽ đường đi A* của từng Player
+    for (const auto& p : players) {
+        if (!p.path.empty()) {
+            float prevX = p.x - camX;
+            float prevY = p.y - camY;
 
-        // Vẽ đường thẳng nối từ ô vuông vàng tới điểm đích
-        SDL_SetRenderDrawColor(r, 100, 255, 120, 140);
-        SDL_RenderLine(r, startScreenX, startScreenY, destScreenX, destScreenY);
+            SDL_SetRenderDrawColor(r, 100, 255, 120, 140);
+            for (const auto& wp : p.path) {
+                float nextX = wp.x - camX;
+                float nextY = wp.y - camY;
+                SDL_RenderLine(r, prevX, prevY, nextX, nextY);
+                prevX = nextX;
+                prevY = nextY;
+            }
 
-        // Vẽ điểm đánh dấu hình chữ thập (+) tại nơi vừa click chuột phải
-        SDL_SetRenderDrawColor(r, 100, 255, 120, 255);
-        SDL_RenderLine(r, destScreenX - 6.0f, destScreenY, destScreenX + 6.0f, destScreenY);
-        SDL_RenderLine(r, destScreenX, destScreenY - 6.0f, destScreenX, destScreenY + 6.0f);
+            // Vẽ dấu (+) ở điểm đích cuối cùng
+            SDL_SetRenderDrawColor(r, 100, 255, 120, 230);
+            SDL_RenderLine(r, prevX - 5.0f, prevY, prevX + 5.0f, prevY);
+            SDL_RenderLine(r, prevX, prevY - 5.0f, prevX, prevY + 5.0f);
+        }
     }
 
-    // Mục tiêu đứng yên trong thế giới; camera khiến nó cuộn theo bản đồ.
-    target.Render(r, camX, camY);
+    target.Render(r, camX, camY);// Mục tiêu đứng yên trong thế giới; camera khiến nó cuộn theo bản đồ.
+    
+    // Vẽ tất cả các Player
+    for (auto& p : players) { p.Render(r, camX, camY); }
 
-    // Ô vuông vàng (người chơi).
-    player.Render(r, g.touchingTarget, camX, camY);
 
     // Vẽ khung quét chuột RTS (chuyển từ tọa độ thế giới về tọa độ màn hình)
     if (g.isSelecting) {
@@ -276,29 +377,21 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
             g.selectEndWorldX = g.selectStartWorldX;
             g.selectEndWorldY = g.selectStartWorldY;
             // Bỏ chọn cũ khi bắt đầu vùng quét mới
-            player.selected = false;
             target.selected = false;
+            for (auto& p : players) { p.selected = false; }
         }
         break;
     case SDL_EVENT_MOUSE_BUTTON_UP: // THẢ CHUỘT
-        switch (event->button.button) {
-        case SDL_BUTTON_LEFT: {
+        if (event->button.button == SDL_BUTTON_LEFT) {
             if (g.isSelecting) g.isSelecting = false;
-            break;
         }
-        case SDL_BUTTON_RIGHT: {
-            // Chuột phải: Ra lệnh di chuyển nếu ô vuông vàng đang được chọn
-            if (player.selected) {
-                const float half = kSquareSize / 2.0f;
-                g.hasMoveOrder = true;
-                // Quy đổi tọa độ click trên cửa sổ sang tọa độ thế giới và kẹp trong bản đồ
-                player.moveX = std::clamp(event->button.x + g.camera.x, half, kWorldW - half);
-                player.moveY = std::clamp(event->button.y + g.camera.y, half, kWorldH - half);
-            }
-            break;
+        else if (event->button.button == SDL_BUTTON_RIGHT) {
+            // Ra lệnh di chuyển đội hình tới vị trí chuột phải
+            float clickWorldX = event->button.x + g.camera.x;
+            float clickWorldY = event->button.y + g.camera.y;
+            IssueFormationMoveOrder(players, clickWorldX, clickWorldY);
         }
-        default: break;
-        }
+        break;
     default: break;
     }
 

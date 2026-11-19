@@ -25,3 +25,6 @@ target_link_libraries(MiniRTS PRIVATE SDL3::SDL3)
 if(MSVC)
     target_compile_options(MiniRTS PRIVATE /utf-8 /W4)
 endif()
+
+# Sao chep thu muc Maps vao thu muc chay cua executable.
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/Maps DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

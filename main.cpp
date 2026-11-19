@@ -3,8 +3,14 @@
 #include <SDL3/SDL_main.h>
 
 #include <algorithm>
+#include <filesystem>
 #include <cmath>
+#include <cctype>
 #include <vector>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <utility>
 #include "camera/camera.h"
 #include "entity/selectable.h"
 #include "Pathfinder.h"
@@ -16,28 +22,63 @@ constexpr float kTileSize = 64.0f;
 constexpr float kSquareSize = 40.0f;
 constexpr float kSpeed = 300.0f; // tốc độ ô vuông vàng (pixel/giây)
 
-// 0 = cỏ, 1 = đất, 2 = nước
-constexpr int kMapRows = 15;
-constexpr int kMapCols = 24;
-constexpr int kMap[kMapRows][kMapCols] = {
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 1, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
+// Map được nạp từ map.txt: 0 = cỏ, 1 = đất, 2 = nước.
+int kMapRows = 0;
+int kMapCols = 0;
+std::vector<int> kMap;
 
-constexpr float kWorldW = kMapCols * kTileSize;
-constexpr float kWorldH = kMapRows * kTileSize;
+static bool LoadMap(const std::string& filePath) {
+    std::ifstream file(filePath);
+    if (!file.is_open()) {
+        SDL_Log("Khong the mo file map: %s", filePath.c_str());
+        return false;
+    }
+
+    std::vector<int> loadedMap;
+    std::string line;
+    int rows = 0;
+    int cols = 0;
+
+    while (std::getline(file, line)) {
+        const auto first = line.find_first_not_of(" \t\r");
+        if (first == std::string::npos || line[first] == '#') continue;
+
+        std::istringstream stream(line);
+        std::vector<int> row;
+        int tile = 0;
+        while (stream >> tile) {
+            if (tile < 0 || tile > 2) {
+                SDL_Log("Gia tri tile khong hop le (chi chap nhan 0, 1, 2).");
+                return false;
+            }
+            row.push_back(tile);
+        }
+        if (!stream.eof() || row.empty()) {
+            SDL_Log("Dong map.txt chua du lieu khong hop le.");
+            return false;
+        }
+        if (cols == 0) cols = static_cast<int>(row.size());
+        if (static_cast<int>(row.size()) != cols) {
+            SDL_Log("Cac dong trong map.txt phai co cung so cot.");
+            return false;
+        }
+        loadedMap.insert(loadedMap.end(), row.begin(), row.end());
+        ++rows;
+    }
+
+    if (rows == 0 || cols == 0) {
+        SDL_Log("map.txt rong hoac khong co du lieu.");
+        return false;
+    }
+
+    kMap = std::move(loadedMap);
+    kMapRows = rows;
+    kMapCols = cols;
+    return true;
+}
+
+float kWorldW = 0.0f;
+float kWorldH = 0.0f;
 Target target{ 12.0f * kTileSize + kTileSize / 2.0f , 6.0f * kTileSize + kTileSize / 2.0f, kSquareSize };
 
 // Khởi tạo danh sách 6 ô vuông vàng xếp sẵn trên bản đồ
@@ -60,11 +101,23 @@ struct GameState {
     float selectEndWorldY = 0.0f;
 };
 
+struct MapEntry {
+    std::string name;
+    std::string path;
+};
+
+enum class AppScreen { MapMenu, Game };
+
 struct App {
     SDL_Window* window = nullptr;
     SDL_Renderer* renderer = nullptr;
     Uint64 lastTicks = 0;
     GameState game;
+    AppScreen screen = AppScreen::MapMenu;
+    std::vector<MapEntry> maps;
+    int selectedMap = -1;
+    int mapScroll = 0;
+    std::string menuMessage;
 };
 
 // Hàm chuẩn hóa 2 điểm bất kỳ thành hình chữ nhật có w, h dương
@@ -109,7 +162,7 @@ static void IssueFormationMoveOrder(std::vector<Player>& unitList, float targetW
         selectedUnits[i]->path = Pathfinder::FindPath(
             selectedUnits[i]->x, selectedUnits[i]->y,
             destX, destY,
-            kMapRows, kMapCols, kTileSize, &kMap[0][0]);
+            kMapRows, kMapCols, kTileSize, kMap.data());
     }
 }
 
@@ -137,7 +190,7 @@ static void ResolveUnitCollisions(std::vector<Player>& unitList) {
 
             float nextJX = unitList[j].x + nx * overlap;
             float nextJY = unitList[j].y + ny * overlap;
-            if (Pathfinder::CanBoxStandAt(nextJX, nextJY, kSquareSize, kMapRows, kMapCols, kTileSize, &kMap[0][0])) {
+            if (Pathfinder::CanBoxStandAt(nextJX, nextJY, kSquareSize, kMapRows, kMapCols, kTileSize, kMap.data())) {
                 unitList[j].x = std::floor(nextJX);
                 unitList[j].y = std::floor(nextJY);
             }
@@ -163,10 +216,10 @@ static void Update(GameState& g, const Input& in, float dt, int windowW, int win
             float nextY = p.y + wasdY * kSpeed * dt;
 
             // Tách trục X và Y để trượt dọc mép hồ nước
-            if (Pathfinder::CanBoxStandAt(nextX, p.y, kSquareSize, kMapRows, kMapCols, kTileSize, &kMap[0][0])) {
+            if (Pathfinder::CanBoxStandAt(nextX, p.y, kSquareSize, kMapRows, kMapCols, kTileSize, kMap.data())) {
                 p.x = nextX;
             }
-            if (Pathfinder::CanBoxStandAt(p.x, nextY, kSquareSize, kMapRows, kMapCols, kTileSize, &kMap[0][0])) {
+            if (Pathfinder::CanBoxStandAt(p.x, nextY, kSquareSize, kMapRows, kMapCols, kTileSize, kMap.data())) {
                 p.y = nextY;
             }
         }
@@ -263,7 +316,7 @@ static void Render(SDL_Renderer* r, const GameState& g, int windowW, int windowH
                 kTileSize,
                 kTileSize };
 
-            switch (kMap[row][col]) {
+            switch (kMap[row * kMapCols + col]) {
             case 1:
                 SDL_SetRenderDrawColor(r, 145, 105, 65, 255); // đất nâu
                 break;
@@ -327,11 +380,153 @@ static void Render(SDL_Renderer* r, const GameState& g, int windowW, int windowH
     SDL_RenderPresent(r);
 }
 
+static SDL_FRect GetMapRowRect(int index, int windowW) {
+    const float width = std::min(620.0f, static_cast<float>(windowW) - 60.0f);
+    const float x = (windowW - width) / 2.0f;
+    return { x, 170.0f + index * 52.0f, width, 42.0f };
+}
+
+static SDL_FRect GetStartButtonRect(int windowW, int windowH) {
+    const float width = 220.0f;
+    return { (windowW - width) / 2.0f, static_cast<float>(windowH) - 105.0f, width, 54.0f };
+}
+
+static void DrawMenu(App& app, int windowW, int windowH) {
+    SDL_Renderer* r = app.renderer;
+    SDL_SetRenderDrawColor(r, 18, 25, 32, 255);
+    SDL_RenderClear(r);
+
+    SDL_SetRenderDrawColor(r, 35, 48, 58, 255);
+    SDL_FRect panel{ (windowW - 760.0f) / 2.0f, 35.0f, 760.0f,
+        static_cast<float>(windowH) - 70.0f };
+    if (panel.x < 10.0f) panel.x = 10.0f;
+    panel.w = std::min(760.0f, static_cast<float>(windowW) - 20.0f);
+    SDL_RenderFillRect(r, &panel);
+
+    SDL_SetRenderDrawColor(r, 230, 235, 240, 255);
+    SDL_RenderDebugText(r, panel.x + 28.0f, 65.0f, "MINI RTS - SELECT MAP");
+    SDL_SetRenderDrawColor(r, 175, 190, 200, 255);
+    SDL_RenderDebugText(r, panel.x + 28.0f, 105.0f, "Choose a map in the Maps folder:");
+
+    const int maxVisible = std::max(0, static_cast<int>((windowH - 300) / 52));
+    const int endIndex = std::min(static_cast<int>(app.maps.size()), app.mapScroll + maxVisible);
+    for (int i = app.mapScroll; i < endIndex; ++i) {
+        const int visibleRow = i - app.mapScroll;
+        SDL_FRect row = GetMapRowRect(visibleRow, windowW);
+        const bool selected = i == app.selectedMap;
+        SDL_SetRenderDrawColor(r, selected ? 65 : 48, selected ? 105 : 62,
+            selected ? 75 : 78, 255);
+        SDL_RenderFillRect(r, &row);
+        SDL_SetRenderDrawColor(r, selected ? 150 : 95, selected ? 230 : 115,
+            selected ? 165 : 130, 255);
+        SDL_RenderRect(r, &row);
+        SDL_SetRenderDrawColor(r, 240, 240, 240, 255);
+        const std::string label = (selected ? ">  " : "   ") + app.maps[i].name;
+        SDL_RenderDebugText(r, row.x + 16.0f, row.y + 15.0f, label.c_str());
+    }
+
+    if (!app.menuMessage.empty()) {
+        SDL_SetRenderDrawColor(r, 255, 190, 100, 255);
+        SDL_RenderDebugText(r, panel.x + 28.0f, 135.0f, app.menuMessage.c_str());
+    }
+
+    SDL_FRect start = GetStartButtonRect(windowW, windowH);
+    const bool canStart = app.selectedMap >= 0 && app.selectedMap < static_cast<int>(app.maps.size());
+    SDL_SetRenderDrawColor(r, canStart ? 45 : 65, canStart ? 135 : 65,
+        canStart ? 75 : 65, 255);
+    SDL_RenderFillRect(r, &start);
+    SDL_SetRenderDrawColor(r, 180, 230, 190, 255);
+    SDL_RenderRect(r, &start);
+    SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
+    SDL_RenderDebugText(r, start.x + 78.0f, start.y + 22.0f, "START GAME");
+
+    SDL_SetRenderDrawColor(r, 175, 190, 200, 255);
+    SDL_RenderDebugText(r, panel.x + 28.0f, static_cast<float>(windowH) - 48.0f,
+        "Click a map, then START. Add .txt maps to Maps folder.");
+    SDL_RenderPresent(r);
+}
+
+// Đặt lại kích thước thế giới và vị trí các đối tượng sau khi nạp map.
+static void InitializeWorldForLoadedMap(GameState& game) {
+    kWorldW = kMapCols * kTileSize;
+    kWorldH = kMapRows * kTileSize;
+
+    target.x = kWorldW / 2.0f;
+    target.y = kWorldH / 2.0f;
+    target.selected = false;
+    game.camera.x = 0.0f;
+    game.camera.y = 0.0f;
+    game.isSelecting = false;
+
+    const float half = kSquareSize / 2.0f;
+    const float spawnX[] = { 2.5f, 3.5f, 4.5f, 2.5f, 3.5f, 4.5f };
+    const float spawnY[] = { 2.5f, 2.5f, 2.5f, 3.5f, 3.5f, 3.5f };
+    for (size_t i = 0; i < players.size(); ++i) {
+        players[i].x = std::clamp(spawnX[i] * kTileSize, half, std::max(half, kWorldW - half));
+        players[i].y = std::clamp(spawnY[i] * kTileSize, half, std::max(half, kWorldH - half));
+        players[i].selected = false;
+        players[i].touchingTarget = false;
+        players[i].path.clear();
+    }
+}
+
+static bool StartSelectedMap(App& app) {
+    if (app.selectedMap < 0 || app.selectedMap >= static_cast<int>(app.maps.size())) return false;
+    const MapEntry& selected = app.maps[app.selectedMap];
+    if (!LoadMap(selected.path)) {
+        app.menuMessage = "Map khong hop le: " + selected.name;
+        return false;
+    }
+    InitializeWorldForLoadedMap(app.game);
+    app.lastTicks = SDL_GetTicks();
+    app.screen = AppScreen::Game;
+    return true;
+}
+
+// Thư mục Maps nằm cạnh file thực thi. Chỉ liệt kê các file .txt.
+static std::string GetMapsDirectory() {
+    const char* basePath = SDL_GetBasePath();
+    if (basePath) {
+        std::string path = std::string(basePath) + "Maps";
+        return path;
+    }
+    return "Maps";
+}
+
+static void RefreshMapList(App& app) {
+    namespace fs = std::filesystem;
+    app.maps.clear();
+    const fs::path mapsDir = GetMapsDirectory();
+    std::error_code ec;
+    fs::create_directories(mapsDir, ec);
+    if (ec) {
+        app.menuMessage = "Khong the tao/ truy cap thu muc Maps.";
+        return;
+    }
+
+    for (fs::directory_iterator it(mapsDir, ec), end; !ec && it != end; it.increment(ec)) {
+        if (!it->is_regular_file(ec) || ec) continue;
+        std::string extension = it->path().extension().string();
+        std::transform(extension.begin(), extension.end(), extension.begin(),
+            [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+        if (extension == ".txt") {
+            app.maps.push_back({ it->path().stem().string(), it->path().string() });
+        }
+    }
+    std::sort(app.maps.begin(), app.maps.end(), [](const MapEntry& a, const MapEntry& b) {
+        return a.name < b.name;
+        });
+    app.selectedMap = app.maps.empty() ? -1 : 0;
+    app.mapScroll = 0;
+    if (app.maps.empty()) app.menuMessage = "Khong tim thay map .txt trong thu muc Maps.";
+    else app.menuMessage.clear();
+}
+
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
     (void)argc;
     (void)argv;
 
-    SDL_SetAppMetadata("Mini RTS", "0.2", "com.example.minirts");
+    SDL_SetAppMetadata("Mini RTS", "0.3", "com.example.minirts");
 
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_Log("SDL_Init failed: %s", SDL_GetError());
@@ -353,40 +548,80 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
 
     SDL_SetRenderVSync(app->renderer, 1);
     app->lastTicks = SDL_GetTicks();
+
+    RefreshMapList(*app);
     return SDL_APP_CONTINUE;
 }
 
 SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
-    (void)appstate;
+    App* app = static_cast<App*>(appstate);
+    if (event->type == SDL_EVENT_QUIT) return SDL_APP_SUCCESS;
+    if (!app) return SDL_APP_CONTINUE;
 
-    if (event->type == SDL_EVENT_QUIT) { return SDL_APP_SUCCESS; }
     if (event->type == SDL_EVENT_KEY_DOWN && event->key.key == SDLK_ESCAPE) {
+        if (app->screen == AppScreen::Game) {
+            app->screen = AppScreen::MapMenu;
+            RefreshMapList(*app);
+            return SDL_APP_CONTINUE;
+        }
         return SDL_APP_SUCCESS;
     }
 
-    App* app = static_cast<App*>(appstate);
-    GameState& g = app->game;
+    if (app->screen == AppScreen::MapMenu) {
+        if (event->type == SDL_EVENT_KEY_DOWN) {
+            if (event->key.key == SDLK_DOWN && !app->maps.empty()) {
+                app->selectedMap = std::min(app->selectedMap + 1, static_cast<int>(app->maps.size()) - 1);
+                int w = 0, h = 0; SDL_GetWindowSize(app->window, &w, &h);
+                const int visible = std::max(1, static_cast<int>((h - 300) / 52));
+                if (app->selectedMap >= app->mapScroll + visible) app->mapScroll = app->selectedMap - visible + 1;
+            } else if (event->key.key == SDLK_UP && !app->maps.empty()) {
+                app->selectedMap = std::max(0, app->selectedMap - 1);
+                if (app->selectedMap < app->mapScroll) app->mapScroll = app->selectedMap;
+            } else if (event->key.key == SDLK_RETURN || event->key.key == SDLK_KP_ENTER) {
+                StartSelectedMap(*app);
+            } else if (event->key.key == SDLK_R) {
+                RefreshMapList(*app);
+            }
+        } else if (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN && event->button.button == SDL_BUTTON_LEFT) {
+            int windowW = 0, windowH = 0;
+            SDL_GetWindowSize(app->window, &windowW, &windowH);
+            const float mx = event->button.x;
+            const float my = event->button.y;
+            const int visible = std::max(0, static_cast<int>((windowH - 300) / 52));
+            for (int rowIndex = 0; rowIndex < visible; ++rowIndex) {
+                const int mapIndex = app->mapScroll + rowIndex;
+                if (mapIndex >= static_cast<int>(app->maps.size())) break;
+                SDL_FRect row = GetMapRowRect(rowIndex, windowW);
+                SDL_FPoint point{ mx, my };
+                if (SDL_PointInRectFloat(&point, &row)) {
+                    app->selectedMap = mapIndex;
+                    break;
+                }
+            }
+            SDL_FRect start = GetStartButtonRect(windowW, windowH);
+            SDL_FPoint point{ mx, my };
+            if (SDL_PointInRectFloat(&point, &start)) StartSelectedMap(*app);
+        }
+        return SDL_APP_CONTINUE;
+    }
 
+    GameState& g = app->game;
     switch (event->type) {
-    case SDL_EVENT_MOUSE_BUTTON_DOWN: // NHẤN CHUỘT
+    case SDL_EVENT_MOUSE_BUTTON_DOWN:
         if (event->button.button == SDL_BUTTON_LEFT) {
             g.isSelecting = true;
-            // Lưu tọa độ theo không gian thế giới (cộng thêm tọa độ camera)
             g.selectStartWorldX = event->button.x + g.camera.x;
             g.selectStartWorldY = event->button.y + g.camera.y;
             g.selectEndWorldX = g.selectStartWorldX;
             g.selectEndWorldY = g.selectStartWorldY;
-            // Bỏ chọn cũ khi bắt đầu vùng quét mới
             target.selected = false;
-            for (auto& p : players) { p.selected = false; }
+            for (auto& p : players) p.selected = false;
         }
         break;
-    case SDL_EVENT_MOUSE_BUTTON_UP: // THẢ CHUỘT
+    case SDL_EVENT_MOUSE_BUTTON_UP:
         if (event->button.button == SDL_BUTTON_LEFT) {
             if (g.isSelecting) g.isSelecting = false;
-        }
-        else if (event->button.button == SDL_BUTTON_RIGHT) {
-            // Ra lệnh di chuyển đội hình tới vị trí chuột phải
+        } else if (event->button.button == SDL_BUTTON_RIGHT) {
             float clickWorldX = event->button.x + g.camera.x;
             float clickWorldY = event->button.y + g.camera.y;
             IssueFormationMoveOrder(players, clickWorldX, clickWorldY);
@@ -394,19 +629,25 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
         break;
     default: break;
     }
-
     return SDL_APP_CONTINUE;
 }
 
 SDL_AppResult SDL_AppIterate(void* appstate) {
     App* app = static_cast<App*>(appstate);
+    if (!app) return SDL_APP_FAILURE;
+    if (app->screen == AppScreen::MapMenu) {
+        int menuW = 0, menuH = 0;
+        SDL_GetWindowSize(app->window, &menuW, &menuH);
+        DrawMenu(*app, menuW, menuH);
+        return SDL_APP_CONTINUE;
+    }
 
     const Uint64 now = SDL_GetTicks();
     float dt = static_cast<float>(now - app->lastTicks) / 1000.0f;
     app->lastTicks = now;
     if (dt > 0.1f) dt = 0.1f;
 
-    int windowW = 00, windowH = 0;
+    int windowW = 0, windowH = 0;
     SDL_GetWindowSize(app->window, &windowW, &windowH);
 
     // Gom input của khung hình này.

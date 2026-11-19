@@ -484,6 +484,7 @@ static bool StartSelectedMap(App& app) {
     InitializeWorldForLoadedMap(app.game);
     app.lastTicks = SDL_GetTicks();
     app.screen = AppScreen::Game;
+    SDL_SetWindowMouseGrab(app.window, true); // Khóa chuột vào cửa sổ khi bắt đầu chơi
     return true;
 }
 
@@ -564,8 +565,14 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
 
     if (event->type == SDL_EVENT_KEY_DOWN && event->key.key == SDLK_ESCAPE) {
         if (app->screen == AppScreen::Game) {
-            app->screen = AppScreen::MapMenu;
-            RefreshMapList(*app);
+            if (SDL_GetWindowMouseGrab(app->window)) { // Nếu chuột đang bị khóa -> thả chuột ra ngoài
+                SDL_SetWindowMouseGrab(app->window, false);
+                app->game.isSelecting = false;
+            }
+            else {
+                app->screen = AppScreen::MapMenu;
+                RefreshMapList(*app);
+            }
             return SDL_APP_CONTINUE;
         }
         return SDL_APP_SUCCESS;
@@ -613,6 +620,9 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
     switch (event->type) {
     case SDL_EVENT_MOUSE_BUTTON_DOWN:
         if (event->button.button == SDL_BUTTON_LEFT) {
+            if (!SDL_GetWindowMouseGrab(app->window)) {
+                SDL_SetWindowMouseGrab(app->window, true); // Khóa chuột trở lại khi người chơi bấm vào cửa sổ game
+            }
             g.isSelecting = true;
             g.selectStartWorldX = event->button.x + g.camera.x;
             g.selectStartWorldY = event->button.y + g.camera.y;
@@ -660,8 +670,9 @@ SDL_AppResult SDL_AppIterate(void* appstate) {
     SDL_GetMouseState(&input.mouseX, &input.mouseY);
 
     // Chỉ cuộn bằng mép khi chuột đang ở trong vùng nội dung của cửa sổ.
+    const bool isMouseGrabbed = SDL_GetWindowMouseGrab(app->window);
     const bool hasMouseFocus = (SDL_GetWindowFlags(app->window) & SDL_WINDOW_MOUSE_FOCUS) != 0;
-    input.mouseInWindow = hasMouseFocus &&
+    input.mouseInWindow = isMouseGrabbed && hasMouseFocus &&
         input.mouseX >= 0.0f && input.mouseY >= 0.0f &&
         input.mouseX < static_cast<float>(windowW) &&
         input.mouseY < static_cast<float>(windowH);

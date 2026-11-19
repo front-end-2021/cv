@@ -19,7 +19,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(SDL3)
 
 # Chưa dùng WIN32 để còn thấy cửa sổ console và SDL_Log khi học.
-add_executable(MiniRTS main.cpp     "camera/camera.h" "camera/camera.cpp" "Utils.h" "Utils.cpp" "entity/selectable.h" "entity/selectable.cpp" "entity/Target.cpp" "entity/Player.cpp" "Pathfinder.h" "Pathfinder.cpp")
+add_executable(MiniRTS main.cpp     "camera/camera.h" "camera/camera.cpp" "Utils.h" "Utils.cpp" "entity/selectable.h" "entity/selectable.cpp" "entity/Target.cpp" "entity/Unit.cpp" "Pathfinder.h" "Pathfinder.cpp" "Tile.h")
 target_link_libraries(MiniRTS PRIVATE SDL3::SDL3)
 
 if(MSVC)

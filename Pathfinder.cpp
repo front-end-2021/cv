@@ -10,19 +10,21 @@ namespace {
         bool operator>(const Node& other) const { return f > other.f; }
     };
 
-    bool IsTileWalkable(int r, int c, int rows, int cols, const int* mapData) {
-        if (r < 0 || r >= rows || c < 0 || c >= cols) return false;
-        return mapData[r * cols + c] != 2; // 2 là nước -> không đi được
+    bool IsTileWalkable(int r, int c, int rows, int cols, const Tile* mapData) {
+        if (r < 0 || r >= rows || c < 0 || c >= cols) return false; // Ngoài cửa sổ game
+        if (mapData[r * cols + c] == Tile::Water) return false; // Nước không đi được
+        if (mapData[r * cols + c] == Tile::Rock) return false; // Đá không đi được
+        return true;
     }
 }
 
-bool Pathfinder::IsWalkableWorld(float worldX, float worldY, int rows, int cols, float tileSize, const int* mapData) {
+bool Pathfinder::IsWalkableWorld(float worldX, float worldY, int rows, int cols, float tileSize, const Tile* mapData) {
     int c = static_cast<int>(std::floor(worldX / tileSize));
     int r = static_cast<int>(std::floor(worldY / tileSize));
     return IsTileWalkable(r, c, rows, cols, mapData);
 }
 
-bool Pathfinder::CanBoxStandAt(float worldX, float worldY, float boxSize, int rows, int cols, float tileSize, const int* mapData) {
+bool Pathfinder::CanBoxStandAt(float worldX, float worldY, float boxSize, int rows, int cols, float tileSize, const Tile* mapData) {
     // Thu nhỏ hitbox 1 chút (0.45 thay vì 0.5) để lính dễ lách qua khe hẹp
     const float half = boxSize * 0.45f;
     return IsWalkableWorld(worldX - half, worldY - half, rows, cols, tileSize, mapData) &&
@@ -31,11 +33,7 @@ bool Pathfinder::CanBoxStandAt(float worldX, float worldY, float boxSize, int ro
         IsWalkableWorld(worldX + half, worldY + half, rows, cols, tileSize, mapData);
 }
 
-std::vector<Waypoint> Pathfinder::FindPath(
-    float startX, float startY,
-    float goalX, float goalY,
-    int rows, int cols, float tileSize,
-    const int* mapData)
+std::vector<Waypoint> Pathfinder::FindPath(float startX, float startY, float goalX, float goalY, int rows, int cols, float tileSize, const Tile* mapData)
 {
     int startC = std::clamp(static_cast<int>(startX / tileSize), 0, cols - 1);
     int startR = std::clamp(static_cast<int>(startY / tileSize), 0, rows - 1);

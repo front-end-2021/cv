@@ -14,44 +14,75 @@
 #include "camera/camera.h"
 #include "entity/selectable.h"
 #include "Pathfinder.h"
+#include "Tile.h"
 #include "Utils.h"
 
 constexpr int kWindowW = 1280;
 constexpr int kWindowH = 720;
-constexpr float kTileSize = 64.0f;
 constexpr float kSquareSize = 40.0f;
 constexpr float kSpeed = 300.0f; // tốc độ ô vuông vàng (pixel/giây)
 
-// Map được nạp từ map.txt: 0 = cỏ, 1 = đất, 2 = nước.
-int kMapRows = 0;
-int kMapCols = 0;
-std::vector<int> kMap;
+struct TileMap {
+    int rows = 0;
+    int cols = 0;
+    float tileSize = 64.0f;
+    std::vector<Tile> data;
+};
 
-static bool LoadMap(const std::string& filePath) {
+struct GameState {
+    TileMap map;
+    Camera camera{ 0.0f, 0.0f };                    // Camera: góc trên-trái của vùng nhìn thấy, tính theo tọa độ thế giới
+    // ---- Trạng thái quét chuột chọn (lưu bằng tọa độ thế giới) ----
+    bool isSelecting = false;
+    float selectStartWorldX = 0.0f;
+    float selectStartWorldY = 0.0f;
+    float selectEndWorldX = 0.0f;
+    float selectEndWorldY = 0.0f;
+    Target target{ 12.0f * map.tileSize + map.tileSize / 2.0f , 6.0f * map.tileSize + map.tileSize / 2.0f, kSquareSize };
+    // Khởi tạo danh sách 6 ô vuông vàng xếp sẵn trên bản đồ
+    std::vector<Unit> units = {
+        { 300.0f, 300.0f, kSquareSize },
+        { 360.0f, 300.0f, kSquareSize },
+        { 420.0f, 300.0f, kSquareSize },
+        { 300.0f, 360.0f, kSquareSize },
+        { 360.0f, 360.0f, kSquareSize },
+        { 420.0f, 360.0f, kSquareSize }
+    };
+    float worldW = 0.0f;
+    float worldH = 0.0f;
+};
+
+static bool LoadMap(GameState& g, const std::string& filePath) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
         SDL_Log("Khong the mo file map: %s", filePath.c_str());
         return false;
     }
 
-    std::vector<int> loadedMap;
+    std::vector<Tile> loadedMap;
     std::string line;
-    int rows = 0;
-    int cols = 0;
-
+    int rows = 0, cols = 0;
+    // Mã số trong file .txt được chuyển sang Tile ngay khi nạp.
+    int grassTileCode = static_cast<int>(Tile::Grass);
+    int dirtTileCode = static_cast<int>(Tile::Dirt);
+    int waterTileCode = static_cast<int>(Tile::Water);
+    int rockTileCode = static_cast<int>(Tile::Rock);
     while (std::getline(file, line)) {
         const auto first = line.find_first_not_of(" \t\r");
         if (first == std::string::npos || line[first] == '#') continue;
 
         std::istringstream stream(line);
-        std::vector<int> row;
+        std::vector<Tile> row;
         int tile = 0;
         while (stream >> tile) {
-            if (tile < 0 || tile > 2) {
-                SDL_Log("Gia tri tile khong hop le (chi chap nhan 0, 1, 2).");
+            if (tile < grassTileCode || rockTileCode < tile) {
+                SDL_Log("Gia tri tile khong hop le (chi chap nhan 0, 1, 2, ...).");
                 return false;
             }
-            row.push_back(tile);
+            if(grassTileCode == tile) { row.push_back(Tile::Grass); }
+            if(dirtTileCode == tile) { row.push_back(Tile::Dirt); }
+            if(waterTileCode == tile) { row.push_back(Tile::Water); }
+            if(rockTileCode == tile) { row.push_back(Tile::Rock); }
         }
         if (!stream.eof() || row.empty()) {
             SDL_Log("Dong map.txt chua du lieu khong hop le.");
@@ -70,36 +101,11 @@ static bool LoadMap(const std::string& filePath) {
         SDL_Log("map.txt rong hoac khong co du lieu.");
         return false;
     }
-
-    kMap = std::move(loadedMap);
-    kMapRows = rows;
-    kMapCols = cols;
+    g.map.rows = rows;
+    g.map.cols = cols;
+    g.map.data = std::move(loadedMap);
     return true;
 }
-
-float kWorldW = 0.0f;
-float kWorldH = 0.0f;
-Target target{ 12.0f * kTileSize + kTileSize / 2.0f , 6.0f * kTileSize + kTileSize / 2.0f, kSquareSize };
-
-// Khởi tạo danh sách 6 ô vuông vàng xếp sẵn trên bản đồ
-std::vector<Player> players = {
-    { 300.0f, 300.0f, kSquareSize },
-    { 360.0f, 300.0f, kSquareSize },
-    { 420.0f, 300.0f, kSquareSize },
-    { 300.0f, 360.0f, kSquareSize },
-    { 360.0f, 360.0f, kSquareSize },
-    { 420.0f, 360.0f, kSquareSize }
-};
-
-struct GameState {
-    Camera camera{ 0.0f, 0.0f };                    // Camera: góc trên-trái của vùng nhìn thấy, tính theo tọa độ thế giới
-    // ---- Trạng thái quét chuột chọn (lưu bằng tọa độ thế giới) ----
-    bool isSelecting = false;
-    float selectStartWorldX = 0.0f;
-    float selectStartWorldY = 0.0f;
-    float selectEndWorldX = 0.0f;
-    float selectEndWorldY = 0.0f;
-};
 
 struct MapEntry {
     std::string name;
@@ -130,10 +136,10 @@ static SDL_FRect GetNormalizedRect(float x1, float y1, float x2, float y2) {
     return r;
 }
 
-// Hàm chia vị trí đội hình cho các Player đang được chọn
-static void IssueFormationMoveOrder(std::vector<Player>& unitList, float targetWorldX, float targetWorldY) {
-    std::vector<Player*> selectedUnits;
-    for (auto& p : unitList) {
+// Hàm chia vị trí đội hình cho các Unit đang được chọn
+static void IssueFormationMoveOrder(GameState& g, float targetWorldX, float targetWorldY) {
+    std::vector<Unit*> selectedUnits;
+    for (auto& p : g.units) {
         if (p.selected) selectedUnits.push_back(&p);
     }
     if (selectedUnits.empty()) return;
@@ -155,29 +161,29 @@ static void IssueFormationMoveOrder(std::vector<Player>& unitList, float targetW
         int unitsInThisRow = (r == rows - 1) ? (count - r * cols) : cols;
         float rowOffsetX = (cols - unitsInThisRow) * spacing / 2.0f;
 
-        float destX = std::clamp(startX + c * spacing + rowOffsetX, half, kWorldW - half);
-        float destY = std::clamp(startY + r * spacing, half, kWorldH - half);
+        float destX = std::clamp(startX + c * spacing + rowOffsetX, half, g.worldW - half);
+        float destY = std::clamp(startY + r * spacing, half, g.worldH - half);
 
         // Tìm đường A* vòng qua nước tới ô vị trí đội hình
         selectedUnits[i]->path = Pathfinder::FindPath(
             selectedUnits[i]->x, selectedUnits[i]->y,
             destX, destY,
-            kMapRows, kMapCols, kTileSize, kMap.data());
+            g.map.rows, g.map.cols, g.map.tileSize, g.map.data.data());
     }
 }
 
 // Hàm đẩy nhẹ các ô vuông ra nếu chúng đè lên nhau
-static void ResolveUnitCollisions(std::vector<Player>& unitList) {
+static void ResolveUnitCollisions(GameState& g) {
     const float minDist = kSquareSize;// +1.0f;
-    for (size_t i = 0; i < unitList.size(); ++i) {
-        if (!unitList[i].path.empty()) return; // !iIdle
+    for (size_t i = 0; i < g.units.size(); ++i) {
+        if (!g.units[i].path.empty()) return; // !iIdle
 
-        for (size_t j = i + 1; j < unitList.size(); ++j) {
-            bool jIdle = unitList[j].path.empty();// && !(unitList[j].selected);
+        for (size_t j = i + 1; j < g.units.size(); ++j) {
+            bool jIdle = g.units[j].path.empty();
             if (!jIdle) return;
 
-            float dx = unitList[j].x - unitList[i].x;
-            float dy = unitList[j].y - unitList[i].y;
+            float dx = g.units[j].x - g.units[i].x;
+            float dy = g.units[j].y - g.units[i].y;
             float dist = dx * dx + dy * dy;
             if (minDist * minDist <= dist) { continue; }
             
@@ -188,11 +194,11 @@ static void ResolveUnitCollisions(std::vector<Player>& unitList) {
             float nx = dx / dist;
             float ny = dy / dist;
 
-            float nextJX = unitList[j].x + nx * overlap;
-            float nextJY = unitList[j].y + ny * overlap;
-            if (Pathfinder::CanBoxStandAt(nextJX, nextJY, kSquareSize, kMapRows, kMapCols, kTileSize, kMap.data())) {
-                unitList[j].x = std::floor(nextJX);
-                unitList[j].y = std::floor(nextJY);
+            float nextJX = g.units[j].x + nx * overlap;
+            float nextJY = g.units[j].y + ny * overlap;
+            if (Pathfinder::CanBoxStandAt(nextJX, nextJY, kSquareSize, g.map.rows, g.map.cols, g.map.tileSize, g.map.data.data())) {
+                g.units[j].x = std::floor(nextJX);
+                g.units[j].y = std::floor(nextJY);
             }
         }
     }
@@ -208,18 +214,18 @@ static void Update(GameState& g, const Input& in, float dt, int windowW, int win
         // Nếu người chơi bấm WASD, hủy lệnh di chuyển bằng chuột hiện tại
         Utils::NormalizeDirection(wasdX, wasdY);
     }
-    // 1. Cập nhật di chuyển cho từng Player
-    for (auto& p : players) {
+    // 1. Cập nhật di chuyển cho từng Unit
+    for (auto& p : g.units) {
         if (hasWasd && p.selected) {
             p.path.clear(); // Hủy đường A* nếu người chơi tự lái bằng WASD
             float nextX = p.x + wasdX * kSpeed * dt;
             float nextY = p.y + wasdY * kSpeed * dt;
 
             // Tách trục X và Y để trượt dọc mép hồ nước
-            if (Pathfinder::CanBoxStandAt(nextX, p.y, kSquareSize, kMapRows, kMapCols, kTileSize, kMap.data())) {
+            if (Pathfinder::CanBoxStandAt(nextX, p.y, kSquareSize, g.map.rows, g.map.cols, g.map.tileSize, g.map.data.data())) {
                 p.x = nextX;
             }
-            if (Pathfinder::CanBoxStandAt(p.x, nextY, kSquareSize, kMapRows, kMapCols, kTileSize, kMap.data())) {
+            if (Pathfinder::CanBoxStandAt(p.x, nextY, kSquareSize, g.map.rows, g.map.cols, g.map.tileSize, g.map.data.data())) {
                 p.y = nextY;
             }
         }
@@ -244,30 +250,30 @@ static void Update(GameState& g, const Input& in, float dt, int windowW, int win
     }
 
     // 2. Xử lý tách va chạm để các ô không đè lên nhau trên đường đi
-    ResolveUnitCollisions(players);
+    ResolveUnitCollisions(g);
 
-    // 3. Kẹp biên bản đồ và kiểm tra chạm Target cho từng Player
-    for (auto& p : players) {
-        p.x = std::clamp(p.x, half, kWorldW - half);
-        p.y = std::clamp(p.y, half, kWorldH - half);
+    // 3. Kẹp biên bản đồ và kiểm tra chạm Target cho từng Unit
+    for (auto& p : g.units) {
+        p.x = std::clamp(p.x, half, g.worldW - half);
+        p.y = std::clamp(p.y, half, g.worldH - half);
 
         p.touchingTarget =
-            std::abs(p.x - target.x) < kSquareSize &&
-            std::abs(p.y - target.y) < kSquareSize;
+            std::abs(p.x - g.target.x) < kSquareSize &&
+            std::abs(p.y - g.target.y) < kSquareSize;
     }
     // 4. Cập nhật Camera
-    g.camera.UpdateCamera(in, dt, windowW, windowH, kWorldW, kWorldH);
+    g.camera.UpdateCamera(in, dt, windowW, windowH, g.worldW, g.worldH);
 
-    if (in.keys[SDL_SCANCODE_SPACE] && !players.empty()) {
+    if (in.keys[SDL_SCANCODE_SPACE] && !g.units.empty()) {
         // Đưa camera về ô vuông đầu tiên đang được chọn (hoặc ô đầu danh sách)
-        const Player* focusUnit = &players[0];
-        for (const auto& p : players) {
+        const Unit* focusUnit = &g.units[0];
+        for (const auto& p : g.units) {
             if (p.selected) {
                 focusUnit = &p;
                 break;
             }
         }
-        g.camera.ClampCamera(focusUnit->x - windowW / 2.0f, focusUnit->y - windowH / 2.0f, windowW, windowH, kWorldW, kWorldH);
+        g.camera.ClampCamera(focusUnit->x - windowW / 2.0f, focusUnit->y - windowH / 2.0f, windowW, windowH, g.worldW, g.worldH);
     }
     // 5. Cập nhật quét chuột chọn hàng loạt
     if (g.isSelecting) {
@@ -283,13 +289,13 @@ static void Update(GameState& g, const Input& in, float dt, int windowW, int win
             selectionWorldRect.h = 3.0f;
         }
 
-        SDL_FRect targetWorldRect = { target.x - half, target.y - half, kSquareSize, kSquareSize };
-        target.selected = SDL_HasRectIntersectionFloat(&selectionWorldRect, &targetWorldRect);
+        SDL_FRect targetWorldRect = { g.target.x - half, g.target.y - half, kSquareSize, kSquareSize };
+        g.target.selected = SDL_HasRectIntersectionFloat(&selectionWorldRect, &targetWorldRect);
 
-        // Duyệt qua toàn bộ vector players để chọn những ô nằm trong khung quét
-        for (auto& p : players) {
-            SDL_FRect playerWorldRect = { p.x - half, p.y - half, kSquareSize, kSquareSize };
-            p.selected = SDL_HasRectIntersectionFloat(&selectionWorldRect, &playerWorldRect);
+        // Duyệt qua toàn bộ vector units để chọn những ô nằm trong khung quét
+        for (auto& p : g.units) {
+            SDL_FRect unitWorldRect = { p.x - half, p.y - half, kSquareSize, kSquareSize };
+            p.selected = SDL_HasRectIntersectionFloat(&selectionWorldRect, &unitWorldRect);
         }
     }
 }
@@ -303,28 +309,28 @@ static void Render(SDL_Renderer* r, const GameState& g, int windowW, int windowH
     const float camY = std::floor(g.camera.y);
 
     // Chỉ vẽ các tile nằm trong vùng camera nhìn thấy.
-    const int firstCol = std::max(0, static_cast<int>(camX / kTileSize));
-    const int firstRow = std::max(0, static_cast<int>(camY / kTileSize));
-    const int lastCol = std::min(kMapCols - 1, static_cast<int>((camX + windowW) / kTileSize));
-    const int lastRow = std::min(kMapRows - 1, static_cast<int>((camY + windowH) / kTileSize));
+    const int firstCol = std::max(0, static_cast<int>(camX / g.map.tileSize));
+    const int firstRow = std::max(0, static_cast<int>(camY / g.map.tileSize));
+    const int lastCol = std::min(g.map.cols - 1, static_cast<int>((camX + windowW) / g.map.tileSize));
+    const int lastRow = std::min(g.map.rows - 1, static_cast<int>((camY + windowH) / g.map.tileSize));
 
     for (int row = firstRow; row <= lastRow; ++row) {
         for (int col = firstCol; col <= lastCol; ++col) {
             SDL_FRect tile = {
-                col * kTileSize - camX,
-                row * kTileSize - camY,
-                kTileSize,
-                kTileSize };
+                col * g.map.tileSize - camX,
+                row * g.map.tileSize - camY,
+                g.map.tileSize,
+                g.map.tileSize };
 
-            switch (kMap[row * kMapCols + col]) {
-            case 1:
-                SDL_SetRenderDrawColor(r, 145, 105, 65, 255); // đất nâu
+            switch (g.map.data[row * g.map.cols + col]) {
+            case Tile::Dirt: SDL_SetRenderDrawColor(r, 145, 105, 65, 255); // đất nâu
                 break;
-            case 2:
-                SDL_SetRenderDrawColor(r, 55, 115, 190, 255); // nước xanh dương
+            case Tile::Water: SDL_SetRenderDrawColor(r, 55, 115, 190, 255); // nước xanh dương
                 break;
-            default:
-                SDL_SetRenderDrawColor(r, 75, 145, 75, 255); // cỏ xanh lá
+            case Tile::Rock: SDL_SetRenderDrawColor(r, 136, 140, 141, 1); // nước xám đá
+                break;
+            case Tile::Grass:
+            default: SDL_SetRenderDrawColor(r, 75, 145, 75, 255); // cỏ xanh lá
                 break;
             }
             SDL_RenderFillRect(r, &tile);
@@ -334,8 +340,8 @@ static void Render(SDL_Renderer* r, const GameState& g, int windowW, int windowH
             SDL_RenderRect(r, &tile);
         }
     }
-    // Vẽ đường đi A* của từng Player
-    for (const auto& p : players) {
+    // Vẽ đường đi A* của từng Unit
+    for (const auto& p : g.units) {
         if (!p.path.empty()) {
             float prevX = p.x - camX;
             float prevY = p.y - camY;
@@ -356,11 +362,9 @@ static void Render(SDL_Renderer* r, const GameState& g, int windowW, int windowH
         }
     }
 
-    target.Render(r, camX, camY);// Mục tiêu đứng yên trong thế giới; camera khiến nó cuộn theo bản đồ.
+    g.target.Render(r, camX, camY);// Mục tiêu đứng yên trong thế giới; camera khiến nó cuộn theo bản đồ.
     
-    // Vẽ tất cả các Player
-    for (auto& p : players) { p.Render(r, camX, camY); }
-
+    for (auto& p : g.units) { p.Render(r, camX, camY); } // Vẽ tất cả các Unit
 
     // Vẽ khung quét chuột RTS (chuyển từ tọa độ thế giới về tọa độ màn hình)
     if (g.isSelecting) {
@@ -447,33 +451,33 @@ static void DrawMenu(App& app, int windowW, int windowH) {
 }
 
 // Đặt lại kích thước thế giới và vị trí các đối tượng sau khi nạp map.
-static void InitializeWorldForLoadedMap(GameState& game) {
-    kWorldW = kMapCols * kTileSize;
-    kWorldH = kMapRows * kTileSize;
+static void InitializeWorldForLoadedMap(GameState& g) {
+    g.worldW = g.map.cols * g.map.tileSize;
+    g.worldH = g.map.rows * g.map.tileSize;
 
-    target.x = kWorldW / 2.0f;
-    target.y = kWorldH / 2.0f;
-    target.selected = false;
-    game.camera.x = 0.0f;
-    game.camera.y = 0.0f;
-    game.isSelecting = false;
+    g.target.x = g.worldW / 2.0f;
+    g.target.y = g.worldH / 2.0f;
+    g.target.selected = false;
+    g.camera.x = 0.0f;
+    g.camera.y = 0.0f;
+    g.isSelecting = false;
 
     const float half = kSquareSize / 2.0f;
     const float spawnX[] = { 2.5f, 3.5f, 4.5f, 2.5f, 3.5f, 4.5f };
     const float spawnY[] = { 2.5f, 2.5f, 2.5f, 3.5f, 3.5f, 3.5f };
-    for (size_t i = 0; i < players.size(); ++i) {
-        players[i].x = std::clamp(spawnX[i] * kTileSize, half, std::max(half, kWorldW - half));
-        players[i].y = std::clamp(spawnY[i] * kTileSize, half, std::max(half, kWorldH - half));
-        players[i].selected = false;
-        players[i].touchingTarget = false;
-        players[i].path.clear();
+    for (size_t i = 0; i < g.units.size(); ++i) {
+        g.units[i].x = std::clamp(spawnX[i] * g.map.tileSize, half, std::max(half, g.worldW - half));
+        g.units[i].y = std::clamp(spawnY[i] * g.map.tileSize, half, std::max(half, g.worldH - half));
+        g.units[i].selected = false;
+        g.units[i].touchingTarget = false;
+        g.units[i].path.clear();
     }
 }
 
 static bool StartSelectedMap(App& app) {
     if (app.selectedMap < 0 || app.selectedMap >= static_cast<int>(app.maps.size())) return false;
     const MapEntry& selected = app.maps[app.selectedMap];
-    if (!LoadMap(selected.path)) {
+    if (!LoadMap(app.game, selected.path)) {
         app.menuMessage = "Map khong hop le: " + selected.name;
         return false;
     }
@@ -614,8 +618,8 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
             g.selectStartWorldY = event->button.y + g.camera.y;
             g.selectEndWorldX = g.selectStartWorldX;
             g.selectEndWorldY = g.selectStartWorldY;
-            target.selected = false;
-            for (auto& p : players) p.selected = false;
+            g.target.selected = false;
+            for (auto& p : g.units) p.selected = false;
         }
         break;
     case SDL_EVENT_MOUSE_BUTTON_UP:
@@ -624,7 +628,7 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
         } else if (event->button.button == SDL_BUTTON_RIGHT) {
             float clickWorldX = event->button.x + g.camera.x;
             float clickWorldY = event->button.y + g.camera.y;
-            IssueFormationMoveOrder(players, clickWorldX, clickWorldY);
+            IssueFormationMoveOrder(g, clickWorldX, clickWorldY);
         }
         break;
     default: break;

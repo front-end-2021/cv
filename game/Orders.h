@@ -12,3 +12,4 @@ void IssueFormationMoveOrder(GameState& g, float targetWorldX, float targetWorld
 
 // Ra lệnh cho các Unit phe ta đang được chọn: đuổi theo rồi đánh `victim`.
 void IssueAttackOrder(GameState& g, EntityId victim);
+float GetRad(Unit* u, float targetX, float targetY);

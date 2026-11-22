@@ -23,35 +23,8 @@ std::vector<Waypoint> Pathfinder::FindPath(const TileMap& map, float startX, flo
     int goalC = std::clamp(static_cast<int>(goalX / tileSize), 0, cols - 1);
     int goalR = std::clamp(static_cast<int>(goalY / tileSize), 0, rows - 1);
 
-    // Nếu điểm đích là ô nước/đá -> tìm ô đi được GẦN NHẤT xung quanh nó.
-    // (Trước đây quét theo thứ tự hàng và lấy ô đầu tiên gặp, nên có thể chọn ô ở phía xa.)
-    if (!map.IsWalkableTile(goalR, goalC)) {
-        constexpr int kMaxSnapRadius = 5;
-        float bestDistSq = 1e18f;
-        int bestR = -1, bestC = -1;
-        for (int dr = -kMaxSnapRadius; dr <= kMaxSnapRadius; ++dr) {
-            for (int dc = -kMaxSnapRadius; dc <= kMaxSnapRadius; ++dc) {
-                const int nr = goalR + dr;
-                const int nc = goalC + dc;
-                if (!map.IsWalkableTile(nr, nc)) continue;
-                // Đo khoảng cách từ điểm người chơi bấm tới tâm ô, nên các lính có
-                // điểm đích khác nhau trong đội hình sẽ ưu tiên các ô khác nhau.
-                const float cx = nc * tileSize + tileSize / 2.0f;
-                const float cy = nr * tileSize + tileSize / 2.0f;
-                const float distSq = (cx - goalX) * (cx - goalX) + (cy - goalY) * (cy - goalY);
-                if (distSq < bestDistSq) {
-                    bestDistSq = distSq;
-                    bestR = nr;
-                    bestC = nc;
-                }
-            }
-        }
-        if (bestR < 0) return {};
-        goalR = bestR;
-        goalC = bestC;
-        goalX = goalC * tileSize + tileSize / 2.0f;
-        goalY = goalR * tileSize + tileSize / 2.0f;
-    }
+    // Không cho phép tìm đường nếu điểm đích nằm trên ô không thể đi được.
+    if (!map.IsWalkableTile(goalR, goalC)) { return {}; }
 
     if (startR == goalR && startC == goalC) { return { { goalX, goalY } }; }
 

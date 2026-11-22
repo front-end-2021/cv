@@ -20,9 +20,7 @@ void AutoAcquireTarget(GameState& g, Unit& u, float dt) {
     // 0. Mục tiêu đã chết hoặc đã biến mất khỏi thế giới -> hết lệnh.
     if (u.HasTarget()) {
         const Unit* target = g.FindUnit(u.attackTargetId);
-        if (!target || !target->IsAlive()) {
-            u.ClearTarget();
-        }
+        if (!target || !target->IsAlive()) { u.ClearTarget(); }
         // 1. Mục tiêu tự chọn mà chạy quá xa -> bỏ cuộc (lệnh do người chơi ra thì đuổi tới cùng).
         else if (u.autoTarget && u.DistanceTo(*target) > u.AggroRange * kLeashFactor) {
             u.ClearTarget();

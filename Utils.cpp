@@ -11,3 +11,8 @@ void Utils::NormalizeDirection(float& dx, float& dy) {
     const float len = std::sqrt(dx * dx + dy * dy);
     if (len > 0.0f) { dx /= len; dy /= len; }
 };
+
+std::string Utils::AssetPath(const std::string& subDir) {
+    const char* basePath = SDL_GetBasePath(); // luôn kết thúc bằng dấu phân cách
+    return basePath ? std::string(basePath) + subDir : subDir;
+}

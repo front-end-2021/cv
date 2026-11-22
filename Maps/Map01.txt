@@ -1,3 +1,16 @@
+# Dinh dang: dong bat dau bang # la ghi chu.
+# @spawn <cot> <hang> [LoaiDonVi]  diem xuat phat cua mot linh (toa do o: 2.5 = giua o so 2).
+# @enemy <cot> <hang> [LoaiDonVi]  diem xuat phat cua mot ke dich.
+# Ten loai xem Data/units.txt; bo trong = Soldier (phe ta) / Grunt (ke dich).
+@spawn 2.5 2.5 Soldier
+@spawn 3.5 2.5 Soldier
+@spawn 4.5 2.5 Soldier
+@spawn 2.5 3.5 Soldier
+@spawn 3.5 3.5 Soldier
+@spawn 4.5 3.5 Soldier
+@enemy 12.5 7.5 Grunt
+@enemy 13.5 8.5 Grunt
+@enemy 12.5 9.5 Grunt
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0 0 0 0 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0 0 0 0 1 2 2 2 1 1 0 0 0 0 0 0 0 0 0 0 0

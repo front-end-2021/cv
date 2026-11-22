@@ -1,0 +1,32 @@
+# Bang chi so cac loai don vi. Moi loai bat dau bang [Ten] (khong chua khoang trang).
+# Khoa duoc ho tro (khoa nao khong ghi thi lay gia tri mac dinh):
+#   hp        mau toi da                          (so nguyen > 0)
+#   armor     giap, tru vao moi don trung         (so nguyen >= 0)
+#   shield    khien, do truoc khi mat mau         (so nguyen >= 0)
+#   damage    sat thuong moi don                  (so nguyen >= 0)
+#   cooldown  giay giua hai don danh              (so > 0)
+#   range     tam danh = khoang ho toi da giua hai canh hitbox, pixel
+#   speed     toc do di chuyen, pixel/giay
+#   aggro     ban kinh tu dong phat hien ke dich khi dung yen, pixel
+#   vision    tam nhin, pixel (danh cho suong mu chien truong)
+#
+# Trong file map: "@spawn <cot> <hang> Soldier" hoac "@enemy <cot> <hang> Grunt".
+# Khong ghi ten loai thi dung Soldier cho phe ta, Grunt cho ke dich.
+
+[Soldier]
+hp = 100
+armor = 1
+damage = 10
+cooldown = 1.0
+range = 20
+speed = 300
+aggro = 192
+
+[Grunt]
+hp = 120
+armor = 1
+damage = 8
+cooldown = 1.2
+range = 20
+speed = 220
+aggro = 192

@@ -9,59 +9,51 @@ namespace {
         float g, f;
         bool operator>(const Node& other) const { return f > other.f; }
     };
-
-    bool IsTileWalkable(int r, int c, int rows, int cols, const Tile* mapData) {
-        if (r < 0 || r >= rows || c < 0 || c >= cols) return false; // Ngoài cửa sổ game
-        if (mapData[r * cols + c] == Tile::Water) return false; // Nước không đi được
-        if (mapData[r * cols + c] == Tile::Rock) return false; // Đá không đi được
-        return true;
-    }
 }
 
-bool Pathfinder::IsWalkableWorld(float worldX, float worldY, int rows, int cols, float tileSize, const Tile* mapData) {
-    int c = static_cast<int>(std::floor(worldX / tileSize));
-    int r = static_cast<int>(std::floor(worldY / tileSize));
-    return IsTileWalkable(r, c, rows, cols, mapData);
-}
-
-bool Pathfinder::CanBoxStandAt(float worldX, float worldY, float boxSize, int rows, int cols, float tileSize, const Tile* mapData) {
-    // Thu nhỏ hitbox 1 chút (0.45 thay vì 0.5) để lính dễ lách qua khe hẹp
-    const float half = boxSize * 0.45f;
-    return IsWalkableWorld(worldX - half, worldY - half, rows, cols, tileSize, mapData) &&
-        IsWalkableWorld(worldX + half, worldY - half, rows, cols, tileSize, mapData) &&
-        IsWalkableWorld(worldX - half, worldY + half, rows, cols, tileSize, mapData) &&
-        IsWalkableWorld(worldX + half, worldY + half, rows, cols, tileSize, mapData);
-}
-
-std::vector<Waypoint> Pathfinder::FindPath(float startX, float startY, float goalX, float goalY, int rows, int cols, float tileSize, const Tile* mapData)
+std::vector<Waypoint> Pathfinder::FindPath(const TileMap& map, float startX, float startY, float goalX, float goalY)
 {
+    if (map.Empty()) return {};
+    const int rows = map.rows;
+    const int cols = map.cols;
+    const float tileSize = map.tileSize;
+
     int startC = std::clamp(static_cast<int>(startX / tileSize), 0, cols - 1);
     int startR = std::clamp(static_cast<int>(startY / tileSize), 0, rows - 1);
     int goalC = std::clamp(static_cast<int>(goalX / tileSize), 0, cols - 1);
     int goalR = std::clamp(static_cast<int>(goalY / tileSize), 0, rows - 1);
 
-    // Nếu điểm đích là ô nước -> tìm ô cạn gần nhất xung quanh nó
-    if (!IsTileWalkable(goalR, goalC, rows, cols, mapData)) {
-        bool found = false;
-        for (int radius = 1; radius <= 5 && !found; ++radius) {
-            for (int dr = -radius; dr <= radius && !found; ++dr) {
-                for (int dc = -radius; dc <= radius && !found; ++dc) {
-                    if (IsTileWalkable(goalR + dr, goalC + dc, rows, cols, mapData)) {
-                        goalR += dr;
-                        goalC += dc;
-                        goalX = goalC * tileSize + tileSize * 0.5f;
-                        goalY = goalR * tileSize + tileSize * 0.5f;
-                        found = true;
-                    }
+    // Nếu điểm đích là ô nước/đá -> tìm ô đi được GẦN NHẤT xung quanh nó.
+    // (Trước đây quét theo thứ tự hàng và lấy ô đầu tiên gặp, nên có thể chọn ô ở phía xa.)
+    if (!map.IsWalkableTile(goalR, goalC)) {
+        constexpr int kMaxSnapRadius = 5;
+        float bestDistSq = 1e18f;
+        int bestR = -1, bestC = -1;
+        for (int dr = -kMaxSnapRadius; dr <= kMaxSnapRadius; ++dr) {
+            for (int dc = -kMaxSnapRadius; dc <= kMaxSnapRadius; ++dc) {
+                const int nr = goalR + dr;
+                const int nc = goalC + dc;
+                if (!map.IsWalkableTile(nr, nc)) continue;
+                // Đo khoảng cách từ điểm người chơi bấm tới tâm ô, nên các lính có
+                // điểm đích khác nhau trong đội hình sẽ ưu tiên các ô khác nhau.
+                const float cx = nc * tileSize + tileSize / 2.0f;
+                const float cy = nr * tileSize + tileSize / 2.0f;
+                const float distSq = (cx - goalX) * (cx - goalX) + (cy - goalY) * (cy - goalY);
+                if (distSq < bestDistSq) {
+                    bestDistSq = distSq;
+                    bestR = nr;
+                    bestC = nc;
                 }
             }
         }
-        if (!found) return {};
+        if (bestR < 0) return {};
+        goalR = bestR;
+        goalC = bestC;
+        goalX = goalC * tileSize + tileSize / 2.0f;
+        goalY = goalR * tileSize + tileSize / 2.0f;
     }
 
-    if (startR == goalR && startC == goalC) {
-        return { { goalX, goalY } };
-    }
+    if (startR == goalR && startC == goalC) { return { { goalX, goalY } }; }
 
     std::vector<float> gScore(rows * cols, 1e9f);
     std::vector<int> parent(rows * cols, -1);
@@ -69,10 +61,9 @@ std::vector<Waypoint> Pathfinder::FindPath(float startX, float startY, float goa
     std::priority_queue<Node, std::vector<Node>, std::greater<Node>> openSet;
 
     auto heuristic = [&](int r, int c) {
-        float dr = static_cast<float>(goalR - r);
-        float dc = static_cast<float>(goalC - c);
+        float dr = static_cast<float>(goalR - r), dc = static_cast<float>(goalC - c);
         return std::sqrt(dr * dr + dc * dc);
-        };
+    };
 
     int startIdx = startR * cols + startC;
     gScore[startIdx] = 0.0f;
@@ -99,12 +90,12 @@ std::vector<Waypoint> Pathfinder::FindPath(float startX, float startY, float goa
         for (int i = 0; i < 8; ++i) {
             int nr = curr.r + dRow[i];
             int nc = curr.c + dCol[i];
-            if (!IsTileWalkable(nr, nc, rows, cols, mapData)) continue;
+            if (!map.IsWalkableTile(nr, nc)) continue;
 
             // Chống cắt góc chéo xuyên qua ô nước
             if (i >= 4) {
-                if (!IsTileWalkable(curr.r + dRow[i], curr.c, rows, cols, mapData) ||
-                    !IsTileWalkable(curr.r, curr.c + dCol[i], rows, cols, mapData)) {
+                if (!map.IsWalkableTile(curr.r + dRow[i], curr.c) ||
+                    !map.IsWalkableTile(curr.r, curr.c + dCol[i])) {
                     continue;
                 }
             }
@@ -136,7 +127,7 @@ std::vector<Waypoint> Pathfinder::FindPath(float startX, float startY, float goa
             result.push_back({ goalX, goalY });
         }
         else {
-            result.push_back({ c * tileSize + tileSize * 0.5f, r * tileSize + tileSize * 0.5f });
+            result.push_back({ c * tileSize + tileSize / 2.0f, r * tileSize + tileSize / 2.0f });
         }
         currIdx = parent[currIdx];
     }

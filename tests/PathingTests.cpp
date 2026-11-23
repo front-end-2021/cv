@@ -2,6 +2,7 @@
 //   cmake -S . -B build -DMINIRTS_BUILD_TESTS=ON && cmake --build build --target PathingTests
 //   ./build/PathingTests            (thêm --bench để in số liệu so sánh hiệu năng)
 // Thoát với mã khác 0 nếu có kiểm tra thất bại.
+#include <gtest/gtest.h>
 #include <algorithm>
 #include <chrono>
 #include <cmath>
@@ -31,13 +32,11 @@
 // ---------------------------------------------------------------------------
 // Khung kiểm thử tối giản
 // ---------------------------------------------------------------------------
-static int g_checks = 0;
-static int g_failed = 0;
 static bool g_bench = false;
 
-#define CHECK(cond) do { ++g_checks; if (!(cond)) { ++g_failed; std::printf("  FAIL  %s:%d  %s\n", __FILE__, __LINE__, #cond); } } while (0)
-#define CHECK_MSG(cond, ...) do { ++g_checks; if (!(cond)) { ++g_failed; std::printf("  FAIL  %s:%d  %s -> ", __FILE__, __LINE__, #cond); std::printf(__VA_ARGS__); std::printf("\n"); } } while (0)
-
+#define CHECK(cond) EXPECT_TRUE(cond)
+#define CHECK_MSG(cond, ...) EXPECT_TRUE(cond) << [&]() { \
+    char buf[512]; std::snprintf(buf, sizeof(buf), __VA_ARGS__); return std::string(buf); }()
 static void Section(const char* name) { std::printf("[%s]\n", name); }
 
 // Số ngẫu nhiên xác định (cùng kết quả mọi lần chạy, mọi máy).
@@ -190,8 +189,8 @@ static bool Walkable(const TileMap& m, int r, int c) { return m.IsWalkableTile(r
 // ---------------------------------------------------------------------------
 // Các nhóm kiểm thử
 // ---------------------------------------------------------------------------
-static void TestPathContainer() {
-    Section("Path: reference point at the beginning O(1) using an index");//lấy mốc ở đầu O(1) bằng chỉ số
+TEST(PathingTest, PathContainer) {
+    Section("Path: O(1) access to the first waypoint by index"); // Section("Path: lấy mốc ở đầu O(1) bằng chỉ số");
     Path p;
     CHECK(p.empty() && p.size() == 0);
     p.assign({ {1, 1}, {2, 2}, {3, 3} });
@@ -199,17 +198,17 @@ static void TestPathContainer() {
     p.pop_front();
     CHECK(p.size() == 2 && p.front().x == 2);
     float sum = 0; for (const auto& w : p) sum += w.x;
-    CHECK(sum == 5.0f);                       // duyệt chỉ thấy các mốc còn lại
+    CHECK(sum == 5.0f);                       // iteration only sees the remaining waypoints // CHECK(sum == 5.0f);                       // duyệt chỉ thấy các mốc còn lại
     p.pop_front(); p.pop_front();
     CHECK(p.empty() && p.begin() == p.end());
-    p.pop_front();                            // pop khi rỗng không làm hỏng
+    p.pop_front();                            // popping an empty path does not corrupt it // p.pop_front();                            // pop khi rỗng không làm hỏng
     CHECK(p.empty());
     p.assign({ {9, 9} });
     CHECK(p.size() == 1 && p.front().x == 9);
     p.clear();
     CHECK(p.empty());
 
-    // Nhiều mốc: duyệt hết rồi pop từng cái, thứ tự đúng.
+    // Multiple waypoints: iterate through all, then pop each one in the correct order. // // Nhiều mốc: duyệt hết rồi pop từng cái, thứ tự đúng.
     std::vector<Waypoint> many;
     for (int i = 0; i < 1000; ++i) many.push_back({ static_cast<float>(i), 0.0f });
     p.assign(many);
@@ -218,8 +217,8 @@ static void TestPathContainer() {
     CHECK(order && p.empty());
 }
 
-static void TestAStarMatchesOracle() {
-    Section("A*: shortest path matches the correct answer exactly (random map)");//đường ngắn nhất đúng bằng đáp án chuẩn (bản đồ ngẫu nhiên)
+TEST(PathingTest, AStarMatchesOracle) {
+    Section("A*: shortest path matches the oracle (random maps)"); // Section("A*: đường ngắn nhất đúng bằng đáp án chuẩn (bản đồ ngẫu nhiên)");
     Rng rng(12345);
     int compared = 0, unreachable = 0, mismatches = 0, invalid = 0;
     for (int mapNo = 0; mapNo < 40; ++mapNo) {
@@ -236,7 +235,7 @@ static void TestAStarMatchesOracle() {
             const float oracle = OracleCost(m, sr, sc, gr, gc);
             if (oracle < 0) {
                 ++unreachable;
-                if (!res.partial) ++mismatches;   // đích không với tới thì phải báo partial
+                if (!res.partial) ++mismatches;   // an unreachable destination must be reported as partial // if (!res.partial) ++mismatches;   // đích không với tới thì phải báo partial
                 continue;
             }
             ++compared;
@@ -246,15 +245,15 @@ static void TestAStarMatchesOracle() {
             else if (std::abs(cost - oracle) > 1e-3f) ++mismatches;
         }
     }
-    CHECK_MSG(compared > 150, "can only compare %d queries", compared);//chỉ so được %d truy vấn
-    CHECK_MSG(unreachable > 5, "need a few cases that are out of reach (%d)", unreachable);//cần có vài ca không với tới (%d)
-    CHECK_MSG(mismatches == 0, "%d queries deviate from the expected answer", mismatches); //%d truy vấn lệch đáp án chuẩn
-    CHECK_MSG(invalid == 0, "%d rough paths with no adjacent marked points", invalid);//%d đường thô có mốc không kề nhau
+    CHECK_MSG(compared > 150, "only %d queries could be compared", compared); // CHECK_MSG(compared > 150, "chỉ so được %d truy vấn", compared);
+    CHECK_MSG(unreachable > 5, "expected some unreachable cases (%d)", unreachable); // CHECK_MSG(unreachable > 5, "cần có vài ca không với tới (%d)", unreachable);
+    CHECK_MSG(mismatches == 0, "%d queries differ from the oracle", mismatches); // CHECK_MSG(mismatches == 0, "%d truy vấn lệch đáp án chuẩn", mismatches);
+    CHECK_MSG(invalid == 0, "%d raw paths contain non-adjacent waypoints", invalid); // CHECK_MSG(invalid == 0, "%d đường thô có mốc không kề nhau", invalid);
 }
 
-static void TestSmoothing() {
-    Section("Smooth: move straight across empty space, without cutting into the wall"); //Làm mượt: đi thẳng qua chỗ trống, không cắt vào tường
-    {   // Bản đồ trống: góc này sang góc kia = đúng 1 mốc (đường thẳng), thay vì zigzag qua tâm ô.
+TEST(PathingTest, Smoothing) {
+    Section("Smoothing: move straight through open space without cutting through walls"); // Section("Làm mượt: đi thẳng qua chỗ trống, không cắt vào tường");
+    {   // Empty map: moving from one corner to the other requires exactly one waypoint (a straight line), rather than zigzagging through tile centers. // {   // Bản đồ trống: góc này sang góc kia = đúng 1 mốc (đường thẳng), thay vì zigzag qua tâm ô.
         const TileMap m = MakeMap(BlankRows(16, 20));
         const Waypoint a = Center(1, 1), b = Center(13, 17);
         const PathResult raw = Pathfinder::FindRaw(m, a.x, a.y, b.x, b.y);
@@ -263,7 +262,7 @@ static void TestSmoothing() {
         CHECK(sm.points.size() == 1 && sm.points[0].x == b.x && sm.points[0].y == b.y);
         CHECK(!sm.partial);
     }
-    {   // Có tường chữ L: đường mượt vẫn an toàn và không dài hơn đường thô.
+    {   // L-shaped wall: the smoothed path remains safe and is no longer than the raw path. // {   // Có tường chữ L: đường mượt vẫn an toàn và không dài hơn đường thô.
         auto rows = BlankRows(14, 20);
         for (int r = 2; r < 11; ++r) rows[static_cast<size_t>(r)][10] = '#';
         for (int c = 4; c < 11; ++c) rows[10][static_cast<size_t>(c)] = '#';
@@ -277,7 +276,7 @@ static void TestSmoothing() {
         for (const auto& p : sm.points) { if (!DenseSafe(m, prev, p)) safe = false; prev = p; }
         CHECK(safe);
     }
-    {   // Ngẫu nhiên: mọi đoạn đều an toàn với hitbox thật, mốc cuối giữ nguyên, không dài hơn đường thô.
+    {   // Random maps: every segment is safe for the actual hitbox, the final waypoint is preserved, and the path is no longer than the raw path. // {   // Ngẫu nhiên: mọi đoạn đều an toàn với hitbox thật, mốc cuối giữ nguyên, không dài hơn đường thô.
         Rng rng(777);
         int checked = 0, unsafe = 0, longer = 0, endDiff = 0;
         for (int mapNo = 0; mapNo < 30; ++mapNo) {
@@ -296,12 +295,12 @@ static void TestSmoothing() {
                 if (sm.points.back().x != raw.points.back().x || sm.points.back().y != raw.points.back().y) ++endDiff;
             }
         }
-        CHECK_MSG(checked > 100, "check only %d paths", checked);//chỉ kiểm %d đường
-        CHECK_MSG(unsafe == 0, "%d smooth paths cut into the wall", unsafe);//%d đường mượt cắt vào tường
-        CHECK_MSG(longer == 0, "%d smooth paths are longer than rough path", longer);//%d đường mượt dài hơn đường thô
-        CHECK_MSG(endDiff == 0, "%d smooth path changes endpoint", endDiff);//%d đường mượt đổi điểm cuối
+        CHECK_MSG(checked > 100, "only %d paths were checked", checked); // CHECK_MSG(checked > 100, "chỉ kiểm %d đường", checked);
+        CHECK_MSG(unsafe == 0, "%d smoothed paths cut through walls", unsafe); // CHECK_MSG(unsafe == 0, "%d đường mượt cắt vào tường", unsafe);
+        CHECK_MSG(longer == 0, "%d smoothed paths are longer than raw paths", longer); // CHECK_MSG(longer == 0, "%d đường mượt dài hơn đường thô", longer);
+        CHECK_MSG(endDiff == 0, "%d smoothed paths changed the endpoint", endDiff); // CHECK_MSG(endDiff == 0, "%d đường mượt đổi điểm cuối", endDiff);
     }
-    {   // Khe 1 ô: vẫn chui qua được (hitbox phình không làm tắc khe).
+    {   // One-tile gap: units can still pass through (the expanded hitbox does not block the gap). // {   // Khe 1 ô: vẫn chui qua được (hitbox phình không làm tắc khe).
         auto rows = BlankRows(11, 20);
         for (int r = 0; r < 11; ++r) rows[static_cast<size_t>(r)][10] = '#';
         rows[5][10] = '.';
@@ -317,22 +316,22 @@ static void TestSmoothing() {
         }
         CHECK(throughGap);
     }
-    {   // Điểm đích sát tường được dời vào chỗ đứng được; đích ngay mép bản đồ giữ nguyên.
+    {   // A goal next to a wall is moved to a valid standing position; a goal at the map edge remains unchanged. // {   // Điểm đích sát tường được dời vào chỗ đứng được; đích ngay mép bản đồ giữ nguyên.
         auto rows = BlankRows(6, 8);
         rows[2][4] = '#';
         const TileMap m = MakeMap(rows);
-        float x = 4 * 64.0f - 3.0f, y = 2.5f * 64.0f; // sát mép trái của ô đá
+        float x = 4 * 64.0f - 3.0f, y = 2.5f * 64.0f; // just left of the rock tile // float x = 4 * 64.0f - 3.0f, y = 2.5f * 64.0f; // sát mép trái của ô đá
         CHECK(Pathfinder::NormalizeGoal(m, x, y));
         CHECK(m.CanBoxStandAt(x, y, kPathClearance));
-        float ex = 20.0f, ey = 20.0f;                 // góc bản đồ: đúng chỗ công thức đội hình kẹp vào
+        float ex = 20.0f, ey = 20.0f;                 // map corner: exactly where the formation formula clamps the position // float ex = 20.0f, ey = 20.0f;                 // góc bản đồ: đúng chỗ công thức đội hình kẹp vào
         CHECK(Pathfinder::NormalizeGoal(m, ex, ey) && ex == 20.0f && ey == 20.0f);
-        float wx = 4.5f * 64.0f, wy = 2.5f * 64.0f;   // trúng ô đá
+        float wx = 4.5f * 64.0f, wy = 2.5f * 64.0f;   // inside the rock tile // float wx = 4.5f * 64.0f, wy = 2.5f * 64.0f;   // trúng ô đá
         CHECK(!Pathfinder::NormalizeGoal(m, wx, wy));
     }
 }
 
-static void TestClosestReachable() {
-    Section("Target in an isolated area: move to nearest reachable point");//Đích ở vùng tách biệt: đi tới điểm gần nhất với tới được
+TEST(PathingTest, ClosestReachable) {
+    Section("Goal in an isolated region: move to the closest reachable point"); // Section("Đích ở vùng tách biệt: đi tới điểm gần nhất với tới được");
     std::vector<std::string> rows = {
         "....~~~~~~....",
         "....~....~....",
@@ -343,41 +342,41 @@ static void TestClosestReachable() {
     };
     const TileMap m = MakeMap(rows);
     const Waypoint start = Center(2, 1);
-    const Waypoint click = Center(2, 7);             // trong đảo đá, bên trong vòng nước (không đi vào được)
-    // Ô trong vòng nước: (1..3, 5..8) trừ đá. Đảo hoàn toàn tách biệt với đất liền.
+    const Waypoint click = Center(2, 7);             // inside the rocky island, within the water ring (inaccessible) // const Waypoint click = Center(2, 7);             // trong đảo đá, bên trong vòng nước (không đi vào được)
+    // Tiles inside the water ring: (1..3, 5..8), excluding rocks. The island is completely isolated from the mainland. // // Ô trong vòng nước: (1..3, 5..8) trừ đá. Đảo hoàn toàn tách biệt với đất liền.
     const PathResult res = Pathfinder::Find(m, start.x, start.y, 7.0f * 64.0f + 10.0f, 1.5f * 64.0f);
     CHECK(res.partial);
     CHECK(!res.points.empty());
-    // Điểm cuối phải là ô đi được GẦN ĐIỂM BẤM NHẤT trong vùng với tới được (so với vét cạn).
+    // The endpoint must be the WALKABLE tile CLOSEST TO THE CLICK within the reachable region (verified by exhaustive search). // // Điểm cuối phải là ô đi được GẦN ĐIỂM BẤM NHẤT trong vùng với tới được (so với vét cạn).
     const float cx = 7.0f * 64.0f + 10.0f, cy = 1.5f * 64.0f;
     float bestD = 1e30f;
     for (int r = 0; r < m.rows; ++r) for (int c = 0; c < m.cols; ++c) {
-        if (!Walkable(m, r, c) || OracleCost(m, 2, 1, r, c) < 0) continue; // chỉ xét ô với tới được từ chỗ lính đứng
+        if (!Walkable(m, r, c) || OracleCost(m, 2, 1, r, c) < 0) continue; // only consider tiles reachable from the unit's starting position // if (!Walkable(m, r, c) || OracleCost(m, 2, 1, r, c) < 0) continue; // chỉ xét ô với tới được từ chỗ lính đứng
         const Waypoint ctr = Center(r, c);
         bestD = std::min(bestD, std::hypot(ctr.x - cx, ctr.y - cy));
     }
     if (!res.points.empty()) {
         const Waypoint e = res.points.back();
-        CHECK_MSG(std::abs(std::hypot(e.x - cx, e.y - cy) - bestD) < 0.01f, "at the end of path, distance to the trigger point is %.1f, optimal distance is %.1f", std::hypot(e.x - cx, e.y - cy), bestD);//cuối đường cách điểm bấm %.1f, tốt nhất là %.1f
+        CHECK_MSG(std::abs(std::hypot(e.x - cx, e.y - cy) - bestD) < 0.01f, "path endpoint is %.1f from the clicked point; the best possible distance is %.1f", std::hypot(e.x - cx, e.y - cy), bestD); // CHECK_MSG(std::abs(std::hypot(e.x - cx, e.y - cy) - bestD) < 0.01f, "cuối đường cách điểm bấm %.1f, tốt nhất là %.1f", std::hypot(e.x - cx, e.y - cy), bestD);
         int er, ec; TileOf(m, e, er, ec);
         CHECK(OracleCost(m, 2, 1, er, ec) >= 0);
     }
     (void)click;
 
-    // Lính đứng TRONG vùng tách biệt (đảo), bấm ra đất liền: đi tới ô trong đảo gần điểm bấm nhất...
-    const float clickX = 10.5f * 64.0f, clickY = 1.5f * 64.0f; // đất liền, ngay ngoài vòng nước, ngang hàng 1
+    // Unit starts INSIDE the isolated region (island) and clicks on the mainland: move to the island tile closest to the click... // // Lính đứng TRONG vùng tách biệt (đảo), bấm ra đất liền: đi tới ô trong đảo gần điểm bấm nhất...
+    const float clickX = 10.5f * 64.0f, clickY = 1.5f * 64.0f; // mainland, just outside the water ring, on row 1 // const float clickX = 10.5f * 64.0f, clickY = 1.5f * 64.0f; // đất liền, ngay ngoài vòng nước, ngang hàng 1
     const Waypoint inIsland = Center(3, 5);
     const PathResult toEdge = Pathfinder::Find(m, inIsland.x, inIsland.y, clickX, clickY);
     CHECK(toEdge.partial && !toEdge.points.empty());
     if (!toEdge.points.empty()) {
         CHECK(std::abs(toEdge.points.back().x - Center(1, 8).x) < 0.01f && std::abs(toEdge.points.back().y - Center(1, 8).y) < 0.01f);
     }
-    // ... và đã đứng đúng ô gần nhất rồi thì không còn chỗ nào lại gần hơn: không đi đâu cả.
+    // ... once already standing on the closest tile, no closer tile exists: do not move. // // ... và đã đứng đúng ô gần nhất rồi thì không còn chỗ nào lại gần hơn: không đi đâu cả.
     const Waypoint atEdge = Center(1, 8);
     const PathResult stay = Pathfinder::Find(m, atEdge.x, atEdge.y, clickX, clickY);
     CHECK(stay.partial && stay.points.empty());
 
-    // Hồ lớn: bấm giữa hồ (xa mọi bờ hơn 5 ô) vẫn đi tới bờ gần nhất, không còn đứng yên như bản cũ.
+    // Large lake: clicking in the middle (more than 5 tiles from every shore) still moves the unit to the nearest shore instead of leaving it idle as before. // // Hồ lớn: bấm giữa hồ (xa mọi bờ hơn 5 ô) vẫn đi tới bờ gần nhất, không còn đứng yên như bản cũ.
     auto lake = BlankRows(30, 30);
     for (int r = 4; r < 26; ++r) for (int c = 4; c < 26; ++c) lake[static_cast<size_t>(r)][static_cast<size_t>(c)] = '~';
     const TileMap lm = MakeMap(lake);
@@ -389,19 +388,19 @@ static void TestClosestReachable() {
         int er, ec; TileOf(lm, e, er, ec);
         CHECK(Walkable(lm, er, ec));
     }
-    // Bản đồ không còn ô nào đi được: không có đường.
+    // Map has no walkable tiles: no path exists. // // Bản đồ không còn ô nào đi được: không có đường.
     const TileMap dead = MakeMap(BlankRows(4, 4, '#'));
     CHECK(Pathfinder::Find(dead, 10, 10, 100, 100).points.empty());
 }
 
-static void TestSlotAssignment() {
-    Section("Assign squad slots based on distance");//Gán slot đội hình theo khoảng cách
+TEST(PathingTest, SlotAssignment) {
+    Section("Assign formation slots by distance"); // Section("Gán slot đội hình theo khoảng cách");
     Rng rng(2024);
     auto totalDist = [](const std::vector<Waypoint>& from, const std::vector<Waypoint>& slots, const std::vector<int>& of) {
         double t = 0; for (size_t i = 0; i < from.size(); ++i) t += std::hypot(from[i].x - slots[static_cast<size_t>(of[i])].x, from[i].y - slots[static_cast<size_t>(of[i])].y); return t; };
     auto isPerm = [](const std::vector<int>& of) { std::vector<int> s = of; std::sort(s.begin(), s.end()); for (size_t i = 0; i < s.size(); ++i) if (s[i] != static_cast<int>(i)) return false; return true; };
 
-    // 1. Hungarian đúng bằng vét cạn hoán vị với n <= 7.
+    // 1. Hungarian assignment matches exhaustive permutation search for n <= 7. // // 1. Hungarian đúng bằng vét cạn hoán vị với n <= 7.
     int wrong = 0, notPerm = 0;
     for (int trial = 0; trial < 150; ++trial) {
         const int n = rng.Int(1, 7);
@@ -414,10 +413,10 @@ static void TestSlotAssignment() {
         do { best = std::min(best, totalDist(from, slots, perm)); } while (std::next_permutation(perm.begin(), perm.end()));
         if (std::abs(totalDist(from, slots, of) - best) > 1e-6) ++wrong;
     }
-    CHECK_MSG(notPerm == 0, "%d times is not a permutation", notPerm);//%d lần không phải hoán vị
-    CHECK_MSG(wrong == 0, "%d non-optimized instances", wrong);//%d lần không tối ưu
+    CHECK_MSG(notPerm == 0, "%d assignments are not permutations", notPerm); // CHECK_MSG(notPerm == 0, "%d lần không phải hoán vị", notPerm);
+    CHECK_MSG(wrong == 0, "%d assignments are not optimal", wrong); // CHECK_MSG(wrong == 0, "%d lần không tối ưu", wrong);
 
-    // 2. Không có hai đường đi cắt nhau (đây chính là "lính chạy chéo nhau").
+    // 2. No two paths intersect (this is what it means for "units to cross paths"). // // 2. Không có hai đường đi cắt nhau (đây chính là "lính chạy chéo nhau").
     auto cross = [](Waypoint a, Waypoint b, Waypoint c, Waypoint d) {
         auto o = [](Waypoint p, Waypoint q, Waypoint r) { return (q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x); };
         const float d1 = o(a, b, c), d2 = o(a, b, d), d3 = o(c, d, a), d4 = o(c, d, b);
@@ -436,11 +435,11 @@ static void TestSlotAssignment() {
             if (cross(from[static_cast<size_t>(i)], slots[static_cast<size_t>(i)], from[static_cast<size_t>(j)], slots[static_cast<size_t>(j)])) ++identityCrossings;
         }
     }
-    CHECK_MSG(optimalCrossings == 0, "the optimal assignment still contains %d pairs of intersecting paths", optimalCrossings);//gán tối ưu vẫn có %d cặp đường cắt nhau
-    CHECK_MSG(identityCrossings > 50, "Following original order, only %d pairs intersect (there should have been more).", identityCrossings);//gán theo thứ tự cũ chỉ có %d cặp cắt nhau (đáng lẽ nhiều)
-    std::printf("      (intersections in 20-board, 30-soldier scenario: assignment by original order = %d, assignment by distance = %d)\n", identityCrossings, optimalCrossings);//(đường cắt nhau trong 20 ván 30 lính: gán theo thứ tự cũ = %d, gán theo khoảng cách = %d)
+    CHECK_MSG(optimalCrossings == 0, "optimal assignment still has %d intersecting path pairs", optimalCrossings); // CHECK_MSG(optimalCrossings == 0, "gán tối ưu vẫn có %d cặp đường cắt nhau", optimalCrossings);
+    CHECK_MSG(identityCrossings > 50, "legacy ordering has only %d intersecting pairs (expected many)", identityCrossings); // CHECK_MSG(identityCrossings > 50, "gán theo thứ tự cũ chỉ có %d cặp cắt nhau (đáng lẽ nhiều)", identityCrossings);
+    std::printf("      (intersections across 20 matches with 30 units: legacy ordering = %d, distance-based assignment = %d)\n", identityCrossings, optimalCrossings); // std::printf("      (đường cắt nhau trong 20 ván 30 lính: gán theo thứ tự cũ = %d, gán theo khoảng cách = %d)\n", identityCrossings, optimalCrossings);
 
-    // 3. Nhóm rất đông dùng cách tham lam: vẫn là hoán vị hợp lệ và tốt hơn nhiều so với gán theo thứ tự.
+    // 3. Very large groups use the greedy method: the assignment is still a valid permutation and much better than index-based assignment. // // 3. Nhóm rất đông dùng cách tham lam: vẫn là hoán vị hợp lệ và tốt hơn nhiều so với gán theo thứ tự.
     {
         const int n = kOptimalAssignMaxUnits + 40;
         std::vector<Waypoint> from, slots;
@@ -454,8 +453,8 @@ static void TestSlotAssignment() {
     CHECK(AssignSlotsByDistance({}, {}).empty());
 }
 
-static void TestFlowField() {
-    Section("FlowField: finding the way for the whole group");//một lần tìm đường cho cả nhóm
+TEST(PathingTest, FlowField) {
+    Section("FlowField: one path search for the entire group"); // Section("FlowField: một lần tìm đường cho cả nhóm");
     Rng rng(99);
     int pathsChecked = 0, costMismatch = 0, unsafe = 0, badEnd = 0, notReach = 0;
     for (int mapNo = 0; mapNo < 25; ++mapNo) {
@@ -484,7 +483,7 @@ static void TestFlowField() {
             if (std::abs(cost - oracle) > 1e-3f) ++costMismatch;
             ++pathsChecked;
 
-            // Đường tới một vị trí đội hình quanh đích: an toàn, đúng điểm cuối.
+            // Path to a formation position around the goal: safe and reaches the correct endpoint. // // Đường tới một vị trí đội hình quanh đích: an toàn, đúng điểm cuối.
             Waypoint slot = Center(gr, gc);
             slot.x += (rng.Float() - 0.5f) * 140.0f;
             slot.y += (rng.Float() - 0.5f) * 140.0f;
@@ -498,31 +497,31 @@ static void TestFlowField() {
             }
         }
     }
-    CHECK_MSG(pathsChecked > 150, "check only %d paths", pathsChecked);//chỉ kiểm %d đường
-    CHECK_MSG(notReach == 0, "%d soldiers incorrectly connected/disconnected compared to the correct answer", notReach);//%d lính nối/không nối sai so với đáp án chuẩn
-    CHECK_MSG(costMismatch == 0, "%d answers deviate from the correct key", costMismatch);//%d đường lệch đáp án chuẩn
-    CHECK_MSG(unsafe == 0, "%d group paths cut into the wall", unsafe);//%d đường nhóm cắt vào tường
-    CHECK_MSG(badEnd == 0, "%d group paths have incorrect endpoints", badEnd);//%d đường nhóm sai điểm cuối
+    CHECK_MSG(pathsChecked > 150, "only %d paths were checked", pathsChecked); // CHECK_MSG(pathsChecked > 150, "chỉ kiểm %d đường", pathsChecked);
+    CHECK_MSG(notReach == 0, "%d units have reachability that differs from the oracle", notReach); // CHECK_MSG(notReach == 0, "%d lính nối/không nối sai so với đáp án chuẩn", notReach);
+    CHECK_MSG(costMismatch == 0, "%d paths differ from the oracle", costMismatch); // CHECK_MSG(costMismatch == 0, "%d đường lệch đáp án chuẩn", costMismatch);
+    CHECK_MSG(unsafe == 0, "%d group paths cut through walls", unsafe); // CHECK_MSG(unsafe == 0, "%d đường nhóm cắt vào tường", unsafe);
+    CHECK_MSG(badEnd == 0, "%d group paths have an incorrect endpoint", badEnd); // CHECK_MSG(badEnd == 0, "%d đường nhóm sai điểm cuối", badEnd);
 
-    // Dừng sớm: lính ở gần đích thì không phải quét cả bản đồ lớn.
+    // Early termination: when units are near the goal, the entire large map does not need to be scanned. // // Dừng sớm: lính ở gần đích thì không phải quét cả bản đồ lớn.
     const TileMap big = MakeMap(BlankRows(100, 100));
     FlowField nearField;
     std::vector<std::pair<int, int>> starts;
     for (int i = 0; i < 12; ++i) starts.push_back({ 50 + i % 3, 52 + i / 3 });
     nearField.Build(big, 50, 50, starts);
-    CHECK_MSG(nearField.ExpandedCount() < 600, "open %d cells on a 10.000-cell map", nearField.ExpandedCount());//mở %d ô trên bản đồ 10.000 ô
+    CHECK_MSG(nearField.ExpandedCount() < 600, "expanded %d tiles on a 10,000-tile map", nearField.ExpandedCount()); // CHECK_MSG(nearField.ExpandedCount() < 600, "mở %d ô trên bản đồ 10.000 ô", nearField.ExpandedCount());
     FlowField full;
     full.Build(big, 50, 50, {});
     CHECK(full.ExpandedCount() == 10000);
-    // Ô đích không đi được: không dựng.
+    // Unwalkable destination tile: do not build the field. // // Ô đích không đi được: không dựng.
     auto r = BlankRows(5, 5); r[2][2] = '#';
     FlowField bad;
     CHECK(!bad.Build(MakeMap(r), 2, 2, {}));
 }
 
 // --- Mô phỏng -------------------------------------------------------------
-static void TestWallCrossing() {
-    Section("Simulation: Entire group must pass through a wall with an opening, without anyone touching or leaning on wall.");//Mô phỏng: cả nhóm qua tường có khe hở, không ai đè lên tường
+TEST(PathingTest, WallCrossing) {
+    Section("Simulation: the whole group crosses a wall through a gap; no unit overlaps the wall"); // Section("Mô phỏng: cả nhóm qua tường có khe hở, không ai đè lên tường");
     auto rows = BlankRows(14, 26);
     for (int r = 0; r < 14; ++r) rows[static_cast<size_t>(r)][12] = '#';
     rows[6][12] = '.';
@@ -531,17 +530,17 @@ static void TestWallCrossing() {
     IssueFormationMoveOrder(g, 21.5f * 64.0f, 7.0f * 64.0f);
     int wallTicks = 0;
     const float t = RunUntilIdle(g, 40.0f, [&] { wallTicks += UnitsInsideWalls(g); });
-    CHECK_MSG(t < 25.0f, "took %.1f seconds", t);//mất %.1f giây
-    CHECK_MSG(wallTicks == 0, "%d instances of soldiers pressing against the wall", wallTicks);//%d lần có lính đè lên tường
+    CHECK_MSG(t < 25.0f, "took %.1f seconds", t); // CHECK_MSG(t < 25.0f, "mất %.1f giây", t);
+    CHECK_MSG(wallTicks == 0, "%d instances of a unit overlapping a wall", wallTicks); // CHECK_MSG(wallTicks == 0, "%d lần có lính đè lên tường", wallTicks);
     int arrived = 0;
     for (const auto& u : g.units) if (u.x > 19.0f * 64.0f && std::hypot(u.x - 21.5f * 64.0f, u.y - 7.0f * 64.0f) < 4.0f * 64.0f) ++arrived;
-    CHECK_MSG(arrived == 8, "%d/8 soldiers have arrived", arrived);//%d/8 lính tới nơi
-    CHECK(MinPairDistance(g) > kSquareSize * 0.8f); // cuối cùng không còn chồng nhau đáng kể
+    CHECK_MSG(arrived == 8, "%d/8 units arrived", arrived); // CHECK_MSG(arrived == 8, "%d/8 lính tới nơi", arrived);
+    CHECK(MinPairDistance(g) > kSquareSize * 0.8f); // no significant overlap remains at the end // CHECK(MinPairDistance(g) > kSquareSize * 0.8f); // cuối cùng không còn chồng nhau đáng kể
     CHECK(g.pathQueue.empty());
 }
 
-static void TestOpposingGroups(float* outMinDist = nullptr, std::vector<Waypoint>* outFinal = nullptr) {
-    if (!outFinal) Section("Simulation: two trains moving in opposite directions squeeze past each other");//Mô phỏng: hai đoàn ngược chiều lách qua nhau
+static void SimulateOpposingGroups(float* outMinDist = nullptr, std::vector<Waypoint>* outFinal = nullptr) {
+    if (!outFinal) Section("Mô phỏng: hai đoàn ngược chiều lách qua nhau");
     GameState g = MakeGame(MakeMap(BlankRows(14, 34)));
     for (int i = 0; i < 10; ++i) { Unit& u = Add(g, Team::Player, Center(2 + i, 2)); u.selected = true; }
     std::vector<EntityId> left;
@@ -561,21 +560,44 @@ static void TestOpposingGroups(float* outMinDist = nullptr, std::vector<Waypoint
     const float t = RunUntilIdle(g, 40.0f, [&] { minDist = std::min(minDist, MinPairDistance(g)); });
     if (outMinDist) *outMinDist = minDist;
     if (outFinal) { for (const auto& u : g.units) outFinal->push_back({ u.x, u.y }); return; }
-    CHECK_MSG(t < 20.0f, "took %.1f seconds", t); //mất % .1f giây
+    CHECK_MSG(t < 20.0f, "mất %.1f giây", t);
     int stillMoving = 0, leftArrived = 0, rightArrived = 0;
     for (const auto& u : g.units) if (Moving(u)) ++stillMoving;
     for (EntityId id : left) if (g.FindUnit(id)->x > 20.0f * 64.0f) ++leftArrived;
     for (EntityId id : right) if (g.FindUnit(id)->x < 14.0f * 64.0f) ++rightArrived;
-    CHECK_MSG(stillMoving == 0, "%d soldiers have not yet stopped", stillMoving);//%d lính chưa dừng
+    CHECK_MSG(stillMoving == 0, "%d lính chưa dừng", stillMoving);
     CHECK_MSG(leftArrived == 10 && rightArrived == 10, "tới nơi: %d + %d / 20", leftArrived, rightArrived);
     // Bản cũ cho hai lính cùng đi xuyên qua nhau hoàn toàn (khoảng cách ~0). Giờ không được chồng quá nửa hitbox.
-    CHECK_MSG(minDist > kSquareSize * 0.45f, "two elements stacked with a spacing of %.1f px", minDist);//hai lính từng chồng sát tới %.1f px
-    CHECK_MSG(UnitsInsideWalls(g) == 0, "There are soldiers pressing against the wall.");//có lính đè lên tường
-    std::printf("      (closest distance between two units as they pass each other: %.1f px, hitbox %.0f px)\n", minDist, kSquareSize);//(khoảng cách gần nhất giữa hai lính trong lúc đi qua nhau: %.1f px, hitbox %.0f px)
+    CHECK_MSG(minDist > kSquareSize * 0.45f, "hai lính từng chồng sát tới %.1f px", minDist);
+    CHECK_MSG(UnitsInsideWalls(g) == 0, "có lính đè lên tường");
+    std::printf("      (khoảng cách gần nhất giữa hai lính trong lúc đi qua nhau: %.1f px, hitbox %.0f px)\n", minDist, kSquareSize);
+}
+TEST(PathingTest, OpposingGroups) { SimulateOpposingGroups(); }
+TEST(PathingTest, Determinism) {
+    std::vector<Waypoint> a, b;
+    SimulateOpposingGroups(nullptr, &a);
+    SimulateOpposingGroups(nullptr, &b);
+
+    ASSERT_EQ(a.size(), b.size());
+    ASSERT_FALSE(a.empty());
+    for (size_t i = 0; i < a.size(); ++i) {
+        EXPECT_FLOAT_EQ(a[i].x, b[i].x);
+        EXPECT_FLOAT_EQ(a[i].y, b[i].y);
+    }
 }
 
-static void TestChokepoint() {
-    Section("Simulation: two groups moving in opposite directions pass through a single 1-cell-wide gap (without becoming completely jammed)");//Mô phỏng: hai đoàn ngược chiều qua MỘT khe 1 ô (không kẹt cứng)
+TEST(PathingTest, DeterminismGemini) {
+    Section("Determinism: running the same scenario twice produces identical results"); // Section("Xác định: cùng kịch bản chạy hai lần cho đúng cùng kết quả");
+    std::vector<Waypoint> a, b;
+    SimulateOpposingGroups(nullptr, &a);
+    SimulateOpposingGroups(nullptr, &b);
+    bool same = a.size() == b.size() && !a.empty();
+    for (size_t i = 0; same && i < a.size(); ++i) same = (a[i].x == b[i].x && a[i].y == b[i].y);
+    CHECK(same);
+}
+
+TEST(PathingTest, Chokepoint) {
+    Section("Simulation: two opposing groups pass through ONE one-tile gap (no deadlock)"); // Section("Mô phỏng: hai đoàn ngược chiều qua MỘT khe 1 ô (không kẹt cứng)");
     auto rows = BlankRows(13, 30);
     for (int r = 0; r < 13; ++r) { rows[static_cast<size_t>(r)][14] = '#'; rows[static_cast<size_t>(r)][15] = '#'; }
     rows[6][14] = '.'; rows[6][15] = '.';
@@ -595,53 +617,53 @@ static void TestChokepoint() {
     int crossed = 0;
     for (EntityId id : left) if (g.FindUnit(id)->x > 15.5f * 64.0f) ++crossed;
     for (EntityId id : right) if (g.FindUnit(id)->x < 14.0f * 64.0f) ++crossed;
-    CHECK_MSG(wallTicks == 0, "%d instances of soldiers pressing against the wall", wallTicks);//%d lần có lính đè lên tường
-    CHECK_MSG(crossed == 12, "%d/12 soldiers made it through the gap (after %.1f seconds)", crossed, t);//%d/12 lính qua được khe (sau %.1f giây)
-    CHECK_MSG(t < 50.0f, "took %.1f seconds", t);//mất %.1f giây
-    std::printf("      (%d/12 soldiers passed through the gap, taking %.1f seconds)\n", crossed, t);//(%d/12 lính qua khe, mất %.1f giây)
+    CHECK_MSG(wallTicks == 0, "%d instances of a unit overlapping a wall", wallTicks); // CHECK_MSG(wallTicks == 0, "%d lần có lính đè lên tường", wallTicks);
+    CHECK_MSG(crossed == 12, "%d/12 units passed through the gap (after %.1f seconds)", crossed, t); // CHECK_MSG(crossed == 12, "%d/12 lính qua được khe (sau %.1f giây)", crossed, t);
+    CHECK_MSG(t < 50.0f, "took %.1f seconds", t); // CHECK_MSG(t < 50.0f, "mất %.1f giây", t);
+    std::printf("      (%d/12 units passed through the gap in %.1f seconds)\n", crossed, t); // std::printf("      (%d/12 lính qua khe, mất %.1f giây)\n", crossed, t);
 }
 
-static void TestBlockedRepath() {
-    Section("Simulation: recalculate the path if blocked; slide along the wall if it is struck at an angle.");//Mô phỏng: bị chặn thì tính lại đường; chạm tường chéo thì trượt dọc tường
-    // Tường dọc ở cột 9 (hàng 3..13), khe rộng 3 ô ở hàng 0..2.
+TEST(PathingTest, BlockedRepath) {
+    Section("Simulation: recalculate the path when blocked; slide along a wall when colliding diagonally"); // Section("Mô phỏng: bị chặn thì tính lại đường; chạm tường chéo thì trượt dọc tường");
+    // Vertical wall in column 9 (rows 3..13), with a 3-tile-wide gap in rows 0..2. // // Tường dọc ở cột 9 (hàng 3..13), khe rộng 3 ô ở hàng 0..2.
     auto rows = BlankRows(14, 20);
     for (int r = 3; r < 14; ++r) rows[static_cast<size_t>(r)][9] = '#';
     {
-        // (a) Đường cũ đi thẳng xuyên tường (như đường đã lỗi thời): lính áp vào tường, không trượt được (đi vuông góc)
-        //     nên bị chặn hẳn. Sau vài tick phải xin đường mới tới ĐÍCH của lệnh, rồi đi vòng qua khe.
+        // (a) The old path goes straight through the wall (as an outdated path): the unit presses against the wall and cannot slide along it (approaching perpendicularly) // // (a) Đường cũ đi thẳng xuyên tường (như đường đã lỗi thời): lính áp vào tường, không trượt được (đi vuông góc)
+        //     so it becomes completely blocked. After a few ticks, it must request a new path to the order's DESTINATION, then go around through the gap. // //     nên bị chặn hẳn. Sau vài tick phải xin đường mới tới ĐÍCH của lệnh, rồi đi vòng qua khe.
         GameState g = MakeGame(MakeMap(rows));
         const EntityId id = Add(g, Team::Player, Center(8, 7)).id;
         g.FindUnit(id)->OrderMove({ Center(8, 10), Center(8, 15) });
         const std::uint32_t ticketBefore = g.FindUnit(id)->pathTicket;
-        Run(g, 24); // ~0,8 giây: đi ~8 tick tới tường rồi bị chặn 4 tick -> xin đường. Chờ bộ phát hiện kẹt thì phải tới 2 giây.
-        CHECK_MSG(g.FindUnit(id)->pathTicket != ticketBefore, "Soldiers were blocked by a wall, yet they did not seek a new route.");//lính bị tường chặn nhưng không xin đường mới
+        ::Run(g, 24); // ~0.8 seconds: move ~8 ticks to the wall, then remain blocked for 4 ticks -> request a new path. Waiting for the stuck detector would take 2 seconds. // ::Run(g, 24); // ~0,8 giây: đi ~8 tick tới tường rồi bị chặn 4 tick -> xin đường. Chờ bộ phát hiện kẹt thì phải tới 2 giây.
+        CHECK_MSG(g.FindUnit(id)->pathTicket != ticketBefore, "unit was blocked by a wall but did not request a new path"); // CHECK_MSG(g.FindUnit(id)->pathTicket != ticketBefore, "lính bị tường chặn nhưng không xin đường mới");
         int wallTicks = 0;
         const float t = RunUntilIdle(g, 30.0f, [&] { wallTicks += UnitsInsideWalls(g); });
         const Unit* p = g.FindUnit(id);
-        CHECK_MSG(wallTicks == 0, "%d times pressed against the wall", wallTicks);//%d lần đè lên tường
-        CHECK_MSG(std::hypot(p->x - Center(8, 15).x, p->y - Center(8, 15).y) < 80.0f, "The soldier stops at (%.0f, %.0f) after %.1f seconds.", p->x, p->y, t);//lính dừng ở (%.0f, %.0f) sau %.1f giây
-        CHECK_MSG(t < 15.0f, "took %.1f seconds", t);//mất %.1f giây
+        CHECK_MSG(wallTicks == 0, "%d wall-overlap instances", wallTicks); // CHECK_MSG(wallTicks == 0, "%d lần đè lên tường", wallTicks);
+        CHECK_MSG(std::hypot(p->x - Center(8, 15).x, p->y - Center(8, 15).y) < 80.0f, "unit stopped at (%.0f, %.0f) after %.1f seconds", p->x, p->y, t); // CHECK_MSG(std::hypot(p->x - Center(8, 15).x, p->y - Center(8, 15).y) < 80.0f, "lính dừng ở (%.0f, %.0f) sau %.1f giây", p->x, p->y, t);
+        CHECK_MSG(t < 15.0f, "took %.1f seconds", t); // CHECK_MSG(t < 15.0f, "mất %.1f giây", t);
     }
     {
-        // (b) Bị xô ra sau tường, mốc kế tiếp nằm bên kia: đường thẳng tới đó cắt tường nhưng lính trượt dọc tường
-        //     lên khe được, nên không cần tính lại đường vẫn tới nơi và không bao giờ đè lên tường.
+        // (b) Pushed behind the wall, with the next waypoint on the other side: the direct line crosses the wall, but the unit can slide along the wall // // (b) Bị xô ra sau tường, mốc kế tiếp nằm bên kia: đường thẳng tới đó cắt tường nhưng lính trượt dọc tường
+        //     to reach the gap, so it can arrive without recalculating the path and never overlaps the wall. // //     lên khe được, nên không cần tính lại đường vẫn tới nơi và không bao giờ đè lên tường.
         GameState g = MakeGame(MakeMap(rows));
         const EntityId id = Add(g, Team::Player, Center(2, 7)).id;
         OrderMoveTo(g, *g.FindUnit(id), Center(6, 13).x, Center(6, 13).y);
-        Run(g, 6);
+        ::Run(g, 6);
         Unit* p = g.FindUnit(id);
         p->x = Center(9, 8).x; p->y = Center(9, 8).y; p->SnapPrevToCurrent();
-        CHECK_MSG(!p->path.empty() && !DenseSafe(g.map, { p->x, p->y }, p->path.front()), "Incorrect test layout: the next waypoint is not positioned behind the wall.");//bố cục test sai: mốc kế tiếp không nằm sau tường
+        CHECK_MSG(!p->path.empty() && !DenseSafe(g.map, { p->x, p->y }, p->path.front()), "invalid test setup: the next waypoint is not behind the wall"); // CHECK_MSG(!p->path.empty() && !DenseSafe(g.map, { p->x, p->y }, p->path.front()), "bố cục test sai: mốc kế tiếp không nằm sau tường");
         int wallTicks = 0;
         const float t = RunUntilIdle(g, 30.0f, [&] { wallTicks += UnitsInsideWalls(g); });
         p = g.FindUnit(id);
-        CHECK_MSG(wallTicks == 0, "%d times pressed against the wall", wallTicks);//%d lần đè lên tường
-        CHECK_MSG(std::hypot(p->x - Center(6, 13).x, p->y - Center(6, 13).y) < 80.0f, "The soldier stops at (%.0f, %.0f) after %.1f seconds.", p->x, p->y, t);//lính dừng ở (%.0f, %.0f) sau %.1f giây
+        CHECK_MSG(wallTicks == 0, "%d wall-overlap instances", wallTicks); // CHECK_MSG(wallTicks == 0, "%d lần đè lên tường", wallTicks);
+        CHECK_MSG(std::hypot(p->x - Center(6, 13).x, p->y - Center(6, 13).y) < 80.0f, "unit stopped at (%.0f, %.0f) after %.1f seconds", p->x, p->y, t); // CHECK_MSG(std::hypot(p->x - Center(6, 13).x, p->y - Center(6, 13).y) < 80.0f, "lính dừng ở (%.0f, %.0f) sau %.1f giây", p->x, p->y, t);
     }
 }
 
-static void TestUnreachableGoalSimulation() {
-    Section("Simulation: command to move to an unreachable location -> approach as closely as possible, then stop");//Mô phỏng: lệnh đi tới nơi không với tới -> đến sát nhất rồi dừng
+TEST(PathingTest, UnreachableGoalSimulation) {
+    Section("Simulation: move order to an unreachable location -> approach as closely as possible, then stop"); // Section("Mô phỏng: lệnh đi tới nơi không với tới -> đến sát nhất rồi dừng");
     const std::vector<std::string> rows = {
         "..............",
         "..............",
@@ -654,17 +676,17 @@ static void TestUnreachableGoalSimulation() {
     GameState g = MakeGame(MakeMap(rows));
     Unit& u = Add(g, Team::Player, Center(0, 0));
     u.selected = true;
-    IssueFormationMoveOrder(g, Center(3, 5).x, Center(3, 5).y); // giữa vùng nước vây quanh
+    IssueFormationMoveOrder(g, Center(3, 5).x, Center(3, 5).y); // in the middle of the surrounding water // IssueFormationMoveOrder(g, Center(3, 5).x, Center(3, 5).y); // giữa vùng nước vây quanh
     const float t = RunUntilIdle(g, 20.0f);
-    CHECK_MSG(t < 15.0f, "The soldiers are still running after %.1f seconds", t);//lính vẫn đang chạy sau %.1f giây
+    CHECK_MSG(t < 15.0f, "unit is still moving after %.1f seconds", t); // CHECK_MSG(t < 15.0f, "lính vẫn đang chạy sau %.1f giây", t);
     CHECK(!g.units[0].hasMoveGoal && g.units[0].path.empty());
     const float d = std::hypot(g.units[0].x - Center(3, 5).x, g.units[0].y - Center(3, 5).y);
-    CHECK_MSG(d < 3.5f * 64.0f, "stop %.0f px from the destination", d);//dừng cách đích %.0f px
-    CHECK(g.units[0].y > 1.0f * 64.0f);  // đã đi chứ không đứng yên ở chỗ cũ
+    CHECK_MSG(d < 3.5f * 64.0f, "stopped %.0f px from the destination", d); // CHECK_MSG(d < 3.5f * 64.0f, "dừng cách đích %.0f px", d);
+    CHECK(g.units[0].y > 1.0f * 64.0f);  // the unit moved instead of staying at its starting position // CHECK(g.units[0].y > 1.0f * 64.0f);  // đã đi chứ không đứng yên ở chỗ cũ
 }
 
-static void TestQueueBudget() {
-    Section("Pathfinding queue: budget-constrained service, no requests are lost, older requests are replaced");//Hàng đợi tìm đường: phục vụ có ngân sách, không mất yêu cầu, yêu cầu cũ bị thay thế
+TEST(PathingTest, QueueBudget) {
+    Section("Pathfinding queue: budgeted processing, no lost requests, obsolete requests are replaced"); // Section("Hàng đợi tìm đường: phục vụ có ngân sách, không mất yêu cầu, yêu cầu cũ bị thay thế");
     Rng rng(5);
     auto rows = BlankRows(110, 110);
     for (auto& line : rows) for (auto& ch : line) if (rng.Int(0, 99) < 22) ch = '#';
@@ -674,7 +696,7 @@ static void TestQueueBudget() {
         int r, c; do { r = rng.Int(0, 109); c = rng.Int(0, 109); } while (!Walkable(g.map, r, c));
         ids.push_back(Add(g, Team::Player, Center(r, c)).id);
     }
-    // Mỗi lính xin đường tới một ô xa; lính đầu tiên đổi ý ngay (yêu cầu đầu thành lỗi thời).
+    // Each unit requests a path to a distant tile; the first unit immediately changes its mind (making the first request obsolete). // // Mỗi lính xin đường tới một ô xa; lính đầu tiên đổi ý ngay (yêu cầu đầu thành lỗi thời).
     for (EntityId id : ids) {
         int r, c; do { r = rng.Int(0, 109); c = rng.Int(0, 109); } while (!Walkable(g.map, r, c));
         OrderMoveTo(g, *g.FindUnit(id), Center(r, c).x, Center(r, c).y);
@@ -685,42 +707,42 @@ static void TestQueueBudget() {
     int ticks = 0, maxServed = 0, prevWith = 0;
     while (!g.pathQueue.empty() && ticks < 200) {
         StepSimulation(g, kTickDt);
-        // Yêu cầu lỗi thời được bỏ qua "miễn phí" nên số yêu cầu rời hàng đợi mỗi tick có thể lớn hơn trần;
-        // ta kiểm trần qua số lính vừa nhận được đường trong tick đó.
+        // Obsolete requests are skipped "for free", so the number of requests removed from the queue per tick may exceed the limit; // // Yêu cầu lỗi thời được bỏ qua "miễn phí" nên số yêu cầu rời hàng đợi mỗi tick có thể lớn hơn trần;
+        // we check the limit by counting the units that received paths during that tick. // // ta kiểm trần qua số lính vừa nhận được đường trong tick đó.
         int withPath = 0;
         for (const auto& u : g.units) if (!u.path.empty()) ++withPath;
         maxServed = std::max(maxServed, withPath - prevWith);
         prevWith = withPath;
         ++ticks;
     }
-    CHECK_MSG(g.pathQueue.empty(), "queue has %zu requests remaining after %d ticks", g.pathQueue.size(), ticks);//hàng đợi còn %zu yêu cầu sau %d tick
-    CHECK_MSG(ticks > 1, "The 150 requests need to be spread across multiple ticks, but only %d were used.", ticks);//150 yêu cầu phải được dàn ra nhiều tick, nhưng chỉ mất %d
-    CHECK_MSG(ticks <= 40, "service too slow: %d ticks", ticks);//phục vụ quá chậm: %d tick
-    CHECK_MSG(maxServed <= kMaxPathRequestsPerTick, "một tick phục vụ %d yêu cầu (tối đa %d)", maxServed, kMaxPathRequestsPerTick);
+    CHECK_MSG(g.pathQueue.empty(), "queue still contains %zu requests after %d ticks", g.pathQueue.size(), ticks); // CHECK_MSG(g.pathQueue.empty(), "hàng đợi còn %zu yêu cầu sau %d tick", g.pathQueue.size(), ticks);
+    CHECK_MSG(ticks > 1, "150 requests should be spread across multiple ticks, but took only %d", ticks); // CHECK_MSG(ticks > 1, "150 yêu cầu phải được dàn ra nhiều tick, nhưng chỉ mất %d", ticks);
+    CHECK_MSG(ticks <= 40, "processing is too slow: %d ticks", ticks); // CHECK_MSG(ticks <= 40, "phục vụ quá chậm: %d tick", ticks);
+    CHECK_MSG(maxServed <= kMaxPathRequestsPerTick, "one tick processed %d requests (maximum %d)", maxServed, kMaxPathRequestsPerTick); // CHECK_MSG(maxServed <= kMaxPathRequestsPerTick, "một tick phục vụ %d yêu cầu (tối đa %d)", maxServed, kMaxPathRequestsPerTick);
     int noPath = 0;
-    for (const auto& u : g.units) if (u.pathPending) ++noPath; // không ai bị bỏ quên trong trạng thái "đang chờ đường"
-    CHECK_MSG(noPath == 0, "%d soldiers are still waiting for a path", noPath);//%d lính vẫn chờ đường
-    // Lính 0 đã đổi ý: đường của nó phải kết thúc gần (1,1), không phải đích đầu tiên.
+    for (const auto& u : g.units) if (u.pathPending) ++noPath; // no unit is left behind in the "waiting for path" state // for (const auto& u : g.units) if (u.pathPending) ++noPath; // không ai bị bỏ quên trong trạng thái "đang chờ đường"
+    CHECK_MSG(noPath == 0, "%d units are still waiting for paths", noPath); // CHECK_MSG(noPath == 0, "%d lính vẫn chờ đường", noPath);
+    // Unit 0 changed its mind: its path must end near (1,1), not at the original destination. // // Lính 0 đã đổi ý: đường của nó phải kết thúc gần (1,1), không phải đích đầu tiên.
     const Unit* first = g.FindUnit(ids[0]);
     CHECK(first && first->hasMoveGoal && std::abs(first->moveGoal.x - Center(1, 1).x) < 1.0f);
-    std::printf("      (150 requests served in %d ticks, with a maximum of %d requests per tick)\n", ticks, maxServed);//150 yêu cầu được phục vụ trong %d tick, tối đa %d yêu cầu mỗi tick
+    std::printf("      (150 requests processed in %d ticks, maximum %d requests per tick)\n", ticks, maxServed); // std::printf("      (150 yêu cầu được phục vụ trong %d tick, tối đa %d yêu cầu mỗi tick)\n", ticks, maxServed);
 }
 
-static void TestOrderReplacement() {
-    Section("Changing an order: the previous path must not overlap with the new order.");//Đổi lệnh: yêu cầu đường cũ không đè lên lệnh mới
+TEST(PathingTest, OrderReplacement) {
+    Section("Order replacement: an old path request must not override a new order"); // Section("Đổi lệnh: yêu cầu đường cũ không đè lên lệnh mới");
     GameState g = MakeGame(MakeMap(BlankRows(12, 24)));
     Unit& u = Add(g, Team::Player, Center(2, 2));
     const EntityId id = u.id;
     OrderMoveTo(g, u, Center(2, 20).x, Center(2, 20).y);
-    OrderMoveTo(g, *g.FindUnit(id), Center(9, 4).x, Center(9, 4).y); // đổi ý trước khi tick nào chạy
+    OrderMoveTo(g, *g.FindUnit(id), Center(9, 4).x, Center(9, 4).y); // changed its mind before any tick was run // OrderMoveTo(g, *g.FindUnit(id), Center(9, 4).x, Center(9, 4).y); // đổi ý trước khi tick nào chạy
     CHECK(g.pathQueue.size() == 2);
-    Run(g, 1);
+    ::Run(g, 1);
     const Unit* p = g.FindUnit(id);
     CHECK(p->path.size() >= 1);
     CHECK(std::abs(p->path.back().x - Center(9, 4).x) < 1.0f && std::abs(p->path.back().y - Center(9, 4).y) < 1.0f);
     CHECK(g.pathQueue.empty());
 
-    // Lệnh tấn công hủy lệnh đi đang chờ đường.
+    // An attack order cancels a move order that is waiting for a path. // // Lệnh tấn công hủy lệnh đi đang chờ đường.
     Unit& foe = Add(g, Team::Enemy, Center(10, 22));
     foe.hasHome = false;
     const EntityId foeId = foe.id;
@@ -729,21 +751,21 @@ static void TestOrderReplacement() {
     OrderMoveTo(g, v, Center(2, 20).x, Center(2, 20).y);
     g.FindUnit(vid)->OrderAttack(foeId);
     CHECK(!g.FindUnit(vid)->hasMoveGoal);
-    Run(g, 2);
+    ::Run(g, 2);
     const Unit* q = g.FindUnit(vid);
-    // Đang đuổi theo kẻ địch (đường kết thúc gần kẻ địch ở (10,22)), không phải đích cũ (2,20).
+    // Chasing the enemy (the path ends near the enemy at (10,22)), not the old destination (2,20). // // Đang đuổi theo kẻ địch (đường kết thúc gần kẻ địch ở (10,22)), không phải đích cũ (2,20).
     CHECK(q->HasTarget());
     CHECK(q->path.empty() || std::abs(q->path.back().y - Center(10, 22).y) < 70.0f);
 }
 
-static void TestMoveOrderNotHijacked() {
-    Section("The order to proceed must not be interrupted by self-defense forces (even while waiting for the road)");//Lệnh đi không bị tự vệ chen ngang (kể cả lúc còn chờ đường)
+TEST(PathingTest, MoveOrderNotHijacked) {
+    Section("Move orders are not interrupted by self-defense (even while waiting for a path)"); // Section("Lệnh đi không bị tự vệ chen ngang (kể cả lúc còn chờ đường)");
     GameState g = MakeGame(MakeMap(BlankRows(12, 24)));
-    const EntityId id = Add(g, Team::Player, Center(5, 5)).id; // tham chiếu Unit mất hiệu lực ở lần Add kế tiếp: chỉ giữ ID
-    Add(g, Team::Enemy, Center(5, 7));                          // kẻ địch trong tầm phát hiện
+    const EntityId id = Add(g, Team::Player, Center(5, 5)).id; // Unit reference becomes invalid on the next Add call: keep only the ID // const EntityId id = Add(g, Team::Player, Center(5, 5)).id; // tham chiếu Unit mất hiệu lực ở lần Add kế tiếp: chỉ giữ ID
+    Add(g, Team::Enemy, Center(5, 7));                          // enemy within detection range // Add(g, Team::Enemy, Center(5, 7));                          // kẻ địch trong tầm phát hiện
     OrderMoveTo(g, *g.FindUnit(id), Center(5, 1).x, Center(5, 1).y);
     for (int i = 0; i < 3; ++i) {
-        Run(g, 1);
+        ::Run(g, 1);
         CHECK(!g.FindUnit(id)->HasTarget());
     }
     CHECK(g.FindUnit(id)->hasMoveGoal || g.FindUnit(id)->path.empty());
@@ -756,11 +778,11 @@ static bool LoadMapFile(const char* name, TileMap& out) {
     return false;
 }
 
-static void TestMap02() {
-    Section("Maps/Map02.txt: Can be loaded; can traverse shallows/narrow bridges; can be placed onto an island without getting stuck.");//nạp được, đi qua bãi cạn / cầu hẹp, bấm lên đảo không treo
+TEST(PathingTest, Map02) {
+    Section("Maps/Map02.txt: nạp được, đi qua bãi cạn / cầu hẹp, bấm lên đảo không treo");
     GameState g;
     g.unitTypes.LoadBuiltInDefaults();
-    if (!LoadMapFile("Map02.txt", g.map)) { std::printf("      (skip: not found Maps/Map02.txt)\n"); return; }//bỏ qua: không tìm thấy Maps/
+    if (!LoadMapFile("Map02.txt", g.map)) { std::printf("      (bỏ qua: không tìm thấy Maps/Map02.txt)\n"); return; }
     InitializeWorld(g);
     CHECK(g.CountUnits(Team::Player, true) == 6 && g.CountUnits(Team::Enemy, true) == 3);
     // Cả đội đi tới cửa khu địch phía đông: phải qua sông (bãi cạn rộng hoặc cầu hẹp), vòng qua sống đá và bậc thang đá chéo.
@@ -769,25 +791,25 @@ static void TestMap02() {
     IssueFormationMoveOrder(g, doorX, doorY);
     int wallTicks = 0;
     const float t = RunUntilIdle(g, 40.0f, [&] { wallTicks += UnitsInsideWalls(g); });
-    CHECK_MSG(wallTicks == 0, "%d over the wall", wallTicks);//%d lần đè tường
-    CHECK_MSG(t < 30.0f, "took %.1f seconds", t);//mất %.1f giây
+    CHECK_MSG(wallTicks == 0, "%d lần đè tường", wallTicks);
+    CHECK_MSG(t < 30.0f, "took %.1f seconds", t); // CHECK_MSG(t < 30.0f, "mất %.1f giây", t);
     int closeCount = 0;
     for (const auto& u : g.units) if (u.team == Team::Player && std::hypot(u.x - doorX, u.y - doorY) < 4.0f * 64.0f) ++closeCount;
-    CHECK_MSG(closeCount >= 5, "only %d/6 soldiers reached the door", closeCount);//chỉ %d/6 lính tới gần cửa
+    CHECK_MSG(closeCount >= 5, "chỉ %d/6 lính tới gần cửa", closeCount);
     // Bấm lên đảo giữa hồ (tách biệt): đến bờ gần nhất rồi dừng, lệnh kết thúc.
     for (auto& u : g.units) u.selected = (u.team == Team::Player);
     IssueFormationMoveOrder(g, 4.5f * 64.0f, 13.5f * 64.0f);
     const float t2 = RunUntilIdle(g, 40.0f);
-    CHECK_MSG(t2 < 40.0f, "The command to go to the island did not finish after %.1f seconds.", t2);//lệnh lên đảo không kết thúc sau %.1f giây
-    CHECK_MSG(UnitsInsideWalls(g) == 0, "Any soldiers over the wall");//có lính đè lên tường
+    CHECK_MSG(t2 < 40.0f, "lệnh lên đảo không kết thúc sau %.1f giây", t2);
+    CHECK_MSG(UnitsInsideWalls(g) == 0, "a unit is overlapping a wall"); // CHECK_MSG(UnitsInsideWalls(g) == 0, "có lính đè lên tường");
 }
 
-static void TestFightRegression() {
-    Section("Regression: 6 soldiers vs. 3 enemies on Default.txt — still a win.");//Hồi quy: 6 lính đánh 3 địch trên Default.txt vẫn thắng
+TEST(PathingTest, FightRegression) {
+    Section("Hồi quy: 6 lính đánh 3 địch trên Default.txt vẫn thắng");
     GameState g;
     g.unitTypes.LoadBuiltInDefaults();
     // Tìm file map: chạy từ thư mục dự án (đường dẫn tương đối) hoặc từ thư mục build.
-    if (!LoadMapFile("Default.txt", g.map)) { std::printf("      (skipping: Maps/Default.txt not found)\n"); return; }//bỏ qua: không tìm thấy Maps/Default.txt
+    if (!LoadMapFile("Default.txt", g.map)) { std::printf("      (bỏ qua: không tìm thấy Maps/Default.txt)\n"); return; }
     InitializeWorld(g);
     for (auto& u : g.units) if (u.team == Team::Player) u.selected = true;
     const Unit* foe = nullptr;
@@ -797,35 +819,35 @@ static void TestFightRegression() {
     int ticks = 0;
     while (g.result == MatchResult::Playing && ticks < 60 * kTickRate) { StepSimulation(g, kTickDt); ++ticks; }
     const int alive = g.CountUnits(Team::Player, true);
-    CHECK_MSG(g.result == MatchResult::Victory, "result %d after %.1f seconds", static_cast<int>(g.result), static_cast<float>(ticks) * kTickDt);//kết quả %d sau %.1f giây
-    CHECK_MSG(alive >= 4, "only %d/6 soldiers remaining", alive);//chỉ còn %d/6 lính
-    std::printf("      (won after %.1f seconds, with %d/6 minions remaining)\n", static_cast<float>(ticks) * kTickDt, alive);//thắng sau %.1f giây, còn %d/6 lính
+    CHECK_MSG(g.result == MatchResult::Victory, "kết quả %d sau %.1f giây", static_cast<int>(g.result), static_cast<float>(ticks) * kTickDt);
+    CHECK_MSG(alive >= 4, "chỉ còn %d/6 lính", alive);
+    std::printf("      (thắng sau %.1f giây, còn %d/6 lính)\n", static_cast<float>(ticks) * kTickDt, alive);
 }
 
-static void TestEnemyReturnsHome() {
-    Section("AI: If lured too far away, it gives up and heads back to its original position (via a pathfinding queue)");//AI: bị dụ đi xa thì bỏ cuộc rồi quay về chỗ cũ (qua hàng đợi tìm đường)
+TEST(PathingTest, EnemyReturnsHome) {
+    Section("AI: when lured far away, give up and return home (through the pathfinding queue)"); // Section("AI: bị dụ đi xa thì bỏ cuộc rồi quay về chỗ cũ (qua hàng đợi tìm đường)");
     GameState g = MakeGame(MakeMap(BlankRows(12, 40)));
     const Waypoint home = Center(6, 20);
     const EntityId foeId = Add(g, Team::Enemy, home).id;
     g.FindUnit(foeId)->hasHome = true;
     g.FindUnit(foeId)->home = home;
-    const EntityId bait = Add(g, Team::Player, Center(6, 22)).id; // lọt vào tầm phát hiện (192px) của kẻ địch
-    Run(g, 20);
+    const EntityId bait = Add(g, Team::Player, Center(6, 22)).id; // within the enemy's detection range (192px) // const EntityId bait = Add(g, Team::Player, Center(6, 22)).id; // lọt vào tầm phát hiện (192px) của kẻ địch
+    ::Run(g, 20);
     CHECK(g.FindUnit(foeId)->HasTarget());
-    // Mồi chạy thật xa (người chơi ra lệnh đi): kẻ địch đuổi tới ngưỡng bỏ cuộc rồi phải quay về.
+    // The bait moves far away (the player issues a move order): the enemy chases until its give-up threshold, then must return home. // // Mồi chạy thật xa (người chơi ra lệnh đi): kẻ địch đuổi tới ngưỡng bỏ cuộc rồi phải quay về.
     g.FindUnit(bait)->selected = true;
     IssueFormationMoveOrder(g, Center(6, 38).x, Center(6, 38).y);
-    Run(g, 40 * kTickRate);
+    ::Run(g, 40 * kTickRate);
     const Unit* foe = g.FindUnit(foeId);
     CHECK(foe != nullptr);
     if (foe) {
-        CHECK_MSG(std::hypot(foe->x - home.x, foe->y - home.y) < kHomeArriveDist + 10.0f, "enemy is %.0f px away from the previous location", std::hypot(foe->x - home.x, foe->y - home.y));//kẻ địch ở cách chỗ cũ %.0f px
+        CHECK_MSG(std::hypot(foe->x - home.x, foe->y - home.y) < kHomeArriveDist + 10.0f, "enemy is %.0f px from its home position", std::hypot(foe->x - home.x, foe->y - home.y)); // CHECK_MSG(std::hypot(foe->x - home.x, foe->y - home.y) < kHomeArriveDist + 10.0f, "kẻ địch ở cách chỗ cũ %.0f px", std::hypot(foe->x - home.x, foe->y - home.y));
         CHECK(!foe->HasTarget());
     }
 }
 
-static void TestChaseUnreachable() {
-    Section("Pursuing an enemy who is out of reach: get as close as possible, then give up—don’t keep chasing indefinitely.");//Đuổi kẻ địch đứng ở nơi không với tới: tới sát nhất rồi bỏ cuộc, không xin đường mãi
+TEST(PathingTest, ChaseUnreachable) {
+    Section("Chase an enemy in an unreachable location: approach as closely as possible, then give up instead of requesting paths forever"); // Section("Đuổi kẻ địch đứng ở nơi không với tới: tới sát nhất rồi bỏ cuộc, không xin đường mãi");
     const std::vector<std::string> rows = {
         "..............",
         "..............",
@@ -836,7 +858,7 @@ static void TestChaseUnreachable() {
         "..............",
     };
     GameState g = MakeGame(MakeMap(rows));
-    const EntityId foe = Add(g, Team::Enemy, Center(3, 5)).id;       // trên đảo tách biệt
+    const EntityId foe = Add(g, Team::Enemy, Center(3, 5)).id;       // on the isolated island // const EntityId foe = Add(g, Team::Enemy, Center(3, 5)).id;       // trên đảo tách biệt
     g.FindUnit(foe)->hasHome = false;
     const EntityId me = Add(g, Team::Player, Center(0, 0)).id;
     g.FindUnit(me)->selected = true;
@@ -845,22 +867,22 @@ static void TestChaseUnreachable() {
     const std::uint32_t ticket0 = g.FindUnit(me)->pathTicket;
     for (int t = 0; t < 30 * kTickRate; ++t) { StepSimulation(g, kTickDt); maxQueue = std::max(maxQueue, g.pathQueue.size()); }
     const Unit* u = g.FindUnit(me);
-    // Mỗi chu kỳ "chọn mục tiêu -> xin đường -> không có đường" tốn ~3 số hiệu. Không có bộ nhớ "không với tới" thì chu kỳ lặp
-    // mỗi 0,25 giây (~360 số hiệu / 30 giây); có bộ nhớ thì chỉ vài chục.
-    CHECK_MSG(u->pathTicket - ticket0 <= 60, "requested the right of way %u times in 30 seconds", u->pathTicket - ticket0);//đã xin đường %u lần trong 30 giây
+    // Each cycle of "select target -> request path -> no path" costs ~3 ticket numbers. Without memory of "unreachable" targets, the cycle repeats // // Mỗi chu kỳ "chọn mục tiêu -> xin đường -> không có đường" tốn ~3 số hiệu. Không có bộ nhớ "không với tới" thì chu kỳ lặp
+    // every 0.25 seconds (~360 ticket numbers / 30 seconds); with memory, only a few dozen. // // mỗi 0,25 giây (~360 số hiệu / 30 giây); có bộ nhớ thì chỉ vài chục.
+    CHECK_MSG(u->pathTicket - ticket0 <= 60, "requested a path %u times in 30 seconds", u->pathTicket - ticket0); // CHECK_MSG(u->pathTicket - ticket0 <= 60, "đã xin đường %u lần trong 30 giây", u->pathTicket - ticket0);
     CHECK(u != nullptr && u->IsAlive());
     if (u) {
-        CHECK_MSG(!u->HasTarget(), "Still chasing an unattainable goal.");//vẫn đang đuổi theo mục tiêu không với tới
-        CHECK_MSG(u->y > 64.0f, "the soldier did not approach (at (%.0f, %.0f))", u->x, u->y);//lính không hề tiến lại gần (ở (%.0f, %.0f))
+        CHECK_MSG(!u->HasTarget(), "still chasing an unreachable target"); // CHECK_MSG(!u->HasTarget(), "vẫn đang đuổi theo mục tiêu không với tới");
+        CHECK_MSG(u->y > 64.0f, "unit did not move closer (at (%.0f, %.0f))", u->x, u->y); // CHECK_MSG(u->y > 64.0f, "lính không hề tiến lại gần (ở (%.0f, %.0f))", u->x, u->y);
     }
-    CHECK_MSG(maxQueue <= 4, "The queue swelled to %zu", maxQueue);//hàng đợi phình tới %zu
+    CHECK_MSG(maxQueue <= 4, "queue grew to %zu", maxQueue); // CHECK_MSG(maxQueue <= 4, "hàng đợi phình tới %zu", maxQueue);
 }
 
 // Chạy nhiều ván ngẫu nhiên (bản đồ có tường, khe hẹp, vật cản; 1-3 nhóm tới 24 lính; lệnh đi tới điểm bất kỳ). Bất biến:
 // không ai đè lên tường, không có số NaN, mọi lệnh đi kết thúc trong thời gian hợp lý, hàng đợi cạn.
 // (Từng lộ ra lỗi 4 lính cùng nhắm một mốc xoay vòng quanh mốc mãi mãi: các ván 51, 77, 113, 144... hết giờ 90 giây.)
-static void TestRandomStress() {
-    Section("Stress: 150 random games; all invariants remain unchanged.");//150 ván ngẫu nhiên, mọi bất biến đều giữ
+TEST(PathingTest, RandomStress) {
+    Section("Stress: 150 random scenarios; all invariants hold"); // Section("Stress: 150 ván ngẫu nhiên, mọi bất biến đều giữ");
     Rng rng(987654321u);
     int wallViolations = 0, nanCount = 0, timeouts = 0, queueLeft = 0, units = 0;
     float worst = 0.0f;
@@ -909,31 +931,21 @@ static void TestRandomStress() {
             }
         });
         worst = std::max(worst, t);
-        if (t >= 90.0f) { ++timeouts; std::printf("      match %d time's up (map %dx%d)\n", sc, cols, rows); }//ván %d hết giờ (bản đồ %dx%d)
+        if (t >= 90.0f) { ++timeouts; std::printf("      scenario %d timed out (map %dx%d)\n", sc, cols, rows); } // if (t >= 90.0f) { ++timeouts; std::printf("      ván %d hết giờ (bản đồ %dx%d)\n", sc, cols, rows); }
         if (!g.pathQueue.empty()) ++queueLeft;
     }
-    CHECK_MSG(wallViolations == 0, "%d instances of soldiers pressing against the wall", wallViolations);//%d lần có lính đè lên tường
-    CHECK_MSG(nanCount == 0, "%d instances of invalid coordinates", nanCount);//%d lần có toạ độ không hợp lệ
-    CHECK_MSG(timeouts == 0, "%d matches where minions kept running endlessly", timeouts);//%d ván có lính chạy mãi không dừng
-    CHECK_MSG(queueLeft == 0, "%d board(s) still require a path in the queue", queueLeft);//%d ván còn yêu cầu đường trong hàng đợi
-    CHECK_MSG(worst < 40.0f, "the longest round took %.1f seconds", worst);//ván lâu nhất mất %.1f giây
-    std::printf("      (%d games, %d units; longest game %.1f seconds)\n", kScenarios, units, worst);//%d ván, %d lính; ván lâu nhất %.1f giây
+    CHECK_MSG(wallViolations == 0, "%d instances of a unit overlapping a wall", wallViolations); // CHECK_MSG(wallViolations == 0, "%d lần có lính đè lên tường", wallViolations);
+    CHECK_MSG(nanCount == 0, "%d instances of invalid coordinates", nanCount); // CHECK_MSG(nanCount == 0, "%d lần có toạ độ không hợp lệ", nanCount);
+    CHECK_MSG(timeouts == 0, "%d scenarios had units moving indefinitely", timeouts); // CHECK_MSG(timeouts == 0, "%d ván có lính chạy mãi không dừng", timeouts);
+    CHECK_MSG(queueLeft == 0, "%d scenarios still had path requests in the queue", queueLeft); // CHECK_MSG(queueLeft == 0, "%d ván còn yêu cầu đường trong hàng đợi", queueLeft);
+    CHECK_MSG(worst < 40.0f, "slowest scenario took %.1f seconds", worst); // CHECK_MSG(worst < 40.0f, "ván lâu nhất mất %.1f giây", worst);
+    std::printf("      (%d scenarios, %d units; slowest scenario took %.1f seconds)\n", kScenarios, units, worst); // std::printf("      (%d ván, %d lính; ván lâu nhất %.1f giây)\n", kScenarios, units, worst);
 }
 
-static void TestDeterminism() {
-    Section("Verification: running the same scenario twice to ensure it yields the same result");//Xác định: cùng kịch bản chạy hai lần cho đúng cùng kết quả
-    std::vector<Waypoint> a, b;
-    TestOpposingGroups(nullptr, &a);
-    TestOpposingGroups(nullptr, &b);
-    bool same = a.size() == b.size() && !a.empty();
-    for (size_t i = 0; same && i < a.size(); ++i) same = (a[i].x == b[i].x && a[i].y == b[i].y);
-    CHECK(same);
-}
-
-static void TestNoDriftFromPushing() {
-    Section("Collision: pushing stationary minions no longer causes them to gradually drift toward the top-left corner.");//Va chạm: đẩy lính đứng yên không còn làm lệch dần về góc trên-trái
+TEST(PathingTest, NoDriftFromPushing) {
+    Section("Collision: pushing stationary units no longer causes gradual drift toward the top-left corner"); // Section("Va chạm: đẩy lính đứng yên không còn làm lệch dần về góc trên-trái");
     GameState g = MakeGame(MakeMap(BlankRows(10, 10)));
-    // Cụm lính chồng lên nhau quanh giữa bản đồ, đứng yên. Trọng tâm cụm không được trôi về một phía.
+    // A cluster of overlapping stationary units near the map center. The cluster's center of mass must not drift in any direction. // // Cụm lính chồng lên nhau quanh giữa bản đồ, đứng yên. Trọng tâm cụm không được trôi về một phía.
     Rng rng(31);
     float cx = 0, cy = 0;
     for (int i = 0; i < 12; ++i) {
@@ -941,12 +953,12 @@ static void TestNoDriftFromPushing() {
         cx += u.x; cy += u.y;
     }
     cx /= 12; cy /= 12;
-    Run(g, 120);
+    ::Run(g, 120);
     float nx = 0, ny = 0;
     for (const auto& u : g.units) { nx += u.x; ny += u.y; }
     nx /= 12; ny /= 12;
-    CHECK_MSG(std::abs(nx - cx) < 8.0f && std::abs(ny - cy) < 8.0f, "centroid drift (%.1f, %.1f)", nx - cx, ny - cy);//trọng tâm trôi (%.1f, %.1f)
-    CHECK_MSG(MinPairDistance(g) > kSquareSize - 2.0f, "still piled on top of each other: %.1f px", MinPairDistance(g));//vẫn còn chồng nhau:
+    CHECK_MSG(std::abs(nx - cx) < 8.0f && std::abs(ny - cy) < 8.0f, "center of mass drifted by (%.1f, %.1f)", nx - cx, ny - cy); // CHECK_MSG(std::abs(nx - cx) < 8.0f && std::abs(ny - cy) < 8.0f, "trọng tâm trôi (%.1f, %.1f)", nx - cx, ny - cy);
+    CHECK_MSG(MinPairDistance(g) > kSquareSize - 2.0f, "units are still overlapping: %.1f px", MinPairDistance(g)); // CHECK_MSG(MinPairDistance(g) > kSquareSize - 2.0f, "vẫn còn chồng nhau: %.1f px", MinPairDistance(g));
 }
 
 // --- Số liệu hiệu năng (chỉ in khi --bench) --------------------------------
@@ -973,38 +985,19 @@ static void Bench() {
     for (const auto& s : starts) field.BuildPath(m, s.x, s.y, Center(gr, gc), out);
     auto t2 = Clock::now();
     auto us = [](Clock::time_point a, Clock::time_point b) { return std::chrono::duration_cast<std::chrono::microseconds>(b - a).count(); };
-    std::printf("  40 units, 160x160 map (24% obstacles), same objective.:\n");//40 linh, bản đồ 160x160 (24%% vật cản), cũng một đi'ch
-    std::printf("    40 instances of A*      : %7d open cells, %6lld us\n", astarNodes, static_cast<long long>(us(t0, t1)));//40 lần A*      : %7d ô mở
-    std::printf("    FlowField once: %7d open cell, %6lld us (including extracting 40 lines + smoothing)\n", field.ExpandedCount(), static_cast<long long>(us(t1, t2)));//1 lần FlowField: %7d ô mở, %6lld us (gồm trích 40 đường + làm mượt
+    std::printf("  40 units, 160x160 map (24%% obstacles), same objective:\n");//40 lính, bản đồ 160x160 (24%% vật cản), cùng một đích
+    std::printf("    40 times A*      : %7d open cells, %6lld us\n", astarNodes, static_cast<long long>(us(t0, t1)));//40 lần A*      : %7d ô mở
+    std::printf("    1 times FlowField: %7d open cells, %6lld us (includes extracting 40 paths + smoothing)\n", field.ExpandedCount(), static_cast<long long>(us(t1, t2)));//1 lần FlowField: %7d ô mở, %6lld us (gồm trích 40 đường + làm mượt)
 }
 
 int main(int argc, char** argv) {
     std::setvbuf(stdout, nullptr, _IONBF, 0); // không mất log nếu một kiểm tra làm chương trình sập
-    for (int i = 1; i < argc; ++i) if (!std::strcmp(argv[i], "--bench")) g_bench = true;
+    ::testing::InitGoogleTest(&argc, argv);
+    for (int i = 1; i < argc; ++i) {
+        if (!std::strcmp(argv[i], "--bench")) g_bench = true;
+    }
 
-    TestPathContainer();
-    TestAStarMatchesOracle();
-    TestSmoothing();
-    TestClosestReachable();
-    TestSlotAssignment();
-    TestFlowField();
-    TestWallCrossing();
-    TestOpposingGroups();
-    TestChokepoint();
-    TestBlockedRepath();
-    TestUnreachableGoalSimulation();
-    TestQueueBudget();
-    TestOrderReplacement();
-    TestMoveOrderNotHijacked();
-    TestEnemyReturnsHome();
-    TestChaseUnreachable();
-    TestFightRegression();
-    TestMap02();
-    TestRandomStress();
-    TestDeterminism();
-    TestNoDriftFromPushing();
+    const int result = RUN_ALL_TESTS();
     if (g_bench) Bench();
-
-    std::printf("\n%d kiem tra, %d that bai.\n", g_checks, g_failed);
-    return g_failed == 0 ? 0 : 1;
+    return result;
 }

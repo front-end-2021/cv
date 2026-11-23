@@ -56,32 +56,45 @@ if(MSVC)
     target_compile_options(MiniRTS PRIVATE /utf-8 /W4)
 endif()
 
-# Bộ kiểm thử di chuyển & pathfinding (không mở cửa sổ, chỉ chạy mô phỏng). Mặc định TẮT:
+# Bộ kiểm thử di chuyển & pathfinding & AI dùng GoogleTest. Mặc định BẬT:
 #   cmake -S . -B build -DMINIRTS_BUILD_TESTS=ON
 #   cmake --build build --target PathingTests
 #   ctest --test-dir build --output-on-failure      (hoặc chạy trực tiếp PathingTests, thêm --bench để xem số liệu)
-option(MINIRTS_BUILD_TESTS "Build bo kiem thu unit test MiniRTS" OFF)
+option(MINIRTS_BUILD_TESTS "Build bo kiem thu unit test MiniRTS" ON)
 if(MINIRTS_BUILD_TESTS)
-    enable_testing()
-    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/tests/PathingTests.cpp)
-        add_executable(PathingTests tests/PathingTests.cpp ${MINIRTS_CORE_SOURCES})
-        target_include_directories(PathingTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-        target_link_libraries(PathingTests PRIVATE SDL3::SDL3)
-        if(MSVC)
-            target_compile_options(PathingTests PRIVATE /utf-8 /W4)
-        endif()
-        # Chạy trong thư mục build để thấy Maps/ và Data/ đã được sao chép (xem bên dưới).
-        add_test(NAME PathingTests COMMAND PathingTests WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-    endif()
+    include(FetchContent)
+    FetchContent_Declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG        v1.18.0
+        GIT_SHALLOW    TRUE
+    )
+    # Tránh xung đột cờ Runtime Library (/MD vs /MT) trên Windows (MSVC)
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(googletest)
 
-    # Unit test cho game/Ai (FindNearestFoe, AutoAcquireTarget). Chạy: AiTests [chuỗi lọc tên test]
+    enable_testing()
+    include(GoogleTest)
+    
+    # 1. Target AiTests dùng GoogleTest
     add_executable(AiTests tests/AiTests.cpp ${MINIRTS_CORE_SOURCES})
     target_include_directories(AiTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-    target_link_libraries(AiTests PRIVATE SDL3::SDL3)
+    target_link_libraries(AiTests PRIVATE SDL3::SDL3 GTest::gtest_main)
     if(MSVC)
         target_compile_options(AiTests PRIVATE /utf-8 /W4)
     endif()
-    add_test(NAME AiTests COMMAND AiTests WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+    gtest_discover_tests(AiTests WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+
+    # 2. Target PathingTests dùng GoogleTest (tự viết main để giữ cờ --bench)
+    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/tests/PathingTests.cpp)
+        add_executable(PathingTests tests/PathingTests.cpp ${MINIRTS_CORE_SOURCES})
+        target_include_directories(PathingTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+        target_link_libraries(PathingTests PRIVATE SDL3::SDL3 GTest::gtest)
+        if(MSVC)
+            target_compile_options(PathingTests PRIVATE /utf-8 /W4)
+        endif()
+        gtest_discover_tests(PathingTests WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+    endif()
 endif()
 
 # Sao chep thu muc Maps vao thu muc chay cua executable.

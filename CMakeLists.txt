@@ -95,6 +95,17 @@ if(MINIRTS_BUILD_TESTS)
         endif()
         gtest_discover_tests(PathingTests WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
     endif()
+
+    # 3. Target StressTest dùng GoogleTest (tự viết main để giữ cờ --bench)
+    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/tests/StressTest.cpp)
+        add_executable(StressTest tests/StressTest.cpp ${MINIRTS_CORE_SOURCES})
+        target_include_directories(StressTest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+        target_link_libraries(StressTest PRIVATE SDL3::SDL3 GTest::gtest)
+        if(MSVC)
+            target_compile_options(PathingTests PRIVATE /utf-8 /W4)
+        endif()
+        gtest_discover_tests(StressTest WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+    endif()
 endif()
 
 # Sao chep thu muc Maps vao thu muc chay cua executable.

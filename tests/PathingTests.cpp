@@ -1,6 +1,6 @@
 // Kiểm thử bước 3 (di chuyển & pathfinding). Không cần cửa sổ/GPU: chỉ chạy mô phỏng.
 //   cmake -S . -B build -DMINIRTS_BUILD_TESTS=ON && cmake --build build --target PathingTests
-//   ./build/PathingTests            (thêm --bench để in số liệu so sánh hiệu năng)
+//   ./build/Debug/PathingTests            (thêm --bench để in số liệu so sánh hiệu năng)
 // Thoát với mã khác 0 nếu có kiểm tra thất bại.
 #include <gtest/gtest.h>
 #include <algorithm>
@@ -540,7 +540,7 @@ TEST(PathingTest, WallCrossing) {
 }
 
 static void SimulateOpposingGroups(float* outMinDist = nullptr, std::vector<Waypoint>* outFinal = nullptr) {
-    if (!outFinal) Section("Mô phỏng: hai đoàn ngược chiều lách qua nhau");
+    if (!outFinal) Section("Simulation: two trains moving in opposite directions squeeze past each other");//Mô phỏng: hai đoàn ngược chiều lách qua nhau
     GameState g = MakeGame(MakeMap(BlankRows(14, 34)));
     for (int i = 0; i < 10; ++i) { Unit& u = Add(g, Team::Player, Center(2 + i, 2)); u.selected = true; }
     std::vector<EntityId> left;
@@ -560,17 +560,17 @@ static void SimulateOpposingGroups(float* outMinDist = nullptr, std::vector<Wayp
     const float t = RunUntilIdle(g, 40.0f, [&] { minDist = std::min(minDist, MinPairDistance(g)); });
     if (outMinDist) *outMinDist = minDist;
     if (outFinal) { for (const auto& u : g.units) outFinal->push_back({ u.x, u.y }); return; }
-    CHECK_MSG(t < 20.0f, "mất %.1f giây", t);
+    CHECK_MSG(t < 20.0f, "took %.1f seconds", t);//mất %.1f giây
     int stillMoving = 0, leftArrived = 0, rightArrived = 0;
     for (const auto& u : g.units) if (Moving(u)) ++stillMoving;
     for (EntityId id : left) if (g.FindUnit(id)->x > 20.0f * 64.0f) ++leftArrived;
     for (EntityId id : right) if (g.FindUnit(id)->x < 14.0f * 64.0f) ++rightArrived;
-    CHECK_MSG(stillMoving == 0, "%d lính chưa dừng", stillMoving);
+    CHECK_MSG(stillMoving == 0, "%d units haven't stopped yet", stillMoving);// lính chưa dừng
     CHECK_MSG(leftArrived == 10 && rightArrived == 10, "tới nơi: %d + %d / 20", leftArrived, rightArrived);
     // Bản cũ cho hai lính cùng đi xuyên qua nhau hoàn toàn (khoảng cách ~0). Giờ không được chồng quá nửa hitbox.
-    CHECK_MSG(minDist > kSquareSize * 0.45f, "hai lính từng chồng sát tới %.1f px", minDist);
-    CHECK_MSG(UnitsInsideWalls(g) == 0, "có lính đè lên tường");
-    std::printf("      (khoảng cách gần nhất giữa hai lính trong lúc đi qua nhau: %.1f px, hitbox %.0f px)\n", minDist, kSquareSize);
+    CHECK_MSG(minDist > kSquareSize * 0.45f, "2 units positioned right up against each other, with a gap of just %.1f px", minDist);//hai lính từng chồng sát tới
+    CHECK_MSG(UnitsInsideWalls(g) == 0, "any unit over the wall");//có lính đè lên tường
+    std::printf("      (the closest distance between two units as they pass each other: %.1f px, hitbox %.0f px)\n", minDist, kSquareSize);//khoảng cách gần nhất giữa hai lính trong lúc đi qua nhau
 }
 TEST(PathingTest, OpposingGroups) { SimulateOpposingGroups(); }
 TEST(PathingTest, Determinism) {
@@ -779,10 +779,10 @@ static bool LoadMapFile(const char* name, TileMap& out) {
 }
 
 TEST(PathingTest, Map02) {
-    Section("Maps/Map02.txt: nạp được, đi qua bãi cạn / cầu hẹp, bấm lên đảo không treo");
+    Section("Maps/Map02.txt: Can be loaded; can traverse shallows/narrow bridges; can be placed onto an island without getting stuck.");//nạp được, đi qua bãi cạn / cầu hẹp, bấm lên đảo không treo
     GameState g;
     g.unitTypes.LoadBuiltInDefaults();
-    if (!LoadMapFile("Map02.txt", g.map)) { std::printf("      (bỏ qua: không tìm thấy Maps/Map02.txt)\n"); return; }
+    if (!LoadMapFile("Map02.txt", g.map)) { std::printf("      (skip: not found Maps/Map02.txt)\n"); return; }//bỏ qua: không tìm thấy
     InitializeWorld(g);
     CHECK(g.CountUnits(Team::Player, true) == 6 && g.CountUnits(Team::Enemy, true) == 3);
     // Cả đội đi tới cửa khu địch phía đông: phải qua sông (bãi cạn rộng hoặc cầu hẹp), vòng qua sống đá và bậc thang đá chéo.
@@ -791,11 +791,11 @@ TEST(PathingTest, Map02) {
     IssueFormationMoveOrder(g, doorX, doorY);
     int wallTicks = 0;
     const float t = RunUntilIdle(g, 40.0f, [&] { wallTicks += UnitsInsideWalls(g); });
-    CHECK_MSG(wallTicks == 0, "%d lần đè tường", wallTicks);
+    CHECK_MSG(wallTicks == 0, "%d times over the wall", wallTicks);// lần đè tường
     CHECK_MSG(t < 30.0f, "took %.1f seconds", t); // CHECK_MSG(t < 30.0f, "mất %.1f giây", t);
     int closeCount = 0;
     for (const auto& u : g.units) if (u.team == Team::Player && std::hypot(u.x - doorX, u.y - doorY) < 4.0f * 64.0f) ++closeCount;
-    CHECK_MSG(closeCount >= 5, "chỉ %d/6 lính tới gần cửa", closeCount);
+    CHECK_MSG(closeCount >= 5, "%d/6 soldiers reached the door", closeCount);// chỉ %d/6 lính tới gần cửa
     // Bấm lên đảo giữa hồ (tách biệt): đến bờ gần nhất rồi dừng, lệnh kết thúc.
     for (auto& u : g.units) u.selected = (u.team == Team::Player);
     IssueFormationMoveOrder(g, 4.5f * 64.0f, 13.5f * 64.0f);
@@ -805,11 +805,11 @@ TEST(PathingTest, Map02) {
 }
 
 TEST(PathingTest, FightRegression) {
-    Section("Hồi quy: 6 lính đánh 3 địch trên Default.txt vẫn thắng");
+    Section("Regression: 6 soldiers vs. 3 enemies on Default.txt — still a win.");//Hồi quy: 6 lính đánh 3 địch trên Default.txt vẫn thắng
     GameState g;
     g.unitTypes.LoadBuiltInDefaults();
     // Tìm file map: chạy từ thư mục dự án (đường dẫn tương đối) hoặc từ thư mục build.
-    if (!LoadMapFile("Default.txt", g.map)) { std::printf("      (bỏ qua: không tìm thấy Maps/Default.txt)\n"); return; }
+    if (!LoadMapFile("Default.txt", g.map)) { std::printf("      (skip: not found Maps/Default.txt)\n"); return; }//bỏ qua: không tìm thấy
     InitializeWorld(g);
     for (auto& u : g.units) if (u.team == Team::Player) u.selected = true;
     const Unit* foe = nullptr;
@@ -819,9 +819,9 @@ TEST(PathingTest, FightRegression) {
     int ticks = 0;
     while (g.result == MatchResult::Playing && ticks < 60 * kTickRate) { StepSimulation(g, kTickDt); ++ticks; }
     const int alive = g.CountUnits(Team::Player, true);
-    CHECK_MSG(g.result == MatchResult::Victory, "kết quả %d sau %.1f giây", static_cast<int>(g.result), static_cast<float>(ticks) * kTickDt);
-    CHECK_MSG(alive >= 4, "chỉ còn %d/6 lính", alive);
-    std::printf("      (thắng sau %.1f giây, còn %d/6 lính)\n", static_cast<float>(ticks) * kTickDt, alive);
+    CHECK_MSG(g.result == MatchResult::Victory, "result %d after %.1f seconds", static_cast<int>(g.result), static_cast<float>(ticks) * kTickDt);//kết quả %d sau %.1f giây
+    CHECK_MSG(alive >= 4, "have %d/6 soldiers remaining", alive);//chỉ còn %d/6 lính
+    std::printf("      (won after %.1f seconds, with %d/6 minions remaining)\n", static_cast<float>(ticks) * kTickDt, alive);//thắng sau %.1f giây, còn %d/6 lính
 }
 
 TEST(PathingTest, EnemyReturnsHome) {

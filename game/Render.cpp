@@ -140,6 +140,7 @@ namespace {
             debugText += " | Outside map";
         }
         debugText += " | Tick: " + std::to_string(g.tickCount);
+        debugText += " | PathQ: " + std::to_string(g.pathQueue.size());
 
         SDL_SetRenderDrawColor(r, 255, 255, 0, 255);
         SDL_RenderDebugText(r, 10.0f, 10.0f, debugText.c_str());

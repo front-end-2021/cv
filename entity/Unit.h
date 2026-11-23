@@ -1,5 +1,7 @@
 #pragma once
+#include <cstdint>
 #include <vector>
+#include "../Path.h"
 #include "Entity.h"
 #include "Animation.h"
 #include "UnitType.h"
@@ -9,7 +11,28 @@
 // Điểm khác nhau là loại đơn vị (UnitType), màu vẽ và việc ai ra lệnh (người chơi hay AI: xem game/Ai.cpp).
 class Unit : public Entity {
 public:
-	std::vector<Waypoint> path;  // Danh sách các điểm mốc từ thuật toán A*
+	Path path;                   // Các điểm mốc còn phải đi (A* đã làm mượt); lấy mốc ở đầu ra là O(1)
+
+	// ---- Lệnh đi (khác với đuổi theo mục tiêu: xem attackTargetId) ----
+	bool hasMoveGoal = false;    // true từ lúc nhận lệnh đi tới lúc tới nơi / bỏ cuộc / bị đổi lệnh
+	Waypoint moveGoal{ 0.0f, 0.0f }; // đích CUỐI CÙNG của lệnh đi; dùng để tính lại đường khi bị chặn
+
+	// ---- Yêu cầu tìm đường đang chờ (xem game/PathService.h) ----
+	bool pathPending = false;    // đã xếp yêu cầu, chưa có kết quả
+	std::uint32_t pathTicket = 0;// số hiệu yêu cầu còn hiệu lực; kết quả mang số khác là của lệnh cũ và bị bỏ
+
+	// ---- Mục tiêu đã biết là không với tới (xem game/PathService.cpp, game/Ai.cpp) ----
+	EntityId unreachableTargetId = kNoEntity; // bộ tự chọn mục tiêu bỏ qua kẻ này, tránh xin đường vô ích liên tục
+	float unreachableTimer = 0.0f;            // giây còn lại của khoảng "bỏ qua" đó
+
+	// ---- Phát hiện kẹt (xem game/Movement.cpp) ----
+	float stuckTimer = 0.0f;     // thời gian đã trôi trong cửa sổ theo dõi hiện tại
+	float stuckRefX = 0.0f;      // vị trí đầu cửa sổ: so với chỗ đang đứng để biết lính có nhích được không
+	float stuckRefY = 0.0f;
+	int hardStuckWindows = 0;    // số cửa sổ liên tiếp gần như không nhích
+	int poorWindows = 0;         // số cửa sổ liên tiếp tiến độ kém (nhích dưới 30% quãng đường đáng lẽ đi)
+	int unstickCount = 0;        // số lần đã tính lại đường vì kẹt mà vẫn chưa thoát
+	int blockedTicks = 0;        // số tick liên tiếp bị TƯỜNG chặn không bước được
 
 	int typeId = -1;             // chỉ số trong UnitTypeTable (-1 = chưa gán)
 
@@ -38,9 +61,14 @@ public:
 	void ApplyType(const UnitType& type, int typeIndex);
 
 	// Lệnh. Luôn đi qua các hàm này để trạng thái và lệnh không bị lệch nhau.
-	void OrderMove(std::vector<Waypoint> newPath);             // đi tới nơi; hủy lệnh tấn công
+	void OrderMove(std::vector<Waypoint> newPath);             // đi theo đường ĐÃ CÓ; hủy lệnh tấn công
+	void StartMoveOrder(float goalX, float goalY);             // đi tới nơi, đường chưa có: dùng OrderMoveTo (game/PathService.h)
 	void OrderAttack(EntityId target, bool automatic = false); // đuổi theo rồi đánh mục tiêu
-	void ClearTarget();                                        // bỏ lệnh tấn công và dừng lại
+	void ClearTarget();                                        // bỏ lệnh tấn công / lệnh đi và dừng lại
+	// Bỏ yêu cầu tìm đường đang chờ (nếu có): kết quả của nó, khi tới, sẽ bị bỏ qua.
+	void CancelPathRequest() { pathPending = false; ++pathTicket; }
+	// Bắt đầu theo dõi tiến độ đi từ chỗ đang đứng (gọi mỗi khi có đường đi mới).
+	void ResetProgressMonitor() { stuckTimer = 0.0f; stuckRefX = x; stuckRefY = y; hardStuckWindows = 0; poorWindows = 0; blockedTicks = 0; }
 	bool HasTarget() const { return attackTargetId != kNoEntity; }
 
 	bool InAttackRange(const Entity& t) const;

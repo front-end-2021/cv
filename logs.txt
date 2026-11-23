@@ -1,0 +1,66 @@
+game/Ai: Các nhóm test
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│         Nhóm           │Số test │                                                                Nội dung chính                                                           │
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ FindNearestFoe         │ 13     │ Bỏ qua lính cùng phe và lính đã chết; chọn kẻ địch gần nhất; giới hạn bán kính (kẻ đứng đúng trên biên vẫn được tính, bán kính bằng 0); │
+│                        │        │ tham số ignore; hoạt động cho cả hai phe; trường hợp hai kẻ địch cách đều                                                               │
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ Thoát sớm              │ 2      │ Lính hết máu hoặc ở trạng thái Dead thì không làm gì                                                                                    │
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ Mục tiêu không với tới │ 4      │ Bộ đếm giảm dần, hết hạn thì xóa; trong lúc còn nhớ thì bỏ qua mục tiêu đó, hết hạn thì chọn lại được                                   │
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ Mục tiêu hiện có       │ 7      │ Mục tiêu chết hoặc biến mất thì bỏ lệnh; ngưỡng bỏ cuộc khi mục tiêu chạy xa (leash, ngay tại ngưỡng vẫn giữ);                          │
+│                        │        │ lệnh do người chơi ra thì đuổi tới cùng; mục tiêu chết thì chuyển sang kẻ khác ngay trong tick đó                                       │
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ Lính phe ta đang đi    │ 5      │ Đang có lệnh đi hoặc đang theo đường thì không tự chọn mục tiêu, không đánh trả; địch do AI điều khiển thì vẫn chọn;                    │
+│                        │        │ lính phe ta đứng yên thì tự vệ                                                                                                          │
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ Đánh trả               │ 7      │ Đánh trả cả khi kẻ đánh mình ở ngoài tầm phát hiện nhưng còn trong ngưỡng bỏ cuộc; ưu tiên kẻ đánh mình hơn kẻ đứng gần hơn;            │
+│                        │        │ quên mối thù khi kẻ đó quá xa, đã chết, biến mất hoặc nằm trong danh sách không với tới; luồng từ TakeDamage tới đánh trả               │
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ Quét định kỳ           │ 5      │ Bộ đếm scanTimer, đặt lại về kScanInterval, dùng đúng AggroRange của lính, khoảng cách giữa hai lần quét                                │
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+│ AI quay về chỗ cũ      │ 11     │ Gửi đúng PathRequest (đích, mục đích, số hiệu yêu cầu); không về khi cách nhà ≤ kHomeArriveDist, khi không có nhà, khi là lính phe ta,  │
+│                        │        │ khi đang theo đường, khi đang đánh hoặc chưa tới lượt quét; không gửi yêu cầu trùng; bỏ cuộc đuổi xong thì về nhà                       │
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+Các test chỉ dựng GameState trong bộ nhớ, không cần map, không mở cửa sổ và không chạy mô phỏng, nên toàn bộ chạy xong ngay. Tôi dùng macro CHECK tự viết giống phong cách cũ của project, nên không cần tải thêm framework nào.
+
+Cách chạy
+
+cmake -S . -B build -DMINIRTS_BUILD_TESTS=ON
+cmake --build build --target AiTests
+build\AiTests.exe              # chạy tất cả
+build\AiTests.exe Retaliat     # chỉ chạy test có tên chứa chuỗi này
+
+Thư mục build out/build/x64-Debug của Visual Studio giờ đang bật sẵn MINIRTS_BUILD_TESTS=ON.
+
+Cách bật MINIRTS_BUILD_TESTS=ON
+Có 3 cách. Project của bạn mở bằng Visual Studio 2022 (dạng Open Folder, thư mục build là out/build/x64-Debug), nên cách 1 là tiện nhất.
+
+Cách 1: Trong Visual Studio (nên dùng)
+1. Menu Project → CMake Settings for MiniRTS. VS sẽ mở trình chỉnh sửa và tạo file CMakeSettings.json nếu chưa có.
+2. Chọn cấu hình x64-Debug. Ở mục CMake variables and cache, tìm MINIRTS_BUILD_TESTS và tích ô Value.
+   Hoặc ở ô CMake command arguments, gõ:
+-DMINIRTS_BUILD_TESTS=ON
+3. Bấm Ctrl+S. VS sẽ tự cấu hình lại.
+4. Ở ô chọn mục khởi động (Select Startup Item) trên thanh công cụ, chọn AiTests.exe rồi bấm F5 hoặc Ctrl+F5. Bạn cũng có thể vào Test → Test Explorer để chạy qua ctest.
+
+Cách này lưu lựa chọn vào CMakeSettings.json. Khi bạn xóa cache hoặc cấu hình lại, tùy chọn vẫn còn.
+
+Cách 2: Dòng lệnh
+Mở Developer PowerShell for VS 2022 rồi chạy:
+cd F:\Projects\demo-test\testMini
+cmake -S . -B out/build/x64-Debug -DMINIRTS_BUILD_TESTS=ON
+cmake --build out/build/x64-Debug --target AiTests
+.\out\build\x64-Debug\AiTests.exe
+Muốn tắt lại thì cấu hình lại với -DMINIRTS_BUILD_TESTS=OFF.
+
+Cách 3: Sửa mặc định trong CMakeLists.txt
+Nếu muốn lúc nào cũng build test, đổi OFF thành ON ở dòng 63:
+option(MINIRTS_BUILD_TESTS "Build bo kiem thu pathfinding / di chuyen" ON)
+Lưu ý: CMake chỉ dùng giá trị mặc định này khi biến chưa có trong cache. Nếu cache đang lưu OFF thì phải xóa cache (Project → Delete Cache and Reconfigure) mới có tác dụng.
+
+---
+
+Ở bước trước, khi build và chạy test, tôi đã cấu hình out/build/x64-Debug bằng -DMINIRTS_BUILD_TESTS=ON. Vì vậy hiện tại tùy chọn này đã được bật trong cache. Nhưng nếu bạn bấm Delete Cache and Reconfigure thì nó sẽ về lại OFF, nên hãy làm theo cách 1 để giữ cố định.

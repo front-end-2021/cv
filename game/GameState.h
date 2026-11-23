@@ -1,9 +1,11 @@
 #pragma once
 #include <cstdint>
+#include <deque>
 #include <vector>
 #include "camera/camera.h"
 #include "entity/Unit.h"
 #include "entity/UnitType.h"
+#include "game/PathRequest.h"
 #include "TileMap.h"
 
 enum class MatchResult { Playing, Victory, Defeat };
@@ -32,6 +34,9 @@ struct GameState {
     // Con trỏ/tham chiếu Unit chỉ dùng tạm TRONG một hàm: AddUnit và RemoveGoneUnits làm chúng mất hiệu lực.
     std::vector<Unit> units;
     EntityId nextEntityId = 1;
+
+    // Yêu cầu tìm đường đang chờ phục vụ (xem game/PathService.h).
+    std::deque<PathRequest> pathQueue;
 
     MatchResult result = MatchResult::Playing;
     int startCount[static_cast<int>(Team::Count)] = { 0, 0 }; // số quân mỗi phe lúc bắt đầu ván

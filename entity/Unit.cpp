@@ -28,19 +28,38 @@ void Unit::ClearTarget() {
     attackTargetId = kNoEntity;
     autoTarget = false;
     path.clear();
+    hasMoveGoal = false;
+    unstickCount = 0;
+    CancelPathRequest();
 }
 
 void Unit::OrderMove(std::vector<Waypoint> newPath) {
     ClearTarget();
-    path = std::move(newPath);
+    if (!newPath.empty()) {
+        hasMoveGoal = true;
+        moveGoal = newPath.back();
+    }
+    path.assign(std::move(newPath));
+    ResetProgressMonitor();
     // Lệnh đi bỏ ngang đòn đánh đang diễn ra.
+    if (state == UnitState::Attack) EnterState(UnitState::Idle);
+}
+
+void Unit::StartMoveOrder(float goalX, float goalY) {
+    ClearTarget();
+    hasMoveGoal = true;
+    moveGoal = { goalX, goalY };
+    ResetProgressMonitor();
     if (state == UnitState::Attack) EnterState(UnitState::Idle);
 }
 
 void Unit::OrderAttack(EntityId target, bool automatic) {
     attackTargetId = target;
     autoTarget = automatic;
-    path.clear();      // đường đi sẽ được tính khi cần (xem UpdateUnit trong game/Simulation.cpp)
+    path.clear();      // đường đi sẽ được xin khi cần (xem UpdateUnit trong game/Simulation.cpp)
+    hasMoveGoal = false;
+    unstickCount = 0;
+    CancelPathRequest();
     repathTimer = 0.0f;
     // Không cắt ngang đòn đang đánh: nếu đang Attack thì cứ đánh nốt.
 }
@@ -75,6 +94,8 @@ bool Unit::UpdateState(float dt, const Entity* target, bool targetInRange) {
     // 0. Hết máu -> chết. Từ đây không còn lệnh, không còn được chọn, chỉ chạy animation chết.
     if (state != UnitState::Dead && !IsAlive()) {
         path.clear();
+        hasMoveGoal = false;
+        CancelPathRequest();
         attackTargetId = kNoEntity;
         autoTarget = false;
         lastAttackerId = kNoEntity;

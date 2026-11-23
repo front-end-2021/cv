@@ -55,6 +55,7 @@ void InitializeWorld(GameState& g) {
 
     // Dựng lại toàn bộ danh sách. nextEntityId KHÔNG đặt lại: ID cũ không bao giờ trùng ID mới.
     g.units.clear();
+    g.pathQueue.clear();
 
     // Map không có @spawn: dùng số lính mặc định, xếp quanh góc trên-trái.
     std::vector<SpawnPoint> playerSpawns = g.map.spawns;

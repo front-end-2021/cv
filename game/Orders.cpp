@@ -1,8 +1,12 @@
 #include "game/Orders.h"
+#include <algorithm>
 #include <cmath>
+#include <utility>
 #include <vector>
+#include "FlowField.h"
 #include "Pathfinder.h"
 #include "game/Formation.h"
+#include "game/PathService.h"
 
 bool PointHitsEntity(const Entity& e, float wx, float wy) {
     const float reach = e.squareSize / 2.0f + 4.0f;
@@ -20,6 +24,40 @@ Unit* FindEnemyAt(GameState& g, float wx, float wy) {
     return best;
 }
 
+namespace {
+    // Lệnh đi cho cả nhóm đông: MỘT lần tìm đường chung về ô đích (FlowField) rồi mỗi lính lần theo cây tới vị trí
+    // đội hình của mình, thay vì mỗi lính một lần A*. Lính nào không dựng được đường theo cách này (vị trí đội hình
+    // khuất sau tường, không nối được tới đích...) thì xếp hàng xin đường riêng.
+    void IssueGroupMove(GameState& g, const std::vector<Unit*>& units, const std::vector<Waypoint>& slots,
+        const std::vector<int>& slotOf, float targetX, float targetY) {
+        int goalRow = 0, goalCol = 0;
+        FlowField field;
+        bool built = false;
+        if (Pathfinder::SnapToWalkable(g.map, targetX, targetY, goalRow, goalCol)) {
+            std::vector<std::pair<int, int>> starts;
+            starts.reserve(units.size());
+            for (const Unit* u : units) {
+                starts.push_back({ std::clamp(static_cast<int>(std::floor(u->y / g.map.tileSize)), 0, g.map.rows - 1),
+                                   std::clamp(static_cast<int>(std::floor(u->x / g.map.tileSize)), 0, g.map.cols - 1) });
+            }
+            built = field.Build(g.map, goalRow, goalCol, starts);
+        }
+
+        std::vector<Waypoint> path;
+        for (size_t i = 0; i < units.size(); ++i) {
+            Unit& u = *units[i];
+            const Waypoint slot = slots[static_cast<size_t>(slotOf[i])];
+            if (built && field.BuildPath(g.map, u.x, u.y, slot, path)) {
+                u.OrderMove(std::move(path));
+                path.clear();
+            }
+            else {
+                OrderMoveTo(g, u, slot.x, slot.y);
+            }
+        }
+    }
+}
+
 void IssueFormationMoveOrder(GameState& g, float targetWorldX, float targetWorldY) {
     std::vector<Unit*> selectedUnits;
     for (auto& p : g.units) {
@@ -28,16 +66,24 @@ void IssueFormationMoveOrder(GameState& g, float targetWorldX, float targetWorld
     if (selectedUnits.empty()) return;
 
     const float half = kSquareSize / 2.0f;
-    float facingAngleRad = GetRad(selectedUnits[0], targetWorldX, targetWorldY);
-    
     const std::vector<Waypoint> slots = ComputeFormationSlots(
         static_cast<int>(selectedUnits.size()), targetWorldX, targetWorldY, kSquareSize + 6.0f,
-        facingAngleRad, half, half, g.map.WorldW() - half, g.map.WorldH() - half);
-    
+        half, half, g.map.WorldW() - half, g.map.WorldH() - half);
+
+    // Gán slot theo khoảng cách (tổng quãng đường nhỏ nhất) để lính không chạy chéo qua nhau.
+    std::vector<Waypoint> positions;
+    positions.reserve(selectedUnits.size());
+    for (const Unit* u : selectedUnits) positions.push_back({ u->x, u->y });
+    const std::vector<int> slotOf = AssignSlotsByDistance(positions, slots);
+
+    if (static_cast<int>(selectedUnits.size()) >= kGroupSearchMinUnits) {
+        IssueGroupMove(g, selectedUnits, slots, slotOf, targetWorldX, targetWorldY);
+        return;
+    }
+    // Nhóm nhỏ: mỗi lính xin một đường A* riêng (xếp hàng, phục vụ ở đầu tick kế tiếp).
     for (size_t i = 0; i < selectedUnits.size(); ++i) {
-        // Tìm đường A* vòng qua nước tới ô vị trí đội hình
-        selectedUnits[i]->OrderMove(Pathfinder::FindPath(
-            g.map, selectedUnits[i]->x, selectedUnits[i]->y, slots[i].x, slots[i].y));
+        const Waypoint slot = slots[static_cast<size_t>(slotOf[i])];
+        OrderMoveTo(g, *selectedUnits[i], slot.x, slot.y);
     }
 }
 
@@ -45,14 +91,4 @@ void IssueAttackOrder(GameState& g, EntityId victim) {
     for (auto& p : g.units) {
         if (p.selected && p.team == Team::Player && p.IsAlive()) p.OrderAttack(victim);
     }
-}
-float GetRad(Unit* u, float targetX, float targetY) {
-    float dx = targetX - u->x;
-    float dy = targetY - u->y;
-    float facingAngleRad = 0.0f;
-    if (dx != 0.0f || dy != 0.0f) { facingAngleRad = std::atan2(dy, dx); } // Tránh trường hợp click trùng ngay tâm đội hình
-    if (-0.785f <= facingAngleRad && facingAngleRad < 0.785f) { return 0.0f; } // -45deg:45deg Sang phải
-    if (0.785f <= facingAngleRad && facingAngleRad < 2.356f) { return 1.571f; } // 45deg:135deg Xuống dưới
-    if (2.356f <= facingAngleRad && facingAngleRad < 3.927f) { return 3.142f; } // 135deg:225deg Sang trái
-    return -1.571f; // 225deg:360deg Lên trên
 }

@@ -93,7 +93,7 @@ void DrawMenu(SDL_Renderer* r, const MenuState& menu, int windowW, int windowH) 
     SDL_RenderFillRect(r, &panel);
 
     SDL_SetRenderDrawColor(r, 230, 235, 240, 255);
-    SDL_RenderDebugText(r, panel.x + 28.0f, 65.0f, "MINI RTS - SELECT MAP");
+    SDL_RenderDebugText(r, panel.x + 28.0f, 65.0f, "MINI TEST - SELECT MAP");
     SDL_SetRenderDrawColor(r, 175, 190, 200, 255);
     SDL_RenderDebugText(r, panel.x + 28.0f, 105.0f, "Choose a map in the Maps folder:");
 

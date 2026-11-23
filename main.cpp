@@ -60,7 +60,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
     (void)argc;
     (void)argv;
 
-    SDL_SetAppMetadata("Mini RTS", "0.4", "com.example.minirts");
+    SDL_SetAppMetadata("Mini Test", "0.4", "com.example.minirts");
 
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_Log("SDL_Init failed: %s", SDL_GetError());
@@ -70,7 +70,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
     App* app = new App();
     *appstate = app;
 
-    if (!SDL_CreateWindowAndRenderer("Mini RTS - Tilemap & Free Camera",
+    if (!SDL_CreateWindowAndRenderer("Mini Test - Tilemap & Free Camera",
         kWindowW, kWindowH, SDL_WINDOW_RESIZABLE,
         &app->window, &app->renderer)) {
         SDL_Log("Create window/renderer failed: %s", SDL_GetError());

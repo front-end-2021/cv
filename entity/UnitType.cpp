@@ -4,32 +4,12 @@
 #include <fstream>
 #include <istream>
 #include <sstream>
+#include "DataParse.h"
 
 namespace {
-    std::string Trim(const std::string& s) {
-        const auto a = s.find_first_not_of(" \t\r\n");
-        if (a == std::string::npos) return "";
-        const auto b = s.find_last_not_of(" \t\r\n");
-        return s.substr(a, b - a + 1);
-    }
-
-    bool ParseInt(const std::string& text, int& out) {
-        std::istringstream is(text);
-        long long v = 0;
-        std::string rest;
-        if (!(is >> v) || (is >> rest) || v < -2000000000LL || v > 2000000000LL) return false;
-        out = static_cast<int>(v);
-        return true;
-    }
-
-    bool ParseFloat(const std::string& text, float& out) {
-        std::istringstream is(text);
-        float v = 0.0f;
-        std::string rest;
-        if (!(is >> v) || (is >> rest) || !std::isfinite(v)) return false;
-        out = v;
-        return true;
-    }
+    using dataparse::ParseFloat;
+    using dataparse::ParseInt;
+    using dataparse::Trim;
 
     // Gán `value` cho khóa `key` của `t`. Trả về chuỗi lỗi (rỗng nếu thành công).
     std::string SetField(UnitType& t, const std::string& key, const std::string& value) {
@@ -58,6 +38,11 @@ namespace {
         if (key == "speed")    return setFloat(t.moveSpeed, 0.0f, false);
         if (key == "aggro")    return setFloat(t.aggroRange, 0.0f, false);
         if (key == "vision")   return setFloat(t.vision, 0.0f, false);
+        if (key == "cost")       return setInt(t.cost, 0);
+        if (key == "supply")     return setInt(t.supply, 0);
+        if (key == "traintime")  return setFloat(t.trainTime, 0.0f, true);
+        if (key == "buildspeed") return setInt(t.buildSpeed, 0);
+        if (key == "carry")      return setInt(t.carry, 1);
         return "khoa khong ro: '" + key + "'";
     }
 }
@@ -128,6 +113,8 @@ void UnitTypeTable::LoadBuiltInDefaults() {
     types_.clear();
     UnitType soldier;
     soldier.name = "Soldier";
+    soldier.cost = 60;
+    soldier.trainTime = 12.0f;
     types_.push_back(soldier);
 
     UnitType grunt; // trâu hơn nhưng yếu và chậm hơn
@@ -136,7 +123,23 @@ void UnitTypeTable::LoadBuiltInDefaults() {
     grunt.damage = 8;
     grunt.cooldown = 1.2f;
     grunt.moveSpeed = 220.0f;
+    grunt.cost = 50;
+    grunt.trainTime = 12.0f;
     types_.push_back(grunt);
+
+    UnitType worker; // thợ: yếu, không tự đánh ai, đào và xây được
+    worker.name = "Worker";
+    worker.hpMax = 60;
+    worker.armor = 0;
+    worker.damage = 4;
+    worker.cooldown = 1.5f;
+    worker.moveSpeed = 260.0f;
+    worker.aggroRange = 0.0f;
+    worker.cost = 50;
+    worker.trainTime = 8.0f;
+    worker.buildSpeed = 100;
+    worker.carry = 10;
+    types_.push_back(worker);
 }
 
 int UnitTypeTable::IndexOf(const std::string& name) const {

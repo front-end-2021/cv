@@ -1,0 +1,43 @@
+# Bang chi so cac loai cong trinh. Moi loai bat dau bang [Ten] (khong chua khoang trang).
+# Khoa duoc ho tro (khoa nao khong ghi thi lay gia tri mac dinh):
+#   width     so o chiem theo chieu ngang            (1..8)
+#   height    so o chiem theo chieu doc              (1..8)
+#   hp        mau toi da                             (so nguyen > 0)
+#   armor     giap                                   (so nguyen >= 0)
+#   cost      vang tra khi dat mong                  (so nguyen >= 0)
+#   buildtime giay de MOT tho (buildspeed 100) xay xong; nhieu tho thi nhanh hon (so > 0)
+#   supply    so slot quan cong trinh cap them khi xay XONG (so nguyen >= 0)
+#   dropoff   1 = la kho, tho mang tai nguyen ve nop o day
+#   produces  cac loai don vi huan luyen duoc (ten trong Data/units.txt), cach nhau bang dau cach hoac dau phay
+#
+# Trong file map: "@building <Loai> <cot> <hang> [player|enemy]" dat san mot cong trinh da xay xong
+# (cot, hang la o GOC TREN-TRAI cua cong trinh, so nguyen).
+
+[Townhall]
+width = 3
+height = 3
+hp = 800
+armor = 2
+cost = 200
+buildtime = 40
+supply = 10
+dropoff = 1
+produces = Worker
+
+[House]
+width = 2
+height = 2
+hp = 300
+armor = 1
+cost = 80
+buildtime = 20
+supply = 8
+
+[Barracks]
+width = 3
+height = 2
+hp = 500
+armor = 1
+cost = 150
+buildtime = 30
+produces = Soldier

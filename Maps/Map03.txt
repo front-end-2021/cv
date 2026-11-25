@@ -1,0 +1,43 @@
+# Map thu nghiem kinh te & xay dung (buoc 4): can cu co san Townhall + 4 tho, 3 mo vang, song co cau 2 o,
+# khu dich o phia dong chi co linh (phai xay Barracks va huan luyen quan moi qua duoc).
+# Dinh dang giong Default.txt: 0 co, 1 dat, 2 nuoc, 3 da.
+# @gold <so>                    vang ban dau cua phe ta.
+# @mine <cot> <hang> [luong]    mo vang chiem 2x2 o; (cot, hang) la o GOC TREN-TRAI (so nguyen).
+# @building <Loai> <cot> <hang> [player|enemy]   cong trinh xay san (Data/buildings.txt); o goc tren-trai.
+
+@gold 300
+@building Townhall 2 2
+@mine 7 2 1500
+@mine 2 8 1000
+@mine 12 12 800
+@spawn 5.5 5.5 Worker
+@spawn 6.5 5.5 Worker
+@spawn 5.5 6.5 Worker
+@spawn 6.5 6.5 Worker
+@spawn 8.5 6.5 Soldier
+@spawn 9.5 6.5 Soldier
+@spawn 8.5 7.5 Soldier
+@spawn 9.5 7.5 Soldier
+@enemy 26.5 9.5 Grunt
+@enemy 27.5 10.5 Grunt
+@enemy 26.5 11.5 Grunt
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 2 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 2 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 2 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 2 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 1 0 0 0 0 1 0 0 0 0 2 2 0 0 0 0 0 3 3 0 0 0 0 0 0 0 0
+0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 2 2 0 0 0 0 0 3 3 0 0 0 0 0 0 0 0
+0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 2 2 0 0 0 0 0 3 3 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0
+0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 2 0 0 0 0 0 3 3 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 2 0 0 0 0 0 3 3 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 2 0 0 0 0 0 3 3 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 2 0 0 0 0 0 0 0 0 0 0 2 2 2 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 2 0 0 0 0 0 0 0 0 0 0 2 2 2 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0

@@ -28,38 +28,20 @@ Các test chỉ dựng GameState trong bộ nhớ, không cần map, không mở
 
 Cách chạy
 
-cmake -S . -B build -DMINIRTS_BUILD_TESTS=ON
-cmake --build build --target AiTests
-build\AiTests.exe              # chạy tất cả
-build\AiTests.exe Retaliat     # chỉ chạy test có tên chứa chuỗi này
+Setup / init: cmake -S . -B build -DMINIRTS_BUILD_TESTS=ON
 
-Thư mục build out/build/x64-Debug của Visual Studio giờ đang bật sẵn MINIRTS_BUILD_TESTS=ON.
+Build full: cmake --build build --target AiTests EconomyTests PathingTests StressTest
 
-Cách bật MINIRTS_BUILD_TESTS=ON
-Có 3 cách. Project của bạn mở bằng Visual Studio 2022 (dạng Open Folder, thư mục build là out/build/x64-Debug), nên cách 1 là tiện nhất.
+Chạy full: ctest --test-dir build -C Debug --output-on-failure
 
-Cách 1: Trong Visual Studio (nên dùng)
-1. Menu Project → CMake Settings for MiniRTS. VS sẽ mở trình chỉnh sửa và tạo file CMakeSettings.json nếu chưa có.
-2. Chọn cấu hình x64-Debug. Ở mục CMake variables and cache, tìm MINIRTS_BUILD_TESTS và tích ô Value.
-   Hoặc ở ô CMake command arguments, gõ:
--DMINIRTS_BUILD_TESTS=ON
-3. Bấm Ctrl+S. VS sẽ tự cấu hình lại.
-4. Ở ô chọn mục khởi động (Select Startup Item) trên thanh công cụ, chọn AiTests.exe rồi bấm F5 hoặc Ctrl+F5. Bạn cũng có thể vào Test → Test Explorer để chạy qua ctest.
+--- Hết ---
 
-Cách này lưu lựa chọn vào CMakeSettings.json. Khi bạn xóa cache hoặc cấu hình lại, tùy chọn vẫn còn.
+Nếu muốn build file riêng lẻ: cmake --build build --target AiTests
 
-Cách 2: Dòng lệnh
-Mở Developer PowerShell for VS 2022 rồi chạy:
-cd F:\Projects\demo-test\testMini
-cmake -S . -B out/build/x64-Debug -DMINIRTS_BUILD_TESTS=ON
-cmake --build out/build/x64-Debug --target AiTests
-.\out\build\x64-Debug\AiTests.exe
-Muốn tắt lại thì cấu hình lại với -DMINIRTS_BUILD_TESTS=OFF.
+Nếu muốn chạy riêng lẻ: có 2 cách 
+build\Debug\AiTests.exe              # chạy tất cả
+build\Debug\AiTests.exe Retaliat     # chỉ chạy test có tên chứa chuỗi này
 
-Cách 3: Sửa mặc định trong CMakeLists.txt
-Nếu muốn lúc nào cũng build test, đổi OFF thành ON ở dòng 63:
-option(MINIRTS_BUILD_TESTS "Build bo kiem thu pathfinding / di chuyen" ON)
-Lưu ý: CMake chỉ dùng giá trị mặc định này khi biến chưa có trong cache. Nếu cache đang lưu OFF thì phải xóa cache (Project → Delete Cache and Reconfigure) mới có tác dụng.
 
 ---
 

@@ -16,6 +16,13 @@ struct UnitType {
     float moveSpeed = 300.0f;  // pixel/giây
     float aggroRange = 192.0f; // bán kính tự động phát hiện kẻ địch khi đứng yên (pixel)
     float vision = 320.0f;     // tầm nhìn (pixel)
+
+    // ---- Kinh tế (bước 4) ----
+    int   cost = 0;            // vàng phải trả khi đưa vào hàng đợi sản xuất
+    int   supply = 1;          // số slot quân chiếm giữ (xem game/Economy.h)
+    float trainTime = 10.0f;   // giây để công trình huấn luyện xong một đơn vị loại này
+    int   buildSpeed = 0;      // tốc độ làm việc theo %, 100 = bình thường. > 0 nghĩa là đây là THỢ (đào được, xây được); 0 = không làm việc
+    int   carry = 10;          // lượng tài nguyên mang được mỗi chuyến (chỉ thợ dùng)
 };
 
 // Loại đơn vị mặc định khi file map không ghi rõ (@spawn / @enemy không có tên loại).
@@ -29,6 +36,7 @@ inline const char* DefaultTypeName(Team t) {
 //   # ghi chú
 //   [TênLoại]            <- mở một loại mới (không chứa khoảng trắng, không trùng nhau)
 //   hp = 100             <- khóa = giá trị; các khóa: hp armor shield damage cooldown range speed aggro vision
+//                           cost supply traintime buildspeed carry
 //   ...
 // Khóa nào không ghi thì lấy giá trị mặc định trong struct UnitType.
 class UnitTypeTable {

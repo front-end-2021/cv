@@ -43,9 +43,9 @@ public:
 	float Detection = 0.0f;   // Phát hiện tàng hình (pixel)
 	float AggroRange = 192.0f;// Bán kính tự động tìm kẻ địch khi đứng yên (pixel)
 
-	int Cost = 0;             // Chi phí sản xuất
-	int Supply = 1;           // Số lượng slot quân đội mà đơn vị chiếm giữ
-	int BuildSpeed = 0;       // Tốc độ khai thác / Xây dựng
+	int Cost = 0;             // Chi phí (vàng): đơn vị trả khi đưa vào hàng đợi sản xuất, công trình trả khi đặt móng (game/Economy.h)
+	int Supply = 1;           // Số slot quân đội mà đơn vị chiếm giữ; tổng không được vượt tổng slot các công trình cấp (game/Economy.h)
+	int BuildSpeed = 0;       // Tốc độ làm việc theo %, 100 = bình thường: tốc độ đào mỏ và xây công trình của thợ. 0 = không làm việc được
 
 	int HpValue = 100;
 	int HpMax = 100;

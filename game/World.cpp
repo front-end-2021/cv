@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <cmath>
 #include <string>
+#include "game/Construction.h"
+#include "game/Economy.h"
 
 namespace {
     // Điểm p có đứng được không (không đè nước/đá) và không đè lên các điểm trong `taken`.
@@ -56,6 +58,40 @@ void InitializeWorld(GameState& g) {
     // Dựng lại toàn bộ danh sách. nextEntityId KHÔNG đặt lại: ID cũ không bao giờ trùng ID mới.
     g.units.clear();
     g.pathQueue.clear();
+    g.buildings.clear();
+    g.resources.clear();
+    g.map.ClearOccupancy();
+    g.placement = PlacementMode{};
+    g.notice.clear();
+    g.noticeTimer = 0.0f;
+    g.gold[0] = g.gold[1] = 0;
+    if (g.buildingTypes.Empty()) g.buildingTypes.LoadBuiltInDefaults();
+
+    // Công trình và mỏ đi trước để lính được đặt sau tự tránh các ô chúng chiếm.
+    for (const auto& bs : g.map.buildings) {
+        const int typeIndex = g.buildingTypes.IndexOf(bs.type);
+        if (typeIndex < 0) {
+            SDL_Log("Khong co loai cong trinh '%s' trong Data/buildings.txt, bo qua.", bs.type.c_str());
+            continue;
+        }
+        PlaceResult result = PlaceResult::Ok;
+        if (!PlaceBuilding(g, typeIndex, bs.row, bs.col, bs.team, true, &result)) {
+            SDL_Log("@building %s (%d, %d) khong dat duoc (ma loi %d), bo qua.", bs.type.c_str(), bs.col, bs.row, static_cast<int>(result));
+        }
+    }
+    for (const auto& m : g.map.mines) {
+        bool ok = m.row >= 0 && m.col >= 0 && m.row + kMineTiles <= g.map.rows && m.col + kMineTiles <= g.map.cols;
+        for (int r = m.row; ok && r < m.row + kMineTiles; ++r) {
+            for (int c = m.col; ok && c < m.col + kMineTiles; ++c) ok = IsTileBuildable(g, r, c);
+        }
+        if (!ok) {
+            SDL_Log("@mine (%d, %d) khong dat duoc (ngoai map, de len nuoc/da hoac len vat khac), bo qua.", m.col, m.row);
+            continue;
+        }
+        g.AddResource(m.row, m.col, m.amount);
+    }
+    g.Gold(Team::Player) = g.map.startGold;
+    g.economyActive = !g.map.buildings.empty() || !g.map.mines.empty() || g.map.startGold > 0;
 
     // Map không có @spawn: dùng số lính mặc định, xếp quanh góc trên-trái.
     std::vector<SpawnPoint> playerSpawns = g.map.spawns;
@@ -92,9 +128,16 @@ void RemoveGoneUnits(GameState& g) {
         [](const Unit& u) { return u.IsGone(); }), g.units.end());
 }
 
+void RemoveDepletedResources(GameState& g) {
+    // Duyệt ngược để gỡ an toàn trong lúc lặp.
+    for (size_t i = g.resources.size(); i-- > 0;) {
+        if (g.resources[i].Depleted()) g.RemoveResource(g.resources[i].id);
+    }
+}
+
 void UpdateMatchResult(GameState& g) {
     if (g.result != MatchResult::Playing) return;
-    if (g.CountUnits(Team::Player, true) == 0) {
+    if (g.CountUnits(Team::Player, true) == 0 && !HasProductionBuilding(g, Team::Player)) {
         g.result = MatchResult::Defeat;
         SDL_Log("THAT BAI.");
     }

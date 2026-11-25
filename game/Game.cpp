@@ -1,6 +1,7 @@
 #include "game/Game.h"
 #include <algorithm>
 #include <cmath>
+#include "game/Commands.h"
 #include "game/Selection.h"
 #include "game/Simulation.h"
 
@@ -22,4 +23,6 @@ void UpdateGameFrame(GameState& g, const Input& in, float frameDt, int windowW, 
     g.camera.UpdateCamera(in, std::min(frameDt, 0.1f), windowW, windowH, g.map.WorldW(), g.map.WorldH());
     if (in.keys[SDL_SCANCODE_SPACE]) FocusCameraOnSelection(g, windowW, windowH);
     UpdateSelection(g, in.mouseX, in.mouseY);
+    UpdatePlacement(g, in.mouseX, in.mouseY);
+    g.noticeTimer = std::max(0.0f, g.noticeTimer - frameDt);
 }

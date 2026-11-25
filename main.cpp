@@ -8,6 +8,7 @@
 
 #include "Utils.h"
 #include "camera/camera.h"
+#include "game/Commands.h"
 #include "game/Game.h"
 #include "game/GameState.h"
 #include "game/Orders.h"
@@ -56,6 +57,19 @@ static void LoadUnitTypes(App& app) {
     if (app.menu.message.empty()) app.menu.message = "Data/units.txt loi: " + error + " (dung chi so mac dinh)";
 }
 
+// Nạp bảng loại công trình từ Data/buildings.txt; thiếu hoặc lỗi (kể cả nhắc tới loại đơn vị không có) thì dùng bảng dự phòng.
+// Phải gọi SAU LoadUnitTypes vì cần đối chiếu tên loại đơn vị.
+static void LoadBuildingTypes(App& app) {
+    const std::filesystem::path path = std::filesystem::path(Utils::AssetPath("Data")) / "buildings.txt";
+    std::string error;
+    if (app.game.buildingTypes.LoadFromFile(path.string(), &error) &&
+        app.game.buildingTypes.Validate(app.game.unitTypes, &error)) return;
+
+    SDL_Log("Khong doc duoc %s (%s) -> dung bang cong trinh mac dinh.", path.string().c_str(), error.c_str());
+    app.game.buildingTypes.LoadBuiltInDefaults();
+    if (app.menu.message.empty()) app.menu.message = "Data/buildings.txt loi: " + error + " (dung chi so mac dinh)";
+}
+
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
     (void)argc;
     (void)argv;
@@ -85,6 +99,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
 
     RefreshMapList(app->menu);
     LoadUnitTypes(*app);
+    LoadBuildingTypes(*app);
     return SDL_APP_CONTINUE;
 }
 
@@ -95,6 +110,10 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
 
     if (event->type == SDL_EVENT_KEY_DOWN && event->key.key == SDLK_ESCAPE) {
         if (app->screen == AppScreen::Game) {
+            if (app->game.placement.active) { // Esc thoát chế độ đặt nhà trước đã
+                CancelPlacement(app->game);
+                return SDL_APP_CONTINUE;
+            }
             if (SDL_GetWindowMouseGrab(app->window)) { // Nếu chuột đang bị khóa -> thả chuột ra ngoài
                 SDL_SetWindowMouseGrab(app->window, false);
                 EndSelection(app->game);
@@ -135,6 +154,13 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
         InitializeWorld(g); // chơi lại map hiện tại
         return SDL_APP_CONTINUE;
     }
+    if (event->type == SDL_EVENT_KEY_DOWN && !event->key.repeat) {
+        // Kinh tế & xây dựng (xem game/Commands.h).
+        const SDL_Keycode key = event->key.key;
+        if (key == SDLK_B) { HandleBuildKey(g); return SDL_APP_CONTINUE; }
+        if (key == SDLK_DELETE || key == SDLK_BACKSPACE) { HandleCancelKey(g); return SDL_APP_CONTINUE; }
+        if (key >= SDLK_1 && key <= SDLK_9) { HandleNumberKey(g, static_cast<int>(key - SDLK_1) + 1); return SDL_APP_CONTINUE; }
+    }
     if (event->type == SDL_EVENT_KEY_UP && event->key.key == SDLK_BACKSLASH) {
         g.debugMode = !g.debugMode;
         return SDL_APP_CONTINUE;
@@ -145,20 +171,25 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
                 if (!SDL_GetWindowMouseGrab(app->window)) {
                     SDL_SetWindowMouseGrab(app->window, true); // Khóa chuột trở lại khi người chơi bấm vào cửa sổ game
                 }
-                BeginSelection(g, event->button.x, event->button.y);
+                if (g.placement.active) {
+                    UpdatePlacement(g, event->button.x, event->button.y);
+                    ConfirmPlacement(g); // đặt móng tại bóng mờ (không bắt đầu kéo chọn quân)
+                }
+                else {
+                    BeginSelection(g, event->button.x, event->button.y);
+                }
             }
             break;
         case SDL_EVENT_MOUSE_BUTTON_UP:
             if (event->button.button == SDL_BUTTON_LEFT) {
                 EndSelection(g);
             } else if (event->button.button == SDL_BUTTON_RIGHT) {
-                const float clickWorldX = event->button.x + g.camera.x;
-                const float clickWorldY = event->button.y + g.camera.y;
-                if (const Unit* foe = FindEnemyAt(g, clickWorldX, clickWorldY)) {
-                    IssueAttackOrder(g, foe->id);
+                if (g.placement.active) {
+                    CancelPlacement(g);
                 }
                 else {
-                    IssueFormationMoveOrder(g, clickWorldX, clickWorldY);
+                    // Tấn công / đào / xây / nộp hàng / đi / đặt điểm tập kết tùy thứ nằm dưới con trỏ (xem IssueSmartOrder).
+                    IssueSmartOrder(g, event->button.x + g.camera.x, event->button.y + g.camera.y);
                 }
             }
             break;

@@ -13,6 +13,7 @@ SDL_FRect GetNormalizedRect(float x1, float y1, float x2, float y2) {
 
 void DeselectAll(GameState& g) {
     for (auto& u : g.units) u.selected = false;
+    for (auto& b : g.buildings) b.selected = false;
 }
 
 void BeginSelection(GameState& g, float screenX, float screenY) {
@@ -42,25 +43,37 @@ void UpdateSelection(GameState& g, float mouseX, float mouseY) {
 
     // Chỉ chọn được lính phe ta còn sống.
     const float half = kSquareSize / 2.0f;
+    bool anyUnit = false;
     for (auto& u : g.units) {
         SDL_FRect unitRect = { u.x - half, u.y - half, kSquareSize, kSquareSize };
         u.selected = u.team == Team::Player && u.IsAlive() &&
             SDL_HasRectIntersectionFloat(&rect, &unitRect);
+        anyUnit = anyUnit || u.selected;
+    }
+
+    // Công trình phe ta chỉ được chọn khi khung không trúng lính nào (lính được ưu tiên, như các game RTS khác).
+    for (auto& b : g.buildings) {
+        SDL_FRect buildingRect = { b.fp.left, b.fp.top, b.fp.right - b.fp.left, b.fp.bottom - b.fp.top };
+        b.selected = !anyUnit && b.team == Team::Player &&
+            SDL_HasRectIntersectionFloat(&rect, &buildingRect);
     }
 }
 
 void FocusCameraOnSelection(GameState& g, int windowW, int windowH) {
-    if (g.units.empty()) return;
-    const Unit* focus = nullptr;
-    for (const auto& u : g.units) {
-        if (u.selected) { focus = &u; break; }
-    }
-    if (!focus) {
-        for (const auto& u : g.units) {
-            if (u.team == Team::Player && u.IsAlive()) { focus = &u; break; }
+    // Thứ tự ưu tiên: lính đang chọn -> công trình đang chọn -> lính phe ta còn sống -> công trình phe ta -> thực thể bất kỳ.
+    const Entity* focus = nullptr;
+    auto pick = [&](auto& list, auto pred) {
+        for (const auto& e : list) {
+            if (!focus && pred(e)) focus = &e;
         }
-    }
-    if (!focus) focus = &g.units[0];
+    };
+    pick(g.units, [](const Unit& u) { return u.selected; });
+    pick(g.buildings, [](const Building& b) { return b.selected; });
+    pick(g.units, [](const Unit& u) { return u.team == Team::Player && u.IsAlive(); });
+    pick(g.buildings, [](const Building& b) { return b.team == Team::Player; });
+    pick(g.units, [](const Unit&) { return true; });
+    pick(g.buildings, [](const Building&) { return true; });
+    if (!focus) return;
     g.camera.ClampCamera(focus->x - windowW / 2.0f, focus->y - windowH / 2.0f,
         windowW, windowH, g.map.WorldW(), g.map.WorldH());
 }

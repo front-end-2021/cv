@@ -3,6 +3,9 @@
 #include <cmath>
 #include <string>
 #include <vector>
+#include "game/Commands.h"
+#include "game/Construction.h"
+#include "game/Economy.h"
 #include "game/Selection.h"
 
 namespace {
@@ -80,6 +83,59 @@ namespace {
         }
     }
 
+    // Mỏ và công trình (vẽ trước lính: lính không bao giờ đứng lên các ô của chúng).
+    void RenderResources(SDL_Renderer* r, const GameState& g, float camX, float camY) {
+        for (const auto& n : g.resources) n.Render(r, camX, camY, g.debugMode);
+    }
+
+    void RenderBuildings(SDL_Renderer* r, const GameState& g, float camX, float camY) {
+        for (const auto& b : g.buildings) b.Render(r, camX, camY, g.debugMode);
+    }
+
+    // Đường nối từ công trình đang chọn tới điểm tập kết của nó, kèm lá cờ nhỏ.
+    void RenderRallyPoints(SDL_Renderer* r, const GameState& g, float camX, float camY) {
+        for (const auto& b : g.buildings) {
+            if (!b.selected || !b.hasRally) continue;
+            const float fx = b.rally.x - camX;
+            const float fy = b.rally.y - camY;
+            SDL_SetRenderDrawColor(r, 90, 200, 255, 150);
+            SDL_RenderLine(r, b.x - camX, b.y - camY, fx, fy);
+            SDL_FRect flag = { fx - 1.0f, fy - 16.0f, 12.0f, 8.0f };
+            SDL_RenderLine(r, fx, fy, fx, fy - 16.0f);
+            SDL_SetRenderDrawColor(r, 90, 200, 255, 255);
+            SDL_RenderFillRect(r, &flag);
+        }
+    }
+
+    // Bóng mờ công trình khi đang đặt nhà: từng ô xanh nếu xây được, đỏ nếu không; viền đỏ nếu cả vị trí không hợp lệ.
+    void RenderPlacementGhost(SDL_Renderer* r, const GameState& g, float camX, float camY) {
+        const PlacementMode& p = g.placement;
+        if (!p.active || p.buildingType < 0 || p.buildingType >= g.buildingTypes.Count()) return;
+        const BuildingType& type = g.buildingTypes.Get(p.buildingType);
+        const float ts = g.map.tileSize;
+
+        for (int row = p.row; row < p.row + type.height; ++row) {
+            for (int col = p.col; col < p.col + type.width; ++col) {
+                const SDL_FRect cell = { static_cast<float>(col) * ts - camX, static_cast<float>(row) * ts - camY, ts, ts };
+                if (IsTileBuildable(g, row, col)) SDL_SetRenderDrawColor(r, 60, 220, 90, 120);
+                else                              SDL_SetRenderDrawColor(r, 235, 60, 60, 150);
+                SDL_RenderFillRect(r, &cell);
+            }
+        }
+        const SDL_FRect box = { static_cast<float>(p.col) * ts - camX, static_cast<float>(p.row) * ts - camY,
+                                static_cast<float>(type.width) * ts, static_cast<float>(type.height) * ts };
+        const bool ok = (p.status == PlaceResult::Ok);
+        SDL_SetRenderDrawColor(r, ok ? 120 : 255, ok ? 255 : 90, ok ? 140 : 90, 255);
+        SDL_RenderRect(r, &box);
+        SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
+        SDL_RenderDebugText(r, box.x + (box.w - static_cast<float>(type.name.size()) * 8.0f) / 2.0f, box.y + box.h / 2.0f - 4.0f, type.name.c_str());
+        if (!ok) {
+            const char* why = DescribePlaceResult(p.status);
+            SDL_SetRenderDrawColor(r, 255, 120, 120, 255);
+            SDL_RenderDebugText(r, box.x, box.y + box.h + 6.0f, why);
+        }
+    }
+
     void RenderSelectionBox(SDL_Renderer* r, const GameState& g, float camX, float camY) {
         if (!g.selection.active) return;
         // Chuyển từ tọa độ thế giới về tọa độ màn hình
@@ -120,6 +176,89 @@ namespace {
         SDL_RenderDebugText(r, cx - static_cast<float>(hint.size()) * 4.0f, cy + 12.0f, hint.c_str());
     }
 
+    // Khung chữ nền tối ở góc dưới-trái; mỗi dòng một màu.
+    struct HudLine { std::string text; Uint8 r, g, b; };
+    void RenderTextPanel(SDL_Renderer* r, const std::vector<HudLine>& lines, float x, float bottom) {
+        if (lines.empty()) return;
+        float width = 0.0f;
+        for (const auto& l : lines) width = std::max(width, static_cast<float>(l.text.size()) * 8.0f);
+        const float height = static_cast<float>(lines.size()) * 14.0f + 10.0f;
+        SDL_FRect panel = { x, bottom - height, width + 16.0f, height };
+        SDL_SetRenderDrawColor(r, 0, 0, 0, 160);
+        SDL_RenderFillRect(r, &panel);
+        float y = panel.y + 6.0f;
+        for (const auto& l : lines) {
+            SDL_SetRenderDrawColor(r, l.r, l.g, l.b, 255);
+            SDL_RenderDebugText(r, panel.x + 8.0f, y, l.text.c_str());
+            y += 14.0f;
+        }
+    }
+
+    // Vàng, slot quân (trên cùng bên trái) và bảng gợi ý lệnh theo thứ đang chọn (dưới cùng bên trái).
+    void RenderEconomyHud(SDL_Renderer* r, const GameState& g, int windowH) {
+        if (g.economyActive) {
+            const std::string bar = "Gold: " + std::to_string(g.Gold(Team::Player)) +
+                "   Supply: " + std::to_string(SupplyUsed(g, Team::Player)) + "/" + std::to_string(SupplyCap(g, Team::Player));
+            SDL_FRect back = { 6.0f, 6.0f, static_cast<float>(bar.size()) * 8.0f + 12.0f, 20.0f };
+            SDL_SetRenderDrawColor(r, 0, 0, 0, 160);
+            SDL_RenderFillRect(r, &back);
+            SDL_SetRenderDrawColor(r, 255, 225, 90, 255);
+            SDL_RenderDebugText(r, 12.0f, 12.0f, bar.c_str());
+        }
+
+        std::vector<HudLine> lines;
+        auto add = [&](const std::string& text, Uint8 cr = 235, Uint8 cg = 235, Uint8 cb = 235) { lines.push_back({ text, cr, cg, cb }); };
+
+        if (g.placement.active) {
+            add("BUILD MODE   LMB: place   RMB/Esc: cancel", 160, 255, 170);
+            std::string row;
+            for (int i = 0; i < g.buildingTypes.Count() && i < 9; ++i) {
+                const BuildingType& t = g.buildingTypes.Get(i);
+                row += (i == g.placement.buildingType ? "> " : "  ");
+                row += "[" + std::to_string(i + 1) + "] " + t.name + " " + std::to_string(t.cost) + "g  ";
+            }
+            add(row);
+        }
+        else {
+            bool anyWorker = false;
+            for (const auto& u : g.units) {
+                if (u.selected && u.team == Team::Player && u.IsAlive() && u.IsWorker()) { anyWorker = true; break; }
+            }
+            if (anyWorker) add("Worker: B = build   RMB on gold mine = mine   RMB on building site = build");
+
+            for (const auto& b : g.buildings) {
+                if (!b.selected || b.team != Team::Player) continue;
+                if (!b.complete) {
+                    add(b.label + ": under construction " + std::to_string(static_cast<int>(b.progress * 100.0f)) + "%   Del: cancel (75% refund)");
+                    continue;
+                }
+                add(b.label + "  HP " + std::to_string(b.HpValue) + "/" + std::to_string(b.HpMax));
+            }
+            const std::vector<int> options = TrainableUnitTypes(g);
+            if (!options.empty()) {
+                std::string row;
+                for (size_t i = 0; i < options.size() && i < 9; ++i) {
+                    const UnitType& t = g.unitTypes.Get(options[i]);
+                    row += "[" + std::to_string(i + 1) + "] " + t.name + " " + std::to_string(t.cost) + "g  ";
+                }
+                add("Train: " + row);
+                for (const auto& b : g.buildings) {
+                    if (!b.selected || b.team != Team::Player || b.queue.empty()) continue;
+                    std::string q = "Queue (" + b.label + "): ";
+                    for (size_t i = 0; i < b.queue.size(); ++i) {
+                        q += g.unitTypes.Get(b.queue[i].unitType).name;
+                        if (i == 0) q += " " + std::to_string(static_cast<int>(b.queue[i].Ratio() * 100.0f)) + "%";
+                        if (i + 1 < b.queue.size()) q += " | ";
+                    }
+                    add(q, 160, 215, 255);
+                }
+                add("RMB: set rally point   Backspace: cancel last in queue");
+            }
+        }
+        if (g.noticeTimer > 0.0f && !g.notice.empty()) add(g.notice, 255, 170, 90);
+        RenderTextPanel(r, lines, 8.0f, static_cast<float>(windowH) - 8.0f);
+    }
+
     void RenderDebugOverlay(SDL_Renderer* r, const GameState& g) {
         float mouseX = 0.0f, mouseY = 0.0f;
         SDL_GetMouseState(&mouseX, &mouseY);
@@ -143,7 +282,7 @@ namespace {
         debugText += " | PathQ: " + std::to_string(g.pathQueue.size());
 
         SDL_SetRenderDrawColor(r, 255, 255, 0, 255);
-        SDL_RenderDebugText(r, 10.0f, 10.0f, debugText.c_str());
+        SDL_RenderDebugText(r, 10.0f, 32.0f, debugText.c_str()); // dưới thanh vàng/slot quân
     }
 }
 
@@ -156,10 +295,15 @@ void RenderGame(SDL_Renderer* r, const GameState& g, int windowW, int windowH) {
     const float camY = std::floor(g.camera.y);
 
     RenderTiles(r, g, camX, camY, windowW, windowH);
+    RenderResources(r, g, camX, camY);
+    RenderBuildings(r, g, camX, camY);
     RenderPaths(r, g, camX, camY);
     RenderUnits(r, g, camX, camY);
+    RenderRallyPoints(r, g, camX, camY);
+    RenderPlacementGhost(r, g, camX, camY);
     RenderSelectionBox(r, g, camX, camY);
     RenderHud(r, g, windowW, windowH);
+    RenderEconomyHud(r, g, windowH);
     if (g.debugMode) RenderDebugOverlay(r, g);
     SDL_RenderPresent(r);
 }

@@ -22,6 +22,10 @@ void Unit::ApplyType(const UnitType& type, int typeIndex) {
     MoveSpeed = type.moveSpeed;
     AggroRange = type.aggroRange;
     Vision = type.vision;
+    Cost = type.cost;
+    Supply = type.supply;
+    BuildSpeed = type.buildSpeed;
+    carryCapacity = type.carry;
 }
 
 void Unit::ClearTarget() {
@@ -264,13 +268,23 @@ void Unit::Render(SDL_Renderer* r, float camX, float camY, float alpha, bool deb
         }
     }
 
+    // Thợ đang mang tài nguyên: cục vàng nhỏ trên vai.
+    if (carrying > 0) {
+        const SDL_FRect nugget = { body.x + 3.0f, body.y + 3.0f, 9.0f, 9.0f };
+        SDL_SetRenderDrawColor(r, 235, 195, 55, 255);
+        SDL_RenderFillRect(r, &nugget);
+        SDL_SetRenderDrawColor(r, 60, 50, 30, 255);
+        SDL_RenderRect(r, &nugget);
+    }
+
     RenderSelectionOutline(r, baseRect);
     RenderHealthBar(r, baseRect);
 
     if (debug) {
         static const char* const kNames[] = { "Idle", "Walk", "Attack", "Dead" };
-        char label[32];
-        std::snprintf(label, sizeof(label), "%s %d", kNames[static_cast<int>(state)], frame);
+        static const char* const kJobs[] = { "", " G", " B" }; // theo JobKind: None, Gather, Build
+        char label[40];
+        std::snprintf(label, sizeof(label), "%s %d%s", kNames[static_cast<int>(state)], frame, kJobs[static_cast<int>(job.kind)]);
         SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
         SDL_RenderDebugText(r, baseRect.x, baseRect.y - 24.0f, label);
 

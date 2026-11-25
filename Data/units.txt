@@ -9,6 +9,11 @@
 #   speed     toc do di chuyen, pixel/giay
 #   aggro     ban kinh tu dong phat hien ke dich khi dung yen, pixel
 #   vision    tam nhin, pixel (danh cho suong mu chien truong)
+#   cost      vang tra khi dua vao hang doi san xuat   (so nguyen >= 0)
+#   supply    so slot quan chiem giu                    (so nguyen >= 0)
+#   traintime giay de huan luyen xong mot don vi        (so > 0)
+#   buildspeed toc do lam viec theo %, 100 = binh thuong (so nguyen >= 0). > 0 nghia la THO: dao duoc, xay duoc
+#   carry     luong tai nguyen mang moi chuyen          (so nguyen >= 1, chi tho dung)
 #
 # Trong file map: "@spawn <cot> <hang> Soldier" hoac "@enemy <cot> <hang> Grunt".
 # Khong ghi ten loai thi dung Soldier cho phe ta, Grunt cho ke dich.
@@ -21,6 +26,9 @@ cooldown = 1.0
 range = 20
 speed = 300
 aggro = 192
+cost = 60
+supply = 1
+traintime = 12
 
 [Grunt]
 hp = 120
@@ -30,3 +38,21 @@ cooldown = 1.2
 range = 20
 speed = 220
 aggro = 192
+cost = 50
+supply = 1
+traintime = 12
+
+# Tho: yeu, khong tu danh ai (aggro = 0), dao vang va xay cong trinh (buildspeed > 0).
+[Worker]
+hp = 60
+armor = 0
+damage = 4
+cooldown = 1.5
+range = 20
+speed = 260
+aggro = 0
+cost = 50
+supply = 1
+traintime = 8
+buildspeed = 100
+carry = 10

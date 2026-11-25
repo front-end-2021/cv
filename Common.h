@@ -15,6 +15,10 @@ constexpr EntityId kNoEntity = 0;
 
 constexpr float kSquareSize = 40.0f; // kích thước hitbox của một đơn vị (pixel)
 
+// ---- Kinh tế & xây dựng ----
+constexpr int kMineTiles = 2;                // mỏ tài nguyên chiếm kMineTiles x kMineTiles ô
+constexpr int kDefaultMineAmount = 1500;     // lượng tài nguyên của mỏ khi file map không ghi
+
 // ---- Mô phỏng chạy theo nhịp cố định, tách khỏi tốc độ khung hình ----
 constexpr int   kTickRate = 30;                                 // số tick logic mỗi giây
 constexpr float kTickDt = 1.0f / static_cast<float>(kTickRate); // thời gian của một tick (giây)

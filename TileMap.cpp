@@ -4,11 +4,34 @@
 #include <fstream>
 #include <sstream>
 #include <utility>
+#include "DataParse.h"
 
-bool TileMap::IsWalkableTile(int row, int col) const {
+bool TileMap::IsTerrainWalkable(int row, int col) const {
     if (row < 0 || row >= rows || col < 0 || col >= cols) return false; // Ngoài bản đồ
     const Tile t = data[static_cast<size_t>(row) * static_cast<size_t>(cols) + static_cast<size_t>(col)];
     return t != Tile::Water && t != Tile::Rock; // Nước và đá không đi được
+}
+
+bool TileMap::IsOccupied(int row, int col) const {
+    if (occupied.empty() || row < 0 || row >= rows || col < 0 || col >= cols) return false;
+    const size_t idx = static_cast<size_t>(row) * static_cast<size_t>(cols) + static_cast<size_t>(col);
+    return idx < occupied.size() && occupied[idx] != 0;
+}
+
+void TileMap::SetOccupied(int row, int col, bool value) {
+    if (row < 0 || row >= rows || col < 0 || col >= cols) return;
+    if (occupied.size() != data.size()) occupied.assign(data.size(), 0); // cấp phát khi cần dùng lần đầu
+    occupied[static_cast<size_t>(row) * static_cast<size_t>(cols) + static_cast<size_t>(col)] = value ? 1 : 0;
+}
+
+void TileMap::SetFootprintOccupied(int row, int col, int w, int h, bool value) {
+    for (int r = row; r < row + h; ++r) {
+        for (int c = col; c < col + w; ++c) SetOccupied(r, c, value);
+    }
+}
+
+bool TileMap::IsWalkableTile(int row, int col) const {
+    return IsTerrainWalkable(row, col) && !IsOccupied(row, col);
 }
 
 bool TileMap::IsWalkableWorld(float worldX, float worldY) const {
@@ -36,6 +59,9 @@ bool LoadTileMap(const std::string& filePath, TileMap& out) {
     std::vector<Tile> loadedMap;
     std::vector<SpawnPoint> spawnTiles; // toạ độ ô; đổi sang pixel khi đã biết kích thước map
     std::vector<SpawnPoint> enemyTiles;
+    std::vector<MineSpawn> loadedMines;
+    std::vector<BuildingSpawn> loadedBuildings;
+    int loadedGold = 0;
     std::string line;
     int rows = 0, cols = 0;
     const int maxTileCode = static_cast<int>(Tile::Rock);
@@ -44,24 +70,54 @@ bool LoadTileMap(const std::string& filePath, TileMap& out) {
         if (first == std::string::npos || line[first] == '#') continue;
 
         if (line[first] == '@') {
+            // Tách thành các từ: "@tên tham_số...". Tham số nào cũng đọc chặt (dataparse::Parse*).
             std::istringstream directive(line.substr(first + 1));
             std::string name;
-            float a = 0.0f, b = 0.0f;
-            if (!(directive >> name >> a >> b)) {
-                SDL_Log("Dong lenh trong map khong hop le: %s", line.c_str());
+            std::vector<std::string> args;
+            directive >> name;
+            for (std::string token; directive >> token;) args.push_back(token);
+            auto bad = [&](const char* why) {
+                SDL_Log("Dong lenh trong map khong hop le (%s): %s", why, line.c_str());
                 return false;
+            };
+            if (name.empty()) return bad("thieu ten lenh");
+
+            if (name == "spawn" || name == "enemy" || name == "target") {
+                // @spawn / @enemy <cột> <hàng> [LoạiĐơnVị]
+                float a = 0.0f, b = 0.0f;
+                if (args.size() < 2 || !dataparse::ParseFloat(args[0], a) || !dataparse::ParseFloat(args[1], b)) return bad("can <cot> <hang>");
+                if (args.size() > 3) return bad("co tham so thua");
+                const std::string unitType = args.size() == 3 ? args[2] : std::string();
+                (name == "spawn" ? spawnTiles : enemyTiles).push_back({ { a, b }, unitType });
             }
-            std::string unitType, extra;
-            directive >> unitType; // tùy chọn
-            if (directive >> extra) {
-                SDL_Log("Dong lenh trong map co tham so thua: %s", line.c_str());
-                return false;
+            else if (name == "gold") {
+                // @gold <số>: vàng ban đầu
+                int amount = 0;
+                if (args.size() != 1 || !dataparse::ParseInt(args[0], amount) || amount < 0) return bad("can mot so nguyen >= 0");
+                loadedGold = amount;
             }
-            if (name == "spawn") {
-                spawnTiles.push_back({ { a, b }, unitType });
+            else if (name == "mine") {
+                // @mine <cột> <hàng> [lượng]
+                MineSpawn m;
+                if (args.size() < 2 || args.size() > 3 || !dataparse::ParseInt(args[0], m.col) || !dataparse::ParseInt(args[1], m.row)) {
+                    return bad("can <cot> <hang> [luong] la so nguyen");
+                }
+                if (args.size() == 3 && (!dataparse::ParseInt(args[2], m.amount) || m.amount <= 0)) return bad("luong phai la so nguyen > 0");
+                loadedMines.push_back(m);
             }
-            else if (name == "enemy" || name == "target") {
-                enemyTiles.push_back({ { a, b }, unitType });
+            else if (name == "building") {
+                // @building <Loại> <cột> <hàng> [player|enemy]
+                BuildingSpawn bs;
+                if (args.size() < 3 || args.size() > 4 || !dataparse::ParseInt(args[1], bs.col) || !dataparse::ParseInt(args[2], bs.row)) {
+                    return bad("can <Loai> <cot> <hang> [player|enemy], cot/hang la so nguyen");
+                }
+                bs.type = args[0];
+                if (args.size() == 4) {
+                    if (args[3] == "player") bs.team = Team::Player;
+                    else if (args[3] == "enemy") bs.team = Team::Enemy;
+                    else return bad("phe phai la player hoac enemy");
+                }
+                loadedBuildings.push_back(bs);
             }
             else {
                 SDL_Log("Lenh map khong ro: @%s", name.c_str());
@@ -121,5 +177,21 @@ bool LoadTileMap(const std::string& filePath, TileMap& out) {
     out.data = std::move(loadedMap);
     out.spawns = std::move(spawns);
     out.enemySpawns = std::move(enemies);
+
+    // Mỏ và công trình: chỉ cần ô góc trên-trái nằm trong bản đồ ở đây; kích thước và địa hình được kiểm tra
+    // khi dựng ván (game/World.cpp) vì cần bảng loại công trình.
+    auto insideMap = [&](int r, int c) { return r >= 0 && c >= 0 && r < rows && c < cols; };
+    out.mines.clear();
+    for (const auto& m : loadedMines) {
+        if (!insideMap(m.row, m.col)) { SDL_Log("@mine (%d, %d) nam ngoai map, bo qua.", m.col, m.row); continue; }
+        out.mines.push_back(m);
+    }
+    out.buildings.clear();
+    for (const auto& b : loadedBuildings) {
+        if (!insideMap(b.row, b.col)) { SDL_Log("@building %s (%d, %d) nam ngoai map, bo qua.", b.type.c_str(), b.col, b.row); continue; }
+        out.buildings.push_back(b);
+    }
+    out.startGold = loadedGold;
+    out.occupied.clear(); // lớp ô bị chiếm thuộc ván đang chơi, không thuộc file map
     return true;
 }

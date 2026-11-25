@@ -6,6 +6,24 @@
 #include "Animation.h"
 #include "UnitType.h"
 
+// Việc thợ đang làm (xem game/Work.cpp). Lệnh của người chơi (đi, đánh) xóa việc này; lệnh đi do chính việc
+// này phát ra (đi tới mỏ, kho, công trình) thì không.
+enum class JobKind : std::uint8_t {
+    None,    // rảnh
+    Gather,  // đào mỏ rồi mang về kho, lặp mãi tới khi hết mỏ quanh đó
+    Build    // đi tới công trình đang xây dở rồi xây
+};
+
+struct WorkJob {
+    JobKind kind = JobKind::None;
+    EntityId target = kNoEntity;   // Gather: mỏ đang đào; Build: công trình đang xây
+    EntityId depot = kNoEntity;    // Gather: kho đang đi tới để nộp hàng
+    bool returning = false;        // Gather: đang mang hàng về kho (false: đang đi đào / đang đào)
+    bool moveIssued = false;       // đã ra lệnh đi tới chỗ làm việc mà chưa thấy tới nơi
+    int failures = 0;              // số lần đi mà không tới được chỗ làm việc; đủ kJobMaxFailures thì bỏ việc
+    float retryTimer = 0.0f;       // giây phải chờ trước khi thử đi lại
+};
+
 // Một Unit dùng cho CẢ HAI PHE. Kẻ địch chính là Unit có team = Team::Enemy:
 // dùng chung state machine, lệnh, di chuyển, đuổi theo, đánh, animation và cách vẽ.
 // Điểm khác nhau là loại đơn vị (UnitType), màu vẽ và việc ai ra lệnh (người chơi hay AI: xem game/Ai.cpp).
@@ -35,6 +53,12 @@ public:
 	int blockedTicks = 0;        // số tick liên tiếp bị TƯỜNG chặn không bước được
 
 	int typeId = -1;             // chỉ số trong UnitTypeTable (-1 = chưa gán)
+
+	// ---- Thợ (xem game/Work.h). Chỉ đơn vị có BuildSpeed > 0 mới làm việc được ----
+	WorkJob job;                 // việc đang làm
+	int carrying = 0;            // tài nguyên đang mang
+	int carryCapacity = 10;      // mang tối đa bao nhiêu mỗi chuyến
+	float gatherAccum = 0.0f;    // phần lẻ tài nguyên đã đào được nhưng chưa đủ 1 đơn vị
 
 	// ---- State machine Idle / Walk / Attack / Dead ----
 	UnitState state = UnitState::Idle;
@@ -70,6 +94,8 @@ public:
 	// Bắt đầu theo dõi tiến độ đi từ chỗ đang đứng (gọi mỗi khi có đường đi mới).
 	void ResetProgressMonitor() { stuckTimer = 0.0f; stuckRefX = x; stuckRefY = y; hardStuckWindows = 0; poorWindows = 0; blockedTicks = 0; }
 	bool HasTarget() const { return attackTargetId != kNoEntity; }
+	bool IsWorker() const { return BuildSpeed > 0; }
+	void CancelJob() { job = WorkJob{}; gatherAccum = 0.0f; }
 
 	bool InAttackRange(const Entity& t) const;
 	// Đã chết và animation chết đã xong: không cần vẽ / xét nữa.

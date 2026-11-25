@@ -37,8 +37,9 @@ void AutoAcquireTarget(GameState& g, Unit& u, float dt) {
     }
     if (u.HasTarget()) return; // đã có việc để làm
 
-    // 2. Lính phe ta đang theo lệnh đi (kể cả lúc còn chờ đường) thì không tự ý đổi ý. AI địch thì không có lệnh nào khác.
-    if (!aiControlled && (u.hasMoveGoal || !u.path.empty())) return;
+    // 2. Lính phe ta đang theo lệnh đi (kể cả lúc còn chờ đường) hoặc đang làm việc (thợ) thì không tự ý đổi ý.
+    //    AI địch thì không có lệnh nào khác.
+    if (!aiControlled && (u.hasMoveGoal || !u.path.empty() || u.job.kind != JobKind::None)) return;
 
     // 3. Đánh trả kẻ vừa đánh mình, miễn là nó chưa đứng quá xa (nếu không sẽ bị bỏ cuộc ngay ở bước 1).
     if (u.lastAttackerId != kNoEntity) {

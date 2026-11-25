@@ -5,6 +5,8 @@
 #include "game/Ai.h"
 #include "game/Movement.h"
 #include "game/PathService.h"
+#include "game/Production.h"
+#include "game/Work.h"
 #include "game/World.h"
 
 namespace {
@@ -79,9 +81,10 @@ void StepSimulation(GameState& g, float dt) {
     // 0. Phục vụ các yêu cầu tìm đường đã xếp hàng (trong ngân sách của một tick), để lính nhận đường rồi đi luôn tick này.
     ProcessPathRequests(g);
 
-    // 1. Mỗi Unit (cả hai phe): tự chọn mục tiêu -> lệnh/di chuyển/trạng thái (Idle/Walk/Attack/Dead)
+    // 1. Mỗi Unit (cả hai phe): tự chọn mục tiêu -> việc của thợ -> lệnh/di chuyển/trạng thái (Idle/Walk/Attack/Dead)
     for (auto& u : g.units) {
         AutoAcquireTarget(g, u, dt);
+        UpdateWorkerJob(g, u, dt);
         UpdateUnit(g, u, dt);
     }
 
@@ -94,7 +97,11 @@ void StepSimulation(GameState& g, float dt) {
         u.y = std::clamp(u.y, half, g.map.WorldH() - half);
     }
 
-    // 4. Xóa hẳn xác đã tan khỏi danh sách rồi xét thắng/thua
+    // 4. Công trình: hàng đợi sản xuất (có thể thêm lính mới), dọn mỏ đã cạn
+    UpdateProduction(g, dt);
+    RemoveDepletedResources(g);
+
+    // 5. Xóa hẳn xác đã tan khỏi danh sách rồi xét thắng/thua
     RemoveGoneUnits(g);
     UpdateMatchResult(g);
     ++g.tickCount;

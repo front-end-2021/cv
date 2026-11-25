@@ -20,7 +20,7 @@ FetchContent_MakeAvailable(SDL3)
 
 # Mã nguồn dùng chung cho game và bộ kiểm thử (mọi thứ trừ main.cpp và màn menu).
 set(MINIRTS_CORE_SOURCES
-    Common.h Tile.h Path.h PathGrid.h
+    Common.h Tile.h Path.h PathGrid.h DataParse.h
     TileMap.h TileMap.cpp
     Pathfinder.h Pathfinder.cpp
     FlowField.h FlowField.cpp
@@ -29,6 +29,10 @@ set(MINIRTS_CORE_SOURCES
     entity/Team.h entity/Animation.h
     entity/Entity.h entity/Entity.cpp
     entity/UnitType.h entity/UnitType.cpp
+    entity/BuildingType.h entity/BuildingType.cpp
+    entity/Footprint.h
+    entity/Building.h entity/Building.cpp
+    entity/ResourceNode.h entity/ResourceNode.cpp
     entity/Unit.h entity/Unit.cpp
     game/GameState.h game/GameState.cpp
     game/PathRequest.h
@@ -38,6 +42,11 @@ set(MINIRTS_CORE_SOURCES
     game/Formation.h game/Formation.cpp
     game/Orders.h game/Orders.cpp
     game/Ai.h game/Ai.cpp
+    game/Economy.h game/Economy.cpp
+    game/Construction.h game/Construction.cpp
+    game/Production.h game/Production.cpp
+    game/Work.h game/Work.cpp
+    game/Commands.h game/Commands.cpp
     game/Simulation.h game/Simulation.cpp
     game/Selection.h game/Selection.cpp
     game/Game.h game/Game.cpp
@@ -105,6 +114,17 @@ if(MINIRTS_BUILD_TESTS)
             target_compile_options(PathingTests PRIVATE /utf-8 /W4)
         endif()
         gtest_discover_tests(StressTest WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+    endif()
+    
+    # 4. Target EconomyTests: kinh tế & xây dựng (ô bị chiếm chặn đường, đặt nhà, xây, đào mỏ, sản xuất, lệnh, stress)
+    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/tests/EconomyTests.cpp)
+        add_executable(EconomyTests tests/EconomyTests.cpp ${MINIRTS_CORE_SOURCES})
+        target_include_directories(EconomyTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+        target_link_libraries(EconomyTests PRIVATE SDL3::SDL3 GTest::gtest_main)
+        if(MSVC)
+            target_compile_options(EconomyTests PRIVATE /utf-8 /W4)
+        endif()
+        gtest_discover_tests(EconomyTests WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
     endif()
 endif()
 

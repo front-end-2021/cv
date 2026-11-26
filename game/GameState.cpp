@@ -3,36 +3,27 @@
 
 Unit* GameState::FindUnit(EntityId id) {
     if (id == kNoEntity) return nullptr;
-    auto it = std::lower_bound(units.begin(), units.end(), id,
-        [](const Unit& u, EntityId value) { return u.id < value; });
+    auto it = std::lower_bound(units.begin(), units.end(), id, [](const Unit& u, EntityId vl) { return u.id < vl; });
     return (it != units.end() && it->id == id) ? &*it : nullptr;
 }
 
-const Unit* GameState::FindUnit(EntityId id) const {
-    return const_cast<GameState*>(this)->FindUnit(id);
-}
+const Unit* GameState::FindUnit(EntityId id) const { return const_cast<GameState*>(this)->FindUnit(id); }
 
 Building* GameState::FindBuilding(EntityId id) {
     if (id == kNoEntity) return nullptr;
-    auto it = std::lower_bound(buildings.begin(), buildings.end(), id,
-        [](const Building& b, EntityId value) { return b.id < value; });
+    auto it = std::lower_bound(buildings.begin(), buildings.end(), id, [](const Building& b, EntityId vl) { return b.id < vl; });
     return (it != buildings.end() && it->id == id) ? &*it : nullptr;
 }
 
-const Building* GameState::FindBuilding(EntityId id) const {
-    return const_cast<GameState*>(this)->FindBuilding(id);
-}
+const Building* GameState::FindBuilding(EntityId id) const { return const_cast<GameState*>(this)->FindBuilding(id); }
 
 ResourceNode* GameState::FindResource(EntityId id) {
     if (id == kNoEntity) return nullptr;
-    auto it = std::lower_bound(resources.begin(), resources.end(), id,
-        [](const ResourceNode& n, EntityId value) { return n.id < value; });
+    auto it = std::lower_bound(resources.begin(), resources.end(), id, [](const ResourceNode& n, EntityId vl) { return n.id < vl; });
     return (it != resources.end() && it->id == id) ? &*it : nullptr;
 }
 
-const ResourceNode* GameState::FindResource(EntityId id) const {
-    return const_cast<GameState*>(this)->FindResource(id);
-}
+const ResourceNode* GameState::FindResource(EntityId id) const { return const_cast<GameState*>(this)->FindResource(id); }
 
 Building& GameState::AddBuilding(int typeIndex, int row, int col, Team team, bool complete) {
     buildings.emplace_back(buildingTypes.Get(typeIndex), typeIndex, row, col, map.tileSize, team, complete);
@@ -51,8 +42,7 @@ ResourceNode& GameState::AddResource(int row, int col, int amount) {
 }
 
 bool GameState::RemoveBuilding(EntityId id) {
-    auto it = std::lower_bound(buildings.begin(), buildings.end(), id,
-        [](const Building& b, EntityId value) { return b.id < value; });
+    auto it = std::lower_bound(buildings.begin(), buildings.end(), id, [](const Building& b, EntityId vl) { return b.id < vl; });
     if (it == buildings.end() || it->id != id) return false;
     map.SetFootprintOccupied(it->fp.row, it->fp.col, it->fp.w, it->fp.h, false);
     buildings.erase(it);
@@ -60,8 +50,7 @@ bool GameState::RemoveBuilding(EntityId id) {
 }
 
 bool GameState::RemoveResource(EntityId id) {
-    auto it = std::lower_bound(resources.begin(), resources.end(), id,
-        [](const ResourceNode& n, EntityId value) { return n.id < value; });
+    auto it = std::lower_bound(resources.begin(), resources.end(), id, [](const ResourceNode& n, EntityId vl) { return n.id < vl; });
     if (it == resources.end() || it->id != id) return false;
     map.SetFootprintOccupied(it->fp.row, it->fp.col, it->fp.w, it->fp.h, false);
     resources.erase(it);

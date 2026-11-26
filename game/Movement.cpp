@@ -15,8 +15,7 @@ namespace {
     constexpr float kArriveSlack = 2.0f * kSquareSize; // kẹt trong bán kính này quanh đích thì coi như đã tới
     constexpr int kMaxUnstick = 2;                // số lần tính lại đường vì kẹt trước khi bỏ lệnh
     constexpr int kBlockedTicksToRepath = 4;      // bị tường chặn ngần tick liên tiếp (~0,13 giây) thì tính lại đường
-    // Qua mốc TRUNG GIAN khi cách nó dưới ngần này và nhìn thấy mốc kế tiếp. Nhiều lính dồn về cùng một mốc
-    // (góc tường, khe hẹp) không thể cùng đứng đúng điểm đó: bắt buộc chạm đúng sẽ khiến họ xoay vòng quanh mốc.
+    // Qua mốc TRUNG GIAN khi cách nó dưới ngần này và nhìn thấy mốc kế tiếp. Nhiều lính dồn về cùng một mốc (góc tường, khe hẹp) không thể cùng đứng đúng điểm đó: bắt buộc chạm đúng sẽ khiến họ xoay vòng quanh mốc.
     constexpr float kWaypointReach = kSquareSize;
 
     // ---- Va chạm ----
@@ -210,8 +209,9 @@ void ResolveUnitCollisions(GameState& g) {
                 const float ny = dy / dist;
                 touched = true;
 
-                const bool aMoving = !a.path.empty();
-                const bool bMoving = !b.path.empty();
+                // Lính đang giữ vị trí (H) được tính như lính "đang đi" về chuyện nhường chỗ: không bị đẩy hoàn toàn lệch khỏi vị trí chỉ vì một lính khác đi ngang qua (lính đứng yên bình thường thì vẫn nhường hết).
+                const bool aMoving = !a.path.empty() || a.IsHolding();
+                const bool bMoving = !b.path.empty() || b.IsHolding();
                 float ahx = 0.0f, ahy = 0.0f, bhx = 0.0f, bhy = 0.0f;
                 const bool aHeads = aMoving && Heading(a, ahx, ahy);
                 const bool bHeads = bMoving && Heading(b, bhx, bhy);
@@ -232,8 +232,7 @@ void ResolveUnitCollisions(GameState& g) {
                 if (wa > 0.0f) StepTo(g.map, a, a.x - nx * overlap * wa, a.y - ny * overlap * wa);
                 if (wb > 0.0f) StepTo(g.map, b, b.x + nx * overlap * wb, b.y + ny * overlap * wb);
 
-                // Cả hai đang đi, và hai đường thật sự cắt nhau (không phải cùng dồn về một mốc): bên nào đang tiến
-                // về phía bên kia thì né sang phải của mình ("phải" trên màn hình, y hướng xuống, của hướng (hx, hy) là (-hy, hx)).
+                // Cả hai đang đi, và hai đường thật sự cắt nhau (không phải cùng dồn về một mốc): bên nào đang tiến về phía bên kia thì né sang phải của mình ("phải" trên màn hình, y hướng xuống, của hướng (hx, hy) là (-hy, hx)).
                 const bool sameTarget = aHeads && bHeads &&
                     std::hypot(a.path.front().x - b.path.front().x, a.path.front().y - b.path.front().y) < kSameTargetDist;
                 if (aMoving && bMoving && !sameTarget) {

@@ -178,8 +178,7 @@ bool LoadTileMap(const std::string& filePath, TileMap& out) {
     out.spawns = std::move(spawns);
     out.enemySpawns = std::move(enemies);
 
-    // Mỏ và công trình: chỉ cần ô góc trên-trái nằm trong bản đồ ở đây; kích thước và địa hình được kiểm tra
-    // khi dựng ván (game/World.cpp) vì cần bảng loại công trình.
+    // Mỏ và công trình: chỉ cần ô góc trên-trái nằm trong bản đồ ở đây; kích thước và địa hình được kiểm tra khi dựng ván (game/World.cpp) vì cần bảng loại công trình.
     auto insideMap = [&](int r, int c) { return r >= 0 && c >= 0 && r < rows && c < cols; };
     out.mines.clear();
     for (const auto& m : loadedMines) {

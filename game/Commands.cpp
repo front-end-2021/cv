@@ -28,6 +28,7 @@ bool BeginPlacement(GameState& g, int buildingType) {
         g.Notify("Select a worker first");
         return false;
     }
+    g.attackMoveArmed = false; // hai chế độ "chờ bấm chuột trái" không đi cùng nhau
     g.placement.active = true;
     g.placement.buildingType = buildingType;
     g.placement.status = PlaceResult::Ok;
@@ -66,6 +67,51 @@ bool ConfirmPlacement(GameState& g) {
     }
     p.active = false;
     return true;
+}
+
+bool BeginAttackMoveMode(GameState& g) {
+    bool anyUnit = false;
+    for (const auto& u : g.units) {
+        if (u.selected && u.team == Team::Player && u.IsAlive()) { anyUnit = true; break; }
+    }
+    if (!anyUnit) {
+        g.Notify("Select units first");
+        return false;
+    }
+    g.attackMoveArmed = true;
+    return true;
+}
+
+void CancelAttackMoveMode(GameState& g) {
+    g.attackMoveArmed = false;
+}
+
+bool ConfirmAttackMove(GameState& g, float worldX, float worldY) {
+    if (!g.attackMoveArmed) return false;
+    g.attackMoveArmed = false;
+    if (IssueAttackMoveOrder(g, worldX, worldY) == 0) {
+        g.Notify("Select units first");
+        return false;
+    }
+    return true;
+}
+
+void HandleStopKey(GameState& g) {
+    if (g.placement.active) return;
+    g.attackMoveArmed = false;
+    IssueStopOrder(g);
+}
+
+void HandleHoldKey(GameState& g) {
+    if (g.placement.active) return;
+    g.attackMoveArmed = false;
+    IssueHoldOrder(g);
+}
+
+void HandleAttackMoveKey(GameState& g) {
+    if (g.placement.active) return;
+    if (g.attackMoveArmed) CancelAttackMoveMode(g);
+    else BeginAttackMoveMode(g);
 }
 
 void HandleBuildKey(GameState& g) {

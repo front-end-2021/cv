@@ -17,9 +17,6 @@
 #include "game/World.h"
 #include "ui/Menu.h"
 
-constexpr int kWindowW = 1280;
-constexpr int kWindowH = 720;
-
 enum class AppScreen { MapMenu, Game };
 
 struct App {
@@ -57,8 +54,7 @@ static void LoadUnitTypes(App& app) {
     if (app.menu.message.empty()) app.menu.message = "Data/units.txt loi: " + error + " (dung chi so mac dinh)";
 }
 
-// Nạp bảng loại công trình từ Data/buildings.txt; thiếu hoặc lỗi (kể cả nhắc tới loại đơn vị không có) thì dùng bảng dự phòng.
-// Phải gọi SAU LoadUnitTypes vì cần đối chiếu tên loại đơn vị.
+// Nạp bảng loại công trình từ Data/buildings.txt; thiếu hoặc lỗi (kể cả nhắc tới loại đơn vị không có) thì dùng bảng dự phòng. Phải gọi SAU LoadUnitTypes vì cần đối chiếu tên loại đơn vị.
 static void LoadBuildingTypes(App& app) {
     const std::filesystem::path path = std::filesystem::path(Utils::AssetPath("Data")) / "buildings.txt";
     std::string error;
@@ -84,8 +80,9 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
     App* app = new App();
     *appstate = app;
 
+    int windowW = 1280, windowH = 720;
     if (!SDL_CreateWindowAndRenderer("Mini RTS - Tilemap & Free Camera",
-        kWindowW, kWindowH, SDL_WINDOW_RESIZABLE,
+        windowW, windowH, SDL_WINDOW_RESIZABLE,
         &app->window, &app->renderer)) {
         SDL_Log("Create window/renderer failed: %s", SDL_GetError());
         return SDL_APP_FAILURE;
@@ -112,6 +109,10 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
         if (app->screen == AppScreen::Game) {
             if (app->game.placement.active) { // Esc thoát chế độ đặt nhà trước đã
                 CancelPlacement(app->game);
+                return SDL_APP_CONTINUE;
+            }
+            if (app->game.attackMoveArmed) { // rồi tới chế độ chờ chọn điểm Attack-move
+                CancelAttackMoveMode(app->game);
                 return SDL_APP_CONTINUE;
             }
             if (SDL_GetWindowMouseGrab(app->window)) { // Nếu chuột đang bị khóa -> thả chuột ra ngoài
@@ -159,6 +160,10 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
         const SDL_Keycode key = event->key.key;
         if (key == SDLK_B) { HandleBuildKey(g); return SDL_APP_CONTINUE; }
         if (key == SDLK_DELETE || key == SDLK_BACKSPACE) { HandleCancelKey(g); return SDL_APP_CONTINUE; }
+        // Lệnh cho lính (xem game/Commands.h): S = Stop, H = Hold position, A = Attack-move (rồi bấm chuột trái chọn điểm).
+        if (key == SDLK_S) { HandleStopKey(g); return SDL_APP_CONTINUE; }
+        if (key == SDLK_H) { HandleHoldKey(g); return SDL_APP_CONTINUE; }
+        if (key == SDLK_A) { HandleAttackMoveKey(g); return SDL_APP_CONTINUE; }
         if (key >= SDLK_1 && key <= SDLK_9) { HandleNumberKey(g, static_cast<int>(key - SDLK_1) + 1); return SDL_APP_CONTINUE; }
     }
     if (event->type == SDL_EVENT_KEY_UP && event->key.key == SDLK_BACKSLASH) {
@@ -175,6 +180,10 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
                     UpdatePlacement(g, event->button.x, event->button.y);
                     ConfirmPlacement(g); // đặt móng tại bóng mờ (không bắt đầu kéo chọn quân)
                 }
+                else if (g.attackMoveArmed) {
+                    // Attack-move tới điểm vừa bấm (không bắt đầu kéo chọn quân, nếu không sẽ bỏ chọn mất lính).
+                    ConfirmAttackMove(g, event->button.x + g.camera.x, event->button.y + g.camera.y);
+                }
                 else {
                     BeginSelection(g, event->button.x, event->button.y);
                 }
@@ -186,6 +195,9 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
             } else if (event->button.button == SDL_BUTTON_RIGHT) {
                 if (g.placement.active) {
                     CancelPlacement(g);
+                }
+                else if (g.attackMoveArmed) {
+                    CancelAttackMoveMode(g);
                 }
                 else {
                     // Tấn công / đào / xây / nộp hàng / đi / đặt điểm tập kết tùy thứ nằm dưới con trỏ (xem IssueSmartOrder).

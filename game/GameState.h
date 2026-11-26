@@ -71,6 +71,7 @@ struct GameState {
     int gold[static_cast<int>(Team::Count)] = { 0, 0 };
     bool economyActive = false;     // ván có kinh tế (map có công trình, mỏ hoặc vàng ban đầu): HUD hiện vàng và slot quân
     PlacementMode placement;
+    bool attackMoveArmed = false;   // đã bấm A, đang chờ chuột trái chọn điểm Attack-move (game/Commands.h)
     std::string notice;             // thông báo ngắn cho người chơi ("Not enough gold"...)
     float noticeTimer = 0.0f;       // giây còn hiển thị thông báo (giảm theo khung hình, không phải tick)
 

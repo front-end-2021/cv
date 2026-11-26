@@ -4,13 +4,11 @@
 // ===========================================================================
 // Kinh tế: vàng và slot quân (supply).
 //
-// Mỗi phe có một kho vàng (GameState::gold). Vàng chỉ vào kho khi thợ NỘP hàng ở một công trình kho (xem game/Work.h),
-// và chỉ ra khỏi kho ở hai chỗ: đặt móng công trình (Entity::Cost của công trình) và đưa đơn vị vào hàng đợi
-// sản xuất (Entity::Cost của đơn vị). Hủy thì hoàn lại.
+// Mỗi phe có một kho vàng (GameState::gold). Vàng chỉ vào kho khi thợ NỘP hàng ở một công trình kho (xem game/Work.h), và chỉ ra khỏi kho ở hai chỗ: 
+// đặt móng công trình (Entity::Cost của công trình) và đưa đơn vị vào hàng đợi sản xuất (Entity::Cost của đơn vị). Hủy thì hoàn lại.
 //
-// Slot quân (Entity::Supply): mỗi đơn vị còn sống chiếm `Supply` slot, và đơn vị đang nằm trong hàng đợi sản xuất
-// cũng chiếm chỗ trước. Tổng slot các công trình ĐÃ XÂY XONG cấp ra là giới hạn (Building::supplyProvided).
-// Chỉ việc đưa thêm đơn vị vào hàng đợi mới bị giới hạn này chặn; quân có sẵn từ map vượt giới hạn thì vẫn ở đó.
+// Slot quân (Entity::Supply): mỗi đơn vị còn sống chiếm `Supply` slot, và đơn vị đang nằm trong hàng đợi sản xuất cũng chiếm chỗ trước.
+// Tổng slot các công trình ĐÃ XÂY XONG cấp ra là giới hạn (Building::supplyProvided). Chỉ việc đưa thêm đơn vị vào hàng đợi mới bị giới hạn này chặn; quân có sẵn từ map vượt giới hạn thì vẫn ở đó.
 // ===========================================================================
 
 constexpr float kGatherPerSecond = 4.0f;   // vàng/giây một thợ đào được khi buildspeed = 100

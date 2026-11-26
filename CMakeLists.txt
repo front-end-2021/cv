@@ -126,6 +126,18 @@ if(MINIRTS_BUILD_TESTS)
         endif()
         gtest_discover_tests(EconomyTests WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
     endif()
+
+    # 5. Target CombatTests: lệnh chiến đấu (Stop, Hold position, Attack-move: Unit, Orders, Commands, va chạm, mô phỏng, stress)
+    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/tests/CombatTests.cpp)
+        add_executable(CombatTests tests/CombatTests.cpp ${MINIRTS_CORE_SOURCES})
+        target_include_directories(CombatTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+        target_link_libraries(CombatTests PRIVATE SDL3::SDL3 GTest::gtest_main)
+        if(MSVC)
+            target_compile_options(CombatTests PRIVATE /utf-8 /W4)
+        endif()
+        gtest_discover_tests(CombatTests WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+    endif()
+
 endif()
 
 # Sao chep thu muc Maps vao thu muc chay cua executable.

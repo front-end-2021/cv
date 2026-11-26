@@ -37,8 +37,35 @@ void Unit::ClearTarget() {
     CancelPathRequest();
 }
 
+void Unit::OrderStop() {
+    CancelJob();
+    ClearTarget();
+    ResetCombatMode();
+    if (state == UnitState::Attack) EnterState(UnitState::Idle);
+}
+
+void Unit::OrderHold() {
+    CancelJob();
+    path.clear();
+    hasMoveGoal = false;
+    unstickCount = 0;
+    CancelPathRequest();
+    combatMode = CombatMode::Hold;
+    attackMoveEngaged = false;
+    // Đang đánh dở ai thì cứ đánh nốt nếu nó còn trong tầm; nếu nó đã ra khỏi tầm thì bộ tự chọn mục tiêu bỏ nó
+    // (chỉ mục tiêu "tự chọn" mới bị bỏ, nên đổi thành tự chọn).
+    if (HasTarget()) autoTarget = true;
+}
+
+void Unit::EnterAttackMove(float goalX, float goalY) {
+    combatMode = CombatMode::AttackMove;
+    attackMoveGoal = { goalX, goalY };
+    attackMoveEngaged = false;
+}
+
 void Unit::OrderMove(std::vector<Waypoint> newPath) {
     ClearTarget();
+    ResetCombatMode();
     if (!newPath.empty()) {
         hasMoveGoal = true;
         moveGoal = newPath.back();
@@ -51,6 +78,7 @@ void Unit::OrderMove(std::vector<Waypoint> newPath) {
 
 void Unit::StartMoveOrder(float goalX, float goalY) {
     ClearTarget();
+    ResetCombatMode();
     hasMoveGoal = true;
     moveGoal = { goalX, goalY };
     ResetProgressMonitor();
@@ -58,6 +86,7 @@ void Unit::StartMoveOrder(float goalX, float goalY) {
 }
 
 void Unit::OrderAttack(EntityId target, bool automatic) {
+    if (!automatic) ResetCombatMode(); // lệnh đánh của người chơi thay cho Hold / AttackMove (đánh tự chọn thì giữ nguyên chế độ)
     attackTargetId = target;
     autoTarget = automatic;
     path.clear();      // đường đi sẽ được xin khi cần (xem UpdateUnit trong game/Simulation.cpp)
@@ -104,6 +133,7 @@ bool Unit::UpdateState(float dt, const Entity* target, bool targetInRange) {
         autoTarget = false;
         lastAttackerId = kNoEntity;
         selected = false;
+        ResetCombatMode();
         EnterState(UnitState::Dead);
     }
     if (state == UnitState::Dead) {
@@ -277,14 +307,25 @@ void Unit::Render(SDL_Renderer* r, float camX, float camY, float alpha, bool deb
         SDL_RenderRect(r, &nugget);
     }
 
+    // Đang giữ vị trí (H): ô xanh lam nhỏ ở góc dưới-phải, dễ nhận ra giữa đám đông.
+    if (IsHolding()) {
+        const SDL_FRect mark = { baseRect.x + baseRect.w - 11.0f, baseRect.y + baseRect.h - 11.0f, 9.0f, 9.0f };
+        SDL_SetRenderDrawColor(r, 90, 190, 255, 255);
+        SDL_RenderFillRect(r, &mark);
+        SDL_SetRenderDrawColor(r, 20, 40, 70, 255);
+        SDL_RenderRect(r, &mark);
+    }
+
     RenderSelectionOutline(r, baseRect);
     RenderHealthBar(r, baseRect);
 
     if (debug) {
         static const char* const kNames[] = { "Idle", "Walk", "Attack", "Dead" };
-        static const char* const kJobs[] = { "", " G", " B" }; // theo JobKind: None, Gather, Build
-        char label[40];
-        std::snprintf(label, sizeof(label), "%s %d%s", kNames[static_cast<int>(state)], frame, kJobs[static_cast<int>(job.kind)]);
+        static const char* const kJobs[] = { "", " G", " B" };      // theo JobKind: None, Gather, Build
+        static const char* const kModes[] = { "", " Hold", " AM" }; // theo CombatMode: Normal, Hold, AttackMove
+        char label[48];
+        std::snprintf(label, sizeof(label), "%s %d%s%s", kNames[static_cast<int>(state)], frame,
+            kJobs[static_cast<int>(job.kind)], kModes[static_cast<int>(combatMode)]);
         SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
         SDL_RenderDebugText(r, baseRect.x, baseRect.y - 24.0f, label);
 

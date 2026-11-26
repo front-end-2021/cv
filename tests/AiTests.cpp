@@ -4,6 +4,7 @@
 #include "Common.h"
 #include "game/Ai.h"
 #include "game/GameState.h"
+#include "game/PathService.h"
 
 namespace {
     constexpr float kAggro = 200.0f;
@@ -611,6 +612,452 @@ TEST(AutoAcquireTargetTest, EnemyGivesUpChase_ThenHeadsHome) {
     EXPECT_TRUE(!U(g, self).HasTarget());
     EXPECT_TRUE(U(g, self).hasMoveGoal);
     EXPECT_EQ(g.pathQueue.size(), 1);
+}
+
+// ===========================================================================
+// FindFoeInReach: chỉ xét kẻ thù mà lính đánh tới được mà không phải di chuyển (dùng cho Hold position)
+// ===========================================================================
+namespace {
+    // Hai lính cùng cỡ hitbox: đánh tới được khi tâm cách nhau tối đa Range + kSquareSize.
+    float ReachCenters(const GameState& g, EntityId id) { return g.FindUnit(id)->Range + kSquareSize; }
+}
+
+TEST(FindFoeInReachTest, NoFoes_ReturnsNull) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Player, 0, 0);
+    EXPECT_EQ(FindFoeInReach(g, U(g, self)), nullptr);
+}
+
+TEST(FindFoeInReachTest, FoeInsideReach_IsReturned) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Player, 0, 0);
+    const EntityId foe = Add(g, Team::Enemy, ReachCenters(g, self) - 5.0f, 0);
+    const Unit* r = FindFoeInReach(g, U(g, self));
+    ASSERT_NE(r, nullptr);
+    EXPECT_EQ(r->id, foe);
+}
+
+TEST(FindFoeInReachTest, FoeExactlyAtReach_IsIncluded) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Player, 0, 0);
+    const EntityId foe = Add(g, Team::Enemy, ReachCenters(g, self), 0);
+    const Unit* r = FindFoeInReach(g, U(g, self));
+    ASSERT_NE(r, nullptr);
+    EXPECT_EQ(r->id, foe);
+}
+
+TEST(FindFoeInReachTest, FoeJustOutsideReach_ReturnsNull) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Player, 0, 0);
+    Add(g, Team::Enemy, ReachCenters(g, self) + 0.5f, 0);
+    EXPECT_EQ(FindFoeInReach(g, U(g, self)), nullptr);
+}
+
+TEST(FindFoeInReachTest, FoeInsideAggroButOutsideReach_OnlyFindNearestFoeSeesIt) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Player, 0, 0);
+    const EntityId foe = Add(g, Team::Enemy, 120, 0);   // trong aggro (200) nhưng xa hơn tầm đánh (60)
+    EXPECT_EQ(FindFoeInReach(g, U(g, self)), nullptr);
+    const Unit* r = FindNearestFoe(g, U(g, self), kAggro);
+    ASSERT_NE(r, nullptr);
+    EXPECT_EQ(r->id, foe);
+}
+
+TEST(FindFoeInReachTest, IgnoresSameTeamAndDeadFoes) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Player, 0, 0);
+    Add(g, Team::Player, 30, 0);
+    Kill(g, Add(g, Team::Enemy, 40, 0));
+    EXPECT_EQ(FindFoeInReach(g, U(g, self)), nullptr);
+}
+
+TEST(FindFoeInReachTest, PicksNearestOfSeveralInReach) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Player, 0, 0);
+    Add(g, Team::Enemy, 55, 0);
+    const EntityId nearest = Add(g, Team::Enemy, 0, 45);
+    Add(g, Team::Enemy, 500, 0);                         // ngoài tầm: không được xét
+    const Unit* r = FindFoeInReach(g, U(g, self));
+    ASSERT_NE(r, nullptr);
+    EXPECT_EQ(r->id, nearest);
+}
+
+TEST(FindFoeInReachTest, IgnoreParam_SkipsThatFoe) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Player, 0, 0);
+    const EntityId nearest = Add(g, Team::Enemy, 45, 0);
+    const EntityId second = Add(g, Team::Enemy, 0, 55);
+    const Unit* r = FindFoeInReach(g, U(g, self), nearest);
+    ASSERT_NE(r, nullptr);
+    EXPECT_EQ(r->id, second);
+    EXPECT_EQ(FindFoeInReach(g, U(g, self), second)->id, nearest);
+}
+
+TEST(FindFoeInReachTest, LongerRangeReachesFurther) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Player, 0, 0);
+    const EntityId foe = Add(g, Team::Enemy, 150, 0);
+    EXPECT_EQ(FindFoeInReach(g, U(g, self)), nullptr);   // Range mặc định 20
+    U(g, self).Range = 120.0f;                           // như lính bắn cung: 120 + 40 = 160 >= 150
+    const Unit* r = FindFoeInReach(g, U(g, self));
+    ASSERT_NE(r, nullptr);
+    EXPECT_EQ(r->id, foe);
+}
+
+// ===========================================================================
+// AutoAcquireTarget — Hold position
+// ===========================================================================
+TEST(AutoAcquireHoldTest, FoeInAggroButOutOfReach_IsIgnored) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Player, 0, 0);
+    Add(g, Team::Enemy, 120, 0);                  // lính thường sẽ đuổi theo; lính giữ vị trí thì không
+    U(g, self).OrderHold();
+    AutoAcquireTarget(g, U(g, self), kDt);
+    EXPECT_TRUE(!U(g, self).HasTarget());
+    EXPECT_TRUE(U(g, self).IsHolding());
+    EXPECT_TRUE(g.pathQueue.empty());
+}
+
+TEST(AutoAcquireHoldTest, FoeInReach_IsAttacked) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Player, 0, 0);
+    const EntityId foe = Add(g, Team::Enemy, 50, 0);
+    U(g, self).OrderHold();
+    AutoAcquireTarget(g, U(g, self), kDt);
+    EXPECT_EQ(U(g, self).attackTargetId, foe);
+    EXPECT_TRUE(U(g, self).autoTarget);
+    EXPECT_TRUE(U(g, self).IsHolding());          // đánh tự chọn không làm mất chế độ giữ vị trí
+    EXPECT_TRUE(!U(g, self).hasMoveGoal);
+}
+
+TEST(AutoAcquireHoldTest, TargetThatLeftReach_IsDroppedWithoutChasing) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Player, 0, 0);
+    const EntityId foe = Add(g, Team::Enemy, 50, 0);
+    U(g, self).OrderHold();
+    AutoAcquireTarget(g, U(g, self), kDt);
+    ASSERT_EQ(U(g, self).attackTargetId, foe);
+    U(g, foe).x = 150.0f;                         // kẻ địch lùi ra khỏi tầm đánh (vẫn trong aggro)
+    U(g, self).scanTimer = 10.0f;                 // không cho quét lại trong lượt này
+    AutoAcquireTarget(g, U(g, self), kDt);
+    EXPECT_TRUE(!U(g, self).HasTarget());
+    EXPECT_TRUE(U(g, self).path.empty());
+    EXPECT_TRUE(!U(g, self).pathPending);
+    EXPECT_TRUE(g.pathQueue.empty());
+    EXPECT_TRUE(U(g, self).IsHolding());
+}
+
+TEST(AutoAcquireHoldTest, TargetOutOfReachDuringSwing_IsKeptUntilSwingEnds) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Player, 0, 0);
+    const EntityId foe = Add(g, Team::Enemy, 50, 0);
+    U(g, self).OrderHold();
+    U(g, self).OrderAttack(foe, true);
+    U(g, self).state = UnitState::Attack;         // đang vung đòn: bỏ mục tiêu lúc này sẽ làm mất sát thương
+    U(g, foe).x = 150.0f;
+    AutoAcquireTarget(g, U(g, self), kDt);
+    EXPECT_EQ(U(g, self).attackTargetId, foe);
+    U(g, self).state = UnitState::Idle;           // đòn đã xong
+    U(g, self).scanTimer = 10.0f;
+    AutoAcquireTarget(g, U(g, self), kDt);
+    EXPECT_TRUE(!U(g, self).HasTarget());
+}
+
+TEST(AutoAcquireHoldTest, TargetInReach_IsKept) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Player, 0, 0);
+    const EntityId foe = Add(g, Team::Enemy, 50, 0);
+    U(g, self).OrderHold();
+    U(g, self).OrderAttack(foe, true);
+    U(g, self).scanTimer = 10.0f;
+    AutoAcquireTarget(g, U(g, self), kDt);
+    EXPECT_EQ(U(g, self).attackTargetId, foe);
+}
+
+TEST(AutoAcquireHoldTest, OrderHoldWhileChasing_KeepsTargetOnlyIfInReach) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Player, 0, 0);
+    const EntityId far = Add(g, Team::Enemy, 150, 0);
+    U(g, self).OrderAttack(far, false);           // người chơi đang ra lệnh đuổi theo
+    U(g, self).OrderHold();                       // rồi bấm H
+    EXPECT_TRUE(U(g, self).autoTarget);           // thành mục tiêu "tự chọn" để bị bỏ khi ngoài tầm
+    U(g, self).scanTimer = 10.0f;
+    AutoAcquireTarget(g, U(g, self), kDt);
+    EXPECT_TRUE(!U(g, self).HasTarget());
+}
+
+TEST(AutoAcquireHoldTest, Retaliates_OnlyAgainstAttackerInReach) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Player, 0, 0);
+    Add(g, Team::Enemy, 30, 0);                   // kẻ gần hơn
+    const EntityId attacker = Add(g, Team::Enemy, 0, 55);
+    U(g, self).OrderHold();
+    U(g, self).lastAttackerId = attacker;
+    AutoAcquireTarget(g, U(g, self), kDt);
+    EXPECT_EQ(U(g, self).attackTargetId, attacker);   // đánh trả được ưu tiên như lính thường
+}
+
+TEST(AutoAcquireHoldTest, AttackerOutOfReach_IsNotChasedAndGrudgeForgotten) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Player, 0, 0);
+    const EntityId attacker = Add(g, Team::Enemy, 150, 0);   // ví dụ lính bắn cung đứng xa
+    U(g, self).OrderHold();
+    U(g, self).lastAttackerId = attacker;
+    AutoAcquireTarget(g, U(g, self), kDt);
+    EXPECT_TRUE(!U(g, self).HasTarget());
+    EXPECT_EQ(U(g, self).lastAttackerId, kNoEntity);
+    EXPECT_TRUE(g.pathQueue.empty());
+}
+
+TEST(AutoAcquireHoldTest, ZeroAggroUnit_NeverAutoAttacks) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Player, 0, 0);
+    U(g, self).AggroRange = 0.0f;                 // như thợ: không tự đánh ai
+    const EntityId foe = Add(g, Team::Enemy, 45, 0);
+    U(g, self).OrderHold();
+    U(g, self).lastAttackerId = foe;
+    AutoAcquireTarget(g, U(g, self), kDt);
+    EXPECT_TRUE(!U(g, self).HasTarget());
+}
+
+TEST(AutoAcquireHoldTest, ScanSkipsUnreachableFoe) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Player, 0, 0);
+    const EntityId nearest = Add(g, Team::Enemy, 45, 0);
+    const EntityId other = Add(g, Team::Enemy, 0, 55);
+    U(g, self).OrderHold();
+    U(g, self).unreachableTargetId = nearest;
+    U(g, self).unreachableTimer = 4.0f;
+    AutoAcquireTarget(g, U(g, self), kDt);
+    EXPECT_EQ(U(g, self).attackTargetId, other);
+}
+
+TEST(AutoAcquireHoldTest, ScanTimerNotElapsed_NoScan) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Player, 0, 0);
+    Add(g, Team::Enemy, 45, 0);
+    U(g, self).OrderHold();
+    U(g, self).scanTimer = 1.0f;
+    AutoAcquireTarget(g, U(g, self), kDt);
+    EXPECT_TRUE(!U(g, self).HasTarget());
+}
+
+TEST(AutoAcquireHoldTest, DeadHoldingUnit_DoesNothing) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Player, 0, 0);
+    Add(g, Team::Enemy, 45, 0);
+    U(g, self).OrderHold();
+    Kill(g, self);
+    AutoAcquireTarget(g, U(g, self), kDt);
+    EXPECT_TRUE(!U(g, self).HasTarget());
+}
+
+// ===========================================================================
+// AutoAcquireTarget — Attack-move
+// ===========================================================================
+namespace {
+    // Lính phe ta đang theo lệnh Attack-move tới (goalX, goalY), lệnh đi đã xếp hàng chờ đường.
+    EntityId AddAttackMover(GameState& g, float x, float y, float goalX, float goalY) {
+        const EntityId id = Add(g, Team::Player, x, y);
+        OrderAttackMoveTo(g, U(g, id), goalX, goalY);
+        return id;
+    }
+}
+
+TEST(AutoAcquireAttackMoveTest, FoeInAggroWhileMoving_IsEngaged) {
+    GameState g = MakeGame();
+    const EntityId self = AddAttackMover(g, 0, 0, 500, 0);
+    const EntityId foe = Add(g, Team::Enemy, 100, 0);
+    ASSERT_TRUE(U(g, self).hasMoveGoal);          // đang theo lệnh đi: lính thường sẽ KHÔNG chọn mục tiêu (xem test PlayerWithMoveGoal)
+    AutoAcquireTarget(g, U(g, self), kDt);
+    const Unit& u = U(g, self);
+    EXPECT_EQ(u.attackTargetId, foe);
+    EXPECT_TRUE(u.autoTarget);
+    EXPECT_TRUE(u.IsAttackMoving());
+    EXPECT_TRUE(u.attackMoveEngaged);             // nhớ là đang bận giữa đường để xong còn đi tiếp
+    EXPECT_TRUE(!u.hasMoveGoal);                  // OrderAttack hủy lệnh đi; đích vẫn còn trong attackMoveGoal
+    EXPECT_TRUE(u.attackMoveGoal.x == 500.0f && u.attackMoveGoal.y == 0.0f);
+    EXPECT_TRUE(!u.pathPending);                  // yêu cầu tìm đường tới đích bị hủy khi quay sang đánh
+}
+
+TEST(AutoAcquireAttackMoveTest, FoeOutsideAggro_IsIgnoredAndMoveContinues) {
+    GameState g = MakeGame();
+    const EntityId self = AddAttackMover(g, 0, 0, 500, 0);
+    Add(g, Team::Enemy, kAggro + 50.0f, 0);
+    AutoAcquireTarget(g, U(g, self), kDt);
+    EXPECT_TRUE(!U(g, self).HasTarget());
+    EXPECT_TRUE(U(g, self).hasMoveGoal);
+    EXPECT_TRUE(U(g, self).IsAttackMoving());
+}
+
+TEST(AutoAcquireAttackMoveTest, PlainMoveStillIgnoresFoe_Control) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Player, 0, 0);
+    Add(g, Team::Enemy, 100, 0);
+    OrderMoveTo(g, U(g, self), 500, 0);
+    AutoAcquireTarget(g, U(g, self), kDt);
+    EXPECT_TRUE(!U(g, self).HasTarget());
+}
+
+TEST(AutoAcquireAttackMoveTest, Retaliates_WhileMoving) {
+    GameState g = MakeGame();
+    const EntityId self = AddAttackMover(g, 0, 0, 500, 0);
+    const EntityId attacker = Add(g, Team::Enemy, kAggro + 40.0f, 0);   // ngoài aggro nhưng trong leash
+    U(g, self).lastAttackerId = attacker;
+    AutoAcquireTarget(g, U(g, self), kDt);
+    EXPECT_EQ(U(g, self).attackTargetId, attacker);
+    EXPECT_TRUE(U(g, self).attackMoveEngaged);
+}
+
+TEST(AutoAcquireAttackMoveTest, ZeroAggroUnit_JustMoves) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Player, 0, 0);
+    U(g, self).AggroRange = 0.0f;
+    OrderAttackMoveTo(g, U(g, self), 500, 0);
+    Add(g, Team::Enemy, 30, 0);
+    AutoAcquireTarget(g, U(g, self), kDt);
+    EXPECT_TRUE(!U(g, self).HasTarget());
+    EXPECT_TRUE(U(g, self).hasMoveGoal);
+}
+
+TEST(AutoAcquireAttackMoveTest, EngagedTargetDied_ResumesTowardGoal) {
+    GameState g = MakeGame();
+    const EntityId self = AddAttackMover(g, 0, 0, 500, 300);
+    const EntityId foe = Add(g, Team::Enemy, 100, 0);
+    AutoAcquireTarget(g, U(g, self), kDt);
+    ASSERT_EQ(U(g, self).attackTargetId, foe);
+    g.pathQueue.clear();
+    Kill(g, foe);
+    AutoAcquireTarget(g, U(g, self), kDt);
+    const Unit& u = U(g, self);
+    EXPECT_TRUE(!u.HasTarget());
+    EXPECT_TRUE(u.IsAttackMoving());
+    EXPECT_TRUE(!u.attackMoveEngaged);
+    EXPECT_TRUE(u.hasMoveGoal);
+    EXPECT_TRUE(u.moveGoal.x == 500.0f && u.moveGoal.y == 300.0f);
+    EXPECT_TRUE(u.pathPending);
+    ASSERT_EQ(g.pathQueue.size(), 1);
+    EXPECT_EQ(g.pathQueue.front().unit, self);
+    EXPECT_EQ(g.pathQueue.front().purpose, PathPurpose::Move);
+    EXPECT_TRUE(g.pathQueue.front().goalX == 500.0f && g.pathQueue.front().goalY == 300.0f);
+}
+
+TEST(AutoAcquireAttackMoveTest, EngagedTargetRemovedFromWorld_ResumesToo) {
+    GameState g = MakeGame();
+    const EntityId self = AddAttackMover(g, 0, 0, 500, 0);
+    const EntityId foe = Add(g, Team::Enemy, 100, 0);
+    AutoAcquireTarget(g, U(g, self), kDt);
+    ASSERT_EQ(U(g, self).attackTargetId, foe);
+    g.units.erase(g.units.begin() + 1);           // kẻ địch biến mất khỏi thế giới
+    AutoAcquireTarget(g, U(g, self), kDt);
+    EXPECT_TRUE(U(g, self).hasMoveGoal);
+    EXPECT_TRUE(U(g, self).IsAttackMoving());
+}
+
+TEST(AutoAcquireAttackMoveTest, EngagedTargetBeyondLeash_GivesUpAndResumes) {
+    GameState g = MakeGame();
+    const EntityId self = AddAttackMover(g, 0, 0, 500, 0);
+    const EntityId foe = Add(g, Team::Enemy, 100, 0);
+    AutoAcquireTarget(g, U(g, self), kDt);
+    ASSERT_EQ(U(g, self).attackTargetId, foe);
+    U(g, foe).x = kLeash + 60.0f;                 // kẻ địch chạy quá xa
+    U(g, foe).y = 400.0f;
+    U(g, self).scanTimer = 10.0f;
+    AutoAcquireTarget(g, U(g, self), kDt);
+    EXPECT_TRUE(!U(g, self).HasTarget());
+    EXPECT_TRUE(U(g, self).hasMoveGoal);          // bỏ đuổi, quay lại đi tới đích
+    EXPECT_TRUE(U(g, self).IsAttackMoving());
+}
+
+TEST(AutoAcquireAttackMoveTest, ResumeWaitsForSwingToFinish) {
+    GameState g = MakeGame();
+    const EntityId self = AddAttackMover(g, 0, 0, 500, 0);
+    const EntityId foe = Add(g, Team::Enemy, 100, 0);
+    AutoAcquireTarget(g, U(g, self), kDt);
+    g.pathQueue.clear();
+    Kill(g, foe);
+    U(g, self).state = UnitState::Attack;         // đòn chém vẫn đang diễn ra: đừng cắt ngang
+    AutoAcquireTarget(g, U(g, self), kDt);
+    EXPECT_TRUE(U(g, self).attackMoveEngaged);
+    EXPECT_TRUE(!U(g, self).hasMoveGoal);
+    EXPECT_TRUE(g.pathQueue.empty());
+    EXPECT_EQ(U(g, self).state, UnitState::Attack);
+    U(g, self).state = UnitState::Idle;           // đòn đã xong
+    AutoAcquireTarget(g, U(g, self), kDt);
+    EXPECT_TRUE(!U(g, self).attackMoveEngaged);
+    EXPECT_TRUE(U(g, self).hasMoveGoal);
+    EXPECT_EQ(g.pathQueue.size(), 1);
+}
+
+TEST(AutoAcquireAttackMoveTest, NextFoeFoundSameTick_StaysEngaged) {
+    GameState g = MakeGame();
+    const EntityId self = AddAttackMover(g, 0, 0, 500, 0);
+    const EntityId first = Add(g, Team::Enemy, 100, 0);
+    const EntityId second = Add(g, Team::Enemy, 0, 120);
+    AutoAcquireTarget(g, U(g, self), kDt);
+    ASSERT_EQ(U(g, self).attackTargetId, first);
+    Kill(g, first);
+    U(g, self).scanTimer = 0.0f;
+    AutoAcquireTarget(g, U(g, self), kDt);        // bỏ mục tiêu chết, xin đường đi tiếp, rồi quét thấy kẻ thứ hai
+    const Unit& u = U(g, self);
+    EXPECT_EQ(u.attackTargetId, second);
+    EXPECT_TRUE(u.attackMoveEngaged);
+    EXPECT_TRUE(u.IsAttackMoving());
+    EXPECT_TRUE(!u.pathPending);                  // yêu cầu đi tiếp vừa xếp đã bị hủy khi quay sang đánh kẻ thứ hai
+}
+
+TEST(AutoAcquireAttackMoveTest, StillWalking_ModeKeptAndNoDuplicateRequests) {
+    GameState g = MakeGame();
+    const EntityId self = AddAttackMover(g, 0, 0, 500, 0);
+    ASSERT_EQ(g.pathQueue.size(), 1);
+    for (int i = 0; i < 30; ++i) AutoAcquireTarget(g, U(g, self), kDt);
+    EXPECT_TRUE(U(g, self).IsAttackMoving());
+    EXPECT_EQ(g.pathQueue.size(), 1);
+}
+
+TEST(AutoAcquireAttackMoveTest, FollowingPath_ModeKept) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Player, 0, 0);
+    U(g, self).EnterAttackMove(500, 0);
+    U(g, self).path.assign({ Waypoint{ 100, 0 } });
+    AutoAcquireTarget(g, U(g, self), kDt);
+    EXPECT_TRUE(U(g, self).IsAttackMoving());
+}
+
+TEST(AutoAcquireAttackMoveTest, ReachedEnd_ReturnsToNormalAndThenDefendsLikeIdleUnit) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Player, 0, 0);
+    U(g, self).EnterAttackMove(0, 0);             // đã tới nơi: không còn đường, không còn lệnh đi
+    AutoAcquireTarget(g, U(g, self), kDt);
+    EXPECT_EQ(U(g, self).combatMode, CombatMode::Normal);
+    EXPECT_TRUE(!U(g, self).attackMoveEngaged);
+    EXPECT_TRUE(g.pathQueue.empty());             // không xin đường mới (tránh vòng lặp vô tận khi đích không với tới)
+    const EntityId foe = Add(g, Team::Enemy, 100, 0);
+    U(g, self).scanTimer = 0.0f;
+    AutoAcquireTarget(g, U(g, self), kDt);        // giờ chỉ là lính đứng yên tự vệ
+    EXPECT_EQ(U(g, self).attackTargetId, foe);
+    EXPECT_TRUE(!U(g, self).attackMoveEngaged);
+}
+
+TEST(AutoAcquireAttackMoveTest, FinishedMoveWithFoeNearby_StillFinishesFirst) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Player, 0, 0);
+    U(g, self).EnterAttackMove(0, 0);
+    Add(g, Team::Enemy, 100, 0);
+    AutoAcquireTarget(g, U(g, self), kDt);
+    EXPECT_TRUE(U(g, self).HasTarget());          // vẫn đánh kẻ trong tầm (như lính đứng yên)
+    EXPECT_EQ(U(g, self).combatMode, CombatMode::Normal); // nhưng lệnh Attack-move đã xong, không "đi tiếp" sau đó
+    EXPECT_TRUE(!U(g, self).attackMoveEngaged);
+}
+
+TEST(AutoAcquireAttackMoveTest, EnemyAiNeverAffected) {
+    GameState g = MakeGame();
+    const EntityId self = Add(g, Team::Enemy, 0, 0);
+    const EntityId foe = Add(g, Team::Player, 100, 0);
+    AutoAcquireTarget(g, U(g, self), kDt);
+    EXPECT_EQ(U(g, self).attackTargetId, foe);
+    EXPECT_EQ(U(g, self).combatMode, CombatMode::Normal);
+    EXPECT_TRUE(!U(g, self).attackMoveEngaged);
 }
 
 // (Xóa bỏ hàm int main(...) cũ vì GTest::gtest_main đã cung cấp sẵn)

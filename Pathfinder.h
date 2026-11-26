@@ -11,8 +11,7 @@ struct PathResult {
 
 class Pathfinder {
 public:
-    // Đường đi dùng trong game: A* rồi làm mượt (string-pulling), nên đi thẳng qua chỗ trống thay vì
-    // zigzag qua tâm từng ô.
+    // Đường đi dùng trong game: A* rồi làm mượt (string-pulling), nên đi thẳng qua chỗ trống thay vì zigzag qua tâm từng ô.
     //  - Đích nằm trên nước/đá: dời tới ô đi được gần điểm bấm nhất (không giới hạn bán kính).
     //  - Đích ở vùng tách biệt (đảo, vùng bị đá chặn): đi tới điểm gần đích nhất mà với tới được
     //    (result.partial = true). Nếu chỗ đang đứng đã là điểm gần nhất thì points rỗng.
@@ -26,8 +25,7 @@ public:
         return Find(map, startX, startY, goalX, goalY).points;
     }
 
-    // Bỏ các mốc thừa: từ chỗ đứng, đi thẳng tới mốc xa nhất còn "nhìn thấy" được, lặp lại.
-    // Mốc cuối cùng luôn được giữ. Mỗi đoạn thẳng đều đi được với hitbox kPathClearance.
+    // Bỏ các mốc thừa: từ chỗ đứng, đi thẳng tới mốc xa nhất còn "nhìn thấy" được, lặp lại. Mốc cuối cùng luôn được giữ. Mỗi đoạn thẳng đều đi được với hitbox kPathClearance.
     static void Smooth(const TileMap& map, float startX, float startY, std::vector<Waypoint>& points);
 
     // Đoạn thẳng (x0,y0)->(x1,y1) có đi được không với hitbox kPathClearance (lấy mẫu dọc đoạn thẳng).
@@ -36,7 +34,6 @@ public:
     // Ô đi được gần (x, y) nhất (đo tới tâm ô, không giới hạn bán kính). false nếu cả bản đồ không có ô nào đi được.
     static bool SnapToWalkable(const TileMap& map, float x, float y, int& outRow, int& outCol);
 
-    // Làm điểm đích dùng được: ô phải đi được; nếu đứng đúng điểm đó bị đè lên tường thì dời về tâm ô.
-    // false nếu ô không đi được (khi đó hãy dùng SnapToWalkable).
+    // Làm điểm đích dùng được: ô phải đi được; nếu đứng đúng điểm đó bị đè lên tường thì dời về tâm ô. false nếu ô không đi được (khi đó hãy dùng SnapToWalkable).
     static bool NormalizeGoal(const TileMap& map, float& x, float& y);
 };

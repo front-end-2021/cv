@@ -7,7 +7,7 @@
 
 void UpdateGameFrame(GameState& g, const Input& in, float frameDt, int windowW, int windowH) {
     // 1. Mô phỏng theo nhịp cố định.
-    frameDt = std::clamp(frameDt, 0.0f, kMaxFrameDt);
+    frameDt = std::clamp(frameDt, 0.0f, kMaxFrameDt); //tránh lỗi nhảy bước quá lớn khi game bị giật hoặc tạm dừng
     g.tickAccumulator += frameDt;
     int steps = 0;
     while (g.tickAccumulator >= kTickDt && steps < kMaxTicksPerFrame) {

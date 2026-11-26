@@ -8,6 +8,5 @@ class Utils {
 public:
     static float Axis(const bool* keys, SDL_Scancode neg, SDL_Scancode pos);
     static void NormalizeDirection(float& dx, float& dy);
-    // Đường dẫn tới thư mục tài nguyên (Maps, Data...) nằm cạnh file thực thi.
-    static std::string AssetPath(const std::string& subDir);
+    static std::string AssetPath(const std::string& subDir); // Đường dẫn tới thư mục tài nguyên (Maps, Data...) nằm cạnh file thực thi.
 };

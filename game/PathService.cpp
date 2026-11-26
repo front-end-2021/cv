@@ -62,6 +62,11 @@ void OrderMoveTo(GameState& g, Unit& u, float goalX, float goalY) {
     RequestPath(g, u, goalX, goalY, PathPurpose::Move);
 }
 
+void OrderAttackMoveTo(GameState& g, Unit& u, float goalX, float goalY) {
+    OrderMoveTo(g, u, goalX, goalY); // hủy lệnh cũ (kể cả chế độ cũ), ghi nhớ đích, xếp yêu cầu tìm đường
+    u.EnterAttackMove(goalX, goalY);
+}
+
 void ProcessPathRequests(GameState& g) {
     int served = 0;
     int nodes = 0;

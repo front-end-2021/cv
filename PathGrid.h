@@ -11,8 +11,7 @@ namespace pathgrid {
 
     inline float StepCost(int dir) { return dir < 4 ? 1.0f : kDiagonalCost; }
 
-    // Từ ô (row, col) bước theo hướng `dir` có hợp lệ không: ô đến phải đi được, và bước chéo
-    // thì không được cắt góc qua ô nước/đá. Luật đối xứng nên đi ngược lại cũng hợp lệ.
+    // Từ ô (row, col) bước theo hướng `dir` có hợp lệ không: ô đến phải đi được, và bước chéo thì không được cắt góc qua ô nước/đá. Luật đối xứng nên đi ngược lại cũng hợp lệ.
     inline bool CanStep(const TileMap& map, int row, int col, int dir) {
         const int nr = row + kDirRow[dir];
         const int nc = col + kDirCol[dir];

@@ -4,8 +4,7 @@
 #include <sstream>
 #include <string>
 
-// Hàm đọc dùng chung cho các file dữ liệu dạng văn bản (Data/*.txt, Maps/*.txt).
-// Mọi hàm Parse* đều chặt chẽ: thừa ký tự phía sau số, hoặc số không hợp lệ (NaN, vô cực, tràn) đều bị từ chối.
+// Hàm đọc dùng chung cho các file dữ liệu dạng văn bản (Data/*.txt, Maps/*.txt). Mọi hàm Parse* đều chặt chẽ: thừa ký tự phía sau số, hoặc số không hợp lệ (NaN, vô cực, tràn) đều bị từ chối.
 namespace dataparse {
     inline std::string Trim(const std::string& s) {
         const auto a = s.find_first_not_of(" \t\r\n");

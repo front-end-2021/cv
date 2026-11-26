@@ -130,7 +130,6 @@ void DrawMenu(SDL_Renderer* r, const MenuState& menu, int windowW, int windowH) 
     SDL_RenderDebugText(r, start.x + 78.0f, start.y + 22.0f, "START GAME");
 
     SDL_SetRenderDrawColor(r, 175, 190, 200, 255);
-    SDL_RenderDebugText(r, panel.x + 28.0f, static_cast<float>(windowH) - 48.0f,
-        "Click a map, then START. Add .txt maps to Maps folder.");
+    SDL_RenderDebugText(r, panel.x + 28.0f, static_cast<float>(windowH) - 48.0f, "Click a map, then START. Add .txt maps to Maps folder.");
     SDL_RenderPresent(r);
 }

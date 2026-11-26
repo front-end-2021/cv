@@ -40,16 +40,14 @@ struct TileMap {
     int startGold = 0;                    // vàng ban đầu của phe ta
 
     // Lớp "ô bị chiếm" phủ lên địa hình: công trình và mỏ đánh dấu các ô chúng đứng lên (game/GameState.cpp).
-    // Ô bị chiếm KHÔNG đi được, nên A*, FlowField, kiểm tra tầm nhìn và va chạm đều tự coi nó là vật cản.
-    // Rỗng (hoặc sai kích thước) = không có ô nào bị chiếm.
+    // Ô bị chiếm KHÔNG đi được, nên A*, FlowField, kiểm tra tầm nhìn và va chạm đều tự coi nó là vật cản. Rỗng (hoặc sai kích thước) = không có ô nào bị chiếm.
     std::vector<std::uint8_t> occupied;
 
     bool Empty() const { return rows <= 0 || cols <= 0; }
     float WorldW() const { return static_cast<float>(cols) * tileSize; }
     float WorldH() const { return static_cast<float>(rows) * tileSize; }
 
-    // Địa hình của ô có đi được không, KHÔNG tính công trình/mỏ (ngoài bản đồ, nước, đá -> không).
-    // Dùng để biết có xây được lên ô đó không.
+    // Địa hình của ô có đi được không, KHÔNG tính công trình/mỏ (ngoài bản đồ, nước, đá -> không). Dùng để biết có xây được lên ô đó không.
     bool IsTerrainWalkable(int row, int col) const;
     // Ô có đang bị công trình/mỏ chiếm không.
     bool IsOccupied(int row, int col) const;

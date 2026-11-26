@@ -19,5 +19,9 @@ void RequestPath(GameState& g, Unit& u, float goalX, float goalY, PathPurpose pu
 // Lệnh đi: hủy lệnh cũ, ghi nhớ đích rồi xếp yêu cầu tìm đường. Lính đứng chờ tới khi có đường (thường là tick kế tiếp).
 void OrderMoveTo(GameState& g, Unit& u, float goalX, float goalY);
 
+// Lệnh Attack-move: như OrderMoveTo nhưng lính vào chế độ AttackMove (Unit::combatMode): gặp kẻ địch trong tầm phát hiện
+// thì dừng lại đánh, xong thì đi tiếp tới (goalX, goalY) (xem AutoAcquireTarget trong game/Ai.cpp).
+void OrderAttackMoveTo(GameState& g, Unit& u, float goalX, float goalY);
+
 // Phục vụ hàng đợi trong ngân sách của MỘT tick. Gọi ở đầu mỗi tick (xem StepSimulation).
 void ProcessPathRequests(GameState& g);

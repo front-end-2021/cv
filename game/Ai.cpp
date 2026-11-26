@@ -13,6 +13,25 @@ Unit* FindNearestFoe(GameState& g, const Unit& self, float radius, EntityId igno
     return best;
 }
 
+Unit* FindFoeInReach(GameState& g, const Unit& self, EntityId ignore) {
+    Unit* best = nullptr;
+    float bestDist = 1e18f;
+    for (auto& o : g.units) {
+        if (o.team == self.team || !o.IsAlive() || o.id == ignore || !self.InAttackRange(o)) continue;
+        const float d = self.DistanceTo(o);
+        if (d < bestDist) { bestDist = d; best = &o; }
+    }
+    return best;
+}
+
+namespace {
+    // Ra lệnh đánh một mục tiêu do bộ não tự chọn. Lính đang AttackMove thì nhớ là đang bận đánh giữa đường để xong còn đi tiếp.
+    void EngageAuto(Unit& u, EntityId foeId) {
+        u.OrderAttack(foeId, true);
+        if (u.IsAttackMoving()) u.attackMoveEngaged = true;
+    }
+}
+
 void AutoAcquireTarget(GameState& g, Unit& u, float dt) {
     if (!u.IsAlive() || u.state == UnitState::Dead) return;
     const bool aiControlled = (u.team == Team::Enemy);
@@ -34,30 +53,49 @@ void AutoAcquireTarget(GameState& g, Unit& u, float dt) {
             u.ClearTarget();
             u.lastAttackerId = kNoEntity; // bỏ luôn mối thù, nếu không sẽ bị kéo lại ngay tick sau
         }
+        // 1b. Giữ vị trí: mục tiêu đã bước ra khỏi tầm đánh thì thôi, không đuổi theo (đòn đang ra thì để đánh nốt).
+        else if (u.IsHolding() && u.state != UnitState::Attack && !u.InAttackRange(*target)) {
+            u.ClearTarget();
+        }
     }
     if (u.HasTarget()) return; // đã có việc để làm
 
-    // 2. Lính phe ta đang theo lệnh đi (kể cả lúc còn chờ đường) hoặc đang làm việc (thợ) thì không tự ý đổi ý.
-    //    AI địch thì không có lệnh nào khác.
-    if (!aiControlled && (u.hasMoveGoal || !u.path.empty() || u.job.kind != JobKind::None)) return;
+    // 1c. AttackMove: không còn mục tiêu giữa đường -> đi tiếp tới đích (đòn đang ra thì đợi đánh nốt); không đang bận đánh mà cũng hết đường đi -> đã tới nơi (hoặc không đi tiếp được): lệnh xong.
+    if (u.IsAttackMoving()) {
+        if (u.attackMoveEngaged) {
+            if (u.state != UnitState::Attack) OrderAttackMoveTo(g, u, u.attackMoveGoal.x, u.attackMoveGoal.y);
+        }
+        else if (!u.hasMoveGoal && u.path.empty() && !u.pathPending) {
+            u.ResetCombatMode();
+        }
+    }
 
-    // 3. Đánh trả kẻ vừa đánh mình, miễn là nó chưa đứng quá xa (nếu không sẽ bị bỏ cuộc ngay ở bước 1).
+    // 2. Lính phe ta đang theo lệnh đi (kể cả lúc còn chờ đường) hoặc đang làm việc (thợ) thì không tự ý đổi ý.
+    //    AI địch thì không có lệnh nào khác. Riêng AttackMove là lệnh "vừa đi vừa đánh" nên vẫn tự chọn mục tiêu giữa đường.
+    if (!aiControlled && !u.IsAttackMoving() && (u.hasMoveGoal || !u.path.empty() || u.job.kind != JobKind::None)) return;
+
+    // Lính không tự đánh ai (AggroRange = 0, như thợ) thì giữ vị trí cũng chỉ là đứng yên.
+    if (u.IsHolding() && u.AggroRange <= 0.0f) return;
+
+    // 3. Đánh trả kẻ vừa đánh mình, miễn là nó chưa đứng quá xa (nếu không sẽ bị bỏ cuộc ngay ở bước 1). Đang giữ vị trí thì chỉ đánh trả kẻ đã lọt vào tầm đánh (không đuổi theo).
     if (u.lastAttackerId != kNoEntity) {
         const Unit* attacker = g.FindUnit(u.lastAttackerId);
         if (attacker && attacker->IsAlive() && attacker->id != u.unreachableTargetId &&
-            u.DistanceTo(*attacker) <= u.AggroRange * kLeashFactor) {
-            u.OrderAttack(attacker->id, true);
+            (u.IsHolding() ? u.InAttackRange(*attacker) : u.DistanceTo(*attacker) <= u.AggroRange * kLeashFactor)) {
+            EngageAuto(u, attacker->id);
             return;
         }
         u.lastAttackerId = kNoEntity;
     }
 
-    // 4. Quét định kỳ tìm kẻ địch trong tầm phát hiện.
+    // 4. Quét định kỳ tìm kẻ địch: trong tầm phát hiện (đang giữ vị trí thì chỉ trong tầm đánh).
     u.scanTimer -= dt;
     if (u.scanTimer > 0.0f) return;
     u.scanTimer = kScanInterval;
-    if (const Unit* foe = FindNearestFoe(g, u, u.AggroRange, u.unreachableTargetId)) {
-        u.OrderAttack(foe->id, true);
+    const Unit* foe = u.IsHolding() ? FindFoeInReach(g, u, u.unreachableTargetId)
+                                    : FindNearestFoe(g, u, u.AggroRange, u.unreachableTargetId);
+    if (foe) {
+        EngageAuto(u, foe->id);
         return;
     }
 

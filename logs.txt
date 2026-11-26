@@ -30,7 +30,7 @@ Cách chạy
 
 Setup / init: cmake -S . -B build -DMINIRTS_BUILD_TESTS=ON
 
-Build full: cmake --build build --target AiTests EconomyTests PathingTests StressTest
+Build full: cmake --build build --target AiTests CombatTests EconomyTests PathingTests StressTest 
 
 Chạy full: ctest --test-dir build -C Debug --output-on-failure
 

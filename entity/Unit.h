@@ -14,6 +14,15 @@ enum class JobKind : std::uint8_t {
     Build    // đi tới công trình đang xây dở rồi xây
 };
 
+// Chế độ chiến đấu do người chơi đặt bằng các lệnh H / A + click (xem game/Orders.h). Chỉ ảnh hưởng cách lính tự chọn
+// mục tiêu và có đuổi theo hay không (xem AutoAcquireTarget trong game/Ai.cpp). Mọi lệnh đi hoặc đánh MỚI của người chơi,
+// và lệnh Stop, đưa lính về Normal.
+enum class CombatMode : std::uint8_t {
+    Normal,      // mặc định: theo lệnh đi; đứng yên thì tự vệ trong tầm phát hiện (AggroRange)
+    Hold,        // giữ vị trí: không bao giờ rời chỗ để đuổi theo ai, chỉ đánh kẻ lọt vào tầm đánh (Range)
+    AttackMove   // đi tới attackMoveGoal; gặp kẻ địch trong tầm phát hiện thì dừng lại đánh, xong thì đi tiếp
+};
+
 struct WorkJob {
     JobKind kind = JobKind::None;
     EntityId target = kNoEntity;   // Gather: mỏ đang đào; Build: công trình đang xây
@@ -74,6 +83,11 @@ public:
 	float chaseGoalY = 0.0f;
 	bool hitDone = false;        // Đòn đánh hiện tại đã gây sát thương chưa
 
+	// ---- Chế độ chiến đấu (xem CombatMode; logic ở game/Ai.cpp) ----
+	CombatMode combatMode = CombatMode::Normal;
+	Waypoint attackMoveGoal{ 0.0f, 0.0f }; // AttackMove: đích cuối của lệnh; vẫn nhớ khi đang bận đánh giữa đường
+	bool attackMoveEngaged = false;        // AttackMove: đang đuổi/đánh một mục tiêu tự chọn; xong thì đi tiếp tới attackMoveGoal
+
 	// ---- Dành cho AI ----
 	float scanTimer = 0.0f;      // Giãn cách giữa hai lần quét tìm kẻ địch
 	bool hasHome = false;        // Có chỗ để quay về khi hết việc không
@@ -89,6 +103,18 @@ public:
 	void StartMoveOrder(float goalX, float goalY);             // đi tới nơi, đường chưa có: dùng OrderMoveTo (game/PathService.h)
 	void OrderAttack(EntityId target, bool automatic = false); // đuổi theo rồi đánh mục tiêu
 	void ClearTarget();                                        // bỏ lệnh tấn công / lệnh đi và dừng lại
+	// Stop (phím S): bỏ mọi lệnh đi / đánh / việc đang làm, về chế độ Normal và đứng lại; cắt ngang cả đòn đang ra.
+	void OrderStop();
+	// Hold position (phím H): như Stop nhưng vào chế độ Hold. Mục tiêu đang đánh (nếu có) được giữ lại tới khi nó ra
+	// khỏi tầm đánh (AutoAcquireTarget sẽ bỏ nó, không đuổi theo).
+	void OrderHold();
+	// Vào chế độ AttackMove với đích (goalX, goalY). KHÔNG tự ra lệnh đi: gọi SAU OrderMoveTo / OrderMove
+	// (xem OrderAttackMoveTo trong game/PathService.h).
+	void EnterAttackMove(float goalX, float goalY);
+	bool IsHolding() const { return combatMode == CombatMode::Hold; }
+	bool IsAttackMoving() const { return combatMode == CombatMode::AttackMove; }
+	// Về chế độ Normal (bỏ luôn việc "đang đánh giữa đường" của AttackMove).
+	void ResetCombatMode() { combatMode = CombatMode::Normal; attackMoveEngaged = false; }
 	// Bỏ yêu cầu tìm đường đang chờ (nếu có): kết quả của nó, khi tới, sẽ bị bỏ qua.
 	void CancelPathRequest() { pathPending = false; ++pathTicket; }
 	// Bắt đầu theo dõi tiến độ đi từ chỗ đang đứng (gọi mỗi khi có đường đi mới).

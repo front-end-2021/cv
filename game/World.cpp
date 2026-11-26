@@ -62,6 +62,7 @@ void InitializeWorld(GameState& g) {
     g.resources.clear();
     g.map.ClearOccupancy();
     g.placement = PlacementMode{};
+    g.attackMoveArmed = false;
     g.notice.clear();
     g.noticeTimer = 0.0f;
     g.gold[0] = g.gold[1] = 0;

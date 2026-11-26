@@ -9,7 +9,8 @@
 void MoveUnitAlongPath(GameState& g, Unit& u, float dt);
 
 // Tách các Unit đang đè lên nhau (gọi sau khi mọi Unit đã di chuyển).
-//  - Lính đứng yên bị lính đang đi đẩy ra (như trước).
+//  - Lính đứng yên bị lính đang đi đẩy ra (như trước). Lính đang giữ vị trí (Hold) được tính như lính đang đi:
+//    chỉ nhường một nửa chứ không bị đẩy lệch hẳn khỏi chỗ.
 //  - Hai lính cùng đứng yên: mỗi bên nhường một nửa.
 //  - Hai lính cùng ĐANG ĐI: mỗi bên nhường một nửa, bên nào đang tiến về phía bên kia thì còn né sang phải
 //    của mình (giao thông bên phải) để hai đoàn ngược chiều lách qua nhau thay vì kẹt cứng.

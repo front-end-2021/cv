@@ -62,7 +62,7 @@ namespace {
             }
 
             // Vẽ dấu (+) ở điểm đích cuối cùng (không vẽ khi đang đuổi theo mục tiêu)
-            if (!p.HasTarget() && p.team == Team::Player) {
+            if (!p.HasTarget() && p.team == Team::Player && !p.IsAttackMoving()) {
                 SDL_SetRenderDrawColor(r, 100, 255, 120, 230);
                 SDL_RenderLine(r, prevX - 5.0f, prevY, prevX + 5.0f, prevY);
                 SDL_RenderLine(r, prevX, prevY - 5.0f, prevX, prevY + 5.0f);
@@ -70,11 +70,34 @@ namespace {
         }
     }
 
+    // Dấu (x) đỏ ở đích của lệnh Attack-move, cho các lính phe ta đang được chọn (kể cả lúc đang bận đánh giữa đường).
+    void RenderAttackMoveMarkers(SDL_Renderer* r, const GameState& g, float camX, float camY) {
+        SDL_SetRenderDrawColor(r, 255, 90, 70, 230);
+        for (const auto& u : g.units) {
+            if (!u.selected || u.team != Team::Player || !u.IsAlive() || !u.IsAttackMoving()) continue;
+            const float gx = u.attackMoveGoal.x - camX;
+            const float gy = u.attackMoveGoal.y - camY;
+            SDL_RenderLine(r, gx - 5.0f, gy - 5.0f, gx + 5.0f, gy + 5.0f);
+            SDL_RenderLine(r, gx - 5.0f, gy + 5.0f, gx + 5.0f, gy - 5.0f);
+        }
+    }
+
+    // Con trỏ chữ thập đỏ khi đang chờ chọn điểm Attack-move.
+    void RenderAttackMoveCursor(SDL_Renderer* r) {
+        float mx = 0.0f, my = 0.0f;
+        SDL_GetMouseState(&mx, &my);
+        SDL_SetRenderDrawColor(r, 255, 90, 70, 255);
+        SDL_RenderLine(r, mx - 12.0f, my, mx + 12.0f, my);
+        SDL_RenderLine(r, mx, my - 12.0f, mx, my + 12.0f);
+        const SDL_FRect box = { mx - 7.0f, my - 7.0f, 14.0f, 14.0f };
+        SDL_RenderRect(r, &box);
+    }
+
     // Vẽ tất cả các Unit; unit ở phía dưới (y lớn hơn) vẽ sau để che unit phía trên.
     void RenderUnits(SDL_Renderer* r, const GameState& g, float camX, float camY) {
         const float alpha = g.renderAlpha;
         std::vector<const Unit*> drawOrder;
-        drawOrder.reserve(g.units.size());
+        drawOrder.reserve(g.units.size()); // cấp phát trước một vùng nhớ cho drawOrder đủ để chứa lượng phần tử = size của g.units
         for (const auto& p : g.units) { if (!p.IsGone()) drawOrder.push_back(&p); }
         std::sort(drawOrder.begin(), drawOrder.end(), [alpha](const Unit* a, const Unit* b) {
             return a->RenderY(alpha) < b->RenderY(alpha); });
@@ -221,9 +244,14 @@ namespace {
         }
         else {
             bool anyWorker = false;
+            bool anyUnit = false;
             for (const auto& u : g.units) {
-                if (u.selected && u.team == Team::Player && u.IsAlive() && u.IsWorker()) { anyWorker = true; break; }
+                if (!(u.selected && u.team == Team::Player && u.IsAlive())) continue;
+                anyUnit = true;
+                if (u.IsWorker()) anyWorker = true;
             }
+            if (g.attackMoveArmed) add("ATTACK-MOVE   LMB: choose destination   RMB/Esc: cancel", 255, 130, 110);
+            else if (anyUnit) add("Units: A = attack-move   S = stop   H = hold position");
             if (anyWorker) add("Worker: B = build   RMB on gold mine = mine   RMB on building site = build");
 
             for (const auto& b : g.buildings) {
@@ -300,8 +328,10 @@ void RenderGame(SDL_Renderer* r, const GameState& g, int windowW, int windowH) {
     RenderPaths(r, g, camX, camY);
     RenderUnits(r, g, camX, camY);
     RenderRallyPoints(r, g, camX, camY);
+    RenderAttackMoveMarkers(r, g, camX, camY);
     RenderPlacementGhost(r, g, camX, camY);
     RenderSelectionBox(r, g, camX, camY);
+    if (g.attackMoveArmed) RenderAttackMoveCursor(r);
     RenderHud(r, g, windowW, windowH);
     RenderEconomyHud(r, g, windowH);
     if (g.debugMode) RenderDebugOverlay(r, g);

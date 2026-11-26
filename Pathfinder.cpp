@@ -51,8 +51,7 @@ namespace {
         }
     };
 
-    // Khoảng cách octile: ước lượng đúng cho lưới 8 hướng (thẳng = 1, chéo = sqrt(2)), sát thực tế hơn
-    // khoảng cách đường thẳng nên A* mở ít ô hơn mà vẫn tìm ra đường ngắn nhất.
+    // Khoảng cách octile: ước lượng đúng cho lưới 8 hướng (thẳng = 1, chéo = sqrt(2)), sát thực tế hơn khoảng cách đường thẳng nên A* mở ít ô hơn mà vẫn tìm ra đường ngắn nhất.
     float OctileDistance(int dr, int dc) {
         const float a = static_cast<float>(std::abs(dr));
         const float b = static_cast<float>(std::abs(dc));
@@ -171,8 +170,7 @@ PathResult Pathfinder::FindRaw(const TileMap& map, float startX, float startY, f
         NormalizeGoal(map, goalPoint.x, goalPoint.y);
     }
     else {
-        // Đích là nước/đá: dời tới ô đi được GẦN ĐIỂM BẤM NHẤT (các lính có điểm đích khác nhau
-        // trong đội hình sẽ được dời tới các ô khác nhau).
+        // Đích là nước/đá: dời tới ô đi được GẦN ĐIỂM BẤM NHẤT (các lính có điểm đích khác nhau trong đội hình sẽ được dời tới các ô khác nhau).
         if (!SnapToWalkable(map, clickX, clickY, goalR, goalC)) return result;
         goalPoint = TileCenter(map, goalR, goalC);
     }
@@ -251,8 +249,7 @@ PathResult Pathfinder::FindRaw(const TileMap& map, float startX, float startY, f
         endIdx = bestIdx;
     }
 
-    // 4. Truy vết ngược từ đích về xuất phát. Mốc cuối là điểm đích chính xác (hoặc tâm ô gần nhất nếu
-    //    đích không với tới được), các mốc giữa lấy tâm ô.
+    // 4. Truy vết ngược từ đích về xuất phát. Mốc cuối là điểm đích chính xác (hoặc tâm ô gần nhất nếu đích không với tới được), các mốc giữa lấy tâm ô.
     std::vector<Waypoint> pts;
     for (int idx = endIdx; idx != startIdx && idx != -1; idx = ws.parent[static_cast<std::size_t>(idx)]) {
         if (idx == endIdx && found) pts.push_back(goalPoint);

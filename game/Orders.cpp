@@ -42,9 +42,8 @@ Building* FindBuildingAt(GameState& g, float wx, float wy, Team team) {
 }
 
 namespace {
-    // Lệnh đi cho cả nhóm đông: MỘT lần tìm đường chung về ô đích (FlowField) rồi mỗi lính lần theo cây tới vị trí
-    // đội hình của mình, thay vì mỗi lính một lần A*. Lính nào không dựng được đường theo cách này (vị trí đội hình
-    // khuất sau tường, không nối được tới đích...) thì xếp hàng xin đường riêng.
+    // Lệnh đi cho cả nhóm đông: MỘT lần tìm đường chung về ô đích (FlowField) rồi mỗi lính lần theo cây tới vị trí đội hình của mình, thay vì mỗi lính một lần A*.
+    // Lính nào không dựng được đường theo cách này (vị trí đội hình khuất sau tường, không nối được tới đích...) thì xếp hàng xin đường riêng.
     void IssueGroupMove(GameState& g, const std::vector<Unit*>& units, const std::vector<Waypoint>& slots,
         const std::vector<int>& slotOf, float targetX, float targetY) {
         int goalRow = 0, goalCol = 0;
@@ -76,8 +75,10 @@ namespace {
 }
 
 namespace {
-    // Ra lệnh đi theo đội hình cho đúng các lính trong `units` (không rỗng).
-    void MoveInFormation(GameState& g, const std::vector<Unit*>& selectedUnits, float targetWorldX, float targetWorldY) {
+    // Ra lệnh đi theo đội hình cho đúng các lính trong `units` (không rỗng). attackMove: mỗi lính vào chế độ AttackMove
+    // với đích là vị trí đội hình của mình (đặt SAU khi ra lệnh đi, vì lệnh đi đưa lính về chế độ Normal).
+    void MoveInFormation(GameState& g, const std::vector<Unit*>& selectedUnits, float targetWorldX, float targetWorldY,
+        bool attackMove = false) {
         if (selectedUnits.empty()) return;
         for (Unit* u : selectedUnits) u->CancelJob(); // lệnh của người chơi thay cho việc thợ đang làm
 
@@ -94,12 +95,19 @@ namespace {
 
         if (static_cast<int>(selectedUnits.size()) >= kGroupSearchMinUnits) {
             IssueGroupMove(g, selectedUnits, slots, slotOf, targetWorldX, targetWorldY);
-            return;
         }
-        // Nhóm nhỏ: mỗi lính xin một đường A* riêng (xếp hàng, phục vụ ở đầu tick kế tiếp).
-        for (size_t i = 0; i < selectedUnits.size(); ++i) {
-            const Waypoint slot = slots[static_cast<size_t>(slotOf[i])];
-            OrderMoveTo(g, *selectedUnits[i], slot.x, slot.y);
+        else {
+            // Nhóm nhỏ: mỗi lính xin một đường A* riêng (xếp hàng, phục vụ ở đầu tick kế tiếp).
+            for (size_t i = 0; i < selectedUnits.size(); ++i) {
+                const Waypoint slot = slots[static_cast<size_t>(slotOf[i])];
+                OrderMoveTo(g, *selectedUnits[i], slot.x, slot.y);
+            }
+        }
+        if (attackMove) {
+            for (size_t i = 0; i < selectedUnits.size(); ++i) {
+                const Waypoint slot = slots[static_cast<size_t>(slotOf[i])];
+                selectedUnits[i]->EnterAttackMove(slot.x, slot.y);
+            }
         }
     }
 
@@ -132,6 +140,29 @@ void IssueAttackOrder(GameState& g, EntityId victim) {
             p.OrderAttack(victim);
         }
     }
+}
+
+int IssueStopOrder(GameState& g) {
+    const std::vector<Unit*> units = SelectedPlayerUnits(g);
+    for (Unit* u : units) u->OrderStop();
+    return static_cast<int>(units.size());
+}
+
+int IssueHoldOrder(GameState& g) {
+    const std::vector<Unit*> units = SelectedPlayerUnits(g);
+    for (Unit* u : units) u->OrderHold();
+    return static_cast<int>(units.size());
+}
+
+int IssueAttackMoveOrder(GameState& g, float wx, float wy) {
+    const std::vector<Unit*> units = SelectedPlayerUnits(g);
+    if (units.empty()) return 0;
+    if (const Unit* foe = FindEnemyAt(g, wx, wy)) {
+        IssueAttackOrder(g, foe->id);
+        return static_cast<int>(units.size());
+    }
+    MoveInFormation(g, units, wx, wy, true); // (đã hủy việc đang làm của thợ)
+    return static_cast<int>(units.size());
 }
 
 std::vector<EntityId> SelectedWorkerIds(const GameState& g) {

@@ -4,8 +4,7 @@
 #include <vector>
 #include "Common.h"
 
-// Danh sách điểm mốc còn lại của một đường đi. Lấy mốc ở đầu ra (pop_front) chỉ là tăng chỉ số
-// `head_` nên O(1), thay cho `std::vector::erase(begin())` vốn dịch cả mảng (O(n)) mỗi lần tới một mốc.
+// Danh sách điểm mốc còn lại của một đường đi. Lấy mốc ở đầu ra (pop_front) chỉ là tăng chỉ số `head_` nên O(1), thay cho `std::vector::erase(begin())` vốn dịch cả mảng (O(n)) mỗi lần tới một mốc.
 // Giữ các tên hàm giống std::vector (empty, front, clear...) để code cũ gần như không phải sửa.
 class Path {
 public:

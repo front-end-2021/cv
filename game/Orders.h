@@ -24,6 +24,21 @@ void IssueFormationMoveOrder(GameState& g, const std::vector<EntityId>& ids, flo
 // Ra lệnh cho các Unit phe ta đang được chọn: đuổi theo rồi đánh `victim` (hủy việc đang làm của thợ).
 void IssueAttackOrder(GameState& g, EntityId victim);
 
+// Stop (phím S) cho các lính phe ta đang được chọn: bỏ lệnh đi / đánh / việc đang làm, đứng lại ngay, về chế độ
+// Normal (xem Unit::OrderStop). Trả về số lính nhận lệnh.
+int IssueStopOrder(GameState& g);
+
+// Hold position (phím H) cho các lính phe ta đang được chọn: đứng yên tại chỗ, chỉ đánh kẻ đã nằm trong tầm đánh,
+// không đuổi theo (xem Unit::OrderHold). Mọi lệnh đi / đánh sau đó của người chơi hủy chế độ này. Trả về số lính nhận lệnh.
+int IssueHoldOrder(GameState& g);
+
+// Attack-move (phím A rồi bấm chuột trái) tới điểm (wx, wy) cho các lính phe ta đang được chọn.
+//   - Có kẻ địch dưới điểm bấm: tấn công thẳng kẻ đó (như chuột phải).
+//   - Còn lại: cả nhóm đi theo đội hình như lệnh đi, mỗi lính vào chế độ AttackMove tới vị trí đội hình của mình:
+//     gặp kẻ địch trong tầm phát hiện thì dừng lại đánh, xong thì đi tiếp (hủy việc đang làm của thợ).
+// Trả về số lính nhận lệnh.
+int IssueAttackMoveOrder(GameState& g, float wx, float wy);
+
 // Chuột phải tại điểm (wx, wy) trên thế giới. Tùy thứ nằm dưới điểm đó và những gì đang được chọn:
 //   - đang chọn lính: kẻ địch -> tấn công; mỏ -> thợ đi đào (lính khác đi tới gần mỏ); công trình xây dở của phe ta ->
 //     thợ đi xây; kho của phe ta -> thợ đang mang hàng đi nộp; còn lại -> đi tới đó theo đội hình.

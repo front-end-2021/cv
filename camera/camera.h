@@ -11,6 +11,8 @@ class Camera {
 public:
 	float x = 0.0f;
 	float y = 0.0f;
+	// Phần đáy cửa sổ bị HUD che (pixel): camera được phép cuộn thêm ngần này xuống dưới đáy bản đồ để ô cuối cùng của bản đồ nằm ngay trên HUD, không bị HUD che mất.
+	float bottomInset = 0.0f;
 
 	Camera(float startX, float startY);
 	void ClampCamera(float px, float py, int windowW, int windowH, float worldW, float worldH);

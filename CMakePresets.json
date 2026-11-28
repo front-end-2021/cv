@@ -1,0 +1,51 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "windows-base",
+      "hidden": true,
+      "generator": "Ninja",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "toolset": {
+        "value": "host=x64",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "FETCHCONTENT_BASE_DIR": "${sourceDir}/out/_deps"
+      }
+    },
+    {
+      "name": "game-debug",
+      "displayName": "Game - Debug (Không Test)",
+      "inherits": "windows-base",
+      "binaryDir": "${sourceDir}/out/build/game-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "MINIRTS_BUILD_TESTS": "OFF"
+      }
+    },
+    {
+      "name": "game-release",
+      "displayName": "Game - Release (Tối ưu FPS)",
+      "inherits": "windows-base",
+      "binaryDir": "${sourceDir}/out/build/game-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "MINIRTS_BUILD_TESTS": "OFF"
+      }
+    },
+    {
+      "name": "test-debug",
+      "displayName": "Test - Debug (Có Unit Tests)",
+      "inherits": "windows-base",
+      "binaryDir": "${sourceDir}/out/build/test-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "MINIRTS_BUILD_TESTS": "ON"
+      }
+    }
+  ]
+}

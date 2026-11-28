@@ -1,6 +1,7 @@
 build/
 .vs/
 out/
+build-test-debug/
 backup/
 build/**
 cmake-build-*/**

@@ -6,7 +6,10 @@
 // Lệnh từ bàn phím và chế độ đặt nhà. Tách khỏi SDL (chỉ nhận dữ liệu thuần) để kiểm thử được không cần cửa sổ; main.cpp chỉ việc đổi phím / chuột thành các lời gọi này.
 //
 //   B               bật/tắt chế độ đặt nhà (cần đang chọn ít nhất một thợ)
-//   1..9            đang đặt nhà: chọn loại công trình; không thì: huấn luyện đơn vị thứ n của công trình đang chọn
+//   1..9            đang đặt nhà: chọn loại công trình; đang chọn công trình huấn luyện được và n <= số loại nó huấn luyện được: huấn luyện đơn vị thứ n;
+//                   còn lại: gọi nhóm điều khiển n (chọn đúng các lính đã lưu trong nhóm). Muốn gọi nhóm khi đang chọn công trình huấn luyện được
+//                   mà n trùng phím huấn luyện thì bấm nút nhóm trên HUD (hoặc bỏ chọn công trình trước)
+//   Ctrl+1..9       lưu các lính phe ta đang chọn thành nhóm điều khiển n (công trình không vào nhóm được)
 //   chuột trái      đang đặt nhà: đặt móng tại bóng mờ (xanh = được, đỏ = không)
 //   chuột phải/Esc  đang đặt nhà: thoát chế độ
 //   Delete/Backspace  đang đặt nhà: thoát chế độ; không thì: hủy công trình xây dở đang chọn (hoàn 75%), hoặc hủy đơn vị cuối hàng đợi của công trình đang chọn (hoàn đủ)
@@ -43,6 +46,8 @@ void HandleAttackMoveKey(GameState& g);
 
 void HandleBuildKey(GameState& g);
 void HandleNumberKey(GameState& g, int number);
+// Ctrl+số: lưu vùng chọn thành nhóm điều khiển `number` (1..kControlGroupCount), kèm thông báo; không có lính nào được chọn thì báo lỗi và giữ nguyên nhóm cũ.
+void HandleSaveGroupKey(GameState& g, int number);
 void HandleCancelKey(GameState& g);
 
 // Các loại đơn vị mà bộ công trình đang chọn huấn luyện được (chỉ công trình đã xây xong), theo thứ tự xuất hiện đầu tiên, không trùng. 

@@ -28,19 +28,20 @@ Các test chỉ dựng GameState trong bộ nhớ, không cần map, không mở
 
 Cách chạy
 
-Setup / init: cmake -S . -B build -DMINIRTS_BUILD_TESTS=ON
+Setup / init:       cmake -S . -B build/test-debug -DMINIRTS_BUILD_TESTS=ON
+Hoac theo cach sau: cmake -S . -B build/test-debug -DMINIRTS_BUILD_TESTS=ON -G Ninja -DCMAKE_BUILD_TYPE=Debug
 
-Build full: cmake --build build --target AiTests CombatTests EconomyTests PathingTests StressTest 
-
-Chạy full: ctest --test-dir build -C Debug --output-on-failure
+Build full: cmake --build build/test-debug --target AiTests CombatTests EconomyTests PathingTests StressTest UiTests
+            
+Chạy full: ctest --test-dir build/test-debug -C Debug --output-on-failure
 
 --- Hết ---
 
-Nếu muốn build file riêng lẻ: cmake --build build --target AiTests
+Nếu muốn build file riêng lẻ: cmake --build build/test-debug --target AiTests
 
 Nếu muốn chạy riêng lẻ: có 2 cách 
-build\Debug\AiTests.exe              # chạy tất cả
-build\Debug\AiTests.exe Retaliat     # chỉ chạy test có tên chứa chuỗi này
+build\test-debug\AiTests.exe              # chạy tất cả
+build\test-debug\AiTests.exe Retaliat     # chỉ chạy test có tên chứa chuỗi này
 
 
 ---

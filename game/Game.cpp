@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cmath>
 #include "game/Commands.h"
+#include "game/Hud.h"
 #include "game/Selection.h"
 #include "game/Simulation.h"
 
@@ -20,6 +21,7 @@ void UpdateGameFrame(GameState& g, const Input& in, float frameDt, int windowW, 
     g.renderAlpha = std::clamp(g.tickAccumulator / kTickDt, 0.0f, 1.0f);
 
     // 2. Camera và chọn quân (theo khung hình).
+    g.camera.bottomInset = kHudPanelHeight; // bản đồ cuộn thêm một đoạn để ô cuối nằm trên bảng HUD, không bị che
     g.camera.UpdateCamera(in, std::min(frameDt, 0.1f), windowW, windowH, g.map.WorldW(), g.map.WorldH());
     if (in.keys[SDL_SCANCODE_SPACE]) FocusCameraOnSelection(g, windowW, windowH);
     UpdateSelection(g, in.mouseX, in.mouseY);

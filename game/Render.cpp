@@ -3,9 +3,8 @@
 #include <cmath>
 #include <string>
 #include <vector>
-#include "game/Commands.h"
 #include "game/Construction.h"
-#include "game/Economy.h"
+#include "game/Hud.h"
 #include "game/Selection.h"
 
 namespace {
@@ -175,7 +174,7 @@ namespace {
         SDL_RenderRect(r, &selectScreenRect);
     }
 
-    // HUD: số quân còn lại + thông báo kết quả
+    // Bộ đếm quân (góc trên phải) + banner kết quả. Phần còn lại của HUD nằm ở game/Hud.cpp.
     void RenderHud(SDL_Renderer* r, const GameState& g, int windowW, int windowH) {
         const std::string hud =
             "Player " + std::to_string(g.CountUnits(Team::Player, true)) + "/" + std::to_string(g.StartCount(Team::Player)) +
@@ -197,94 +196,6 @@ namespace {
         SDL_RenderDebugText(r, cx - static_cast<float>(title.size()) * 4.0f, cy - 20.0f, title.c_str());
         SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
         SDL_RenderDebugText(r, cx - static_cast<float>(hint.size()) * 4.0f, cy + 12.0f, hint.c_str());
-    }
-
-    // Khung chữ nền tối ở góc dưới-trái; mỗi dòng một màu.
-    struct HudLine { std::string text; Uint8 r, g, b; };
-    void RenderTextPanel(SDL_Renderer* r, const std::vector<HudLine>& lines, float x, float bottom) {
-        if (lines.empty()) return;
-        float width = 0.0f;
-        for (const auto& l : lines) width = std::max(width, static_cast<float>(l.text.size()) * 8.0f);
-        const float height = static_cast<float>(lines.size()) * 14.0f + 10.0f;
-        SDL_FRect panel = { x, bottom - height, width + 16.0f, height };
-        SDL_SetRenderDrawColor(r, 0, 0, 0, 160);
-        SDL_RenderFillRect(r, &panel);
-        float y = panel.y + 6.0f;
-        for (const auto& l : lines) {
-            SDL_SetRenderDrawColor(r, l.r, l.g, l.b, 255);
-            SDL_RenderDebugText(r, panel.x + 8.0f, y, l.text.c_str());
-            y += 14.0f;
-        }
-    }
-
-    // Vàng, slot quân (trên cùng bên trái) và bảng gợi ý lệnh theo thứ đang chọn (dưới cùng bên trái).
-    void RenderEconomyHud(SDL_Renderer* r, const GameState& g, int windowH) {
-        if (g.economyActive) {
-            const std::string bar = "Gold: " + std::to_string(g.Gold(Team::Player)) +
-                "   Supply: " + std::to_string(SupplyUsed(g, Team::Player)) + "/" + std::to_string(SupplyCap(g, Team::Player));
-            SDL_FRect back = { 6.0f, 6.0f, static_cast<float>(bar.size()) * 8.0f + 12.0f, 20.0f };
-            SDL_SetRenderDrawColor(r, 0, 0, 0, 160);
-            SDL_RenderFillRect(r, &back);
-            SDL_SetRenderDrawColor(r, 255, 225, 90, 255);
-            SDL_RenderDebugText(r, 12.0f, 12.0f, bar.c_str());
-        }
-
-        std::vector<HudLine> lines;
-        auto add = [&](const std::string& text, Uint8 cr = 235, Uint8 cg = 235, Uint8 cb = 235) { lines.push_back({ text, cr, cg, cb }); };
-
-        if (g.placement.active) {
-            add("BUILD MODE   LMB: place   RMB/Esc: cancel", 160, 255, 170);
-            std::string row;
-            for (int i = 0; i < g.buildingTypes.Count() && i < 9; ++i) {
-                const BuildingType& t = g.buildingTypes.Get(i);
-                row += (i == g.placement.buildingType ? "> " : "  ");
-                row += "[" + std::to_string(i + 1) + "] " + t.name + " " + std::to_string(t.cost) + "g  ";
-            }
-            add(row);
-        }
-        else {
-            bool anyWorker = false;
-            bool anyUnit = false;
-            for (const auto& u : g.units) {
-                if (!(u.selected && u.team == Team::Player && u.IsAlive())) continue;
-                anyUnit = true;
-                if (u.IsWorker()) anyWorker = true;
-            }
-            if (g.attackMoveArmed) add("ATTACK-MOVE   LMB: choose destination   RMB/Esc: cancel", 255, 130, 110);
-            else if (anyUnit) add("Units: A = attack-move   S = stop   H = hold position");
-            if (anyWorker) add("Worker: B = build   RMB on gold mine = mine   RMB on building site = build");
-
-            for (const auto& b : g.buildings) {
-                if (!b.selected || b.team != Team::Player) continue;
-                if (!b.complete) {
-                    add(b.label + ": under construction " + std::to_string(static_cast<int>(b.progress * 100.0f)) + "%   Del: cancel (75% refund)");
-                    continue;
-                }
-                add(b.label + "  HP " + std::to_string(b.HpValue) + "/" + std::to_string(b.HpMax));
-            }
-            const std::vector<int> options = TrainableUnitTypes(g);
-            if (!options.empty()) {
-                std::string row;
-                for (size_t i = 0; i < options.size() && i < 9; ++i) {
-                    const UnitType& t = g.unitTypes.Get(options[i]);
-                    row += "[" + std::to_string(i + 1) + "] " + t.name + " " + std::to_string(t.cost) + "g  ";
-                }
-                add("Train: " + row);
-                for (const auto& b : g.buildings) {
-                    if (!b.selected || b.team != Team::Player || b.queue.empty()) continue;
-                    std::string q = "Queue (" + b.label + "): ";
-                    for (size_t i = 0; i < b.queue.size(); ++i) {
-                        q += g.unitTypes.Get(b.queue[i].unitType).name;
-                        if (i == 0) q += " " + std::to_string(static_cast<int>(b.queue[i].Ratio() * 100.0f)) + "%";
-                        if (i + 1 < b.queue.size()) q += " | ";
-                    }
-                    add(q, 160, 215, 255);
-                }
-                add("RMB: set rally point   Backspace: cancel last in queue");
-            }
-        }
-        if (g.noticeTimer > 0.0f && !g.notice.empty()) add(g.notice, 255, 170, 90);
-        RenderTextPanel(r, lines, 8.0f, static_cast<float>(windowH) - 8.0f);
     }
 
     void RenderDebugOverlay(SDL_Renderer* r, const GameState& g) {
@@ -333,7 +244,7 @@ void RenderGame(SDL_Renderer* r, const GameState& g, int windowW, int windowH) {
     RenderSelectionBox(r, g, camX, camY);
     if (g.attackMoveArmed) RenderAttackMoveCursor(r);
     RenderHud(r, g, windowW, windowH);
-    RenderEconomyHud(r, g, windowH);
+    DrawHud(r, g, windowW, windowH); // thanh tài nguyên, nhóm điều khiển, bảng thông tin và thẻ lệnh (game/Hud.cpp)
     if (g.debugMode) RenderDebugOverlay(r, g);
     SDL_RenderPresent(r);
 }

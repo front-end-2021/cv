@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 #include <cstdint>
 #include <deque>
 #include <vector>
@@ -37,6 +38,8 @@ struct PlacementMode {
     PlaceResult status = PlaceResult::Ok; // kết quả kiểm tra tại vị trí hiện tại (Ok = đặt được và đủ vàng)
 };
 
+constexpr int kControlGroupCount = 9;   // nhóm điều khiển 1..9 (Ctrl+số để lưu, số để gọi: game/Selection.h)
+
 // Khung kéo chuột chọn quân (lưu bằng tọa độ thế giới).
 struct SelectionBox {
     bool active = false;
@@ -44,6 +47,12 @@ struct SelectionBox {
     float startY = 0.0f;
     float endX = 0.0f;
     float endY = 0.0f;
+
+    // Shift + kéo/bấm: không thay vùng chọn cũ mà cộng thêm vào nó (bấm đơn lẻ lên thứ đã chọn thì bỏ chọn thứ đó).
+    // Lúc bắt đầu kéo ghi nhớ ai đang được chọn (theo ID, tăng dần) để mỗi khung hình tính lại được vùng chọn từ "vùng chọn cũ + khung kéo".
+    bool additive = false;
+    std::vector<EntityId> baseUnits;
+    std::vector<EntityId> baseBuildings;
 };
 
 struct GameState {
@@ -53,6 +62,10 @@ struct GameState {
     Camera camera{ 0.0f, 0.0f };                    // Camera: góc trên-trái của vùng nhìn thấy, tính theo tọa độ thế giới
     bool debugMode = false;
     SelectionBox selection;
+
+    // Nhóm điều khiển (Ctrl+1..9 lưu, 1..9 gọi). Chỉ chứa lính phe ta, lưu bằng ID nên lính chết/biến mất tự rơi khỏi nhóm
+    // (RecallControlGroup dọn dần). Ván mới (InitializeWorld) xóa hết.
+    std::array<std::vector<EntityId>, kControlGroupCount> controlGroups;
 
     // Lính của CẢ HAI PHE. LUÔN sắp xếp theo id tăng dần (id cấp tăng dần và chỉ thêm vào cuối,
     // xóa thì giữ nguyên thứ tự) nên tra theo ID bằng tìm nhị phân (FindUnit).

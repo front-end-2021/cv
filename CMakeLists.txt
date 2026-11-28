@@ -4,8 +4,7 @@ project(MiniRTS LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Tự tải và build SDL3 (cần Git và internet ở lần cấu hình đầu tiên).
-# Build tĩnh để không phải copy SDL3.dll cạnh file .exe.
+# Tự tải và build SDL3 (cần Git và internet ở lần cấu hình đầu tiên). Build tĩnh để không phải copy SDL3.dll cạnh file .exe.
 set(SDL_STATIC ON  CACHE BOOL "" FORCE)
 set(SDL_SHARED OFF CACHE BOOL "" FORCE)
 
@@ -18,7 +17,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(SDL3)
 
-# Mã nguồn dùng chung cho game và bộ kiểm thử (mọi thứ trừ main.cpp và màn menu).
+# ==============================================================================
+# 1. THƯ VIỆN LÕI DÙNG CHUNG (Biên dịch 1 lần duy nhất cho cả Game và Tests)
+# ==============================================================================
 set(MINIRTS_CORE_SOURCES
     Common.h Tile.h Path.h PathGrid.h DataParse.h
     TileMap.h TileMap.cpp
@@ -49,29 +50,40 @@ set(MINIRTS_CORE_SOURCES
     game/Commands.h game/Commands.cpp
     game/Simulation.h game/Simulation.cpp
     game/Selection.h game/Selection.cpp
+    game/Hud.h game/Hud.cpp
     game/Game.h game/Game.cpp
-    game/Render.h game/Render.cpp)
+    game/Render.h game/Render.cpp
+)
 
+add_library(MiniRTSCore STATIC ${MINIRTS_CORE_SOURCES})
+# Dùng PUBLIC để MiniRTS và các bộ Test tự động kế thừa đường dẫn include và SDL3
+target_include_directories(MiniRTSCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(MiniRTSCore PUBLIC SDL3::SDL3)
+
+if(MSVC)
+    target_compile_options(MiniRTSCore PRIVATE /utf-8 /W4)
+endif()
+
+# ==============================================================================
+# 2. FILE THỰC THI GAME CHÍNH
+# ==============================================================================
 # Chưa dùng WIN32 để còn thấy cửa sổ console và SDL_Log khi học.
 add_executable(MiniRTS
     main.cpp
     ui/Menu.h ui/Menu.cpp
-    ${MINIRTS_CORE_SOURCES})
-# Cho phép #include "entity/Unit.h", "game/World.h"... từ mọi thư mục con.
-target_include_directories(MiniRTS PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(MiniRTS PRIVATE SDL3::SDL3)
+)
+target_link_libraries(MiniRTS PRIVATE MiniRTSCore)
 
 if(MSVC)
     target_compile_options(MiniRTS PRIVATE /utf-8 /W4)
 endif()
 
-# Bộ kiểm thử di chuyển & pathfinding & AI dùng GoogleTest. Mặc định BẬT:
-#   cmake -S . -B build -DMINIRTS_BUILD_TESTS=ON
-#   cmake --build build --target PathingTests
-#   ctest --test-dir build --output-on-failure      (hoặc chạy trực tiếp PathingTests, thêm --bench để xem số liệu)
+# ==============================================================================
+# 3. BỘ KIỂM THỬ UNIT TEST (GoogleTest)
+# ==============================================================================
+# Mặc định BẬT:
 option(MINIRTS_BUILD_TESTS "Build bo kiem thu unit test MiniRTS" ON)
 if(MINIRTS_BUILD_TESTS)
-    include(FetchContent)
     FetchContent_Declare(
         googletest
         GIT_REPOSITORY https://github.com/google/googletest.git
@@ -84,62 +96,42 @@ if(MINIRTS_BUILD_TESTS)
 
     enable_testing()
     include(GoogleTest)
-    
+
+    # Hàm hỗ trợ tạo target test gọn gàng, tránh lặp code và tự động cấu hình MSVC
+    function(add_minirts_test TEST_NAME SOURCE_PATH GTEST_TARGET)
+        if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${SOURCE_PATH})
+            add_executable(${TEST_NAME} ${SOURCE_PATH})
+            target_link_libraries(${TEST_NAME} PRIVATE MiniRTSCore ${GTEST_TARGET})
+            if(MSVC)
+                target_compile_options(${TEST_NAME} PRIVATE /utf-8 /W4)
+                target_compile_definitions(${TEST_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS) # Tắt cảnh báo C4996 (như std::getenv trong UiTests) trên Windows
+            endif()
+            gtest_discover_tests(${TEST_NAME} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+        endif()
+    endfunction()
+
     # 1. Target AiTests dùng GoogleTest
-    add_executable(AiTests tests/AiTests.cpp ${MINIRTS_CORE_SOURCES})
-    target_include_directories(AiTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-    target_link_libraries(AiTests PRIVATE SDL3::SDL3 GTest::gtest_main)
-    if(MSVC)
-        target_compile_options(AiTests PRIVATE /utf-8 /W4)
-    endif()
-    gtest_discover_tests(AiTests WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+    add_minirts_test(AiTests tests/AiTests.cpp GTest::gtest_main)
 
-    # 2. Target PathingTests dùng GoogleTest (tự viết main để giữ cờ --bench)
-    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/tests/PathingTests.cpp)
-        add_executable(PathingTests tests/PathingTests.cpp ${MINIRTS_CORE_SOURCES})
-        target_include_directories(PathingTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-        target_link_libraries(PathingTests PRIVATE SDL3::SDL3 GTest::gtest)
-        if(MSVC)
-            target_compile_options(PathingTests PRIVATE /utf-8 /W4)
-        endif()
-        gtest_discover_tests(PathingTests WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-    endif()
+    # 2. Target PathingTests (tự viết main để giữ cờ --bench)
+    add_minirts_test(PathingTests tests/PathingTests.cpp GTest::gtest)
 
-    # 3. Target StressTest dùng GoogleTest (tự viết main để giữ cờ --bench)
-    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/tests/StressTest.cpp)
-        add_executable(StressTest tests/StressTest.cpp ${MINIRTS_CORE_SOURCES})
-        target_include_directories(StressTest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-        target_link_libraries(StressTest PRIVATE SDL3::SDL3 GTest::gtest)
-        if(MSVC)
-            target_compile_options(PathingTests PRIVATE /utf-8 /W4)
-        endif()
-        gtest_discover_tests(StressTest WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-    endif()
-    
-    # 4. Target EconomyTests: kinh tế & xây dựng (ô bị chiếm chặn đường, đặt nhà, xây, đào mỏ, sản xuất, lệnh, stress)
-    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/tests/EconomyTests.cpp)
-        add_executable(EconomyTests tests/EconomyTests.cpp ${MINIRTS_CORE_SOURCES})
-        target_include_directories(EconomyTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-        target_link_libraries(EconomyTests PRIVATE SDL3::SDL3 GTest::gtest_main)
-        if(MSVC)
-            target_compile_options(EconomyTests PRIVATE /utf-8 /W4)
-        endif()
-        gtest_discover_tests(EconomyTests WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-    endif()
+    # 3. Target StressTest (tự viết main để giữ cờ --bench)
+    add_minirts_test(StressTest tests/StressTest.cpp GTest::gtest)
 
-    # 5. Target CombatTests: lệnh chiến đấu (Stop, Hold position, Attack-move: Unit, Orders, Commands, va chạm, mô phỏng, stress)
-    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/tests/CombatTests.cpp)
-        add_executable(CombatTests tests/CombatTests.cpp ${MINIRTS_CORE_SOURCES})
-        target_include_directories(CombatTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-        target_link_libraries(CombatTests PRIVATE SDL3::SDL3 GTest::gtest_main)
-        if(MSVC)
-            target_compile_options(CombatTests PRIVATE /utf-8 /W4)
-        endif()
-        gtest_discover_tests(CombatTests WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-    endif()
+    # 4. Target EconomyTests: kinh tế & xây dựng
+    add_minirts_test(EconomyTests tests/EconomyTests.cpp GTest::gtest_main)
 
+    # 5. Target CombatTests: lệnh chiến đấu
+    add_minirts_test(CombatTests tests/CombatTests.cpp GTest::gtest_main)
+
+    # 6. Target UiTests: giao diện & điều khiển bước 5
+    add_minirts_test(UiTests tests/UiTests.cpp GTest::gtest_main)
 endif()
 
-# Sao chep thu muc Maps vao thu muc chay cua executable.
+# ==============================================================================
+# 4. TÀI NGUYÊN (ASSETS)
+# ==============================================================================
+# Sao chép thư mục Maps và Data vào thư mục chạy của executable.
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/Maps DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

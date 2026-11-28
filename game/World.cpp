@@ -50,6 +50,7 @@ void InitializeWorld(GameState& g) {
     g.camera.x = 0.0f;
     g.camera.y = 0.0f;
     g.selection = SelectionBox{};
+    for (auto& group : g.controlGroups) group.clear();
     g.result = MatchResult::Playing;
     g.tickAccumulator = 0.0f;
     g.renderAlpha = 1.0f;

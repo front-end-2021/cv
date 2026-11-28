@@ -10,6 +10,7 @@
 #include "camera/camera.h"
 #include "game/Commands.h"
 #include "game/Game.h"
+#include "game/Hud.h"
 #include "game/GameState.h"
 #include "game/Orders.h"
 #include "game/Render.h"
@@ -164,7 +165,13 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
         if (key == SDLK_S) { HandleStopKey(g); return SDL_APP_CONTINUE; }
         if (key == SDLK_H) { HandleHoldKey(g); return SDL_APP_CONTINUE; }
         if (key == SDLK_A) { HandleAttackMoveKey(g); return SDL_APP_CONTINUE; }
-        if (key >= SDLK_1 && key <= SDLK_9) { HandleNumberKey(g, static_cast<int>(key - SDLK_1) + 1); return SDL_APP_CONTINUE; }
+        if (key >= SDLK_1 && key <= SDLK_9) {
+            const int number = static_cast<int>(key - SDLK_1) + 1;
+            // Ctrl+số: lưu nhóm điều khiển. Số một mình: chọn loại nhà / huấn luyện / gọi nhóm (xem HandleNumberKey).
+            if (event->key.mod & SDL_KMOD_CTRL) HandleSaveGroupKey(g, number);
+            else HandleNumberKey(g, number);
+            return SDL_APP_CONTINUE;
+        }
     }
     if (event->type == SDL_EVENT_KEY_UP && event->key.key == SDLK_BACKSLASH) {
         g.debugMode = !g.debugMode;
@@ -176,7 +183,13 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
                 if (!SDL_GetWindowMouseGrab(app->window)) {
                     SDL_SetWindowMouseGrab(app->window, true); // Khóa chuột trở lại khi người chơi bấm vào cửa sổ game
                 }
-                if (g.placement.active) {
+                int windowW = 0, windowH = 0;
+                SDL_GetWindowSize(app->window, &windowW, &windowH);
+                const bool shift = (SDL_GetModState() & SDL_KMOD_SHIFT) != 0;
+                if (HandleHudClick(g, windowW, windowH, event->button.x, event->button.y, shift)) {
+                    // HUD nhận cú bấm (nút lệnh, ô lính, nhóm hoặc nền bảng): không đặt nhà / Attack-move / kéo chọn.
+                }
+                else if (g.placement.active) {
                     UpdatePlacement(g, event->button.x, event->button.y);
                     ConfirmPlacement(g); // đặt móng tại bóng mờ (không bắt đầu kéo chọn quân)
                 }
@@ -185,7 +198,8 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
                     ConfirmAttackMove(g, event->button.x + g.camera.x, event->button.y + g.camera.y);
                 }
                 else {
-                    BeginSelection(g, event->button.x, event->button.y);
+                    // Giữ Shift: cộng thêm vào vùng chọn (bấm lên thứ đã chọn thì bỏ chọn thứ đó) thay vì thay thế.
+                    BeginSelection(g, event->button.x, event->button.y, shift);
                 }
             }
             break;
@@ -200,8 +214,13 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
                     CancelAttackMoveMode(g);
                 }
                 else {
-                    // Tấn công / đào / xây / nộp hàng / đi / đặt điểm tập kết tùy thứ nằm dưới con trỏ (xem IssueSmartOrder).
-                    IssueSmartOrder(g, event->button.x + g.camera.x, event->button.y + g.camera.y);
+                    int windowW = 0, windowH = 0;
+                    SDL_GetWindowSize(app->window, &windowW, &windowH);
+                    // Chuột phải trên HUD không ra lệnh cho thế giới nằm dưới bảng.
+                    if (!IsOverHud(g, windowW, windowH, event->button.x, event->button.y)) {
+                        // Tấn công / đào / xây / nộp hàng / đi / đặt điểm tập kết tùy thứ nằm dưới con trỏ (xem IssueSmartOrder).
+                        IssueSmartOrder(g, event->button.x + g.camera.x, event->button.y + g.camera.y);
+                    }
                 }
             }
             break;

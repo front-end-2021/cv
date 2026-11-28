@@ -1,10 +1,12 @@
 #include "game/Commands.h"
 #include <algorithm>
 #include <cmath>
+#include <string>
 #include "game/Construction.h"
 #include "game/Economy.h"
 #include "game/Orders.h"
 #include "game/Production.h"
+#include "game/Selection.h"
 
 std::vector<int> TrainableUnitTypes(const GameState& g) {
     std::vector<int> types;
@@ -129,7 +131,11 @@ void HandleNumberKey(GameState& g, int number) {
     }
 
     const std::vector<int> options = TrainableUnitTypes(g);
-    if (index >= static_cast<int>(options.size())) return;
+    if (index >= static_cast<int>(options.size())) {
+        // Không phải phím huấn luyện (không chọn công trình nào, hoặc số lớn hơn số loại nó huấn luyện được): gọi nhóm điều khiển.
+        RecallControlGroup(g, number);
+        return;
+    }
     const int unitType = options[static_cast<size_t>(index)];
 
     // Công trình đang chọn huấn luyện được loại này mà hàng đợi ngắn nhất.
@@ -141,6 +147,16 @@ void HandleNumberKey(GameState& g, int number) {
     if (!best) return;
     const EnqueueResult r = EnqueueUnit(g, best->id, unitType);
     if (r != EnqueueResult::Ok) g.Notify(DescribeEnqueueResult(r));
+}
+
+void HandleSaveGroupKey(GameState& g, int number) {
+    if (number < 1 || number > kControlGroupCount) return;
+    const int saved = SaveControlGroup(g, number);
+    if (saved == 0) {
+        g.Notify("Select units to save a group");
+        return;
+    }
+    g.Notify("Group " + std::to_string(number) + " saved: " + std::to_string(saved) + (saved == 1 ? " unit" : " units"));
 }
 
 void HandleCancelKey(GameState& g) {

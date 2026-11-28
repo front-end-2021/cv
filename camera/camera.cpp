@@ -9,7 +9,7 @@ Camera::Camera(float startX, float startY) : x(startX), y(startY) { }
 void Camera::ClampCamera(float px, float py, int windowW, int windowH, float worldW, float worldH) {
     // Giữ camera không nhìn ra ngoài biên bản đồ.
     const float maxX = std::max(0.0f, worldW - static_cast<float>(windowW));
-    const float maxY = std::max(0.0f, worldH - static_cast<float>(windowH));
+    const float maxY = std::max(0.0f, worldH - (static_cast<float>(windowH) - bottomInset));
     x = std::clamp(px, 0.0f, maxX);
     y = std::clamp(py, 0.0f, maxY);
 }

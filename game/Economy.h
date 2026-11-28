@@ -11,10 +11,10 @@
 // Tổng slot các công trình ĐÃ XÂY XONG cấp ra là giới hạn (Building::supplyProvided). Chỉ việc đưa thêm đơn vị vào hàng đợi mới bị giới hạn này chặn; quân có sẵn từ map vượt giới hạn thì vẫn ở đó.
 // ===========================================================================
 
-constexpr float kGatherPerSecond = 4.0f;   // vàng/giây một thợ đào được khi buildspeed = 100
+constexpr float kGatherPerSecond = 3.0f;   // vàng/giây một thợ đào được khi buildspeed = 100
 constexpr float kWorkReach = 30.0f;        // thợ được coi là "tới nơi làm việc" khi khoảng hở giữa hitbox và mép công trình/mỏ <= ngần này (px)
 constexpr float kAutoMineRadius = 8.0f * 64.0f; // mỏ đang đào cạn thì thợ tự tìm mỏ khác trong bán kính này (px)
-constexpr float kCancelRefundRatio = 0.75f;// hủy công trình xây dở: hoàn lại ngần này giá
+constexpr float kCancelRefundRatio = 0.5f;// hủy công trình xây dở: hoàn lại ngần này giá 0.75 thi` cao qua'
 constexpr int kMaxQueueLength = 5;         // số đơn vị tối đa trong hàng đợi của một công trình
 constexpr int kJobMaxFailures = 3;         // thợ đi tới chỗ làm việc thất bại ngần lần liên tiếp thì bỏ việc
 constexpr float kJobRetryDelay = 0.5f;     // giây chờ giữa hai lần thợ thử đi lại

@@ -111,11 +111,13 @@ namespace {
 
     void BuildCommandCard(const GameState& g, const Picked& p, HudLayout& L) {
         if (g.placement.active) {
-            // Đang đặt nhà: mỗi loại công trình một nút (= phím số tương ứng); Cancel ở ô cuối nếu còn chỗ.
+            // Đang đặt nhà: mỗi loại công trình một nút (ghi kèm phím chữ tương ứng, xem kBuildingHotkeys); Cancel ở ô cuối nếu còn chỗ.
             const int n = std::min(g.buildingTypes.Count(), kCardSlots);
             for (int i = 0; i < n; ++i) {
                 const BuildingType& t = g.buildingTypes.Get(i);
-                AddCommand(L, i, HudAction::ChooseBuilding, i, kNoEntity, t.name, Num(t.cost) + "g [" + Num(i + 1) + "]",
+                std::string sub = Num(t.cost) + "g";
+                if (const char hotkey = BuildingHotkeyLabel(i)) sub += std::string(" [") + hotkey + "]";   // loại không có phím tắt: chỉ ghi giá
+                AddCommand(L, i, HudAction::ChooseBuilding, i, kNoEntity, t.name, sub,
                     CanAfford(g, Team::Player, t.cost), i == g.placement.buildingType);
             }
             if (n < kCardSlots) AddCommand(L, kCancelSlot, HudAction::CancelPlacement, 0, kNoEntity, "Cancel", "[Esc]");
@@ -266,7 +268,7 @@ bool HandleHudClick(GameState& g, int windowW, int windowH, float x, float y, bo
     case HudAction::Stop:            HandleStopKey(g); break;
     case HudAction::Hold:            HandleHoldKey(g); break;
     case HudAction::Build:           HandleBuildKey(g); break;
-    case HudAction::ChooseBuilding:
+    case HudAction::ChooseBuilding:  ChooseBuildingType(g, b.arg); break;
     case HudAction::Train:           HandleNumberKey(g, b.arg + 1); break;
     case HudAction::CancelPlacement: CancelPlacement(g); break;
     case HudAction::CancelOrder:     HandleCancelKey(g); break;

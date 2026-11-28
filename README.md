@@ -98,11 +98,11 @@ Mở game, chọn một map trong danh sách (click rồi bấm **START**, hoặ
 | Thao tác | Tác dụng |
 |---|---|
 | Chuột phải | Tùy thứ dưới con trỏ: kẻ địch → tấn công; mỏ → thợ đi đào; móng xây dở → thợ đi xây; kho → thợ đang mang hàng đi nộp; mặt đất → đi theo đội hình; đang chọn công trình → đặt điểm tập kết |
-| `A`, rồi chuột trái | Attack-move: đi tới điểm đã bấm và đánh mọi kẻ địch gặp trên đường |
-| `S` | Stop: dừng và bỏ lệnh hiện tại |
-| `H` | Hold position: đứng yên, chỉ đánh kẻ trong tầm |
-| `B` | Vào chế độ đặt nhà (cần đang chọn thợ) |
-| `1`…`9` khi đặt nhà | Chọn loại công trình |
+| `a`, rồi chuột trái | Attack-move: đi tới điểm đã bấm và đánh mọi kẻ địch gặp trên đường |
+| `s` | Stop: dừng và bỏ lệnh hiện tại |
+| `h` | Hold position: đứng yên, chỉ đánh kẻ trong tầm |
+| `b` | Vào chế độ đặt nhà (cần đang chọn thợ) |
+| `n`,`a`,`b` khi đặt nhà | Chọn loại công trình Home, Horse, Barrack |
 | Chuột trái khi đặt nhà | Đặt móng tại bóng mờ (mọi thợ đang chọn đi xây) |
 | `1`…`9` khi chọn công trình huấn luyện được | Huấn luyện đơn vị thứ n |
 | `Backspace` | Hủy đơn vị cuối hàng đợi |

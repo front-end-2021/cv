@@ -159,6 +159,10 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
     if (event->type == SDL_EVENT_KEY_DOWN && !event->key.repeat) {
         // Kinh tế & xây dựng (xem game/Commands.h).
         const SDL_Keycode key = event->key.key;
+        // Đang đặt nhà: h / a / b chọn loại công trình (Townhall / House / Barracks). Phải xét TRƯỚC B / H / A bên dưới:
+        // lúc này B chọn Barracks chứ không thoát chế độ đặt nhà, còn H / A không phải lệnh lính. Thoát chế độ bằng Esc / chuột phải / Delete.
+        // Mã phím của chữ cái trong SDL chính là mã ASCII chữ thường.
+        if (g.placement.active && key >= 0x20 && key <= 0x7E && HandleBuildingHotkey(g, static_cast<char>(key))) return SDL_APP_CONTINUE;
         if (key == SDLK_B) { HandleBuildKey(g); return SDL_APP_CONTINUE; }
         if (key == SDLK_DELETE || key == SDLK_BACKSPACE) { HandleCancelKey(g); return SDL_APP_CONTINUE; }
         // Lệnh cho lính (xem game/Commands.h): S = Stop, H = Hold position, A = Attack-move (rồi bấm chuột trái chọn điểm).
@@ -167,7 +171,7 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
         if (key == SDLK_A) { HandleAttackMoveKey(g); return SDL_APP_CONTINUE; }
         if (key >= SDLK_1 && key <= SDLK_9) {
             const int number = static_cast<int>(key - SDLK_1) + 1;
-            // Ctrl+số: lưu nhóm điều khiển. Số một mình: chọn loại nhà / huấn luyện / gọi nhóm (xem HandleNumberKey).
+            // Ctrl+số: lưu nhóm điều khiển. Số một mình: huấn luyện / gọi nhóm (xem HandleNumberKey); đang đặt nhà thì bị bỏ qua (chọn loại nhà bằng h / a / b).
             if (event->key.mod & SDL_KMOD_CTRL) HandleSaveGroupKey(g, number);
             else HandleNumberKey(g, number);
             return SDL_APP_CONTINUE;

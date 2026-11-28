@@ -1,5 +1,6 @@
 #include "game/Commands.h"
 #include <algorithm>
+#include <cctype>
 #include <cmath>
 #include <string>
 #include "game/Construction.h"
@@ -121,14 +122,35 @@ void HandleBuildKey(GameState& g) {
     else BeginPlacement(g, -1);
 }
 
+char BuildingHotkeyLabel(int buildingType) {
+    if (buildingType < 0 || buildingType >= kBuildingHotkeyCount) return 0;
+    return static_cast<char>(std::toupper(static_cast<unsigned char>(kBuildingHotkeys[buildingType])));
+}
+
+void ChooseBuildingType(GameState& g, int buildingType) {
+    if (!g.placement.active) return;
+    if (buildingType < 0 || buildingType >= g.buildingTypes.Count()) return;
+    g.placement.buildingType = buildingType;
+}
+
+bool HandleBuildingHotkey(GameState& g, char key) {
+    if (!g.placement.active) return false;
+    const char lower = static_cast<char>(std::tolower(static_cast<unsigned char>(key)));
+    for (int i = 0; i < kBuildingHotkeyCount; ++i) {
+        if (kBuildingHotkeys[i] != lower) continue;
+        ChooseBuildingType(g, i);
+        return true;
+    }
+    return false;
+}
+
 void HandleNumberKey(GameState& g, int number) {
     if (number < 1) return;
     const int index = number - 1;
 
-    if (g.placement.active) {
-        if (index < g.buildingTypes.Count()) g.placement.buildingType = index;
-        return;
-    }
+    // Đang đặt nhà: phím số không còn chọn loại công trình (đã chuyển sang h / a / b, xem HandleBuildingHotkey), cũng không gọi nhóm
+    // để vùng chọn thợ không bị đổi giữa chừng.
+    if (g.placement.active) return;
 
     const std::vector<int> options = TrainableUnitTypes(g);
     if (index >= static_cast<int>(options.size())) {

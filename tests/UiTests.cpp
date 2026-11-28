@@ -661,7 +661,7 @@ TEST(ControlGroupKeys, NumberKeyBeyondTheTrainingOptionsRecallsAGroupEvenWithABu
     EXPECT_TRUE(g.FindBuilding(TownhallId(g))->queue.empty());
 }
 
-TEST(ControlGroupKeys, NumberKeyWhilePlacingPicksTheBuildingTypeNotTheGroup) {
+TEST(ControlGroupKeys, NumberKeyWhilePlacingIsIgnoredItNeitherPicksTheBuildingTypeNorRecallsTheGroup) {
     GameState g = MakeGame(500);
     const EntityId w = SpawnAt(g, 100, 100, Team::Player, "Worker");
     const EntityId a = SpawnAt(g, 300, 100);
@@ -670,9 +670,102 @@ TEST(ControlGroupKeys, NumberKeyWhilePlacingPicksTheBuildingTypeNotTheGroup) {
     SelectOnly(g, { w });
     ASSERT_TRUE(BeginPlacement(g, 0));
     HandleNumberKey(g, 2);
-    EXPECT_EQ(g.placement.buildingType, 1);
-    EXPECT_TRUE(Sel(g, w));
+    EXPECT_TRUE(g.placement.active);
+    EXPECT_EQ(g.placement.buildingType, 0);   // phím số không còn chọn loại công trình (dùng h / a / b)
+    EXPECT_TRUE(Sel(g, w));                   // và cũng không gọi nhóm 2
     EXPECT_FALSE(Sel(g, a));
+}
+
+// ===========================================================================
+// Phím chữ n / a / b chọn loại công trình khi đang đặt nhà
+// ===========================================================================
+TEST(BuildingHotkeys, HotkeysMapToTheFirstThreeTypesInOrder) {
+    GameState g = MakeGame(500);
+    ASSERT_GE(g.buildingTypes.Count(), 3);
+    EXPECT_EQ(BuildingHotkeyLabel(0), 'N');
+    EXPECT_EQ(BuildingHotkeyLabel(1), 'A');
+    EXPECT_EQ(BuildingHotkeyLabel(2), 'B');
+    EXPECT_EQ(BuildingHotkeyLabel(3), 0);    // không có phím thứ tư
+    EXPECT_EQ(BuildingHotkeyLabel(-1), 0);
+}
+
+TEST(BuildingHotkeys, HAndABChooseTheTypeWhilePlacing) {
+    GameState g = MakeGame(500);
+    const EntityId w = SpawnAt(g, 100, 100, Team::Player, "Worker");
+    SelectOnly(g, { w });
+    ASSERT_TRUE(BeginPlacement(g, 0));
+
+    EXPECT_TRUE(HandleBuildingHotkey(g, 'a'));
+    EXPECT_EQ(g.placement.buildingType, 1);
+    EXPECT_TRUE(HandleBuildingHotkey(g, 'b'));
+    EXPECT_EQ(g.placement.buildingType, 2);
+    EXPECT_TRUE(HandleBuildingHotkey(g, 'n'));
+    EXPECT_EQ(g.placement.buildingType, 0);
+    EXPECT_TRUE(g.placement.active);          // chọn loại không làm thoát chế độ đặt nhà (kể cả B)
+}
+
+TEST(BuildingHotkeys, UpperCaseWorksToo) {
+    GameState g = MakeGame(500);
+    const EntityId w = SpawnAt(g, 100, 100, Team::Player, "Worker");
+    SelectOnly(g, { w });
+    ASSERT_TRUE(BeginPlacement(g, 0));
+    EXPECT_TRUE(HandleBuildingHotkey(g, 'B'));
+    EXPECT_EQ(g.placement.buildingType, 2);
+    EXPECT_TRUE(HandleBuildingHotkey(g, 'A'));
+    EXPECT_EQ(g.placement.buildingType, 1);
+}
+
+TEST(BuildingHotkeys, OtherKeysAreNotConsumedAndChangeNothing) {
+    GameState g = MakeGame(500);
+    const EntityId w = SpawnAt(g, 100, 100, Team::Player, "Worker");
+    SelectOnly(g, { w });
+    ASSERT_TRUE(BeginPlacement(g, 1));
+    EXPECT_FALSE(HandleBuildingHotkey(g, 's'));
+    EXPECT_FALSE(HandleBuildingHotkey(g, 'x'));
+    EXPECT_FALSE(HandleBuildingHotkey(g, '1'));   // số không còn là phím chọn công trình
+    EXPECT_FALSE(HandleBuildingHotkey(g, '2'));
+    EXPECT_EQ(g.placement.buildingType, 1);
+}
+
+TEST(BuildingHotkeys, IgnoredWhenNotPlacingSoHAndAStillMeanHoldAndAttackMove) {
+    GameState g = MakeGame(500);
+    const EntityId a = SpawnAt(g, 300, 100);
+    SelectOnly(g, { a });
+    EXPECT_FALSE(HandleBuildingHotkey(g, 'n'));   // main.cpp sẽ để phím h rơi xuống HandleHoldKey
+    EXPECT_FALSE(HandleBuildingHotkey(g, 'a'));
+    EXPECT_FALSE(HandleBuildingHotkey(g, 'b'));
+    EXPECT_FALSE(g.placement.active);
+    HandleHoldKey(g);
+    EXPECT_TRUE(U(g, a).IsHolding());
+    HandleAttackMoveKey(g);
+    EXPECT_TRUE(g.attackMoveArmed);
+}
+
+TEST(BuildingHotkeys, ChooseBuildingTypeValidatesItsArgument) {
+    GameState g = MakeGame(500);
+    const EntityId w = SpawnAt(g, 100, 100, Team::Player, "Worker");
+    SelectOnly(g, { w });
+    ChooseBuildingType(g, 2);                     // chưa đặt nhà: bỏ qua
+    EXPECT_FALSE(g.placement.active);
+    ASSERT_TRUE(BeginPlacement(g, 0));
+    ChooseBuildingType(g, 99);                    // không có loại này: giữ nguyên
+    EXPECT_EQ(g.placement.buildingType, 0);
+    ChooseBuildingType(g, -1);
+    EXPECT_EQ(g.placement.buildingType, 0);
+    ChooseBuildingType(g, 2);
+    EXPECT_EQ(g.placement.buildingType, 2);
+}
+
+TEST(BuildingHotkeys, ChosenTypeIsTheOneThatGetsPlaced) {
+    GameState g = MakeGame(1000);
+    const EntityId w = SpawnAt(g, 300, 300, Team::Player, "Worker");
+    SelectOnly(g, { w });
+    ASSERT_TRUE(BeginPlacement(g, 0));
+    ASSERT_TRUE(HandleBuildingHotkey(g, 'b'));    // Barracks
+    UpdatePlacement(g, 640.0f, 512.0f);
+    ASSERT_TRUE(ConfirmPlacement(g));
+    ASSERT_EQ(g.buildings.size(), 1u);
+    EXPECT_EQ(g.buildings.back().typeId, BuildIdx(g, "Barracks"));
 }
 
 // ===========================================================================
@@ -828,6 +921,25 @@ TEST(HudLayout, PlacementModeListsEveryBuildingTypeAndACancelButton) {
         ASSERT_TRUE(b != nullptr);
         EXPECT_EQ(b->active, i == 1);
         EXPECT_EQ(b->enabled, g.buildingTypes.Get(i).cost <= 100);   // vàng 100: nhà 80g mua được, 150g / 200g thì không
+    }
+}
+
+TEST(HudLayout, PlacementButtonsShowTheLetterHotkeysNotNumbers) {
+    GameState g = MakeGame(500);
+    const EntityId w = SpawnAt(g, 100, 100, Team::Player, "Worker");
+    SelectOnly(g, { w });
+    ASSERT_TRUE(BeginPlacement(g, 0));
+    const HudLayout L = BuildHudLayout(g, kW, kH);
+    const char* const expected[] = { "[H]", "[A]", "[B]" };
+    for (int i = 0; i < 3; ++i) {
+        const HudButton* b = FindButton(L, HudAction::ChooseBuilding, i);
+        ASSERT_TRUE(b != nullptr);
+        EXPECT_NE(b->sub.find(expected[i]), std::string::npos) << "button " << i << " sub=" << b->sub;
+        EXPECT_EQ(b->sub.find('['), b->sub.rfind('[')) << "chỉ một nhãn phím trên nút " << i;
+        for (char digit = '0'; digit <= '9'; ++digit) {
+            const std::string bracketed = std::string("[") + digit + "]";
+            EXPECT_EQ(b->sub.find(bracketed), std::string::npos) << "button " << i << " vẫn ghi phím số: " << b->sub;
+        }
     }
 }
 
